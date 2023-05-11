@@ -23,6 +23,25 @@ const routes: Routes = [
           import('../tab3/tab3.module').then((m) => m.Tab3PageModule),
       },
       {
+        path: 'parametres',
+        children: [
+          {
+            path: '',
+            loadChildren: () =>
+              import('../parametres/parametres.module').then(
+                (m) => m.ParametresPageModule
+              ),
+          },
+          {
+            path: 'profile',
+            loadChildren: () =>
+              import('../profile/profile.module').then(
+                (m) => m.ProfilePageModule
+              ),
+          },
+        ],
+      },
+      {
         path: '',
         redirectTo: '/tabs/tab1',
         pathMatch: 'full',

@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import { TranslateService } from '@ngx-translate/core';
 import { signInWithEmailAndPassword, Auth } from '@angular/fire/auth';
 import { Firestore } from '@angular/fire/firestore';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -27,15 +28,9 @@ export class LoginPage implements OnInit {
     public translate: TranslateService,
     private auth: Auth,
     private navController: NavController,
-    private firestore: Firestore
-  ) {
-    // if (Capacitor.isNativePlatform) {
-    //   const app = initializeApp(environment.firebase);
-    //   initializeAuth(app, {
-    //     persistence: indexedDBLocalPersistence
-    //   });
-    // }
-  }
+    private firestore: Firestore,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {}
 
@@ -54,16 +49,13 @@ export class LoginPage implements OnInit {
       console.log('Login with ', this.userInfo.password);
 
       try {
-        const credentials = await signInWithEmailAndPassword(
-          this.auth,
+        const credentials = await this.authService.login(
           email,
           this.userInfo.password
-        ).then((user) => {
-          console.log('user logged');
-          console.log(user);
-          this.utils.hideLoader();
-          this.navController.navigateRoot('/tabs');
-        });
+        );
+        console.log('user logged');
+        this.utils.hideLoader();
+        this.navController.navigateRoot('/tabs');
         console.log(credentials);
         this.utils.hideLoader();
         return credentials;

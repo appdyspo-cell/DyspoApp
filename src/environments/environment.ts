@@ -14,6 +14,8 @@ export const environment = {
     messagingSenderId: '515901093848',
     appId: '1:515901093848:web:0260f1acf86b32b1ae64ad',
   },
+  DEFAULT_AVATAR: './assets/img/user.png',
+  dyspo_email: 'contact@dyspo.com',
 };
 
 /*

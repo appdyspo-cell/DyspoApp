@@ -5,6 +5,8 @@ import {
   LoadingController,
 } from '@ionic/angular';
 
+import Swal from 'sweetalert2';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -104,5 +106,54 @@ export class UtilsService {
         this.loader = undefined;
       }
     }, 450);
+  }
+
+  validateEmail(email: string) {
+    console.log('Validate ', email);
+    const re =
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  }
+
+  validatePhone(phone: string) {
+    // eslint-disable-next-line no-useless-escape
+    //const re = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+    const re =
+      /^(?:(?:\+|00)33[\s.-]{0,3}(?:\(0\)[\s.-]{0,3})?|0)[1-9](?:(?:[\s.-]?\d{2}){4}|\d{2}(?:[\s.-]?\d{3}){2})$/;
+    return re.test(String(phone).toLowerCase());
+  }
+
+  createUID() {
+    return Math.floor(100000 + Math.random() * 900000);
+  }
+
+  //Sweet alerts
+  swalError(message: string) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Erreur',
+      text: message,
+      //footer: '<a href>Why do I have this issue?</a>',
+      heightAuto: false,
+    });
+  }
+
+  swalWarning(message: string) {
+    Swal.fire({
+      icon: 'warning',
+      //title: 'Erreur',
+      text: message,
+      //footer: '<a href>Why do I have this issue?</a>',
+      heightAuto: false,
+    });
+  }
+
+  swalSuccess(title: string, message: string) {
+    Swal.fire({
+      title,
+      text: message,
+      icon: 'success',
+      heightAuto: false,
+    });
   }
 }
