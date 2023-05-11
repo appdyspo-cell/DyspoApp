@@ -1,0 +1,129 @@
+<ion-content fullscreen="true" class="ion-no-padding">
+  <div class="main">
+    <div class="bg"></div>
+
+    <ion-card class="ion-no-margin">
+      <ion-card-content>
+        <ion-row class="row">
+          <div class="fire-logo ion-text-center">
+            <img
+              #title
+              class="img-logo"
+              src="../../../assets/img/kompot_logo.png"
+            />
+            <ion-text #title class="text-light">
+              <h1 class="ion-no-margin ion-margin-vertical ion-text-center">
+                DYSPO
+              </h1>
+            </ion-text>
+          </div>
+        </ion-row>
+        <ion-row class="ion-margin-top">
+          <ion-col>
+            <ion-item class="roundedInput8px margin-bottom-10">
+              <div
+                style="
+                  border-right: 1px solid;
+                  border-color: rgb(155, 155, 155);
+                  margin-right: 8px;
+                  width: 35px;
+                "
+              >
+                <ion-icon
+                  color="medium"
+                  name="mail-outline"
+                  style="font-size: 22px; padding-top: 10px"
+                ></ion-icon>
+              </div>
+              <ion-input
+                type="email"
+                placeholder="Email"
+                [(ngModel)]="userInfo.email"
+                clear-input="true"
+              ></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-item class="roundedInput8px margin-bottom-10">
+              <div
+                style="
+                  border-right: 1px solid;
+                  border-color: rgb(155, 155, 155);
+                  margin-right: 8px;
+                  width: 35px;
+                "
+              >
+                <ion-icon
+                  color="medium"
+                  name="lock-closed-outline"
+                  style="font-size: 22px; padding-top: 10px"
+                ></ion-icon>
+              </div>
+              <ion-input
+                type="password"
+                placeholder="Mot de passe"
+                [(ngModel)]="userInfo.password"
+                class="ion-padding-start ion-padding-horizontal"
+                clear-input="true"
+              ></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-text
+              class="ion-float-end text-light"
+              color="medium"
+              (click)="forgotPassword()"
+            >
+              <h6 class="small ion-no-margin ion-text-end">
+                {{ 'FORGOTPASSWORD' | translate }}
+              </h6>
+            </ion-text>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-button
+              #btn1
+              [disabled]="disablePage"
+              shape="block"
+              (click)="login()"
+              color="undefined"
+              class="btn-transition"
+              ><strong style="color:#fff"
+                >{{ 'LOGIN' | translate }}</strong
+              ></ion-button
+            >
+          </ion-col>
+        </ion-row>
+
+        <p>&nbsp;</p>
+        <ion-row>
+          <ion-col>
+            <div class="ion-text-center text-light">
+              <h1>Pas encore de compte ?</h1>
+            </div>
+          </ion-col>
+        </ion-row>
+
+        <ion-row>
+          <ion-col>
+            <ion-button
+              expand="block"
+              (click)="signup()"
+              color="undefined"
+              class="btn-transition"
+              ><strong style="color:#fff"
+                >{{ 'REGISTER' | translate }}</strong
+              ></ion-button
+            >
+          </ion-col>
+        </ion-row>
+        <div class="line"></div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
