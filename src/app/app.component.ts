@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Auth, User, authState, user } from '@angular/fire/auth';
 import { MenuController, NavController } from '@ionic/angular';
+import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
 
 @Component({
@@ -16,9 +17,18 @@ export class AppComponent {
 
   constructor(
     private auth: Auth,
+    private translate: TranslateService,
     private navController: NavController,
     private menuCtrl: MenuController
   ) {
+    //Lang
+    this.translate.setDefaultLang('fr');
+    const preferredLang = localStorage.getItem('lang');
+    if (!preferredLang) {
+      this.translate.use('fr');
+    } else {
+      this.translate.use(preferredLang);
+    }
     this.user$ = user(auth);
     this.authState$ = authState(auth);
 

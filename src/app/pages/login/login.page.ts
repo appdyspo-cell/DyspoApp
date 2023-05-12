@@ -61,31 +61,10 @@ export class LoginPage implements OnInit {
         return credentials;
       } catch (error: any) {
         this.utils.hideLoader();
-        let firebaseError = this.utils.getFirebaseError(error['code']);
-        let mess = firebaseError ? firebaseError : error.message;
-        this.utils.showToastError(mess);
-        this.utils.hideLoader();
+        this.utils.showFirebaseError(error);
         return null;
       }
-
-      // this.afAuth
-      //   .signInWithEmailAndPassword(email, this.userInfo.password)
-      //   .then(
-      //     () => {
-      //       this.utils.hideLoader();
-      //       //localStorage.setItem('isLoggedIn', 'true');
-      //     },
-      //     (error) => {
-      //       let mess = error.message;
-      //       if (environment.errors[error.code]) {
-      //         mess = environment.errors[error.code];
-      //       }
-      //       this.utils.showToastError(mess);
-      //       this.utils.hideLoader();
-      //     }
-      //   );
     } else {
-      //this.common.hideLoader();
       this.utils.showToastError('Veuillez entrer vos identifiants');
     }
 
@@ -102,7 +81,7 @@ export class LoginPage implements OnInit {
       inputPlaceholder: 'Entrez votre email',
     });
     if (email) {
-      // this.authServ.forgotPassoword(email);
+      this.authService.resetPw(email);
     }
   }
 }

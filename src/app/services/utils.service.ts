@@ -4,6 +4,7 @@ import {
   AlertController,
   LoadingController,
 } from '@ionic/angular';
+import { environment } from 'src/environments/environment';
 
 import Swal from 'sweetalert2';
 
@@ -18,6 +19,23 @@ export class UtilsService {
     private alertCtrl: AlertController,
     private loadCtrl: LoadingController
   ) {}
+
+  // Wrapper of console.log()
+  log(message?: any, ...optionalParams: any[]) {
+    if (environment.debug) {
+      console.log(message, optionalParams);
+    }
+  }
+
+  showFirebaseError(error: any) {
+    let errMsg = 'Erreur inconnue';
+    if (error['code']) {
+      errMsg = this.getFirebaseError(error['code']);
+    } else if (error.message) {
+      errMsg = error.message;
+    }
+    this.showToastError(errMsg);
+  }
 
   getFirebaseError(code: string) {
     switch (code) {
@@ -43,7 +61,7 @@ export class UtilsService {
         return "L'accès à ce compte a été temporairement désactivé en raison de nombreuses tentatives de connexion infructueuses. Vous pouvez le restaurer immédiatement en réinitialisant votre mot de passe ou vous pouvez réessayer plus tard";
         break;
       default:
-        return null;
+        return 'Erreur inconnue';
     }
   }
 
@@ -115,7 +133,8 @@ export class UtilsService {
     return re.test(String(email).toLowerCase());
   }
 
-  validatePhone(phone: string) {
+  validatePhone(phone: string | undefined) {
+    if (!phone) return;
     // eslint-disable-next-line no-useless-escape
     //const re = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
     const re =

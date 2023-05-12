@@ -46,7 +46,7 @@ export class ParametresPage implements OnInit {
     receiveEmail: true,
     receiveNotification: true,
     friendInvitation: true,
-    actualiteKompot: true,
+    actualiteDyspo: true,
     rangeDistance: 100,
   };
   settingsBackup: AppSettings | undefined;
@@ -67,7 +67,7 @@ export class ParametresPage implements OnInit {
       receiveEmail: false,
       receiveNotification: true,
       friendInvitation: true,
-      actualiteKompot: true,
+      actualiteDyspo: true,
       rangeDistance: 100,
     },
     tagline: '',

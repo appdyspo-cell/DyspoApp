@@ -21,18 +21,17 @@ export interface AppUser {
   nb_rates?: number;
   created_at_ms?: number;
   is_phoneVerified?: boolean;
-  stripe_account_id?: string;
 }
 
 export interface AppSettings {
   receiveEmail: boolean;
   receiveNotification: boolean;
   friendInvitation: boolean;
-  actualiteKompot: boolean;
+  actualiteDyspo: boolean;
   rangeDistance: number;
 }
 
 export enum UserStatus {
-  ACTIVE,
-  DELETED,
+  ACTIVE = 'ACTIVE',
+  DELETED = 'DELETED',
 }

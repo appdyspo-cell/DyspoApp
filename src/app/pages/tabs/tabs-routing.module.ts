@@ -8,19 +8,28 @@ const routes: Routes = [
     component: TabsPage,
     children: [
       {
-        path: 'tab1',
+        path: 'user-status',
         loadChildren: () =>
-          import('../tab1/tab1.module').then((m) => m.Tab1PageModule),
+          import('../user-status/user-status.module').then(
+            (m) => m.UserStatusPageModule
+          ),
       },
       {
-        path: 'tab2',
+        path: 'chat-home',
         loadChildren: () =>
-          import('../tab2/tab2.module').then((m) => m.Tab2PageModule),
+          import('../chat-home/chat-home.module').then(
+            (m) => m.ChatHomePageModule
+          ),
       },
       {
-        path: 'tab3',
+        path: 'agenda',
         loadChildren: () =>
-          import('../tab3/tab3.module').then((m) => m.Tab3PageModule),
+          import('../agenda/agenda.module').then((m) => m.AgendaPageModule),
+      },
+      {
+        path: 'friends',
+        loadChildren: () =>
+          import('../friends/friends.module').then((m) => m.FriendsPageModule),
       },
       {
         path: 'parametres',
@@ -43,14 +52,14 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/tabs/tab1',
+        redirectTo: '/tabs/user-status',
         pathMatch: 'full',
       },
     ],
   },
   {
     path: '',
-    redirectTo: '/tabs/tab1',
+    redirectTo: '/tabs/user-status',
     pathMatch: 'full',
   },
 ];

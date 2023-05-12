@@ -52,7 +52,7 @@
     
       <div *ngIf="appSettings">
         <ion-item>
-          <ion-toggle color="primary" [(ngModel)]="appSettings.actualiteKompot" slot="end" ></ion-toggle>
+          <ion-toggle color="primary" [(ngModel)]="appSettings.actualiteDyspo" slot="end" ></ion-toggle>
           <ion-label>           
             Actualités
           </ion-label>
@@ -89,10 +89,8 @@
     <ion-list>
       <div>
         <ion-item>
-          <ion-toggle color="primary" (ionChange)="toggleDarkMode($event)" [(ngModel)]="darkmode" slot="end"></ion-toggle>
-          <ion-label>
-            Mode Sombre
-          </ion-label>
+          <ion-toggle  color="primary" (ionChange)="toggleDarkMode($event)" [(ngModel)]="darkmode">Email</ion-toggle>
+          
         </ion-item>        
       </div>
     
