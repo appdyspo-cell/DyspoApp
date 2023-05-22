@@ -34,7 +34,7 @@ export class RegisterPage implements OnInit {
   };
   userInfo: AppUser = {
     email: '',
-    id: '',
+    uid: '',
     firstname: '',
     lastname: '',
     gender: 'M',
@@ -48,7 +48,6 @@ export class RegisterPage implements OnInit {
       receiveNotification: true,
       friendInvitation: true,
       actualiteDyspo: true,
-      rangeDistance: 100,
     },
     tagline: '',
   };

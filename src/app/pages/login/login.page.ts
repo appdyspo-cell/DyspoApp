@@ -8,6 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { signInWithEmailAndPassword, Auth } from '@angular/fire/auth';
 import { Firestore } from '@angular/fire/firestore';
 import { AuthService } from 'src/app/services/auth.service';
+import { LoggerService } from 'src/app/services/logger.service';
 
 @Component({
   selector: 'app-login',
@@ -28,7 +29,7 @@ export class LoginPage implements OnInit {
     public translate: TranslateService,
     private auth: Auth,
     private navController: NavController,
-    private firestore: Firestore,
+    private logger: LoggerService,
     private authService: AuthService
   ) {}
 
@@ -45,18 +46,18 @@ export class LoginPage implements OnInit {
     if (this.userInfo.email && this.userInfo.password) {
       const email = this.userInfo.email.toLowerCase().trim();
       this.utils.showLoader();
-      console.log('Login with ', email);
-      console.log('Login with ', this.userInfo.password);
+      this.logger.logDebug('Login with ', email);
+      this.logger.logDebug('Login with ', this.userInfo.password);
 
       try {
         const credentials = await this.authService.login(
           email,
           this.userInfo.password
         );
-        console.log('user logged');
+        this.logger.logDebug('user logged');
         this.utils.hideLoader();
         this.navController.navigateRoot('/tabs');
-        console.log(credentials);
+        this.logger.logDebug(credentials);
         this.utils.hideLoader();
         return credentials;
       } catch (error: any) {

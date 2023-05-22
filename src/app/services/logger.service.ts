@@ -1,9 +1,18 @@
 import { Injectable } from '@angular/core';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LoggerService {
+  constructor() {}
 
-  constructor() { }
+  logDebug(message?: any, ...optionalParams: any[]) {
+    if (environment.debug) {
+      console.log(message, optionalParams);
+      //iOS
+      // console.log(message);
+      // if (optionalParams) console.log(optionalParams[0]);
+    }
+  }
 }

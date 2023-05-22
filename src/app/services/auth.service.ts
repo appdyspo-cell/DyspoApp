@@ -18,6 +18,7 @@ import {
 } from '@angular/fire/firestore';
 import { UtilsService } from './utils.service';
 import { AppUser, UserStatus } from '../models/models';
+import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root',

@@ -7,6 +7,7 @@ import {
 import { environment } from 'src/environments/environment';
 
 import Swal from 'sweetalert2';
+import { LoggerService } from './logger.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,13 +18,14 @@ export class UtilsService {
   constructor(
     private toast: ToastController,
     private alertCtrl: AlertController,
-    private loadCtrl: LoadingController
+    private loadCtrl: LoadingController,
+    private logger: LoggerService
   ) {}
 
-  // Wrapper of console.log()
+  // Wrapper of this.logger.logDebug()
   log(message?: any, ...optionalParams: any[]) {
     if (environment.debug) {
-      console.log(message, optionalParams);
+      this.logger.logDebug(message, optionalParams);
     }
   }
 
@@ -95,7 +97,7 @@ export class UtilsService {
       .then((res) => res.present());
   }
 
-  showAlert(message: string) {
+  showAlert(message: any) {
     this.alertCtrl
       .create({
         message,
@@ -118,7 +120,7 @@ export class UtilsService {
   hideLoader() {
     setTimeout(() => {
       if (this.loader != null) {
-        console.log('Hide Loader');
+        this.logger.logDebug('Hide Loader');
 
         this.loader.dismiss();
         this.loader = undefined;
@@ -127,7 +129,7 @@ export class UtilsService {
   }
 
   validateEmail(email: string) {
-    console.log('Validate ', email);
+    this.logger.logDebug('Validate ', email);
     const re =
       /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(String(email).toLowerCase());

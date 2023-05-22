@@ -3,6 +3,8 @@ import { Auth, User, authState, user } from '@angular/fire/auth';
 import { MenuController, NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
+import { UserService } from './services/user.service';
+import { LoggerService } from './services/logger.service';
 
 @Component({
   selector: 'app-root',
@@ -19,7 +21,9 @@ export class AppComponent {
     private auth: Auth,
     private translate: TranslateService,
     private navController: NavController,
-    private menuCtrl: MenuController
+    private menuCtrl: MenuController,
+    private userSvc: UserService,
+    private logger: LoggerService
   ) {
     //Lang
     this.translate.setDefaultLang('fr');
@@ -42,17 +46,30 @@ export class AppComponent {
     this.authStateSubscription = this.authState$.subscribe(
       (aUser: User | null) => {
         //handle auth state changes here. Note, that user will be null if there is no currently logged in user.
-        console.log(aUser);
+        this.logger.logDebug(aUser);
         if (aUser) {
-          this.navController.navigateRoot('/tabs');
+          // Init user svc
+          this.userSvc
+            .subscribeUserInfo(aUser.uid)
+            .then((appUser) => {
+              this.initAllServices(appUser.uid!);
+              this.logger.logDebug('validateAuthState userInfo ---> ', appUser);
+              this.navController.navigateRoot('/tabs');
+              //SplashScreen.hide();
+            })
+            .catch((err) => {
+              this.logger.logDebug('ERR validateAuthState ', err);
+              this.navController.navigateRoot('/login');
+              //SplashScreen.hide();
+            });
         } else {
-          console.log('navigateRoot: Login');
+          this.logger.logDebug('navigateRoot: Login');
           this.navController.navigateRoot('/login');
 
           this.menuCtrl.enable(false);
           localStorage.clear();
-          //this.killAllServices();
-          //this.userSvc.unsubscribeUserInfo();
+          this.killAllServices();
+          this.userSvc.unsubscribeUserInfo();
         }
       }
     );
@@ -62,5 +79,14 @@ export class AppComponent {
     // when manually subscribing to an observable remember to unsubscribe in ngOnDestroy
     this.authStateSubscription.unsubscribe();
     //this.userSubscription.unsubscribe();
+  }
+
+  initAllServices(uid: string) {
+    // this.notifSvc.initService(uid);
+    // this.kdoSvc.initService(uid);
+  }
+
+  killAllServices() {
+    //this.notifSvc.unsubscribeAllAfterLogoutEvent();
   }
 }

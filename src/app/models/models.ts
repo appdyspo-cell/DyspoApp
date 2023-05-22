@@ -1,7 +1,6 @@
 export interface AppUser {
-  id: string;
   email?: string;
-  uid?: string;
+  uid: string;
   firstname?: string;
   lastname?: string;
   gender?: string;
@@ -28,7 +27,6 @@ export interface AppSettings {
   receiveNotification: boolean;
   friendInvitation: boolean;
   actualiteDyspo: boolean;
-  rangeDistance: number;
 }
 
 export enum UserStatus {

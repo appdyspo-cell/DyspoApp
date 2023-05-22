@@ -9,6 +9,7 @@ import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { environment } from 'src/environments/environment';
 import { EmailComposer } from 'capacitor-email-composer';
+import { LoggerService } from 'src/app/services/logger.service';
 
 @Component({
   selector: 'app-parametres',
@@ -47,14 +48,13 @@ export class ParametresPage implements OnInit {
     receiveNotification: true,
     friendInvitation: true,
     actualiteDyspo: true,
-    rangeDistance: 100,
   };
   settingsBackup: AppSettings | undefined;
   avatar: string | undefined = '';
 
   emptyUser: AppUser = {
     email: '',
-    id: '',
+    uid: '',
     firstname: '',
     lastname: '',
     gender: 'M',
@@ -68,7 +68,6 @@ export class ParametresPage implements OnInit {
       receiveNotification: true,
       friendInvitation: true,
       actualiteDyspo: true,
-      rangeDistance: 100,
     },
     tagline: '',
   };
@@ -78,11 +77,12 @@ export class ParametresPage implements OnInit {
     private common: UtilsService,
     private navCtrl: NavController,
     private authSvc: AuthService,
-    private userSvc: UserService
+    private userSvc: UserService,
+    private logger: LoggerService
   ) {}
 
   ngOnInit() {
-    console.log('ngOnInit Parametres');
+    this.logger.logDebug('ngOnInit Parametres');
     if (!localStorage.getItem('darkmode')) {
       this.darkmode = false;
     } else {
@@ -92,7 +92,7 @@ export class ParametresPage implements OnInit {
   }
 
   toggleDarkMode(ev: any) {
-    console.log('toggle');
+    this.logger.logDebug('toggle');
     if (ev.detail.checked) {
       this.darkmode = true;
       document.body.classList.toggle('dark', true);
@@ -109,7 +109,7 @@ export class ParametresPage implements OnInit {
   }
 
   ngOnDestroy() {
-    console.log('ngOnDestroy Parametres');
+    this.logger.logDebug('ngOnDestroy Parametres');
   }
 
   loadInfos() {
@@ -130,17 +130,8 @@ export class ParametresPage implements OnInit {
     if (
       JSON.stringify(this.appSettings) !== JSON.stringify(this.settingsBackup)
     ) {
-      if (this.userSvc.userInfo?.id) {
-        this.userSvc.updateUser(
-          this.userSvc.userInfo?.id,
-          Object.assign({}, this.userInfo)
-        );
-      }
-
-      if (
-        this.settingsBackup?.rangeDistance !== this.appSettings?.rangeDistance
-      ) {
-        //this.gameSvc.onAppSettingsChanged(this.appSettings);
+      if (this.userSvc.userInfo?.uid) {
+        this.userSvc.updateUser(Object.assign({}, this.userInfo));
       }
     }
   }
@@ -159,7 +150,7 @@ export class ParametresPage implements OnInit {
   }
 
   async deleteAccount() {
-    console.log('del');
+    this.logger.logDebug('del');
     this.saveFilters = false;
     const alert = await this.alertController.create({
       //cssClass: 'my-custom-class',
@@ -189,7 +180,7 @@ export class ParametresPage implements OnInit {
   }
 
   openBlockedUsers() {
-    //console.log('Open');
+    //this.logger.logDebug('Open');
     this.navCtrl.navigateForward('banned-users');
   }
 }
