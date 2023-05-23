@@ -63,7 +63,7 @@ export class NotificationService {
         console.log(
           'data ' + JSON.stringify(actionPerformed.notification.data)
         );
-        this.goToChat(actionPerformed.notification.data.friendUid);
+        this.goToChat(actionPerformed.notification.data.friend_uid);
       }
     );
   }
@@ -129,23 +129,23 @@ export class NotificationService {
     PushNotifications.removeAllDeliveredNotifications();
   }
 
-  goToChat(friendUid: string) {
-    console.log('goToChat', friendUid);
+  goToChat(friend_uid: string) {
+    console.log('goToChat', friend_uid);
     const navigationExtras: NavigationExtras = {
       state: {
-        friendUid,
+        friend_uid,
       },
     };
     this.router.navigate(['chatroom'], navigationExtras);
   }
 
-  async sendInviteFriendNotif(friendUid: string) {
+  async sendInviteFriendNotif(friend_uid: string) {
     // Send notification
     console.log('Check to send notif or not');
 
     const q = query(
       collection(this.firestore, 'users'),
-      where('uid', '==', friendUid)
+      where('uid', '==', friend_uid)
     );
     const querySnapshot = await getDocs(q);
     if (!querySnapshot.empty) {

@@ -3,6 +3,7 @@ import {
   Firestore,
   collection,
   collectionData,
+  getDocs,
   query,
   where,
 } from '@angular/fire/firestore';
@@ -25,10 +26,14 @@ export class FriendsPage implements OnInit {
   uid: any;
 
   friends$: Observable<Friend[]>;
-  friendsSuggested$: Observable<Friend[]>;
+  //friendsSuggested$: Observable<Friend[]>;
   friendsSubscribtion: any;
   friends: Friend[] = [];
   friendsSuggested: Friend[] = [];
+
+  inputSearch = '';
+  autocompleteItems: AppUser[] = [];
+  allOtherUsers: AppUser[] = [];
 
   constructor(
     public utils: UtilsService,
@@ -39,14 +44,22 @@ export class FriendsPage implements OnInit {
     public friendService: FriendsService,
     public animationCtrl: AnimationController
   ) {
-    this.friends$ = this.friendService.friends;
-    this.friendsSuggested$ = this.friendService.friendsSuggested$;
+    this.friends$ = this.friendService.friends$;
+
     this.friends$.subscribe((friends) => {
-      this.friends = friends;
+      console.log('Friends  ', friends);
+      this.friends = friends.filter((elt) => elt.friend_status === 'FRIEND');
+      this.friendsSuggested = friends.filter(
+        (elt) => elt.friend_status === 'SUGGESTED'
+      );
     });
-    this.friendsSuggested$.subscribe((friendsSuggested) => {
-      this.friendsSuggested = friendsSuggested;
-    });
+    // this.friendsSuggested$.subscribe((friendsSuggested) => {
+    //   console.log('Friends suggested ', friendsSuggested);
+    //   this.friendsSuggested = friendsSuggested;
+    // });
+  }
+
+  async ngOnInit() {
     // const friendsCollectionRef = collection(
     //   this.firestore,
     //   `friends/${this.userSvc.userInfo?.uid}/friend_list`
@@ -57,16 +70,23 @@ export class FriendsPage implements OnInit {
     // );
     // const qFriendsSuggested = query(
     //   friendsCollectionRef,
-    //   where('friend_status', '==', FriendStatus.PENDING)
+    //   where('friend_status', '==', FriendStatus.SUGGESTED)
     // );
-
+    // const suggs = await getDocs(qFriendsSuggested);
+    // suggs.forEach((snap) => {
+    //   const user = snap.data() as AppUser;
+    //   console.log('Friend sugg', user);
+    //   this.friendsSuggested.push(user);
+    // });
     // this.friends$ = collectionData(qFriends) as Observable<Friend[]>;
     // this.friendsSuggested$ = collectionData(qFriendsSuggested) as Observable<
     //   Friend[]
     // >;
   }
 
-  ngOnInit() {}
+  async ionViewWillEnter() {
+    this.allOtherUsers = await this.userSvc.getAllOtherUsers();
+  }
 
   promptDeleteFriend(friend: Friend, i: number) {
     this.alertCtrl
@@ -124,8 +144,7 @@ export class FriendsPage implements OnInit {
     if (friend) {
       const navigationExtras: NavigationExtras = {
         state: {
-          friendDocId: friend.uid,
-          friendUid: friend.uid,
+          friend_uid: friend.uid,
           friendAvatar: friend.avatarPath,
           friendUsername: friend.firstname + ' ' + friend.lastname,
         },
@@ -173,5 +192,31 @@ export class FriendsPage implements OnInit {
       this.utils.showToast('Ami ajouté');
       console.log('Add friend ');
     });
+  }
+
+  clearAutocomplete() {
+    this.autocompleteItems = [];
+    this.inputSearch = '';
+  }
+
+  updateSearchResults() {
+    const pattern = this.inputSearch;
+    if (pattern === '') {
+      this.autocompleteItems = [];
+      return;
+    } else if (pattern && pattern.length > 2) {
+      this.autocompleteItems = this.allOtherUsers.filter(
+        (user) =>
+          user.firstname!.toUpperCase().indexOf(pattern.toUpperCase()) >= 0 ||
+          user.lastname!.toUpperCase().indexOf(pattern.toUpperCase()) >= 0
+      );
+      console.log('Results ', this.autocompleteItems);
+    }
+  }
+
+  selectSearchResult(user: AppUser) {
+    this.autocompleteItems = [];
+    this.inputSearch = '';
+    this.friendService.invite(user);
   }
 }

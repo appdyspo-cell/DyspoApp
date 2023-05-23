@@ -14,7 +14,7 @@ export interface AppUser {
   notificationToken?: string;
   isConnected?: boolean;
   friendStatus?: string;
-  friendListDocId?: string;
+  friendListUid?: string;
   tagline?: string;
   avg_rates?: number;
   nb_rates?: number;
@@ -26,8 +26,8 @@ export interface Friend extends AppUser {
   sinceDate?: number;
   requestDate?: number;
   friend_status?: string;
-  friendUid?: string;
-  friendDocId?: string;
+  friend_uid?: string;
+
   userData?: AppUser;
 }
 

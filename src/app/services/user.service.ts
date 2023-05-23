@@ -6,8 +6,11 @@ import {
   collectionSnapshots,
   doc,
   docData,
+  getDocs,
+  query,
   setDoc,
   updateDoc,
+  where,
 } from '@angular/fire/firestore';
 import { environment } from 'src/environments/environment';
 import { AuthService } from './auth.service';
@@ -43,17 +46,17 @@ export class UserService {
   public async subscribeUserInfo(uid: string) {
     return new Promise<AppUser>((resolve, reject) => {
       if (this.userInfoSubscription) {
+        console.log('Unsubscribe previous user');
         this.userInfoSubscription.unsubscribe();
       }
       if (uid) {
+        this.logger.logDebug('userSvc subscribe to ----- ', uid);
         const docRef = doc(this.firestore, 'users', uid);
         this.userInfoObs$ = docData(docRef) as Observable<AppUser>;
         this.userInfoSubscription = this.userInfoObs$.subscribe((appUser) => {
           if (!appUser) {
             reject('NOTFOUND');
           } else {
-            this.logger.logDebug('userSvc changed ----- ');
-            this.logger.logDebug(appUser);
             appUser.uid = uid;
             this.userInfo = { ...appUser };
             this._userInfoSubject.next(this.userInfo);
@@ -107,5 +110,26 @@ export class UserService {
       },
       tagline: '',
     };
+  }
+
+  public getAllOtherUsers() {
+    return new Promise<AppUser[]>(async (resolve, reject) => {
+      const users: AppUser[] = [];
+      const usersCollectionRef = collection(this.firestore, 'users');
+
+      const querySnapshot = await getDocs(usersCollectionRef);
+      querySnapshot.forEach((snap) => {
+        const user = snap.data() as AppUser;
+
+        if (
+          user.status === UserStatus.ACTIVE &&
+          snap.id !== this.userInfo!.uid
+        ) {
+          user.uid = snap.id;
+          users.push(user);
+        }
+      });
+      resolve(users);
+    });
   }
 }

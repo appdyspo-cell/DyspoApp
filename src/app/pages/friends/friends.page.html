@@ -24,6 +24,36 @@
   </ion-segment>
 
   <div *ngIf="selectSegment === 'friends'" class="ion-no-margin">
+    <ion-searchbar
+    mode="ios"
+    [(ngModel)]="inputSearch"
+    (ngModelChange)="updateSearchResults()"
+    placeholder="Rechercher un membre Kompot"
+    (ionClear)="clearAutocomplete()"
+    showCancelButton="never"
+  ></ion-searchbar>
+  <ion-list [hidden]="autocompleteItems.length === 0">
+    <ion-item
+      *ngFor="let user of autocompleteItems"
+      
+      
+    >
+      <ion-avatar slot="start">
+        <img src="{{user.avatarPath}}" />
+      </ion-avatar>
+      <ion-label>
+        <ion-row class="ion-align-items-center">
+          <p class="ion-no-margin">
+            {{user.lastname | uppercase}} {{user.firstname}}
+          </p>
+        </ion-row>
+      </ion-label>
+      <ion-button slot="end" (click)="selectSearchResult(user)">
+        <ion-icon name="person-add" slot="start"></ion-icon>
+        Inviter
+      </ion-button>
+    </ion-item>
+  </ion-list>
     <div id="container-friends" *ngIf="friends.length === 0">
       <ion-icon name="person-outline" class="empty-icon-circle icon-large empty-icon-color"></ion-icon>
       <br>

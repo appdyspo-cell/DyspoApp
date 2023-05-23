@@ -7,6 +7,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  onSnapshot,
   query,
   setDoc,
   updateDoc,
@@ -16,21 +17,27 @@ import { AppUser, Friend, FriendStatus } from '../models/models';
 import { UtilsService } from './utils.service';
 import { NotificationService } from './notification.service';
 import { UserService } from './user.service';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FriendsService {
-  friends$!: Observable<Friend[]>;
-  friendsSuggested$!: Observable<Friend[]>;
+  public friends: Friend[] = [];
+  //public friendsSuggested: Friend[] = [];
+  public friendsSubject = new BehaviorSubject<Friend[]>([]);
+
+  public friends$!: Observable<Friend[]>;
+  public friendsSuggested$!: Observable<Friend[]>;
 
   constructor(
     private firestore: Firestore,
     private utils: UtilsService,
     private userSvc: UserService,
     private notificationSvc: NotificationService
-  ) {}
+  ) {
+    this.friends$ = this.friendsSubject.asObservable();
+  }
 
   async unblockFriend(friend: Friend) {
     return new Promise(async (resolve, reject) => {
@@ -43,7 +50,7 @@ export class FriendsService {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         updateDoc(docSnap.ref, {
-          status: FriendStatus.FRIEND,
+          friend_status: FriendStatus.FRIEND,
           since: new Date().getTime(),
         }).then(() => {
           console.log('Finished update my friend list');
@@ -57,14 +64,14 @@ export class FriendsService {
       );
       const queryFriend = query(
         collectionFriendRef,
-        where('friendUid', '==', uid)
+        where('friend_uid', '==', uid)
       );
       const docFriendSnap = await getDocs(queryFriend);
       if (!docFriendSnap.empty) {
         const target = docFriendSnap.docs[0];
 
         updateDoc(target.ref, {
-          status: FriendStatus.FRIEND,
+          friend_status: FriendStatus.FRIEND,
           since: new Date().getTime(),
         }).then(() => {
           console.log('Finished update his friend list');
@@ -74,18 +81,25 @@ export class FriendsService {
     });
   }
 
-  getFriendByUid(friend: Friend) {
+  getFriendAndPush(friend: Friend) {
     return new Promise(async (resolve, reject) => {
-      const usersRef = collection(this.firestore, 'users');
-      const q = query(usersRef, where('uid', '==', friend.friendUid));
-      const result = await getDocs(q);
-      if (!result.empty) {
-        const userData = result.docs[0].data() as AppUser;
+      if (!friend.friend_uid) {
+        reject('NO_UID');
+      }
+      const docRef = doc(this.firestore, `users`, friend.friend_uid!);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        console.log('Document data:', docSnap.data());
+        const userData = docSnap.data() as AppUser;
         friend.userData = userData;
-        friend.userData.uid = result.docs[0].id;
+        friend.userData.uid = docSnap.id;
+        this.friends.push(friend);
         resolve(friend);
       } else {
-        reject('NOT FOUND');
+        // docSnap.data() will be undefined in this case
+        console.log('No such document!');
+        reject('USER_NOT_FOUND');
       }
     });
   }
@@ -93,28 +107,62 @@ export class FriendsService {
   initService(uid: string) {
     console.log('Init Friend Service...');
     const that = this;
-
+    this.friends = [];
     const friendsCollectionRef = collection(
       this.firestore,
       `friends/${uid}/friend_list`
     );
-    const qFriends = query(
-      friendsCollectionRef,
-      where('friend_status', '==', FriendStatus.FRIEND)
-    );
-    const qFriendsSuggested = query(
-      friendsCollectionRef,
-      where('friend_status', '==', FriendStatus.SUGGESTED)
-    );
 
-    this.friends$ = collectionData(qFriends) as Observable<Friend[]>;
-    this.friendsSuggested$ = collectionData(qFriendsSuggested) as Observable<
-      Friend[]
-    >;
-  }
+    onSnapshot(friendsCollectionRef, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === 'modified') {
+          const friendModified = change.doc.data() as Friend;
 
-  public get friends() {
-    return this.friends$;
+          const foundIndex = this.friends.findIndex(
+            (elt) => elt.friend_uid === friendModified.friend_uid
+          );
+          if (foundIndex >= 0) {
+            const userData = this.friends[foundIndex].userData;
+            friendModified.userData = userData;
+            this.friends[foundIndex] = friendModified;
+            this.friendsSubject.next(this.friends);
+          }
+        }
+        if (change.type === 'added') {
+          const friendAdded = change.doc.data() as Friend;
+          friendAdded.friend_uid = change.doc.id;
+          const foundIndex = this.friends.findIndex(
+            (elt) => elt.friend_uid === friendAdded.friend_uid
+          );
+          if (foundIndex >= 0) {
+            //Do nothing
+          } else {
+            const friend = change.doc.data() as Friend;
+            friend.friend_uid = change.doc.id;
+            console.log(friend);
+            this.getFriendAndPush(friend)
+              .then((resPromise) => {
+                console.log('Friend Hydrated ', resPromise);
+                that.friendsSubject.next(that.friends);
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          }
+        }
+        if (change.type === 'removed') {
+          const friendRemoved = change.doc.data() as Friend;
+          friendRemoved.friend_uid = change.doc.id;
+          const foundIndex = this.friends.findIndex(
+            (elt) => elt.friend_uid === friendRemoved.friend_uid
+          );
+          if (foundIndex >= 0) {
+            this.friends.splice(foundIndex, 1);
+          }
+          this.friendsSubject.next(this.friends);
+        }
+      });
+    });
   }
 
   async invite(membre: AppUser) {
@@ -125,10 +173,10 @@ export class FriendsService {
     this.utils.showLoader();
 
     const myInviteData = {
-      friendUid: membre.uid,
+      friend_uid: membre.uid,
       friendLastname: membre.lastname,
       friendFirstname: membre.firstname,
-      status: FriendStatus.INVITED,
+      friend_status: FriendStatus.INVITED,
       requestDate: new Date().getTime(),
     };
     await setDoc(
@@ -138,32 +186,32 @@ export class FriendsService {
     );
 
     const hisSuggestionData = {
-      friendUid: uid,
-      friendDocId: this.userSvc.userInfo?.uid,
+      friend_uid: uid,
       friendLastname: this.userSvc.userInfo?.lastname,
       friendFirstname: this.userSvc.userInfo?.firstname,
-      status: FriendStatus.SUGGESTED,
+      friend_status: FriendStatus.SUGGESTED,
       requestDate: new Date().getTime(),
     };
     await setDoc(
-      doc(this.firestore, `friends/${uid}/friend_list`, uid),
+      doc(this.firestore, `friends/${membre.uid}/friend_list`, uid),
       hisSuggestionData,
       { merge: true }
     );
 
-    this.notificationSvc.sendInviteFriendNotif(membre.uid);
+    this.utils.hideLoader();
+    //this.notificationSvc.sendInviteFriendNotif(membre.uid);
   }
 
   async addFriend(friend: AppUser) {
     const uid = this.userSvc.userInfo?.uid || 'unknown';
 
     updateDoc(doc(this.firestore, `friends/${uid}/friend_list/${friend.uid}`), {
-      status: FriendStatus.FRIEND,
+      friend_status: FriendStatus.FRIEND,
       since: new Date().getTime(),
     });
 
     updateDoc(doc(this.firestore, `friends/${friend.uid}/friend_list/${uid}`), {
-      status: FriendStatus.FRIEND,
+      friend_status: FriendStatus.FRIEND,
       since: new Date().getTime(),
     });
 
@@ -181,7 +229,7 @@ export class FriendsService {
       `friends/${uid}/friend_list`
     );
     const querySnapshot = await getDocs(
-      query(friendCollectionRef, where('friendUid', '==', uid))
+      query(friendCollectionRef, where('friend_uid', '==', uid))
     );
     if (!querySnapshot.empty) {
       deleteDoc(querySnapshot.docs[0].ref);
@@ -195,10 +243,10 @@ export class FriendsService {
     // this.friends = [];
   }
 
-  // getFriendStatus(friendUid: string) {
-  //   console.log('Get friend status with uid:', friendUid);
+  // getFriendStatus(friend_uid: string) {
+  //   console.log('Get friend status with uid:', friend_uid);
   //   const foundIndex = this.friends.findIndex(
-  //     (elt) => elt.friendUid === friendUid
+  //     (elt) => elt.friend_uid === friend_uid
   //   );
   //   if (foundIndex >= 0) {
   //     return this.friends[foundIndex].status;
