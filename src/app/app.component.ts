@@ -5,6 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
 import { UserService } from './services/user.service';
 import { LoggerService } from './services/logger.service';
+import { FriendsService } from './services/friends.service';
 
 @Component({
   selector: 'app-root',
@@ -23,7 +24,8 @@ export class AppComponent {
     private navController: NavController,
     private menuCtrl: MenuController,
     private userSvc: UserService,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private friendsSvc: FriendsService
   ) {
     //Lang
     this.translate.setDefaultLang('fr');
@@ -82,7 +84,7 @@ export class AppComponent {
   }
 
   initAllServices(uid: string) {
-    // this.notifSvc.initService(uid);
+    this.friendsSvc.initService(uid);
     // this.kdoSvc.initService(uid);
   }
 

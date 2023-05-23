@@ -26,6 +26,7 @@ import {
   uploadString,
 } from '@angular/fire/storage';
 import { LoggerService } from 'src/app/services/logger.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -37,6 +38,7 @@ export class ProfilePage implements OnInit {
   avatarPath = '';
   avatarChangedURL = '';
   defaultAvatar = environment.DEFAULT_AVATAR;
+  userSubscription: Subscription | undefined;
 
   constructor(
     public actionSheetController: ActionSheetController,
@@ -49,8 +51,16 @@ export class ProfilePage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.user! = Object.assign({}, this.userSvc.userInfo);
-    this.logger.logDebug(this.user);
+    this.user = this.userSvc.getEmptyUser();
+    this.userSubscription = this.userSvc.userInfoObs$.subscribe((user) => {
+      this.user = user;
+      console.log('user subscription profile page', user);
+    });
+    //this.user! = Object.assign({}, this.userSvc.userInfo);
+  }
+
+  ngOnDestroy() {
+    if (this.userSubscription) this.userSubscription.unsubscribe();
   }
 
   async resetPw() {

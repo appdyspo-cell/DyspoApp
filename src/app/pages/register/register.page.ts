@@ -4,6 +4,7 @@ import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { AppUser, UserStatus } from 'src/app/models/models';
 import { AuthService } from 'src/app/services/auth.service';
+import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { environment } from 'src/environments/environment';
 
@@ -32,25 +33,7 @@ export class RegisterPage implements OnInit {
     phoneNumber: false,
     cgu: false,
   };
-  userInfo: AppUser = {
-    email: '',
-    uid: '',
-    firstname: '',
-    lastname: '',
-    gender: 'M',
-    phoneNumber: '',
-    avatarPath: environment.DEFAULT_AVATAR,
-    firstConnexion: true,
-    last_connexion_ms: 0,
-    status: UserStatus.ACTIVE,
-    appSettings: {
-      receiveEmail: false,
-      receiveNotification: true,
-      friendInvitation: true,
-      actualiteDyspo: true,
-    },
-    tagline: '',
-  };
+  userInfo: AppUser;
   password = '';
 
   constructor(
@@ -58,8 +41,11 @@ export class RegisterPage implements OnInit {
     private authSvc: AuthService,
     private utils: UtilsService,
     private navCtrl: NavController,
+    private userSvc: UserService,
     private router: Router
-  ) {}
+  ) {
+    this.userInfo = this.userSvc.getEmptyUser();
+  }
 
   ngOnInit() {}
 

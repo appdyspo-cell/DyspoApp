@@ -7,7 +7,7 @@ export interface AppUser {
   phoneNumber?: string;
   avatarPath?: string;
   appSettings?: AppSettings;
-  status: UserStatus;
+  status?: UserStatus;
   last_connexion_ms?: number;
   last_connexion_ISO?: string;
   firstConnexion?: boolean;
@@ -15,11 +15,20 @@ export interface AppUser {
   isConnected?: boolean;
   friendStatus?: string;
   friendListDocId?: string;
-  tagline: string;
+  tagline?: string;
   avg_rates?: number;
   nb_rates?: number;
   created_at_ms?: number;
   is_phoneVerified?: boolean;
+}
+
+export interface Friend extends AppUser {
+  sinceDate?: number;
+  requestDate?: number;
+  friend_status?: string;
+  friendUid?: string;
+  friendDocId?: string;
+  userData?: AppUser;
 }
 
 export interface AppSettings {
@@ -32,4 +41,16 @@ export interface AppSettings {
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
   DELETED = 'DELETED',
+}
+
+export enum FriendStatus {
+  FRIEND = 'FRIEND',
+  PENDING = 'PENDING',
+  INVITED = 'INVITED',
+  SUGGESTED = 'SUGGESTED',
+}
+
+export enum NotifSubjects {
+  MESSAGE = 'MESSAGE',
+  INVITE = 'INVITE',
 }

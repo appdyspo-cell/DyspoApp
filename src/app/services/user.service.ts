@@ -19,9 +19,7 @@ import { LoggerService } from './logger.service';
 })
 export class UserService {
   private _userInfo: AppUser | undefined;
-  private _userInfoSubject = new BehaviorSubject<AppUser | undefined>(
-    undefined
-  );
+  private _userInfoSubject = new BehaviorSubject<AppUser>(this.getEmptyUser());
 
   userInfoFirebaseObs$!: Observable<AppUser>;
   userInfoObs$!: Observable<AppUser>;
@@ -32,7 +30,7 @@ export class UserService {
     private authSvc: AuthService,
     private logger: LoggerService
   ) {
-    //this.userInfoObs$ = this._userInfoSubject.asObservable();
+    this.userInfoObs$ = this._userInfoSubject.asObservable();
   }
 
   get userInfo(): AppUser | undefined {
@@ -54,10 +52,11 @@ export class UserService {
           if (!appUser) {
             reject('NOTFOUND');
           } else {
-            this.logger.logDebug('user changed ----- ');
+            this.logger.logDebug('userSvc changed ----- ');
             this.logger.logDebug(appUser);
             appUser.uid = uid;
             this.userInfo = { ...appUser };
+            this._userInfoSubject.next(this.userInfo);
             //Si l'utilisateur a été effacé
             if (appUser.status === UserStatus.DELETED) {
               this.authSvc.logout();
@@ -86,5 +85,27 @@ export class UserService {
     //delete appUserClone.id;
     const ref = doc(this.firestore, `users/${appUser.uid}`);
     updateDoc(ref, appUserClone);
+  }
+
+  public getEmptyUser(): AppUser {
+    return {
+      email: '',
+      uid: '',
+      firstname: '',
+      lastname: '',
+      gender: 'M',
+      phoneNumber: '',
+      avatarPath: environment.DEFAULT_AVATAR,
+      firstConnexion: true,
+      last_connexion_ms: 0,
+      status: UserStatus.ACTIVE,
+      appSettings: {
+        receiveEmail: false,
+        receiveNotification: true,
+        friendInvitation: true,
+        actualiteDyspo: true,
+      },
+      tagline: '',
+    };
   }
 }

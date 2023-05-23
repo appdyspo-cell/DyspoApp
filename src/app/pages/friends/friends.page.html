@@ -10,4 +10,120 @@
       <ion-title size="large">Amis</ion-title>
     </ion-toolbar>
   </ion-header>
+  <ion-segment [(ngModel)]="selectSegment">
+    <ion-segment-button value="friends" class="segmentButton" color="light">
+      <ion-icon name="person"></ion-icon>
+      <ion-label>Mes amis</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="suggestions" color="light">
+      <ion-icon name="person-add"></ion-icon>
+      <ion-label>Invitations</ion-label>
+      <ion-badge *ngIf="friendsSuggested.length>0" color="danger" style="position: absolute; right: 15px;">{{ friendsSuggested.length }}</ion-badge>
+    </ion-segment-button>
+    
+  </ion-segment>
+
+  <div *ngIf="selectSegment === 'friends'" class="ion-no-margin">
+    <div id="container-friends" *ngIf="friends.length === 0">
+      <ion-icon name="person-outline" class="empty-icon-circle icon-large empty-icon-color"></ion-icon>
+      <br>
+      <strong class="capitalize">
+        <ion-text style="color:rgb(100, 100, 100)">Vous n'avez pas encore d'amis</ion-text>
+      </strong>
+     
+    </div>
+    <ion-list *ngIf="friends.length > 0">
+      <ion-item-sliding [id]="'slidingItem' + i" *ngFor="let friendListDoc of friends ; let i = index;">
+        <ion-item-options>
+          <ion-item-option (click)="promptDeleteFriend(friendListDoc, i)" color="danger">
+            <ion-icon  slot="icon-only" name="trash"></ion-icon>            
+          </ion-item-option>				
+        </ion-item-options>
+        <ion-item  (click)="showProfile(friendListDoc)">
+        <ion-avatar slot="start">
+          <img  src="{{friendListDoc.userData?.avatarPath}}">
+        </ion-avatar>
+
+          <div>
+            <ion-row class="ion-align-items-center">
+              <p class="ion-no-margin">
+                {{friendListDoc.userData?.lastname | uppercase}} {{friendListDoc.userData?.firstname}} 
+              </p>
+              
+            </ion-row>
+            <ion-row class="ion-align-items-center">
+              <p class="ion-no-margin">
+                5
+              </p>              
+            </ion-row>
+            <!-- <ion-row class="ion-align-items-center">
+              <rating [rating]="rate" (ratingChange)="onRateChanged($event)">
+              </rating>            
+            </ion-row> -->
+
+          
+          </div>
+          <ion-buttons slot="end">
+            <ion-button color="primary" (click)="goToChat(friendListDoc.userData, $event)">
+              <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+            </ion-button>
+            
+          </ion-buttons>
+          
+        </ion-item>
+      </ion-item-sliding>
+    </ion-list>
+  </div>
+
+  <div *ngIf="selectSegment === 'suggestions'" class="ion-no-margin">
+    <div id="container-suggestions" *ngIf="friendsSuggested.length === 0">
+      <ion-icon name="person-outline" class="empty-icon-circle icon-large empty-icon-color"></ion-icon>
+      <br>
+      <strong class="capitalize">
+        <ion-text style="color:rgb(100, 100, 100)">Vous n'avez pas d'invitations</ion-text>
+      </strong>
+     
+    </div>
+
+    <ion-list *ngIf="friendsSuggested.length > 0">
+      <ion-item-sliding [id]="'slidingItem' + i" *ngFor="let friendSuggested of friendsSuggested; let i = index;">
+        <ion-item-options>
+          <ion-item-option (click)="promptDeleteFriend(friendSuggested,i)" color="danger">
+            <ion-icon  slot="icon-only" name="trash"></ion-icon>            
+          </ion-item-option>				
+        </ion-item-options>
+        <ion-item  (click)="showProfile(friendSuggested)">
+        <ion-avatar slot="start">
+          <img  src="{{friendSuggested.userData?.avatarPath}}">
+        </ion-avatar>
+
+          <ion-label>
+            <ion-row class="ion-align-items-center">
+              <p class="ion-no-margin">
+                {{friendSuggested.userData?.lastname | uppercase}} {{friendSuggested.firstname}} 
+              </p>
+              
+            </ion-row>
+            <ion-row class="ion-align-items-center">
+              <p class="ion-no-margin">
+                4
+              </p>
+              
+            </ion-row>
+          
+          </ion-label>
+          <ion-buttons slot="end">
+            <ion-button color="primary" (click)="goToChat(friendSuggested, $event)">
+              <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+            </ion-button>
+            <ion-button  color="primary" size="small" (click)="addFriend(friendSuggested, i, $event)">
+              <ion-icon [id]="'add'+i" name="person-add"></ion-icon>              
+            </ion-button>
+            
+          </ion-buttons>
+          
+        </ion-item>
+      </ion-item-sliding>
+    </ion-list>
+  </div>
 </ion-content>
