@@ -26,6 +26,7 @@ import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { provideStorage, getStorage } from '@angular/fire/storage';
 import { Capacitor } from '@capacitor/core';
 import { getFunctions, provideFunctions } from '@angular/fire/functions';
+import { getDatabase, provideDatabase } from '@angular/fire/database';
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/lang/', '.json');
@@ -60,6 +61,7 @@ export function createTranslateLoader(http: HttpClient) {
     provideFirestore(() => getFirestore()),
     provideStorage(() => getStorage()),
     provideFunctions(() => getFunctions()),
+    provideDatabase(() => getDatabase()),
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],

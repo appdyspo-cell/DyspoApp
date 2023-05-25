@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ChatService } from 'src/app/services/chat.service';
 
 @Component({
   selector: 'app-chat-home',
@@ -6,10 +7,11 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./chat-home.page.scss'],
 })
 export class ChatHomePage implements OnInit {
+  constructor(private chatSvc: ChatService) {}
 
-  constructor() { }
+  ngOnInit() {}
 
-  ngOnInit() {
+  createChatroom() {
+    this.chatSvc.createChatroom();
   }
-
 }

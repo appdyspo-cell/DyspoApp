@@ -18,6 +18,7 @@ import { UtilsService } from './utils.service';
 import { NotificationService } from './notification.service';
 import { UserService } from './user.service';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { Database } from '@angular/fire/database';
 
 @Injectable({
   providedIn: 'root',
@@ -34,6 +35,7 @@ export class FriendsService {
     private firestore: Firestore,
     private utils: UtilsService,
     private userSvc: UserService,
+    private db: Database,
     private notificationSvc: NotificationService
   ) {
     this.friends$ = this.friendsSubject.asObservable();

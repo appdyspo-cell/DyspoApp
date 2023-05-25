@@ -1,15 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  Firestore,
-  collection,
-  collectionData,
-  getDocs,
-  query,
-  where,
-} from '@angular/fire/firestore';
 import { NavigationExtras, Router } from '@angular/router';
 import { AlertController, AnimationController } from '@ionic/angular';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { AppUser, Friend, FriendStatus } from 'src/app/models/models';
 import { FriendsService } from 'src/app/services/friends.service';
 import { UserService } from 'src/app/services/user.service';
@@ -26,19 +18,18 @@ export class FriendsPage implements OnInit {
   uid: any;
 
   friends$: Observable<Friend[]>;
-  //friendsSuggested$: Observable<Friend[]>;
-  friendsSubscribtion: any;
+
   friends: Friend[] = [];
   friendsSuggested: Friend[] = [];
 
   inputSearch = '';
   autocompleteItems: AppUser[] = [];
   allOtherUsers: AppUser[] = [];
+  friendsSubscrition: Subscription;
 
   constructor(
     public utils: UtilsService,
     public alertCtrl: AlertController,
-    private firestore: Firestore,
     public route: Router,
     private userSvc: UserService,
     public friendService: FriendsService,
@@ -46,42 +37,21 @@ export class FriendsPage implements OnInit {
   ) {
     this.friends$ = this.friendService.friends$;
 
-    this.friends$.subscribe((friends) => {
+    this.friendsSubscrition = this.friends$.subscribe((friends) => {
       console.log('Friends  ', friends);
-      this.friends = friends.filter((elt) => elt.friend_status === 'FRIEND');
+      this.friends = friends.filter(
+        (elt) => elt.friend_status === FriendStatus.FRIEND
+      );
       this.friendsSuggested = friends.filter(
-        (elt) => elt.friend_status === 'SUGGESTED'
+        (elt) => elt.friend_status === FriendStatus.SUGGESTED
       );
     });
-    // this.friendsSuggested$.subscribe((friendsSuggested) => {
-    //   console.log('Friends suggested ', friendsSuggested);
-    //   this.friendsSuggested = friendsSuggested;
-    // });
   }
 
-  async ngOnInit() {
-    // const friendsCollectionRef = collection(
-    //   this.firestore,
-    //   `friends/${this.userSvc.userInfo?.uid}/friend_list`
-    // );
-    // const qFriends = query(
-    //   friendsCollectionRef,
-    //   where('friend_status', '==', FriendStatus.FRIEND)
-    // );
-    // const qFriendsSuggested = query(
-    //   friendsCollectionRef,
-    //   where('friend_status', '==', FriendStatus.SUGGESTED)
-    // );
-    // const suggs = await getDocs(qFriendsSuggested);
-    // suggs.forEach((snap) => {
-    //   const user = snap.data() as AppUser;
-    //   console.log('Friend sugg', user);
-    //   this.friendsSuggested.push(user);
-    // });
-    // this.friends$ = collectionData(qFriends) as Observable<Friend[]>;
-    // this.friendsSuggested$ = collectionData(qFriendsSuggested) as Observable<
-    //   Friend[]
-    // >;
+  async ngOnInit() {}
+
+  ngOnDestroy() {
+    this.friendsSubscrition.unsubscribe();
   }
 
   async ionViewWillEnter() {
@@ -92,7 +62,6 @@ export class FriendsPage implements OnInit {
     this.alertCtrl
       .create({
         header: 'Suppression',
-        //subHeader: 'Size Selection',
         message: 'Etes-vous sur de vouloir retirer cet ami de votre liste ?',
 
         buttons: [

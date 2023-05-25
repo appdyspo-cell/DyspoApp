@@ -6,6 +6,8 @@ import { Observable, Subscription } from 'rxjs';
 import { UserService } from './services/user.service';
 import { LoggerService } from './services/logger.service';
 import { FriendsService } from './services/friends.service';
+import { TestService } from './test.service';
+import { ChatService } from './services/chat.service';
 
 @Component({
   selector: 'app-root',
@@ -25,7 +27,9 @@ export class AppComponent {
     private menuCtrl: MenuController,
     private userSvc: UserService,
     private logger: LoggerService,
-    private friendsSvc: FriendsService
+    private friendsSvc: FriendsService,
+    private testSvc: TestService,
+    private chatSvc: ChatService
   ) {
     //Lang
     this.translate.setDefaultLang('fr');
@@ -85,6 +89,8 @@ export class AppComponent {
 
   initAllServices(uid: string) {
     this.friendsSvc.initService(uid);
+    // this.testSvc.initService(uid);
+    this.chatSvc.initService(uid);
     // this.kdoSvc.initService(uid);
   }
 

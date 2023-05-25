@@ -38,6 +38,27 @@ export interface AppSettings {
   actualiteDyspo: boolean;
 }
 
+export interface Chatroom {
+  chatroomKey: string;
+  description: string;
+  count: number;
+  lastMessage: string;
+  startMessageId: number;
+  nextMessageId: number;
+  blocked?: boolean;
+  blockedBy?: string;
+  blockedTime?: string;
+  blockedTimeMs?: number;
+  isArchived?: boolean;
+}
+
+export interface DBUser {
+  firstname: string;
+  lastname: string;
+  avatar: string;
+  chatIds?: string[];
+}
+
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
   DELETED = 'DELETED',
