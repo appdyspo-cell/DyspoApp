@@ -1,0 +1,141 @@
+
+
+ion-list {
+	padding-top: 5px;
+	background: var(--transparent) !important;
+	margin-bottom: 50px;
+
+	ion-item {
+		padding: 12px 18px 12px 18px;
+		--padding-start: 0;
+		--inner-padding-end: 0px;
+		--inner-min-height: unset !important;
+
+		&::after {
+			content: '';
+			position: absolute;
+			right: 0;
+			bottom: 0;
+			width: calc(100% - 88px);
+			height: 1px;
+			background: var(--text-light2);
+		}
+
+		.item_inner {
+
+			.profile_img_box {
+				margin: 0;
+				width: 50px;
+				min-width: 50px;
+				height: 50px;
+				position: relative;
+				margin-right: 17px;
+
+				.profile_img {
+					width: 50px;
+					height: 50px;
+					position: relative;
+					overflow: hidden;
+					border-radius: 50%;
+
+					img {
+						position: absolute;
+						width: 100%;
+						height: 100%;
+						left: -50% !important;
+						right: -50% !important;
+						top: 0;
+						bottom: 0;
+						left: 0;
+						margin: auto;
+					}
+				}
+			}
+
+			.text-box {
+				margin: 0;
+				width: 100%;
+
+				h2 {
+					font-size: .95rem;
+					font-weight: 500;
+					margin: 0;
+					color: var(--text-black);
+					overflow: hidden;
+
+					span {
+						text-overflow: ellipsis;
+						overflow: hidden;
+						white-space: nowrap;
+						max-width: calc(100% - 100px);
+						display: block;
+					}
+
+					small {
+						color: var(--text-light2);
+						font-weight: 400;
+						min-width: 45px;
+						text-align: center;
+						font-size: 0.6rem;
+						display: block;
+					}
+				}
+
+				p {
+					font-size: .75rem;
+					font-weight: 400;
+					padding-top: 3px;
+					color: var(--text-dark);
+					text-overflow: ellipsis;
+					overflow: hidden;
+					white-space: nowrap;
+					margin: 0;
+
+					span {
+						&.message {
+							text-overflow: ellipsis;
+							overflow: hidden;
+							white-space: nowrap;
+							max-width: calc(100% - 50px);
+							display: block;
+						}
+
+						&.end {
+							color: var(--white);
+							background: var(--primary);
+							border-radius: 50%;
+							text-align: center;
+							min-width: 16px;
+							height: 16px;
+							line-height: 16px;
+							font-size: .7rem;
+							font-weight: 400;
+						}
+					}
+
+					ion-icon {
+						font-size: 1rem;
+						min-width: 21px;
+					}
+				}
+			}
+		}
+		&:last-child {
+			&::after {
+				display: none;
+			}
+		}
+	}
+}
+
+ion-fab {
+	ion-fab-button {
+		--background: var(--primary);
+		width: 48px;
+		height: 48px;
+
+		ion-icon {
+			font-size: 1.15rem;
+		}
+	}
+}

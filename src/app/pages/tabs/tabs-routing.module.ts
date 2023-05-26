@@ -15,10 +15,10 @@ const routes: Routes = [
           ),
       },
       {
-        path: 'chat-home',
+        path: 'group-list',
         loadChildren: () =>
-          import('../chat-home/chat-home.module').then(
-            (m) => m.ChatHomePageModule
+          import('../chat/group-list/group-list.module').then(
+            (m) => m.GroupListPageModule
           ),
       },
       {

@@ -37,6 +37,7 @@
     "@ionic/angular": "^7.0.0",
     "@ngx-translate/core": "^15.0.0",
     "@ngx-translate/http-loader": "^8.0.0",
+    "animate.css": "^4.1.1",
     "capacitor-email-composer": "^1.2.1",
     "ionicons": "^7.0.0",
     "moment": "^2.29.4",

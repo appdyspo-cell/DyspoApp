@@ -53,6 +53,26 @@ const routes: Routes = [
     path: 'register',
     loadChildren: () => import('./pages/register/register.module').then( m => m.RegisterPageModule)
   },
+  {
+    path: 'group-list',
+    loadChildren: () => import('./pages/chat/group-list/group-list.module').then( m => m.GroupListPageModule)
+  },
+  {
+    path: 'group-info',
+    loadChildren: () => import('./pages/chat/group-info/group-info.module').then( m => m.GroupInfoPageModule)
+  },
+  {
+    path: 'group-chatting',
+    loadChildren: () => import('./pages/chat/group-chatting/group-chatting.module').then( m => m.GroupChattingPageModule)
+  },
+  {
+    path: 'create-group',
+    loadChildren: () => import('./pages/chat/create-group/create-group.module').then( m => m.CreateGroupPageModule)
+  },
+  {
+    path: 'create-group-info',
+    loadChildren: () => import('./pages/chat/create-group-info/create-group-info.module').then( m => m.CreateGroupInfoPageModule)
+  },
 ];
 @NgModule({
   imports: [

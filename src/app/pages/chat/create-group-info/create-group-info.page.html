@@ -1,0 +1,35 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-back-button text="" icon="chevron-back-outline"></ion-back-button>
+        </ion-buttons>
+        <ion-title>{{'group_info' | translate}} </ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg_color" fullscreen>
+    <div class="form">
+        <ion-list lines="none">
+            <ion-item class="profile">
+                <div class="profile_img_box animated zoomIn delay_1">
+                    <div class="profile_img">
+                        <!--						<img src="assets/img/profile_placeholder.png">-->
+                        <ion-icon class="ion-text-center zmdi zmdi-camera"></ion-icon>
+
+                    </div>
+                </div>
+            </ion-item>
+
+            <ion-item lines="none" class="status">
+                <ion-input type="text" class="ion-text-center" placeholder="{{'add_group_name' | translate}}"></ion-input>
+            </ion-item>
+
+            <ion-item lines="none" class="status">
+                <ion-input type="text" class="ion-text-center" placeholder="{{'description' | translate}}"></ion-input>
+            </ion-item>
+        </ion-list>
+    </div>
+</ion-content>
+<ion-footer class="ion-no-border animated slideInUp delay_3">
+    <ion-button size="large" shape="round" class="btn" (click)="tabs()">{{'create_group' | translate}}</ion-button>
+</ion-footer>

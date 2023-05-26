@@ -1,0 +1,142 @@
+<ion-header class="bg_transparent">
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-back-button text="" icon="chevron-back-outline"></ion-back-button>
+        </ion-buttons>
+        <ion-title>
+            <div class="profile d-flex active">
+                <div class="profile_img_box" (click)="groupinfo()">
+                    <div class="profile_img">
+                        <img src="assets/img/g5.png">
+                    </div>
+                </div>
+                <h2 (click)="groupinfo()">Charilie's Angels</h2>
+                <span class="end">
+ 					<ion-icon class="zmdi zmdi-more-vert ion-text-center"></ion-icon>
+ 				</span>
+            </div>
+        </ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <div class="chat_container d-flex">
+        <div class="chat-box d-flex received">
+            <div class="chat">
+                <div class="chat_detail">
+                    <div class="profile_img center_img">
+                        <img src="assets/img/1.png" class="crop_img">
+                    </div>
+                    <div class="text">
+                        <h6>Luicy Williams</h6>
+                        <h2>Hello, Guys?</h2>
+                    </div>
+                </div>
+            </div>
+            <p>12:01 pm</p>
+        </div>
+
+        <div class="chat-box d-flex received">
+            <div class="chat">
+                <div class="chat_detail">
+                    <div class="profile_img center_img">
+                        <img src="assets/img/2.png" class="crop_img">
+                    </div>
+                    <div class="text">
+                        <h6> Azler Hopson</h6>
+                        <h2>Hey, Whats up?</h2>
+                    </div>
+                </div>
+            </div>
+            <p>12:02 pm</p>
+        </div>
+
+        <div class="chat-box d-flex send">
+            <p>12:02 pm</p>
+            <div class="chat">
+                <div class="chat_detail">
+                    <div class="text">
+                        <h6>You</h6>
+                        <h2>What's the weekend plan?</h2>
+                    </div>
+                    <div class="profile_img center_img">
+                        <img src="assets/img/8.png" class="crop_img">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-box d-flex received">
+            <div class="chat">
+                <div class="chat_detail">
+                    <div class="profile_img center_img">
+                        <img src="assets/img/1.png" class="crop_img">
+                    </div>
+                    <div class="text">
+                        <h6>Luicy Williams</h6>
+                        <h2>Let's met & plan something !</h2>
+                    </div>
+                </div>
+            </div>
+            <p>12:02 pm</p>
+        </div>
+
+        <div class="chat-box d-flex send">
+            <p>12:02 pm</p>
+            <div class="chat">
+                <div class="chat_detail">
+                    <div class="text">
+                        <h6>You</h6>
+                        <h2>Okey ! Where to meet?</h2>
+                    </div>
+                    <div class="profile_img center_img">
+                        <img src="assets/img/8.png" class="crop_img">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-box d-flex received">
+            <div class="chat">
+                <div class="chat_detail">
+                    <div class="profile_img center_img">
+                        <img src="assets/img/1.png" class="crop_img">
+                    </div>
+                    <div class="text">
+                        <h6>Luicy Williams</h6>
+                        <h2>Found best place !!</h2>
+                    </div>
+                </div>
+
+                <div class="attachment">
+                    <img src="assets/img/map.png">
+                </div>
+            </div>
+            <p>12:04 pm</p>
+        </div>
+    </div>
+</ion-content>
+
+<ion-footer class="form animated slideInUp delay_3">
+    <ion-list lines="none" [ngClass]="viewType === 'active' ? 'list active':'list'">
+        <div class="option bg-theme d-flex">
+            <ion-icon class="zmdi zmdi-file-text"></ion-icon>
+            <ion-icon class="zmdi zmdi-headset-mic"></ion-icon>
+            <ion-icon class="zmdi zmdi-account-calendar"></ion-icon>
+            <ion-icon class="zmdi zmdi-pin"></ion-icon>
+            <ion-icon class="zmdi zmdi-image"></ion-icon>
+            <ion-icon class="zmdi zmdi-camera"></ion-icon>
+            <ion-icon class="zmdi zmdi-close" (click)="setViewType('')"></ion-icon>
+        </div>
+        <ion-item lines="none">
+            <div class="item_inner d-flex">
+                <ion-icon class="zmdi zmdi-mood" ion-text-start></ion-icon>
+                <ion-input type="text " placeholder="{{ 'type_your_message' | translate}} "></ion-input>
+                <div class="end icon_box">
+                    <ion-icon class="zmdi zmdi-attachment-alt ion-text-end" (click)="setViewType('active')"></ion-icon>
+                    <ion-icon class="zmdi zmdi-mic ion-text-end"></ion-icon>
+                </div>
+            </div>
+        </ion-item>
+    </ion-list>
+</ion-footer>

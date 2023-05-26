@@ -29,7 +29,7 @@ import { getFunctions, provideFunctions } from '@angular/fire/functions';
 import { getDatabase, provideDatabase } from '@angular/fire/database';
 
 export function createTranslateLoader(http: HttpClient) {
-  return new TranslateHttpLoader(http, './assets/lang/', '.json');
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 
 @NgModule({
