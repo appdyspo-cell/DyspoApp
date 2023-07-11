@@ -7,14 +7,16 @@ import { IonicModule } from '@ionic/angular';
 import { FriendsPageRoutingModule } from './friends-routing.module';
 
 import { FriendsPage } from './friends.page';
+import { NgCalendarModule } from 'src/app/components/calendar';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
+    NgCalendarModule,
     IonicModule,
-    FriendsPageRoutingModule
+    FriendsPageRoutingModule,
   ],
-  declarations: [FriendsPage]
+  declarations: [FriendsPage],
 })
 export class FriendsPageModule {}

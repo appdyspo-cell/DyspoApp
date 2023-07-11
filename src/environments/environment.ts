@@ -17,6 +17,7 @@ export const environment = {
   },
   DEFAULT_AVATAR: './assets/img/user.png',
   dyspo_email: 'contact@dyspo.com',
+  BIOMETRIC_KEY: 'dyspo_123456',
 };
 
 /*

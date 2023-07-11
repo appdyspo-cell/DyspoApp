@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 
@@ -27,6 +27,8 @@ import { provideStorage, getStorage } from '@angular/fire/storage';
 import { Capacitor } from '@capacitor/core';
 import { getFunctions, provideFunctions } from '@angular/fire/functions';
 import { getDatabase, provideDatabase } from '@angular/fire/database';
+import { CalendarModule } from './calendar';
+import { HammerModule } from '@angular/platform-browser';
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -34,10 +36,16 @@ export function createTranslateLoader(http: HttpClient) {
 
 @NgModule({
   declarations: [AppComponent],
+
   imports: [
     BrowserModule,
     IonicModule.forRoot(),
     HttpClientModule,
+    HammerModule,
+    CalendarModule.forRoot({
+      doneLabel: 'Save',
+      closeIcon: true,
+    }),
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

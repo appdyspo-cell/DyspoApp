@@ -1,7 +1,7 @@
 {
   "name": "dyspo",
   "version": "0.0.1",
-  "author": "Ionic Framework",
+  "author": "Romain VINCENT",
   "homepage": "https://ionicframework.com/",
   "scripts": {
     "ng": "ng",
@@ -34,16 +34,22 @@
     "@capacitor/push-notifications": "^5.0.2",
     "@capacitor/splash-screen": "^5.0.2",
     "@capacitor/status-bar": "5.0.2",
-    "@ionic/angular": "^7.0.0",
+    "@ionic/angular": "^7.1.1",
     "@ngx-translate/core": "^15.0.0",
     "@ngx-translate/http-loader": "^8.0.0",
+    "@types/hammerjs": "^2.0.41",
     "animate.css": "^4.1.1",
     "capacitor-email-composer": "^1.2.1",
+    "capacitor-native-biometric": "^4.2.2",
+    "dom7": "^4.0.6",
+    "hammerjs": "^2.0.8",
     "ionicons": "^7.0.0",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",
     "rxjs": "~7.8.0",
+    "stencil-components": "^0.0.1",
     "sweetalert2": "^11.7.5",
+    "swiper": "^8.4.6",
     "tslib": "^2.3.0",
     "zone.js": "~0.13.0"
   },
@@ -79,5 +85,5 @@
     "ts-node": "^8.3.0",
     "typescript": "~5.0.2"
   },
-  "description": "An Ionic project"
+  "description": "Dyspo beta project"
 }

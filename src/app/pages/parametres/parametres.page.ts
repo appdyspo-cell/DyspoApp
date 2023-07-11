@@ -48,6 +48,7 @@ export class ParametresPage implements OnInit {
     receiveNotification: true,
     friendInvitation: true,
     actualiteDyspo: true,
+    biometricAuth: true,
   };
   settingsBackup: AppSettings | undefined;
   avatar: string | undefined = '';
@@ -68,6 +69,7 @@ export class ParametresPage implements OnInit {
       receiveNotification: true,
       friendInvitation: true,
       actualiteDyspo: true,
+      biometricAuth: true,
     },
     tagline: '',
   };
@@ -113,6 +115,7 @@ export class ParametresPage implements OnInit {
   }
 
   loadInfos() {
+    console.log('loadINFOS');
     this.userInfo = Object.assign({}, this.userSvc.userInfo);
     //Real time appSettings changed
     this.appSettings = this.userSvc.userInfo?.appSettings;

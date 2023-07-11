@@ -26,6 +26,9 @@
 @import "@ionic/angular/css/flex-utils.css";
 @import '~animate.css/animate.min.css';
 
+@import 'swiper/scss';
+@import '@ionic/angular/css/ionic-swiper';
+
 :root {
     --white: #fff;
     --primary: #93b7ff;

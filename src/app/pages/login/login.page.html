@@ -90,7 +90,7 @@
               #btn1
               [disabled]="disablePage"
               shape="block"
-              (click)="login()"
+              (click)="submitLoginForm()"
               color="undefined"
               class="btn-transition"
               ><strong style="color:#fff"
@@ -99,7 +99,15 @@
             >
           </ion-col>
         </ion-row>
-
+        <ion-row *ngIf="showBiometricLogin">
+         
+          <ion-col >
+            <ion-button expand="block" (click)="biometricLogin()" color="undefined" class="btn-transition"><strong
+              class="white">Authentification biométrique</strong></ion-button>
+            
+          </ion-col>
+         
+        </ion-row>
         <p>&nbsp;</p>
         <ion-row>
           <ion-col>

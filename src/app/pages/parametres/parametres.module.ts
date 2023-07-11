@@ -7,14 +7,16 @@ import { IonicModule } from '@ionic/angular';
 import { ParametresPageRoutingModule } from './parametres-routing.module';
 
 import { ParametresPage } from './parametres.page';
+import { NgCalendarModule } from 'src/app/components/calendar';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    ParametresPageRoutingModule
+    NgCalendarModule,
+    ParametresPageRoutingModule,
   ],
-  declarations: [ParametresPage]
+  declarations: [ParametresPage],
 })
 export class ParametresPageModule {}

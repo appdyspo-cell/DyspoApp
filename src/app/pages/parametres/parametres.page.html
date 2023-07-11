@@ -30,6 +30,8 @@
       <!-- <ion-icon slot="end" name="chevron-forward-outline" style="color: var(--ion-color-primary)"></ion-icon>
        -->
     </ion-item>
+    
+    <!-- <dys-datetime></dys-datetime> -->
   </ion-card>
 
 
@@ -78,6 +80,25 @@
     </ion-list>
     
   </ion-card>
+  <div *ngIf="appSettings">
+    <ion-list-header>Réglages</ion-list-header>
+    <ion-card>
+      <ion-list>
+        <div>
+          <ion-item>
+            <ion-toggle color="primary"[(ngModel)]="appSettings.biometricAuth"  slot="end"></ion-toggle>
+            <ion-label>
+              <ion-text class="ion-text-capitalize">Authentification</ion-text>
+              <p class="ion-text-wrap">Activer l'authentification biométrique</p>
+            </ion-label>
+          </ion-item>        
+          
+        </div>
+      
+      </ion-list>
+      
+    </ion-card>
+  </div>
 
   <ion-list-header>
     <h2>Apparence</h2>
@@ -86,7 +107,7 @@
     <ion-list>
       <div>
         <ion-item>
-          <ion-toggle  color="primary" (ionChange)="toggleDarkMode($event)" [(ngModel)]="darkmode">Email</ion-toggle>
+          <ion-toggle  color="primary" (ionChange)="toggleDarkMode($event)" [(ngModel)]="darkmode">Mode Sombre</ion-toggle>
           
         </ion-item>        
       </div>

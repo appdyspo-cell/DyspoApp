@@ -7,14 +7,18 @@ import { IonicModule } from '@ionic/angular';
 import { AgendaPageRoutingModule } from './agenda-routing.module';
 
 import { AgendaPage } from './agenda.page';
+import { NgCalendarModule } from 'src/app/components/calendar';
+import { CalendarModule } from 'src/app/calendar';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
+    NgCalendarModule,
+    CalendarModule,
     IonicModule,
-    AgendaPageRoutingModule
+    AgendaPageRoutingModule,
   ],
-  declarations: [AgendaPage]
+  declarations: [AgendaPage],
 })
 export class AgendaPageModule {}
