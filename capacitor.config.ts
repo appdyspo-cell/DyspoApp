@@ -12,6 +12,10 @@ const config: CapacitorConfig = {
       presentationOptions: ['badge', 'sound', 'alert'],
     },
   },
+  ios: {
+    appendUserAgent: 'ios:application',
+    webContentsDebuggingEnabled: true,
+  },
 };
 
 export default config;
