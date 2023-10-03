@@ -10,6 +10,7 @@ import {
   GestureController,
   GestureDetail,
   IonDatetime,
+  NavController,
 } from '@ionic/angular';
 import { CalendarComponentOptions } from 'src/app/calendar';
 import { CalendarMode } from 'src/app/components/calendar';
@@ -35,7 +36,7 @@ export class AgendaPage implements AfterViewInit {
     showMonthPicker: true,
     showToggleButtons: true,
   };
-  constructor(private gestureCtrl: GestureController) {}
+  constructor(private gestureCtrl: GestureController, private navCtrl: NavController) {}
 
   ngAfterViewInit() {
     // console.log('mydiv', this.mydiv);
@@ -77,5 +78,9 @@ export class AgendaPage implements AfterViewInit {
   }
   onItemSwipe(ev: any) {
     console.log('Sxipe');
+  }
+  onSelect(ev:any){
+    console.log('Selected ', ev);
+    this.navCtrl.navigateForward('/agenda/create-event');
   }
 }

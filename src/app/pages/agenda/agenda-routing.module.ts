@@ -7,6 +7,10 @@ const routes: Routes = [
   {
     path: '',
     component: AgendaPage
+  },
+  {
+    path: 'create-event',
+    loadChildren: () => import('./create-event/create-event.module').then( m => m.CreateEventPageModule)
   }
 ];
 

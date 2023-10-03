@@ -20,6 +20,7 @@ import { defaults, pickModes } from '../config';
 import { ActionSheetController, GestureController } from '@ionic/angular';
 import * as Hammer from 'hammerjs';
 import $$ from 'dom7';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 export const MONTH_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -251,7 +252,10 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     await actionSheet.present();
 
     let result = await actionSheet.onDidDismiss();
-    this.updateDays(result.data.action);
+    if(result.data){
+      this.updateDays(result.data.action);
+    }
+    
     console.log(result);
   }
 
@@ -446,13 +450,15 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     }
   }
 
-  onDoubleTap(ev: any, day: any) {
+  async onDoubleTap(ev: any, day: any) {
     console.log('doubletap ', ev, day);
+    await Haptics.impact({ style: ImpactStyle.Heavy });
   }
 
-  onLongPress(ev: any, day: CalendarDay) {
+  async onLongPress(ev: any, day: CalendarDay) {
     console.log('longpress ', ev, day);
     this.longPressedDay = day;
+    await Haptics.vibrate();
   }
   onPan(ev: any) {
     console.log('pan ', ev);

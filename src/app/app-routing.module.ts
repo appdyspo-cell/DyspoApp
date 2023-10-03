@@ -73,6 +73,11 @@ const routes: Routes = [
     path: 'create-group-info',
     loadChildren: () => import('./pages/chat/create-group-info/create-group-info.module').then( m => m.CreateGroupInfoPageModule)
   },
+  {
+    path: 'pro-calendar',
+    loadChildren: () => import('./pages/pro-calendar/pro-calendar.module').then( m => m.ProCalendarPageModule)
+  },
+
 ];
 @NgModule({
   imports: [

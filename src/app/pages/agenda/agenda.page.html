@@ -12,17 +12,14 @@
   </ion-header>
  
 <div class="container">
-  <!-- <ion-datetime  #mydiv locale="fr-FR" multiple="true" mode="md" (ionChange)="onChange($event)"></ion-datetime>
-   -->
+
 </div>
-<!-- <div #mydivs  style="width: 100%; height: 150px; background-color: aquamarine;">
-  Hello
-</div> -->
-<!-- <calendar [calendarMode]="calendar.mode"></calendar> -->
+
 <ion-calendar 
 #mydiv
 [(ngModel)]="dateMulti"
 (change)="onChange($event)"
+(select)="onSelect($event)"
 [type]="type"
 [options]="optionsMulti"
 [format]="'YYYY-MM-DD'"></ion-calendar>

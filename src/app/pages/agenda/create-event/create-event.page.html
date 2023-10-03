@@ -1,0 +1,71 @@
+<ion-header [translucent]="true">
+
+  <ion-toolbar>
+    <ion-buttons>
+      <ion-back-button slot="start" title=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Créer un evenement</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+     
+  
+      
+      <ion-title size="large">Nouvel Evenement</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <form [formGroup]="eventForm">
+    <ion-item>
+      <ion-label position="floating">Titre</ion-label>
+      <ion-input formControlName="title" required></ion-input>
+    </ion-item>
+
+   
+
+    <ion-item button="true" id="open-time-item">
+      <ion-text *ngIf="startTimeValue">{{startTimeValue}}</ion-text>
+      <ion-text *ngIf="!startTimeValue">Sélectionnez Heure de debut</ion-text>
+      <ion-icon slot="end" color="primary" icon="alarm"></ion-icon>
+      <ion-popover #popover_time trigger="open-time-item" show-backdrop="false" size="cover">
+        <ng-template>
+          <ion-datetime
+            #datetime_starttime
+            presentation="time"
+            showDefaultButtons="true"
+            doneText="OK"
+            hour-cycle="h23" locale="fr-FR"
+            [value]="datetime_starttime_value"
+            cancelText="Annuler"
+           
+            (ionChange)="onStartTimeChanged($event)"
+          ></ion-datetime>
+        </ng-template>
+      </ion-popover>
+    </ion-item>
+
+    <ion-item button="true" id="open-end-time-item">
+      <ion-text *ngIf="endTimeValue">{{endTimeValue}}</ion-text>
+      <ion-text *ngIf="!endTimeValue">Sélectionnez Heure de fin</ion-text>
+      <ion-icon slot="end" color="primary" icon="alarm"></ion-icon>
+      <ion-popover #popover_time trigger="open-end-time-item" show-backdrop="false" size="cover">
+        <ng-template>
+          <ion-datetime
+            presentation="time"
+            showDefaultButtons="true"
+            doneText="OK"
+            hour-cycle="h23" locale="fr-FR"
+            [value]="datetime_endtime_value"
+            cancelText="Annuler"
+           
+            (ionChange)="onEndTimeChanged($event)"
+          ></ion-datetime>
+        </ng-template>
+      </ion-popover>
+    </ion-item>
+
+    <ion-button expand="full" (click)="createEvent()">Créer</ion-button>
+  </form>
+</ion-content>
