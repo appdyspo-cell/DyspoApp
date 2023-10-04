@@ -14,8 +14,11 @@ import {
   NavController,
 } from '@ionic/angular';
 import { formatISO } from 'date-fns';
+import { Observable, Subscription } from 'rxjs';
 import { CalendarComponentOptions } from 'src/app/calendar';
 import { CalendarMode } from 'src/app/components/calendar';
+import { AgendaEvent } from 'src/app/models/models';
+import { AgendaService } from 'src/app/services/agenda.service';
 
 @Component({
   selector: 'app-agenda',
@@ -41,10 +44,28 @@ export class AgendaPage implements AfterViewInit {
 
   eventsForDate: any;
   selectedDate: any;
+
+  agendaEvents$: Observable<AgendaEvent[]>;
+  agendaEvents: AgendaEvent[] = [];
+  agendaEventsSubscription: Subscription;
+
   constructor(
     private gestureCtrl: GestureController,
+    private agendaSvc: AgendaService,
     private navCtrl: NavController
-  ) {}
+  ) {
+    this.agendaEvents$ = this.agendaSvc.agendaEvents$;
+    this.agendaEventsSubscription = this.agendaSvc.agendaEvents$.subscribe(
+      (agendaEvents: AgendaEvent[]) => {
+        console.log('Agenda Events  ', agendaEvents);
+        this.agendaEvents = agendaEvents;
+      }
+    );
+  }
+
+  ngOnDestroy() {
+    this.agendaEventsSubscription.unsubscribe();
+  }
 
   ngAfterViewInit() {
     // console.log('mydiv', this.mydiv);

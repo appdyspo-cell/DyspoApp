@@ -21,7 +21,9 @@ export class AgendaService {
 
   public agendaEvents$!: Observable<AgendaEvent[]>;
 
-  constructor(private firestore: Firestore) {}
+  constructor(private firestore: Firestore) {
+    this.agendaEvents$ = this.agendaEventsSubject.asObservable();
+  }
 
   initService(uid: string) {
     console.log('Init Agenda Service...');
@@ -30,7 +32,7 @@ export class AgendaService {
     this.agendaEvents = [];
     const agendaEventsCollectionRef = collection(
       this.firestore,
-      `agenda/${uid}/event_list`
+      `agenda_events/${uid}/event_list`
     );
 
     onSnapshot(agendaEventsCollectionRef, (snapshot) => {
@@ -58,6 +60,8 @@ export class AgendaService {
             const agendaEvent = change.doc.data() as AgendaEvent;
             agendaEvent.uid = change.doc.id;
             console.log(agendaEvent);
+            this.agendaEvents.push(agendaEvent);
+            this.agendaEventsSubject.next(this.agendaEvents);
             // this.getAgendaEventAndPush(agendaEvent)
             //   .then((resPromise: any) => {
             //     console.log('agendaEvent Hydrated ', resPromise);
