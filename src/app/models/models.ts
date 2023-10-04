@@ -53,6 +53,28 @@ export interface Chatroom {
   isArchived?: boolean;
 }
 
+export interface AgendaEvent {
+  title?: string;
+  startISO: string;
+  endISO: string;
+  uid?: string;
+  status: AgendaEventStatus;
+  type: AgendaEventType;
+  start_date_formatted?: string;
+  start_time_formatted?: string;
+  end_date_formatted?: string;
+  end_time_formatted?: string;
+}
+
+export interface AgendaEventForm {
+  title: string;
+  startISO: string;
+  endISO: string;
+  agendaEvent_uid?: string;
+  status: AgendaEventStatus;
+  isKids: boolean;
+}
+
 export interface DBUser {
   firstname: string;
   lastname: string;
@@ -63,6 +85,16 @@ export interface DBUser {
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
   DELETED = 'DELETED',
+}
+
+export enum AgendaEventStatus {
+  ACTIVE = 'ACTIVE',
+  DELETED = 'DELETED',
+}
+
+export enum AgendaEventType {
+  KIDS = 'KIDS',
+  NOKIDS = 'NOKIDS',
 }
 
 export enum FriendStatus {

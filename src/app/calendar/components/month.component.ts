@@ -252,10 +252,10 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     await actionSheet.present();
 
     let result = await actionSheet.onDidDismiss();
-    if(result.data){
+    if (result.data) {
       this.updateDays(result.data.action);
     }
-    
+
     console.log(result);
   }
 

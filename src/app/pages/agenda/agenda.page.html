@@ -10,18 +10,25 @@
       <ion-title size="large">Calendrier</ion-title>
     </ion-toolbar>
   </ion-header>
- 
-<div class="container">
 
-</div>
+  <div class="container"></div>
 
-<ion-calendar 
-#mydiv
-[(ngModel)]="dateMulti"
-(change)="onChange($event)"
-(select)="onSelect($event)"
-[type]="type"
-[options]="optionsMulti"
-[format]="'YYYY-MM-DD'"></ion-calendar>
- 
+  <ion-calendar
+    #mydiv
+    [(ngModel)]="dateMulti"
+    (change)="onChange($event)"
+    (select)="onSelect($event)"
+    [type]="type"
+    [options]="optionsMulti"
+    [format]="'YYYY-MM-DD'"
+  ></ion-calendar>
+
+  <ion-list *ngIf="eventsForDate">
+    <ion-item> </ion-item>
+  </ion-list>
+  <ion-item *ngIf="!eventsForDate">
+    <ion-button expand="full" (click)="addEvent()"
+      >Ajouter un évènement</ion-button
+    >
+  </ion-item>
 </ion-content>

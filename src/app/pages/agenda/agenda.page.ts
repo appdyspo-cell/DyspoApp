@@ -5,6 +5,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
+import { NavigationExtras } from '@angular/router';
 import {
   Gesture,
   GestureController,
@@ -12,6 +13,7 @@ import {
   IonDatetime,
   NavController,
 } from '@ionic/angular';
+import { formatISO } from 'date-fns';
 import { CalendarComponentOptions } from 'src/app/calendar';
 import { CalendarMode } from 'src/app/components/calendar';
 
@@ -36,7 +38,13 @@ export class AgendaPage implements AfterViewInit {
     showMonthPicker: true,
     showToggleButtons: true,
   };
-  constructor(private gestureCtrl: GestureController, private navCtrl: NavController) {}
+
+  eventsForDate: any;
+  selectedDate: any;
+  constructor(
+    private gestureCtrl: GestureController,
+    private navCtrl: NavController
+  ) {}
 
   ngAfterViewInit() {
     // console.log('mydiv', this.mydiv);
@@ -74,13 +82,27 @@ export class AgendaPage implements AfterViewInit {
   }
 
   onChange(ev: any) {
-    //console.log(ev);
+    console.log('onChange');
   }
   onItemSwipe(ev: any) {
     console.log('Sxipe');
   }
-  onSelect(ev:any){
+  onSelect(ev: any) {
     console.log('Selected ', ev);
-    this.navCtrl.navigateForward('/agenda/create-event');
+    getEvents(ev.time);
+    this.selectedDate = ev;
   }
+  addEvent() {
+    const navigationExtras: NavigationExtras = {
+      state: {
+        tsDate: this.selectedDate.time,
+      },
+    };
+    this.navCtrl.navigateForward('/agenda/create-event/new', navigationExtras);
+  }
+}
+function getEvents(selectedDateMs: number) {
+  console.log(formatISO(selectedDateMs));
+
+  //throw new Error('Function not implemented.');
 }

@@ -47,7 +47,7 @@ export class ChatService {
   async initService(idUser: string) {
     this.chatrooms = [];
     // on recupere les chatrooms du user
-    console.log('chatroomService => initService');
+    console.log('Init Chat Service...');
 
     const chat_user = (
       await get(child(ref(this.db), 'chat_users/' + idUser))

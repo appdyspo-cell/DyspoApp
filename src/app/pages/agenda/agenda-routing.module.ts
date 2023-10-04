@@ -6,12 +6,15 @@ import { AgendaPage } from './agenda.page';
 const routes: Routes = [
   {
     path: '',
-    component: AgendaPage
+    component: AgendaPage,
   },
   {
-    path: 'create-event',
-    loadChildren: () => import('./create-event/create-event.module').then( m => m.CreateEventPageModule)
-  }
+    path: 'create-event/:mode',
+    loadChildren: () =>
+      import('./create-event/create-event.module').then(
+        (m) => m.CreateEventPageModule
+      ),
+  },
 ];
 
 @NgModule({

@@ -8,6 +8,7 @@ import { LoggerService } from './services/logger.service';
 import { FriendsService } from './services/friends.service';
 import { TestService } from './test.service';
 import { ChatService } from './services/chat.service';
+import { AgendaService } from './services/agenda.service';
 
 @Component({
   selector: 'app-root',
@@ -28,7 +29,7 @@ export class AppComponent {
     private userSvc: UserService,
     private logger: LoggerService,
     private friendsSvc: FriendsService,
-    private testSvc: TestService,
+    private agendaSvc: AgendaService,
     private chatSvc: ChatService
   ) {
     //Lang
@@ -89,7 +90,7 @@ export class AppComponent {
 
   initAllServices(uid: string) {
     this.friendsSvc.initService(uid);
-    // this.testSvc.initService(uid);
+    this.agendaSvc.initService(uid);
     this.chatSvc.initService(uid);
     // this.kdoSvc.initService(uid);
   }

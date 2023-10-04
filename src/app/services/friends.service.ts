@@ -99,7 +99,7 @@ export class FriendsService {
         this.friends.push(friend);
         resolve(friend);
       } else {
-        // docSnap.data() will be undefined in this case
+        // docSnap.data() will be undefined in this case !
         console.log('No such document!');
         reject('USER_NOT_FOUND');
       }

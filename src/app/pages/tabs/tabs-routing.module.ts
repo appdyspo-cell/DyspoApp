@@ -29,7 +29,9 @@ const routes: Routes = [
       {
         path: 'pro-calendar',
         loadChildren: () =>
-          import('../pro-calendar/pro-calendar.module').then((m) => m.ProCalendarPageModule),
+          import('../pro-calendar/pro-calendar.module').then(
+            (m) => m.ProCalendarPageModule
+          ),
       },
       {
         path: 'friends',
