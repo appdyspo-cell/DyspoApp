@@ -33,6 +33,7 @@
   --white: #fff;
   --primary: #93b7ff;
   --bg-color: #f3f4f8;
+  --bg-color-dark: #7e97f1;
   --green_color: #00ff5a;
   --gray: #d5d5d5;
   --transparent: rgba(0, 0, 0, 0);
@@ -54,7 +55,8 @@
 }
 
 .bg_color {
-  --background: var(--bg-color);
+  //--background: var(--bg-color);
+  --background: radial-gradient(circle, var(--bg-color), var(--bg-color-dark));
 }
 
 .margin-bottom {
