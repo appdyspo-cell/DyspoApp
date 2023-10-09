@@ -59,7 +59,7 @@ export class AgendaService {
           } else {
             const agendaEvent = change.doc.data() as AgendaEvent;
             agendaEvent.uid = change.doc.id;
-            console.log(agendaEvent);
+
             this.agendaEvents.push(agendaEvent);
             this.agendaEventsSubject.next(this.agendaEvents);
             // this.getAgendaEventAndPush(agendaEvent)

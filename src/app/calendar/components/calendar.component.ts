@@ -121,6 +121,7 @@ interface CompatibleIcons {
         (select)="select.emit($event)"
         (selectStart)="selectStart.emit($event)"
         (selectEnd)="selectEnd.emit($event)"
+        (selectReadOnly)="selectReadOnly.emit($event)"
         [pickMode]="_d.pickMode"
         [color]="_d.color"
       >
@@ -201,6 +202,10 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
   public selectStart: EventEmitter<CalendarDay> = new EventEmitter();
   @Output()
   public selectEnd: EventEmitter<CalendarDay> = new EventEmitter();
+  @Output()
+  public selectReadOnly: EventEmitter<CalendarDay[]> = new EventEmitter();
+  @Output()
+  public createMonthEvent: EventEmitter<CalendarMonth> = new EventEmitter();
 
   @Input()
   set options(value: CalendarComponentOptions) {
@@ -239,6 +244,7 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
   ngOnInit(): void {
     this.initOpt();
     this.monthOpt = this.createMonth(new Date().getTime());
+    console.log('Month opt', this.monthOpt);
   }
 
   getViewDate() {
@@ -408,7 +414,14 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
   }
 
   createMonth(date: number): CalendarMonth {
-    return this.calSvc.createMonthsByPeriod(date, 1, this._d)[0];
+    const createMonthData = this.calSvc.createMonthsByPeriod(
+      date,
+      1,
+      this._d
+    )[0];
+    this.createMonthEvent.emit(createMonthData);
+
+    return createMonthData;
   }
 
   _createCalendarDay(value: CalendarComponentPayloadTypes): CalendarDay {

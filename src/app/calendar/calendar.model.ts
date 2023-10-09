@@ -26,6 +26,10 @@ export interface CalendarDay {
   };
   isFirst?: boolean;
   isLast?: boolean;
+  isEvent?: boolean;
+  userDyspo?: boolean;
+  userDyspoWithKids?: boolean;
+  userNoDyspo?: boolean;
 }
 
 export class CalendarMonth {

@@ -48,7 +48,7 @@ export const MONTH_VALUE_ACCESSOR: any = {
       <ng-template [ngIf]="!_isRange" [ngIfElse]="rangeBox">
         <div class="days-box">
           <ng-template ngFor let-day [ngForOf]="month.days || []">
-            <div class="days">
+            <div class="days" style="position: relative;">
               <ng-container *ngIf="day">
                 <button
                   type="button"
@@ -67,6 +67,12 @@ export const MONTH_VALUE_ACCESSOR: any = {
                   <p [id]="'day-' + day.time" class="p-day">{{ day.title }}</p>
                   <small *ngIf="day.subTitle">{{ day?.subTitle }}</small>
                 </button>
+                <div
+                  *ngIf="day.isEvent"
+                  style="width:10px; height:10px; background-color:red; position:absolute; top: 5px; border-radius:5px"
+                >
+                  &nbsp;
+                </div>
               </ng-container>
             </div>
           </ng-template>
@@ -131,6 +137,10 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   @Output()
   // eslint-disable-next-line @angular-eslint/no-output-native
   public change: EventEmitter<CalendarDay[]> = new EventEmitter();
+
+  @Output()
+  // eslint-disable-next-line @angular-eslint/no-output-native
+  public selectReadOnly: EventEmitter<CalendarDay[]> = new EventEmitter();
   @Output()
   // eslint-disable-next-line @angular-eslint/no-output-native
   public select: EventEmitter<CalendarDay> = new EventEmitter();
@@ -162,12 +172,22 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   ) {}
 
   onPanEnd(ev: any) {
-    console.log('panend');
+    console.log('pan end');
+    if (this.readonly) {
+      console.log('Read Only Mode');
+
+      return;
+    }
     console.log('Selected days ', this.selectedDays);
     this.presentAction();
   }
 
   onPanMove(ev: any) {
+    if (this.readonly) {
+      console.log('Read Only Mode');
+
+      return;
+    }
     const targetElement = document.elementFromPoint(ev.center.x, ev.center.y);
 
     if (targetElement && targetElement.classList.contains('p-day')) {
@@ -189,7 +209,7 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
           // On recupere l'intervalle des dates
           for (let i = this.startDayIndex; i <= targetDayIndex; i++) {
             // this.month.days[i].selected = true;
-            this.month.days[i].subTitle = '*';
+            this.month.days[i].subTitle = 'My sub';
             //this.select.emit(this.month.days[i]);
             this.selectedDays.push(this.month.days[i]);
           }
@@ -383,7 +403,13 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   }
 
   onSelected(item: CalendarDay, event?: any): void {
-    if (this.readonly) return;
+    if (this.readonly) {
+      console.log('Read Only Mode');
+      if (this.pickMode === pickModes.MULTI) {
+        this.selectReadOnly.emit([item]);
+      }
+      return;
+    }
 
     // // Handle double tap
     // const currentTime = new Date().getTime();

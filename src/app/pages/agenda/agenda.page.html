@@ -8,6 +8,14 @@
   <ion-header collapse="condense">
     <ion-toolbar style="--background: transparent">
       <ion-title size="large">Calendrier</ion-title>
+      <ion-buttons slot="end">
+        <ion-toggle
+          labelPlacement="stacked"
+          [enableOnOffLabels]="true"
+          (ionChange)="onChangeMode($event)"
+          >Edit</ion-toggle
+        >
+      </ion-buttons>
     </ion-toolbar>
   </ion-header>
 
@@ -18,9 +26,12 @@
     [(ngModel)]="dateMulti"
     (change)="onChange($event)"
     (select)="onSelect($event)"
+    (selectReadOnly)="onSelectReadOnly($event)"
+    (createMonthEvent)="onCreateMonthEvent($event)"
     [type]="type"
     [options]="optionsMulti"
     [format]="'YYYY-MM-DD'"
+    [readonly]="agendaMode === agendaModes.READONLY"
   ></ion-calendar>
 
   <ion-list-header> {{selectedDateFormatted}} </ion-list-header>

@@ -22,7 +22,12 @@ import {
   parseISO,
 } from 'date-fns';
 import { Observable, Subscription } from 'rxjs';
-import { CalendarComponentOptions, DayConfig } from 'src/app/calendar';
+import {
+  CalendarComponentOptions,
+  CalendarDay,
+  CalendarMonth,
+  DayConfig,
+} from 'src/app/calendar';
 import { CalendarMode } from 'src/app/components/calendar';
 import { AgendaEvent } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
@@ -31,7 +36,7 @@ import { UtilsService } from 'src/app/services/utils.service';
 export enum AgendaMode {
   SELECT,
   EDIT,
-  GETEVENTS,
+  READONLY,
 }
 
 @Component({
@@ -59,9 +64,12 @@ export class AgendaPage implements AfterViewInit {
   agendaEvents: AgendaEvent[] = [];
   agendaEventsSubscription: Subscription;
 
-  agendaMode: AgendaMode = AgendaMode.GETEVENTS;
+  agendaMode: AgendaMode = AgendaMode.READONLY;
   selectedDateFormatted: any;
   selectedDateMs: number;
+
+  agendaModes = AgendaMode;
+  calendarMonthData!: CalendarMonth;
 
   constructor(
     private gestureCtrl: GestureController,
@@ -72,8 +80,8 @@ export class AgendaPage implements AfterViewInit {
     this.agendaEvents$ = this.agendaSvc.agendaEvents$;
     this.agendaEventsSubscription = this.agendaSvc.agendaEvents$.subscribe(
       (agendaEvents: AgendaEvent[]) => {
-        console.log('Agenda Events  ', agendaEvents);
         this.agendaEvents = agendaEvents;
+        this.tagCalendarData();
         this.getAgendaEventsForSelectedDate();
       }
     );
@@ -83,6 +91,14 @@ export class AgendaPage implements AfterViewInit {
 
   ngOnDestroy() {
     this.agendaEventsSubscription.unsubscribe();
+  }
+
+  onChangeMode(ev: any) {
+    if (ev.detail.checked) {
+      this.agendaMode = AgendaMode.EDIT;
+    } else {
+      this.agendaMode = AgendaMode.READONLY;
+    }
   }
 
   ngAfterViewInit() {
@@ -102,16 +118,16 @@ export class AgendaPage implements AfterViewInit {
     // gesture.enable()
 
     // Set events for today
-    this.getAgendaEventsForSelectedDate();
+    //this.getAgendaEventsForSelectedDate();
 
-    let _daysConfig: DayConfig[] = [];
+    // let _daysConfig: DayConfig[] = [];
 
-    for (let i = 0; i < 31; i++) {
-      _daysConfig.push({
-        date: new Date(2022, 9, i + 1),
-        subTitle: `$${i + 1}`,
-      });
-    }
+    // for (let i = 0; i < 31; i++) {
+    //   _daysConfig.push({
+    //     date: new Date(2022, 9, i + 1),
+    //     subTitle: `$${i + 1}`,
+    //   });
+    // }
     this.optionsMulti = {
       pickMode: 'multi',
       showMonthPicker: true,
@@ -139,18 +155,51 @@ export class AgendaPage implements AfterViewInit {
   }
 
   onChange(ev: any) {
-    console.log('onChange');
+    console.log('onChange', ev);
   }
   onItemSwipe(ev: any) {
     console.log('Sxipe');
   }
   onSelect(ev: any) {
-    if (this.agendaMode === AgendaMode.GETEVENTS) {
+    if (this.agendaMode === AgendaMode.READONLY) {
       console.log('Get events for Selected ', ev);
 
       this.selectedDate = ev;
       this.selectedDateFormatted = this.utils.formatDate(ev.time);
       this.selectedDateMs = ev.time;
+      this.getAgendaEventsForSelectedDate();
+    }
+  }
+
+  onCreateMonthEvent(calendarMonthData: CalendarMonth) {
+    console.log('Month created !!!!', calendarMonthData);
+    this.calendarMonthData = calendarMonthData;
+    this.tagCalendarData();
+  }
+
+  tagCalendarData() {
+    if (!this.calendarMonthData) {
+      console.log('Can not tag calendar data');
+    } else {
+      this.calendarMonthData.days.forEach((day) => {
+        this.agendaEvents.forEach((agendaEvent) => {
+          if (isSameDay(day.time, parseISO(agendaEvent.startISO))) {
+            day.isEvent = true;
+            //day.subTitle = agendaEvent.title?.substring(0, 5);
+          }
+        });
+      });
+    }
+  }
+
+  onSelectReadOnly(ev: CalendarDay[]) {
+    if (this.agendaMode === AgendaMode.READONLY) {
+      console.log('Selected read only ', ev);
+
+      this.selectedDate = ev;
+      this.selectedDateFormatted = this.utils.formatDate(ev[0].time);
+      this.selectedDateMs = ev[0].time;
+      //ev[0].marked = true;
       this.getAgendaEventsForSelectedDate();
     }
   }
@@ -187,6 +236,5 @@ export class AgendaPage implements AfterViewInit {
         return 0; // les dates sont égales
       }
     });
-    console.log(this.eventsForDate);
   }
 }

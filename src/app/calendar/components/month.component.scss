@@ -17,7 +17,7 @@
   float: left;
   text-align: center;
   height: 36px;
-  margin-bottom: 5px;
+  margin-bottom: 9px;
 }
 
 :host .days .marked p {
@@ -808,8 +808,8 @@
   border-radius: 50%;
 }
 
-:host .days.endSelection:nth-child(7n+1):before,
-:host .days.between:nth-child(7n+1) button.days-btn,
+:host .days.endSelection:nth-child(7n + 1):before,
+:host .days.between:nth-child(7n + 1) button.days-btn,
 :host .days.between.is-first-wrap button.days-btn.is-first,
 :host button.days-btn.is-first {
   border-radius: 36px 0 0 36px;
