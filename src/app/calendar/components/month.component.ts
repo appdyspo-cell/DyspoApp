@@ -260,6 +260,7 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    console.log('after view init month comp');
     this._isInit = true;
     const element = this.myElement.nativeElement;
     const hammer = new Hammer.Manager(element);

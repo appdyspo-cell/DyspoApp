@@ -8,6 +8,8 @@ import { environment } from 'src/environments/environment';
 
 import Swal from 'sweetalert2';
 import { LoggerService } from './logger.service';
+import { fr } from 'date-fns/locale';
+import { format, parseISO } from 'date-fns';
 
 @Injectable({
   providedIn: 'root',
@@ -176,5 +178,13 @@ export class UtilsService {
       icon: 'success',
       heightAuto: false,
     });
+  }
+
+  formatISODate(dateISO: string) {
+    return format(parseISO(dateISO), 'iii dd MMM yyyy', { locale: fr });
+  }
+
+  formatDate(dateMs: number) {
+    return format(new Date(dateMs), 'iii dd MMM yyyy', { locale: fr });
   }
 }

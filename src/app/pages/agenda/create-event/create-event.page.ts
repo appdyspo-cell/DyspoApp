@@ -37,6 +37,8 @@ export class CreateEventPage implements OnInit {
   min_time_ISO_end!: string;
   agendaEvent: AgendaEvent | undefined;
   agendaEventType = AgendaEventType;
+  pageTitle = '';
+  saveLabel = '';
 
   constructor(
     private navCtrl: NavController,
@@ -48,6 +50,8 @@ export class CreateEventPage implements OnInit {
       const mode = params['mode'];
       switch (mode) {
         case 'new':
+          this.pageTitle = 'Créer un evenement';
+          this.saveLabel = 'Sauvegarder';
           this.tsInputDate =
             this.router.getCurrentNavigation()?.extras.state?.['tsDate'];
 
@@ -89,8 +93,11 @@ export class CreateEventPage implements OnInit {
 
           break;
         case 'edit':
+          this.saveLabel = 'Mettre à jour';
+          this.pageTitle = 'Editer un evenement';
           this.agendaEvent =
             this.router.getCurrentNavigation()?.extras.state?.['agendaEvent'];
+
           break;
       }
     });

@@ -6,7 +6,7 @@
 
 <ion-content [fullscreen]="true" class="bg_color">
   <ion-header collapse="condense">
-    <ion-toolbar>
+    <ion-toolbar style="--background: transparent">
       <ion-title size="large">Calendrier</ion-title>
     </ion-toolbar>
   </ion-header>
@@ -23,12 +23,29 @@
     [format]="'YYYY-MM-DD'"
   ></ion-calendar>
 
-  <ion-list *ngIf="eventsForDate">
-    <ion-item> </ion-item>
-  </ion-list>
-  <ion-item *ngIf="!eventsForDate">
-    <ion-button expand="full" (click)="addEvent()"
-      >Ajouter un évènement</ion-button
+  <ion-list-header> {{selectedDateFormatted}} </ion-list-header>
+
+  <ion-list *ngIf="eventsForDate.length > 0">
+    <ion-item
+      *ngFor="let agendaEvent of eventsForDate; let i=index "
+      type="button"
+      mode="ios"
+      (click)="updateEvent(agendaEvent)"
     >
-  </ion-item>
+      <ion-icon name="time-outline" slot="start"></ion-icon>
+      {{agendaEvent.title}}<br />
+      {{agendaEvent.start_time_formatted}} - {{agendaEvent.end_time_formatted}}
+    </ion-item>
+  </ion-list>
+  <ion-list *ngIf="!eventsForDate || eventsForDate?.length === 0">
+    <ion-item>
+      <ion-icon name="time-outline" slot="start"></ion-icon>
+      Pas d'evenement prévu
+    </ion-item>
+  </ion-list>
+  <ion-fab slot="fixed" horizontal="end" vertical="bottom">
+    <ion-fab-button (click)="addEvent()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

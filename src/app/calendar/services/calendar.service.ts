@@ -128,6 +128,7 @@ export class CalendarService {
     opt: InternalCalendarModalOptions,
     month?: number
   ): CalendarDay {
+    console.log('Create calendar day');
     let _time = moment(time);
     let date = moment(time);
     let isToday = moment().isSame(_time, 'days');
