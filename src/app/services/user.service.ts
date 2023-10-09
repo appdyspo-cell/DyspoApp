@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AppUser, UserStatus } from '../models/models';
+import { AppUser, UserDyspoStatus, UserStatus } from '../models/models';
 import {
   Firestore,
   collection,
@@ -102,6 +102,7 @@ export class UserService {
       firstConnexion: true,
       last_connexion_ms: 0,
       status: UserStatus.ACTIVE,
+      dyspoStatus: UserDyspoStatus.DYSPO,
       appSettings: {
         receiveEmail: false,
         receiveNotification: true,

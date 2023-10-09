@@ -8,6 +8,7 @@ export interface AppUser {
   avatarPath?: string;
   appSettings?: AppSettings;
   status?: UserStatus;
+  dyspoStatus: UserDyspoStatus;
   last_connexion_ms?: number;
   last_connexion_ISO?: string;
   firstConnexion?: boolean;
@@ -85,6 +86,12 @@ export interface DBUser {
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
   DELETED = 'DELETED',
+}
+
+export enum UserDyspoStatus {
+  DYSPO = 'DYSPO',
+  DYSPOWITHKIDS = 'DYSPOWITHKIDS',
+  NODYSPO = 'NODYSPO',
 }
 
 export enum AgendaEventStatus {

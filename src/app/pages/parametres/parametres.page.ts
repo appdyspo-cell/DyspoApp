@@ -1,15 +1,28 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { Router } from '@angular/router';
-import { AlertController, NavController } from '@ionic/angular';
+import {
+  AlertController,
+  IonModal,
+  ModalController,
+  NavController,
+} from '@ionic/angular';
+import { OverlayEventDetail } from '@ionic/core/components';
 import { Subscription } from 'rxjs';
-import { AppSettings, AppUser, UserStatus } from 'src/app/models/models';
+import {
+  AppSettings,
+  AppUser,
+  UserDyspoStatus,
+  UserStatus,
+} from 'src/app/models/models';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { environment } from 'src/environments/environment';
 import { EmailComposer } from 'capacitor-email-composer';
 import { LoggerService } from 'src/app/services/logger.service';
+import { UserStatusComponent } from 'src/app/components/user-status/user-status.component';
+import { UserCredential } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-parametres',
@@ -17,6 +30,11 @@ import { LoggerService } from 'src/app/services/logger.service';
   styleUrls: ['./parametres.page.scss'],
 })
 export class ParametresPage implements OnInit {
+  @ViewChild(IonModal) modal!: IonModal;
+  dyspoStatus = UserDyspoStatus;
+
+  presentingElement: any;
+
   darkmode: boolean = false;
   ionRangeMin = 10;
   ionRangeMax = 1000;
@@ -64,6 +82,7 @@ export class ParametresPage implements OnInit {
     firstConnexion: true,
     last_connexion_ms: 0,
     status: UserStatus.ACTIVE,
+    dyspoStatus: UserDyspoStatus.DYSPO,
     appSettings: {
       receiveEmail: false,
       receiveNotification: true,
@@ -80,10 +99,12 @@ export class ParametresPage implements OnInit {
     private navCtrl: NavController,
     private authSvc: AuthService,
     private userSvc: UserService,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private modalCtrl: ModalController
   ) {}
 
   ngOnInit() {
+    this.presentingElement = document.querySelector('.ion-page');
     this.logger.logDebug('ngOnInit Parametres');
     if (!localStorage.getItem('darkmode')) {
       this.darkmode = false;
@@ -185,5 +206,40 @@ export class ParametresPage implements OnInit {
   openBlockedUsers() {
     //this.logger.logDebug('Open');
     this.navCtrl.navigateForward('banned-users');
+  }
+
+  openStatus() {
+    this.modalCtrl
+      .create({
+        component: UserStatusComponent,
+        cssClass: 'transparent-modal',
+      })
+      .then((modal) => {
+        modal.present();
+      });
+  }
+
+  cancel() {
+    this.modal.dismiss(null, 'cancel');
+  }
+
+  confirm() {
+    //this.modal.dismiss(this.name, 'confirm');
+  }
+
+  updateStatus(dyspoStatus: UserDyspoStatus) {
+    this.modal.dismiss(dyspoStatus, 'confirm');
+  }
+
+  onWillDismiss(event: Event) {
+    const ev = event as CustomEvent<OverlayEventDetail<string>>;
+    if (ev.detail.role === 'confirm') {
+      //this.message = `Hello, ${ev.detail.data}!`;
+      console.log(`Update status, ${ev.detail.data}!`);
+      this.userInfo.dyspoStatus = ev.detail.data as UserDyspoStatus;
+      const userInfoClone = Object.assign({}, this.userInfo) as AppUser;
+
+      this.userSvc.updateUser(userInfoClone);
+    }
   }
 }

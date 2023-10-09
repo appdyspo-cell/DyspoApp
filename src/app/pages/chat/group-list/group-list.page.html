@@ -1,183 +1,206 @@
-
 <ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title
+      >{{'groups' | translate}}
+      <ion-icon class="ion-float-end zmdi zmdi-search ion-text-end"></ion-icon>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title>{{'groups' | translate}}
-        <ion-icon class="ion-float-end zmdi zmdi-search ion-text-end"></ion-icon>
-      </ion-title>
+      <ion-title size="large">{{'groups' | translate}}</ion-title>
     </ion-toolbar>
   </ion-header>
-<ion-content [fullscreen] = true>
-    <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">{{'groups' | translate}}</ion-title>
-        </ion-toolbar>
-      </ion-header>
-    <ion-list lines="none" class="">
-        <ion-item class=" animated slideInRight delay_1" (click)="GroupChatting()">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/g5.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Charlie's Angels</span> <small>2m</small></h2>
-                    <p class="d-flex"><span class="message">Luicy : Found Best place.</span>
-                        <span class="end">2</span>
-                    </p>
-                </div>
-            </div>
-        </ion-item>
-        <ion-item class=" animated slideInRight delay_2" (click)="GroupChatting()">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/g8.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>School Friends</span> <small>14m</small></h2>
-                    <p class="d-flex"><span class="message">Tanisha : That's a great news buddy, we.</span>
-                        <span class="end">1</span>
-                    </p>
-                </div>
-            </div>
-        </ion-item>
-        <ion-item class=" animated slideInRight delay_3" (click)="GroupChatting()">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/g3.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Fitness Groupr</span> <small>26m</small></h2>
-                    <p class="d-flex">
-                        <ion-icon class="ion-text-start zmdi zmdi-attachment"></ion-icon>
-                        <span class="message">You shared a file. </span>
-                    </p>
-                </div>
-            </div>
-        </ion-item>
-        <ion-item class="animated slideInRight delay_4" (click)="GroupChatting()">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/g7.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Smili Community</span> <small>2h</small></h2>
-                    <p class="d-flex"><span class="message">I will be there by 10:00 aunty.</span>
-                    </p>
-                </div>
-            </div>
-        </ion-item>
-        <ion-item class=" animated slideInRight delay_5" (click)="GroupChatting()">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/g2.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Smith Family</span> <small>2m</small></h2>
-                    <p class="d-flex"><span class="message">Yes, I am Coming.</span>
-                    </p>
-                </div>
-            </div>
-        </ion-item>
-        <ion-item class="animated slideInRight delay_6" (click)="GroupChatting()">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/g4.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Office Birds</span> <small>2m</small></h2>
-                    <p class="d-flex"><span class="message">You :  LOL That was so funny, ken.</span>
-                    </p>
-                </div>
-            </div>
-        </ion-item>
-        <ion-item class=" animated slideInRight delay_7" (click)="GroupChatting()">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/g1.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Manchester United fans</span> <small>14m</small></h2>
-                    <p class="d-flex"><span class="message">Peter : 8:00 pm  At my place. Party on.</span>
-                    </p>
-                </div>
-            </div>
-        </ion-item>
+  <ion-list lines="none" class="">
+    <ion-item class="animated slideInRight delay_1" (click)="GroupChatting()">
+      <div class="item_inner d-flex">
+        <div class="profile_img_box">
+          <div class="profile_img">
+            <img src="assets/img/g5.png" />
+          </div>
+        </div>
+        <div class="text-box">
+          <h2 class="d-flex">
+            <span>Charlie's Angels</span> <small>2m</small>
+          </h2>
+          <p class="d-flex">
+            <span class="message">Luicy : Found Best place.</span>
+            <span class="end">2</span>
+          </p>
+        </div>
+      </div>
+    </ion-item>
+    <ion-item class="animated slideInRight delay_2" (click)="GroupChatting()">
+      <div class="item_inner d-flex">
+        <div class="profile_img_box">
+          <div class="profile_img">
+            <img src="assets/img/g8.png" />
+          </div>
+        </div>
+        <div class="text-box">
+          <h2 class="d-flex"><span>School Friends</span> <small>14m</small></h2>
+          <p class="d-flex">
+            <span class="message"
+              >Tanisha : That's a great news buddy, we.</span
+            >
+            <span class="end">1</span>
+          </p>
+        </div>
+      </div>
+    </ion-item>
+    <ion-item class="animated slideInRight delay_3" (click)="GroupChatting()">
+      <div class="item_inner d-flex">
+        <div class="profile_img_box">
+          <div class="profile_img">
+            <img src="assets/img/g3.png" />
+          </div>
+        </div>
+        <div class="text-box">
+          <h2 class="d-flex"><span>Fitness Groupr</span> <small>26m</small></h2>
+          <p class="d-flex">
+            <ion-icon class="ion-text-start zmdi zmdi-attachment"></ion-icon>
+            <span class="message">You shared a file. </span>
+          </p>
+        </div>
+      </div>
+    </ion-item>
+    <ion-item class="animated slideInRight delay_4" (click)="GroupChatting()">
+      <div class="item_inner d-flex">
+        <div class="profile_img_box">
+          <div class="profile_img">
+            <img src="assets/img/g7.png" />
+          </div>
+        </div>
+        <div class="text-box">
+          <h2 class="d-flex"><span>Smili Community</span> <small>2h</small></h2>
+          <p class="d-flex">
+            <span class="message">I will be there by 10:00 aunty.</span>
+          </p>
+        </div>
+      </div>
+    </ion-item>
+    <ion-item class="animated slideInRight delay_5" (click)="GroupChatting()">
+      <div class="item_inner d-flex">
+        <div class="profile_img_box">
+          <div class="profile_img">
+            <img src="assets/img/g2.png" />
+          </div>
+        </div>
+        <div class="text-box">
+          <h2 class="d-flex"><span>Smith Family</span> <small>2m</small></h2>
+          <p class="d-flex"><span class="message">Yes, I am Coming.</span></p>
+        </div>
+      </div>
+    </ion-item>
+    <ion-item class="animated slideInRight delay_6" (click)="GroupChatting()">
+      <div class="item_inner d-flex">
+        <div class="profile_img_box">
+          <div class="profile_img">
+            <img src="assets/img/g4.png" />
+          </div>
+        </div>
+        <div class="text-box">
+          <h2 class="d-flex"><span>Office Birds</span> <small>2m</small></h2>
+          <p class="d-flex">
+            <span class="message">You : LOL That was so funny, ken.</span>
+          </p>
+        </div>
+      </div>
+    </ion-item>
+    <ion-item class="animated slideInRight delay_7" (click)="GroupChatting()">
+      <div class="item_inner d-flex">
+        <div class="profile_img_box">
+          <div class="profile_img">
+            <img src="assets/img/g1.png" />
+          </div>
+        </div>
+        <div class="text-box">
+          <h2 class="d-flex">
+            <span>Manchester United fans</span> <small>14m</small>
+          </h2>
+          <p class="d-flex">
+            <span class="message">Peter : 8:00 pm At my place. Party on.</span>
+          </p>
+        </div>
+      </div>
+    </ion-item>
 
-        <ion-item class=" animated slideInRight delay_8" (click)="GroupChatting()">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/g5.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Charlie's Angels</span> <small>2m</small></h2>
-                    <p class="d-flex"><span class="message">Luicy : Found Best place.</span>
-                    </p>
-                </div>
-            </div>
-        </ion-item>
-        <ion-item class=" animated slideInRight delay_9" (click)="GroupChatting()">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/g8.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>School Friends</span> <small>14m</small></h2>
-                    <p class="d-flex"><span class="message">Tanisha : That's a great news buddy, we.</span>
-                    </p>
-                </div>
-            </div>
-        </ion-item>
-        <ion-item class=" animated slideInRight delay_10" (click)="GroupChatting()">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/g3.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Fitness Groupr</span> <small>26m</small></h2>
-                    <p class="d-flex">
-                        <ion-icon class="ion-text-start zmdi zmdi-attachment"></ion-icon>
-                        <span class="message">You shared a file. </span>
-                    </p>
-                </div>
-            </div>
-        </ion-item>
-        <ion-item class="animated slideInRight delay_11" (click)="GroupChatting()">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/g7.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Smili Community</span> <small>2h</small></h2>
-                    <p class="d-flex"><span class="message">I will be there by 10:00 aunty.</span>
-                    </p>
-                </div>
-            </div>
-        </ion-item>
-    </ion-list>
-    <ion-fab class="animated zoomIn delay_4" vertical="bottom" horizontal="end" slot="fixed" (click)="create_group()">
-        <ion-fab-button>
-            <ion-icon class="zmdi zmdi-accounts-add"></ion-icon>
-        </ion-fab-button>
-    </ion-fab>
+    <ion-item class="animated slideInRight delay_8" (click)="GroupChatting()">
+      <div class="item_inner d-flex">
+        <div class="profile_img_box">
+          <div class="profile_img">
+            <img src="assets/img/g5.png" />
+          </div>
+        </div>
+        <div class="text-box">
+          <h2 class="d-flex">
+            <span>Charlie's Angels</span> <small>2m</small>
+          </h2>
+          <p class="d-flex">
+            <span class="message">Luicy : Found Best place.</span>
+          </p>
+        </div>
+      </div>
+    </ion-item>
+    <ion-item class="animated slideInRight delay_9" (click)="GroupChatting()">
+      <div class="item_inner d-flex">
+        <div class="profile_img_box">
+          <div class="profile_img">
+            <img src="assets/img/g8.png" />
+          </div>
+        </div>
+        <div class="text-box">
+          <h2 class="d-flex"><span>School Friends</span> <small>14m</small></h2>
+          <p class="d-flex">
+            <span class="message"
+              >Tanisha : That's a great news buddy, we.</span
+            >
+          </p>
+        </div>
+      </div>
+    </ion-item>
+    <ion-item class="animated slideInRight delay_10" (click)="GroupChatting()">
+      <div class="item_inner d-flex">
+        <div class="profile_img_box">
+          <div class="profile_img">
+            <img src="assets/img/g3.png" />
+          </div>
+        </div>
+        <div class="text-box">
+          <h2 class="d-flex"><span>Fitness Groupr</span> <small>26m</small></h2>
+          <p class="d-flex">
+            <ion-icon class="ion-text-start zmdi zmdi-attachment"></ion-icon>
+            <span class="message">You shared a file. </span>
+          </p>
+        </div>
+      </div>
+    </ion-item>
+    <ion-item class="animated slideInRight delay_11" (click)="GroupChatting()">
+      <div class="item_inner d-flex">
+        <div class="profile_img_box">
+          <div class="profile_img">
+            <img src="assets/img/g7.png" />
+          </div>
+        </div>
+        <div class="text-box">
+          <h2 class="d-flex"><span>Smili Community</span> <small>2h</small></h2>
+          <p class="d-flex">
+            <span class="message">I will be there by 10:00 aunty.</span>
+          </p>
+        </div>
+      </div>
+    </ion-item>
+  </ion-list>
+  <ion-fab
+    class="animated zoomIn delay_4"
+    vertical="bottom"
+    horizontal="end"
+    slot="fixed"
+    (click)="create_group()"
+  >
+    <ion-fab-button>
+      <ion-icon class="zmdi zmdi-accounts-add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

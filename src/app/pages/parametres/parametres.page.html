@@ -1,39 +1,89 @@
-
-
-
-
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>Paramètres</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding-top bg_color">
+<ion-content class="bg_color" [fullscreen]="true">
   <ion-header collapse="condense">
-    <ion-toolbar>
+    <ion-toolbar style="--background: transparent">
       <ion-title size="large">Paramètres</ion-title>
     </ion-toolbar>
   </ion-header>
- <ion-list-header>
-  <h2>Mon Profil</h2>
-</ion-list-header>
+
+  <ion-list-header>
+    <h2>Mon Profil</h2>
+  </ion-list-header>
 
   <ion-card>
-    <ion-item type="button" mode="ios" routerLink="/tabs/parametres/profile" routerDirection="forward" style="padding-top: 3px;">
+    <ion-item
+      type="button"
+      mode="ios"
+      routerLink="/tabs/parametres/profile"
+      routerDirection="forward"
+      style="padding-top: 3px"
+    >
       <!-- <ion-avatar slot="start">
       <ion-img [src]="avatar"></ion-img>
       </ion-avatar> -->
-      <div>
-        {{ userInfo?.firstname}} {{userInfo?.lastname}}
-      </div>
-      
+      <div>{{ userInfo?.firstname}} {{userInfo?.lastname}}</div>
+
       <!-- <ion-icon slot="end" name="chevron-forward-outline" style="color: var(--ion-color-primary)"></ion-icon>
        -->
     </ion-item>
-    
+
     <!-- <dys-datetime></dys-datetime> -->
   </ion-card>
 
+  <ion-list-header>
+    <h2>Mon Status</h2>
+  </ion-list-header>
+
+  <ion-card>
+    <ion-item
+      type="button"
+      mode="ios"
+      id="open-status-modal"
+      style="
+        padding-top: 3px;
+        background-color: transparent;
+        margin: 16px 0px 16px 0px;
+      "
+    >
+      <!-- <ion-avatar slot="start">
+      <ion-img [src]="avatar"></ion-img>
+      </ion-avatar> -->
+      <div
+        class="dyspo-button dyspo"
+        *ngIf="userInfo?.dyspoStatus === dyspoStatus.DYSPO"
+      >
+        Dyspo
+      </div>
+
+      <div
+        *ngIf="userInfo?.dyspoStatus === dyspoStatus.DYSPOWITHKIDS"
+        class="dyspo-button dyspo-with-kids"
+      >
+        Dyspo With Kids
+      </div>
+
+      <div
+        *ngIf="userInfo?.dyspoStatus === dyspoStatus.NODYSPO"
+        class="dyspo-button no-dyspo"
+      >
+        No Dyspo
+      </div>
+
+      <div *ngIf="!userInfo?.dyspoStatus" class="dyspo-button no-dyspo">
+        Dyspo ?
+      </div>
+
+      <!-- <ion-icon slot="end" name="chevron-forward-outline" style="color: var(--ion-color-primary)"></ion-icon>
+       -->
+    </ion-item>
+
+    <!-- <dys-datetime></dys-datetime> -->
+  </ion-card>
 
   <ion-list-header>
     <h2>Notifications</h2>
@@ -42,22 +92,26 @@
     <ion-list>
       <div *ngIf="appSettings">
         <ion-item>
-          <ion-toggle color="primary" [(ngModel)]="appSettings.receiveNotification" slot="end"></ion-toggle>
-          <ion-label>
-            Nouveau message reçu
-          </ion-label>
-        </ion-item>        
-      </div>
-    
-      <div *ngIf="appSettings">
-        <ion-item>
-          <ion-toggle color="primary" [(ngModel)]="appSettings.actualiteDyspo" slot="end" ></ion-toggle>
-          <ion-label>           
-            Actualités
-          </ion-label>
+          <ion-toggle
+            color="primary"
+            [(ngModel)]="appSettings.receiveNotification"
+            slot="end"
+          ></ion-toggle>
+          <ion-label> Nouveau message reçu </ion-label>
         </ion-item>
       </div>
-    
+
+      <!-- <div *ngIf="appSettings">
+        <ion-item>
+          <ion-toggle
+            color="primary"
+            [(ngModel)]="appSettings.actualiteDyspo"
+            slot="end"
+          ></ion-toggle>
+          <ion-label> Actualités </ion-label>
+        </ion-item>
+      </div> -->
+
       <!-- <div>
         <ion-item>
           <ion-toggle color="primary" [(ngModel)]="appSettings.friendInvitation" slot="end" ></ion-toggle>
@@ -66,37 +120,45 @@
           </ion-label>
         </ion-item>
       </div> -->
-    
-       <div *ngIf="appSettings">
+
+      <div *ngIf="appSettings">
         <ion-item>
-          <ion-toggle color="primary" [(ngModel)]="appSettings.receiveEmail" slot="end" ></ion-toggle>
+          <ion-toggle
+            color="primary"
+            [(ngModel)]="appSettings.receiveEmail"
+            slot="end"
+          ></ion-toggle>
           <ion-label>
-            <ion-text class="ion-text-capitalize">Equipe Kompot</ion-text>
-            <p class="ion-text-wrap">Vous souhaitez recevoir des informations et des offres de la part de Kompot</p>
+            <ion-text class="ion-text-capitalize">Equipe Dyspo</ion-text>
+            <p class="ion-text-wrap">
+              Vous souhaitez recevoir des informations et des offres de la part
+              de Dyspo
+            </p>
           </ion-label>
         </ion-item>
       </div>
-     
     </ion-list>
-    
   </ion-card>
-  <div *ngIf="appSettings">
+  <!-- <div *ngIf="appSettings">
     <ion-list-header>Réglages</ion-list-header>
     <ion-card>
       <ion-list>
         <div>
           <ion-item>
-            <ion-toggle color="primary"[(ngModel)]="appSettings.biometricAuth"  slot="end"></ion-toggle>
+            <ion-toggle
+              color="primary"
+              [(ngModel)]="appSettings.biometricAuth"
+              slot="end"
+            ></ion-toggle>
             <ion-label>
               <ion-text class="ion-text-capitalize">Authentification</ion-text>
-              <p class="ion-text-wrap">Activer l'authentification biométrique</p>
+              <p class="ion-text-wrap">
+                Activer l'authentification biométrique
+              </p>
             </ion-label>
-          </ion-item>        
-          
+          </ion-item>
         </div>
-      
       </ion-list>
-      
     </ion-card>
   </div>
 
@@ -107,51 +169,115 @@
     <ion-list>
       <div>
         <ion-item>
-          <ion-toggle  color="primary" (ionChange)="toggleDarkMode($event)" [(ngModel)]="darkmode">Mode Sombre</ion-toggle>
-          
-        </ion-item>        
-      </div>
-    
-     
-     
+          <ion-toggle
+            color="primary"
+            (ionChange)="toggleDarkMode($event)"
+            [(ngModel)]="darkmode"
+            >Mode Sombre</ion-toggle
+          >
+        </ion-item>
+      </div> 
     </ion-list>
-    
-  </ion-card>
+  </ion-card>-->
 
   <ion-list-header>
     <h2>Mentions Légales</h2>
   </ion-list-header>
-  
- 
+
   <ion-card>
-    <ion-item tappable (click)="openMail()"> 
-      <ion-label class="ion-text-wrap">                         
-          <ion-icon name="mail" class="iconmail" color="primary"></ion-icon>
-          <ion-text class="contacttext">Contactez-nous</ion-text>
+    <ion-item tappable (click)="openMail()">
+      <ion-label class="ion-text-wrap">
+        <ion-icon name="mail" class="iconmail" color="primary"></ion-icon>
+        <ion-text class="contacttext">Contactez-nous</ion-text>
       </ion-label>
     </ion-item>
-    <ion-item [routerDirection]="'forward'" [routerLink]="['/cgu']" routerLinkActive="active-item" lines="none">
-      <ion-label class="ion-text-wrap text">                         
-          <ion-icon name="information-circle" class="iconmail" color="primary"></ion-icon>
-          <ion-text class="contacttext">A propos de nous</ion-text>
+    <ion-item
+      [routerDirection]="'forward'"
+      [routerLink]="['/cgu']"
+      routerLinkActive="active-item"
+      lines="none"
+    >
+      <ion-label class="ion-text-wrap text">
+        <ion-icon
+          name="information-circle"
+          class="iconmail"
+          color="primary"
+        ></ion-icon>
+        <ion-text class="contacttext">A propos de nous</ion-text>
       </ion-label>
     </ion-item>
   </ion-card>
-  
+
   <!--<ion-card>
     <ion-item>
       <ion-button fill="clear" expand="full" class="logout" color="dark" (click)="logout()">Déconnexion</ion-button>
     </ion-item>
   </ion-card>-->
   <div class="ovelDivContentBottom">
-    <ion-img src="../../assets/img/kompot_logo.png" class="logo"></ion-img>
-  <ion-footer>
-    <ion-button fill="solid" expand="full" class="logout ion-text-capitalize" color="danger" (click)="deleteAccount()">Supprimer mon compte
-    </ion-button>
-    <ion-button fill="solid" expand="full" class="logout ion-text-capitalize" color="danger" (click)="logout()">Deconnexion
-    </ion-button>
-  </ion-footer>
+    <ion-img src="../../assets/dyspo_black_logo.png" class="logo"></ion-img>
+    <ion-footer>
+      <ion-button
+        fill="solid"
+        expand="full"
+        class="logout ion-text-capitalize"
+        color="danger"
+        (click)="deleteAccount()"
+        >Supprimer mon compte
+      </ion-button>
+      <ion-button
+        fill="solid"
+        expand="full"
+        class="logout ion-text-capitalize"
+        color="danger"
+        (click)="logout()"
+        >Deconnexion
+      </ion-button>
+    </ion-footer>
     <p class="excepTextSize">Version 0.0.1</p>
   </div>
 
+  <ion-modal
+    #statusmodal
+    trigger="open-status-modal"
+    (willDismiss)="onWillDismiss($event)"
+    [initialBreakpoint]="0.7"
+    [breakpoints]="[0, 0.7]"
+  >
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Mon Status</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding ion-margin">
+        <ion-button
+          shape="round"
+          size="large"
+          color="success"
+          style="margin-bottom: 16px; font-family: Dyspo"
+          expand="full"
+          (click)="updateStatus(dyspoStatus.DYSPO)"
+          >Dyspo</ion-button
+        >
+        <ion-button
+          shape="round"
+          size="large"
+          color="secondary"
+          expand="full"
+          style="margin-bottom: 16px; font-family: Dyspo"
+          (click)="updateStatus(dyspoStatus.DYSPOWITHKIDS)"
+          >Dyspo with kids</ion-button
+        >
+        <ion-button
+          shape="round"
+          size="large"
+          color="warning"
+          expand="full"
+          style="margin-bottom: 16px; font-family: Dyspo"
+          (click)="updateStatus(dyspoStatus.NODYSPO)"
+          >No Dyspo</ion-button
+        >
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
