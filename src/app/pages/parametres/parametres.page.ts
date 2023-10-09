@@ -100,7 +100,8 @@ export class ParametresPage implements OnInit {
     private authSvc: AuthService,
     private userSvc: UserService,
     private logger: LoggerService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private utils: UtilsService
   ) {}
 
   ngOnInit() {
@@ -234,12 +235,20 @@ export class ParametresPage implements OnInit {
   onWillDismiss(event: Event) {
     const ev = event as CustomEvent<OverlayEventDetail<string>>;
     if (ev.detail.role === 'confirm') {
-      //this.message = `Hello, ${ev.detail.data}!`;
-      console.log(`Update status, ${ev.detail.data}!`);
-      this.userInfo.dyspoStatus = ev.detail.data as UserDyspoStatus;
-      const userInfoClone = Object.assign({}, this.userInfo) as AppUser;
-
-      this.userSvc.updateUser(userInfoClone);
+      if (ev.detail.data !== this.userInfo.dyspoStatus) {
+        //this.message = `Hello, ${ev.detail.data}!`;
+        console.log(`Update status, ${ev.detail.data}!`);
+        this.userInfo.dyspoStatus = ev.detail.data as UserDyspoStatus;
+        const userInfoClone = Object.assign({}, this.userInfo) as AppUser;
+        this.userSvc
+          .updateUser(userInfoClone)
+          .then(() => {
+            this.utils.showToastSuccess('Le status a été mis à jour');
+          })
+          .catch((err) => {
+            this.utils.showToastError(err);
+          });
+      }
     }
   }
 }

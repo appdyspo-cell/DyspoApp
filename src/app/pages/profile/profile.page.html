@@ -1,9 +1,9 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button text=""></ion-back-button>
     </ion-buttons>
-    <ion-title class="title-ios ion-text-capitalize">Mon compte</ion-title>
+    <ion-title class="title-ios ion-text-capitalize">Profil</ion-title>
     <!--<ion-button slot="end" mode="ios" class="pRelative" (click)="cartPage()">
       <ion-icon slot="icon-only" name="cart"></ion-icon>
       <span class="cartQuantity">{{cart.productQty}}</span>
@@ -17,7 +17,12 @@
   </ion-toolbar>
   <ion-toolbar color="primary">
     <div class="userSection ion-padding-horizontal">
-      <div slot="start" style="position: relative" tappable (click)="changeAvatar()">
+      <div
+        slot="start"
+        style="position: relative"
+        tappable
+        (click)="changeAvatar()"
+      >
         <div
           style="
             position: absolute;
@@ -36,7 +41,7 @@
           ></ion-icon>
         </div>
 
-        <ion-avatar slot="start" >
+        <ion-avatar slot="start">
           <img [src]="user.avatarPath || defaultAvatar" />
         </ion-avatar>
       </div>
@@ -51,12 +56,7 @@
     <p></p>
   </ion-toolbar>
 </ion-header>
-<ion-content class="ion-padding bg_color" [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Profile</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
   <div class="form" padding>
     <ion-list class="f-list" lines="full">
       <ion-item lines="none">
@@ -144,8 +144,7 @@
   </div>
 </ion-content>
 <ion-footer class="bg_color">
-  <ion-button expand="block" fill="clear" (click)="save()"
+  <ion-button expand="block" (click)="save()"
     >{{'SAVE' | translate}}</ion-button
   >
 </ion-footer>
-

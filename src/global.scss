@@ -40,6 +40,9 @@
   --text-black: #444444;
   --text-light: #c6cee0;
   --text-light2: #c9c9c9;
+  --text-no-dyspo: #d24c75;
+  --text-dyspo-with-kids: #e1e163;
+  --text-dyspo: #3492d0;
 }
 
 .transparent-modal {
@@ -54,7 +57,11 @@
   --background: var(--bg-color);
 }
 
-ion-footer {
+.margin-bottom {
+  margin-bottom: 16px;
+}
+
+.text-no-dyspo ion-footer {
   &::before {
     display: none;
   }
