@@ -59,6 +59,14 @@
   --background: radial-gradient(circle, var(--bg-color), var(--bg-color-dark));
 }
 
+.bg-nokids {
+  background-color: var(--text-dyspo);
+}
+
+.bg-kid {
+  background-color: var(--text-dyspo-with-kids);
+}
+
 .margin-bottom {
   margin-bottom: 16px;
 }

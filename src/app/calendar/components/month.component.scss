@@ -59,8 +59,37 @@
 :host .primary .days .on-selected,
 :host .primary .startSelection button.days-btn,
 :host .primary .endSelection button.days-btn {
-  background-color: var(--ion-color-primary);
+  //background-color: var(--ion-color-primary);
+  //background-color: red;
   color: #fff;
+}
+
+:host .on-selected-pan {
+  border: 2px solid var(--text-black);
+}
+
+:host .on-selected-dyspo {
+  background-color: var(--text-dyspo) !important;
+  color: #fff !important;
+}
+
+.p-selected {
+  color: rgb(255, 255, 255) !important;
+}
+
+:host .on-selected-dyspo-kids {
+  background-color: var(--text-dyspo-with-kids) !important;
+  color: #fff !important;
+}
+
+:host .event-badge {
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  position: absolute;
+  top: 5px;
+  border-radius: 5px;
+  z-index: 15;
 }
 
 :host .primary .startSelection {
@@ -770,7 +799,7 @@
 
 :host button.days-btn p {
   margin: 0;
-  font-size: 1.2em;
+  font-size: 1.5em;
   color: #333;
   text-align: center;
 }

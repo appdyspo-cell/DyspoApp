@@ -21,6 +21,7 @@ import { ActionSheetController, GestureController } from '@ionic/angular';
 import * as Hammer from 'hammerjs';
 import $$ from 'dom7';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { UserDyspoStatus } from 'src/app/models/models';
 
 export const MONTH_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -61,18 +62,29 @@ export const MONTH_VALUE_ACCESSOR: any = {
                   [class.last-month-day]="day.isLastMonth"
                   [class.next-month-day]="day.isNextMonth"
                   [class.on-selected]="isSelected(day.time)"
+                  [class.on-selected-pan]="isSelectedPan(day.time)"
+                  [class.on-selected-dyspo-kids]="
+                    day.userDyspo === userDyspoStatus.DYSPOWITHKIDS
+                  "
+                  [class.on-selected-dyspo]="
+                    day.userDyspo === userDyspoStatus.DYSPO
+                  "
                   [disabled]="day.disable"
                   [attr.aria-label]="getDayLabel(day) | date : DAY_DATE_FORMAT"
                 >
-                  <p [id]="'day-' + day.time" class="p-day">{{ day.title }}</p>
+                  <p
+                    [id]="'day-' + day.time"
+                    class="p-day"
+                    [class.p-selected]="
+                      day.userDyspo === userDyspoStatus.DYSPOWITHKIDS ||
+                      day.userDyspo === userDyspoStatus.DYSPO
+                    "
+                  >
+                    {{ day.title }}
+                  </p>
                   <small *ngIf="day.subTitle">{{ day?.subTitle }}</small>
                 </button>
-                <div
-                  *ngIf="day.isEvent"
-                  style="width:10px; height:10px; background-color:red; position:absolute; top: 5px; border-radius:5px"
-                >
-                  &nbsp;
-                </div>
+                <div *ngIf="day.isEvent" class="event-badge">&nbsp;</div>
               </ng-container>
             </div>
           </ng-template>
@@ -102,6 +114,12 @@ export const MONTH_VALUE_ACCESSOR: any = {
                   [class.next-month-day]="day.isNextMonth"
                   [class.is-first]="day.isFirst"
                   [class.is-last]="day.isLast"
+                  [class.on-selected-dyspo-kids]="
+                    day.userDyspo === userDyspoStatus.DYSPOWITHKIDS
+                  "
+                  [class.on-selected-dyspo]="
+                    day.userDyspo === userDyspoStatus.DYSPO
+                  "
                   [class.on-selected]="isSelected(day.time)"
                   [disabled]="day.disable"
                 >
@@ -159,7 +177,8 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   startDay: CalendarDay | undefined;
   startDayIndex = -1;
 
-  selectedDays: CalendarDay[] = [];
+  _selectedPanDays: CalendarDay[] = [];
+  userDyspoStatus = UserDyspoStatus;
 
   get _isRange(): boolean {
     return this.pickMode === pickModes.RANGE;
@@ -178,7 +197,8 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
 
       return;
     }
-    console.log('Selected days ', this.selectedDays);
+    console.log('_selectedPanDays ', this._selectedPanDays);
+    console.log('_date ', this._date);
     this.presentAction();
   }
 
@@ -201,27 +221,28 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
         if (!this.startDay || this.startDayIndex < 0) {
           this.startDay = targetDay;
           this.startDayIndex = targetDayIndex as number;
-          this.selectedDays.push(this.startDay);
-          //this.onSelected(targetDay);
+          this._selectedPanDays.push(this.startDay);
         } else if (targetDayIndex !== this.startDayIndex) {
-          this.selectedDays = [];
+          this._selectedPanDays = [];
 
           // On recupere l'intervalle des dates
           for (let i = this.startDayIndex; i <= targetDayIndex; i++) {
-            // this.month.days[i].selected = true;
-            this.month.days[i].subTitle = 'My sub';
+            //this.month.days[i].selected = true;
+            //this.month.days[i].subTitle = '*';
             //this.select.emit(this.month.days[i]);
-            this.selectedDays.push(this.month.days[i]);
+            // this._date.push(this.month.days[i]);
+            this._selectedPanDays.push(this.month.days[i]);
           }
         }
       }
     }
   }
 
-  updateDays(action: string) {
-    this.selectedDays.forEach((item) => {
+  updateDays(action: UserDyspoStatus) {
+    this._selectedPanDays.forEach((item) => {
       //item.selected = true;
-      item.subTitle = action;
+      // item.subTitle = action;
+      item.userDyspo = action;
       //this.select.emit(item);
 
       const index = this._date.findIndex(
@@ -239,7 +260,7 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     this.change.emit((this._date as CalendarDay[]).filter((e) => e !== null));
     // this.startDay = undefined;
     this.startDayIndex = -1;
-    // this.selectedDays = [];
+    this._selectedPanDays = [];
   }
 
   async presentAction() {
@@ -250,17 +271,23 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
           text: 'Kid',
           role: 'destructive',
           data: {
-            action: 'kids',
+            action: UserDyspoStatus.DYSPOWITHKIDS,
           },
         },
         {
           text: 'No Kid',
           data: {
-            action: 'nokids',
+            action: UserDyspoStatus.DYSPO,
           },
         },
         {
-          text: 'Cancel',
+          text: 'No Dyspo',
+          data: {
+            action: UserDyspoStatus.NODYSPO,
+          },
+        },
+        {
+          text: 'Fermer',
           role: 'cancel',
           data: {
             action: 'cancel',
@@ -274,6 +301,9 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     let result = await actionSheet.onDidDismiss();
     if (result.data) {
       this.updateDays(result.data.action);
+    } else {
+      this.startDayIndex = -1;
+      this._selectedPanDays = [];
     }
 
     console.log(result);
@@ -380,8 +410,8 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     return this._date[0].time === day.time && this._date[1] !== null;
   }
 
-  isSelected(time: number): boolean {
-    if (Array.isArray(this._date)) {
+  oldisSelected(time: number): boolean {
+    if (Array.isArray(this._date) && this._date.length > 0) {
       if (this.pickMode !== pickModes.MULTI) {
         if (this._date[0] !== null) {
           return time === this._date[0].time;
@@ -393,6 +423,37 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
       } else {
         return (
           this._date.findIndex((e) => e !== null && e.time === time) !== -1
+        );
+      }
+    } else {
+      return false;
+    }
+
+    return false;
+  }
+
+  isSelected(time: number): boolean {
+    return false;
+  }
+
+  isSelectedPan(time: number): boolean {
+    if (
+      Array.isArray(this._selectedPanDays) &&
+      this._selectedPanDays.length > 0
+    ) {
+      if (this.pickMode !== pickModes.MULTI) {
+        if (this._selectedPanDays[0] !== null) {
+          return time === this._selectedPanDays[0].time;
+        }
+
+        if (this._selectedPanDays[1] !== null) {
+          return time === this._selectedPanDays[1].time;
+        }
+      } else {
+        return (
+          this._selectedPanDays.findIndex(
+            (e) => e !== null && e.time === time
+          ) !== -1
         );
       }
     } else {
@@ -424,9 +485,9 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     //   this.lastTap = currentTime;
     // }
 
-    console.log('tap');
-    item.selected = true;
-    this.select.emit(item);
+    console.log('tapS');
+    // item.selected = true;
+    // this.select.emit(item);
     if (this.pickMode === pickModes.SINGLE) {
       this._date[0] = item;
       this.change.emit(this._date as CalendarDay[]);
@@ -463,29 +524,49 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
       return;
     }
 
-    if (this.pickMode === pickModes.MULTI) {
-      const index = this._date.findIndex(
-        (e) => e !== null && e.time === item.time
-      );
+    // if (this.pickMode === pickModes.MULTI) {
+    //   const index = this._date.findIndex(
+    //     (e) => e !== null && e.time === item.time
+    //   );
 
-      if (index === -1) {
-        this._date.push(item);
+    //   if (index === -1) {
+    //     this._date.push(item);
+    //   } else {
+    //     this._date.splice(index, 1);
+    //   }
+    //   this.change.emit((this._date as CalendarDay[]).filter((e) => e !== null));
+    // }
+    if (this.pickMode === pickModes.MULTI) {
+      if (item.userDyspo === UserDyspoStatus.DYSPO) {
+        item.userDyspo = UserDyspoStatus.DYSPOWITHKIDS;
+      } else if (item.userDyspo === UserDyspoStatus.DYSPOWITHKIDS) {
+        item.userDyspo = UserDyspoStatus.NODYSPO;
       } else {
-        this._date.splice(index, 1);
+        item.userDyspo = UserDyspoStatus.DYSPO;
       }
-      this.change.emit((this._date as CalendarDay[]).filter((e) => e !== null));
     }
   }
 
-  async onDoubleTap(ev: any, day: any) {
+  async onDoubleTap(ev: any, day: CalendarDay) {
     console.log('doubletap ', ev, day);
+    if (day.userDyspo === UserDyspoStatus.DYSPOWITHKIDS) {
+      day.userDyspo = UserDyspoStatus.DYSPO;
+
+      day.subTitle = 'nokids';
+    } else {
+      day.userDyspo = UserDyspoStatus.DYSPOWITHKIDS;
+      day.subTitle = 'kids';
+    }
     await Haptics.impact({ style: ImpactStyle.Heavy });
   }
 
   async onLongPress(ev: any, day: CalendarDay) {
     console.log('longpress ', ev, day);
     this.longPressedDay = day;
+
     await Haptics.vibrate();
+
+    // Slide mode
   }
   onPan(ev: any) {
     console.log('pan ', ev);

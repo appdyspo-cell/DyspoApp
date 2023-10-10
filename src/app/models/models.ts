@@ -67,6 +67,14 @@ export interface AgendaEvent {
   end_time_formatted?: string;
 }
 
+export interface AgendaDyspo {
+  uid?: string;
+  time: number;
+  userDyspo: UserDyspoStatus;
+  month: number;
+  year: number;
+}
+
 export interface AgendaEventForm {
   title: string;
   startISO: string;

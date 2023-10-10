@@ -10,7 +10,7 @@
       <ion-title size="large">Calendrier</ion-title>
       <ion-buttons slot="end">
         <ion-toggle
-          labelPlacement="stacked"
+          labelPlacement="start"
           [enableOnOffLabels]="true"
           (ionChange)="onChangeMode($event)"
           >Edit</ion-toggle
@@ -19,7 +19,16 @@
     </ion-toolbar>
   </ion-header>
 
-  <div class="container"></div>
+  <div class="container">
+    <ion-chip [outline]="true"
+      ><div class="chip-evt bg-kid">&nbsp;</div>
+      Kids</ion-chip
+    >
+    <ion-chip [outline]="true"
+      ><div class="chip-evt bg-nokids">&nbsp;</div>
+      No Kids</ion-chip
+    >
+  </div>
 
   <ion-calendar
     #mydiv
@@ -33,30 +42,43 @@
     [format]="'YYYY-MM-DD'"
     [readonly]="agendaMode === agendaModes.READONLY"
   ></ion-calendar>
+  <div *ngIf="agendaMode === agendaModes.READONLY">
+    <!-- <ion-list-header> {{selectedDateFormatted}} </ion-list-header> -->
 
-  <ion-list-header> {{selectedDateFormatted}} </ion-list-header>
+    <ion-list *ngIf="eventsForDate.length > 0">
+      <ion-item
+        *ngFor="let agendaEvent of eventsForDate; let i=index "
+        type="button"
+        mode="ios"
+        (click)="updateEvent(agendaEvent)"
+      >
+        <div slot="start">{{agendaEvent.startISO | dayDateFormat}}</div>
+        {{agendaEvent.title}}<br />
+        {{agendaEvent.start_time_formatted}} -
+        {{agendaEvent.end_time_formatted}}
+      </ion-item>
+    </ion-list>
+    <ion-list *ngIf="!eventsForDate || eventsForDate?.length === 0">
+      <ion-item>
+        <ion-icon name="time-outline" slot="start"></ion-icon>
+        Pas d'evenement prévu
+      </ion-item>
+    </ion-list>
+  </div>
 
-  <ion-list *ngIf="eventsForDate.length > 0">
-    <ion-item
-      *ngFor="let agendaEvent of eventsForDate; let i=index "
-      type="button"
-      mode="ios"
-      (click)="updateEvent(agendaEvent)"
-    >
-      <ion-icon name="time-outline" slot="start"></ion-icon>
-      {{agendaEvent.title}}<br />
-      {{agendaEvent.start_time_formatted}} - {{agendaEvent.end_time_formatted}}
-    </ion-item>
-  </ion-list>
-  <ion-list *ngIf="!eventsForDate || eventsForDate?.length === 0">
-    <ion-item>
-      <ion-icon name="time-outline" slot="start"></ion-icon>
-      Pas d'evenement prévu
-    </ion-item>
-  </ion-list>
-  <ion-fab slot="fixed" horizontal="end" vertical="bottom">
+  <div *ngIf="agendaMode === agendaModes.EDIT" class="ion-padding">
+    Vous êtes en mode édition
+    <ion-button (click)="saveAgenda()"> Sauvegarder mon agenda </ion-button>
+    <ion-button color="danger"> Annuler </ion-button>
+  </div>
+  <!-- <ion-fab
+    *ngIf="agendaMode === agendaModes.READONLY"
+    slot="fixed"
+    horizontal="end"
+    vertical="bottom"
+  >
     <ion-fab-button (click)="addEvent()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
-  </ion-fab>
+  </ion-fab> -->
 </ion-content>

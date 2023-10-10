@@ -1,4 +1,5 @@
 import { AnimationBuilder } from '@ionic/core';
+import { UserDyspoStatus } from '../models/models';
 
 export interface CalendarOriginal {
   time: number;
@@ -27,9 +28,7 @@ export interface CalendarDay {
   isFirst?: boolean;
   isLast?: boolean;
   isEvent?: boolean;
-  userDyspo?: boolean;
-  userDyspoWithKids?: boolean;
-  userNoDyspo?: boolean;
+  userDyspo?: UserDyspoStatus;
 }
 
 export class CalendarMonth {
