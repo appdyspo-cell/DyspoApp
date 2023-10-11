@@ -140,7 +140,7 @@
       </div>
     </ion-list>
   </ion-card>
-  <!-- <div *ngIf="appSettings">
+  <div *ngIf="appSettings">
     <ion-list-header>Réglages</ion-list-header>
     <ion-card>
       <ion-list>
@@ -148,13 +148,13 @@
           <ion-item>
             <ion-toggle
               color="primary"
-              [(ngModel)]="appSettings.biometricAuth"
+              [(ngModel)]="appSettings.shareAgenda"
               slot="end"
             ></ion-toggle>
             <ion-label>
-              <ion-text class="ion-text-capitalize">Authentification</ion-text>
+              <ion-text class="ion-text-capitalize">Agenda</ion-text>
               <p class="ion-text-wrap">
-                Activer l'authentification biométrique
+                Autoriser les autres membres à avoir accès à mes disponibilités
               </p>
             </ion-label>
           </ion-item>
@@ -162,7 +162,7 @@
       </ion-list>
     </ion-card>
   </div>
-
+  <!--
   <ion-list-header>
     <h2>Apparence</h2>
   </ion-list-header>

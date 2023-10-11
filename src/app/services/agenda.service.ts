@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
-import { AgendaDyspo, AgendaEvent, AgendaEventStatus } from '../models/models';
+import {
+  AgendaDyspoItem,
+  AgendaEvent,
+  AgendaEventStatus,
+  CrudFBAction,
+} from '../models/models';
 import {
   Firestore,
   collection,
@@ -18,11 +23,18 @@ export class AgendaService {
   private uid!: string;
   public agendaEvents: AgendaEvent[] = [];
   public agendaEventsSubject = new BehaviorSubject<AgendaEvent[]>([]);
-  public agendaDyspos: AgendaDyspo[] = [];
-  public agendaDysposSubject = new BehaviorSubject<AgendaDyspo[]>([]);
+  public agendaDyspos: AgendaDyspoItem[] = [];
+  public agendaDysposSubject = new BehaviorSubject<{
+    action: 'MODIFIED' | 'ADDED' | 'REMOVED';
+    items: AgendaDyspoItem[];
+  }>({ action: 'ADDED', items: [] });
 
   public agendaEvents$!: Observable<AgendaEvent[]>;
-  public agendaDyspos$!: Observable<AgendaDyspo[]>;
+  public agendaDyspos$!: Observable<{
+    action: 'MODIFIED' | 'ADDED' | 'REMOVED';
+    items: AgendaDyspoItem[];
+  }>;
+  public isModified = false;
 
   constructor(private firestore: Firestore) {
     this.agendaEvents$ = this.agendaEventsSubject.asObservable();
@@ -97,53 +109,37 @@ export class AgendaService {
     });
 
     //Dyspos
-    onSnapshot(agendaEventsCollectionRef, (snapshot) => {
+    onSnapshot(agendaDysposCollectionRef, (snapshot) => {
       snapshot.docChanges().forEach((change) => {
-        if (change.type === 'modified') {
-          const agendaDyspoModified = change.doc.data() as AgendaDyspo;
-
-          const foundIndex = this.agendaDyspos.findIndex(
-            (elt) => elt.uid === agendaDyspoModified.uid
-          );
-          if (foundIndex >= 0) {
-            this.agendaDyspos[foundIndex] = agendaDyspoModified;
-            this.agendaDysposSubject.next(this.agendaDyspos);
-          }
+        const agendaDyspoFetched = change.doc.data() as AgendaDyspoItem;
+        let foundItem = this.agendaDyspos.find((elt) => {
+          return elt.time === agendaDyspoFetched.time;
+        });
+        if (change.type === 'modified' && foundItem) {
+          foundItem.userDyspo = agendaDyspoFetched.userDyspo;
+          this.agendaDysposSubject.next({
+            action: 'MODIFIED',
+            items: this.agendaDyspos,
+          });
         }
-        if (change.type === 'added') {
-          const agendaDyspoAdded = change.doc.data() as AgendaDyspo;
-          agendaDyspoAdded.uid = change.doc.id;
-          const foundIndex = this.agendaDyspos.findIndex(
-            (elt) => elt.uid === agendaDyspoAdded.uid
-          );
-          if (foundIndex >= 0) {
-            //Do nothing
-          } else {
-            const agendaDyspo = change.doc.data() as AgendaDyspo;
-            agendaDyspo.uid = change.doc.id;
-
-            this.agendaDyspos.push(agendaDyspo);
-            this.agendaDysposSubject.next(this.agendaDyspos);
-            // this.getagendaDyspoAndPush(agendaDyspo)
-            //   .then((resPromise: any) => {
-            //     console.log('agendaDyspo Hydrated ', resPromise);
-            //     that.agendaDysposSubject.next(that.agendaDyspos);
-            //   })
-            //   .catch((err: any) => {
-            //     console.log(err);
-            //   });
-          }
+        if (change.type === 'added' && !foundItem) {
+          this.agendaDyspos.push(agendaDyspoFetched);
+          this.agendaDysposSubject.next({
+            action: 'ADDED',
+            items: this.agendaDyspos,
+          });
         }
         if (change.type === 'removed') {
-          const agendaDyspoRemoved = change.doc.data() as AgendaDyspo;
-          agendaDyspoRemoved.uid = change.doc.id;
           const foundIndex = this.agendaDyspos.findIndex(
-            (elt) => elt.uid === agendaDyspoRemoved.uid
+            (elt) => elt.time === agendaDyspoFetched.time
           );
           if (foundIndex >= 0) {
             this.agendaDyspos.splice(foundIndex, 1);
           }
-          this.agendaDysposSubject.next(this.agendaDyspos);
+          this.agendaDysposSubject.next({
+            action: 'REMOVED',
+            items: this.agendaDyspos,
+          });
         }
       });
     });
@@ -161,17 +157,6 @@ export class AgendaService {
 
     // Send notif ?
     // this.notification-service.sendConfirmFriend()
-  }
-
-  async addDyspo(agendaDyspo: AgendaDyspo) {
-    setDoc(
-      doc(
-        this.firestore,
-        `agenda_dyspos/${this.uid}/dyspo_list/`,
-        agendaDyspo.uid!
-      ),
-      agendaDyspo
-    );
   }
 
   async removeEvent(agendaEvent: AgendaEvent) {
@@ -200,6 +185,20 @@ export class AgendaService {
         }
       });
       resolve(agendaEvents);
+    });
+  }
+
+  public saveDyspos(agendaDyspos: AgendaDyspoItem[]) {
+    agendaDyspos.forEach((item) => {
+      console.log(item);
+      setDoc(
+        doc(
+          this.firestore,
+          `agenda_dyspos/${this.uid}/dyspo_list/`,
+          item.year + '_' + item.month + '_' + item.day
+        ),
+        item
+      );
     });
   }
 }

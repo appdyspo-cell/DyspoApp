@@ -28,6 +28,10 @@
       ><div class="chip-evt bg-nokids">&nbsp;</div>
       No Kids</ion-chip
     >
+    <ion-chip [outline]="true"
+      ><div class="chip-evt bg-nodyspo">&nbsp;</div>
+      No Dyspo</ion-chip
+    >
   </div>
 
   <ion-calendar
@@ -68,8 +72,16 @@
 
   <div *ngIf="agendaMode === agendaModes.EDIT" class="ion-padding">
     Vous êtes en mode édition
-    <ion-button (click)="saveAgenda()"> Sauvegarder mon agenda </ion-button>
-    <ion-button color="danger"> Annuler </ion-button>
+    <ion-button *ngIf="agendaSvc.isModified" (click)="saveAgenda()">
+      Sauvegarder mon agenda
+    </ion-button>
+    <ion-button
+      *ngIf="agendaSvc.isModified"
+      color="danger"
+      (click)="cancelAgenda()"
+    >
+      Annuler
+    </ion-button>
   </div>
   <!-- <ion-fab
     *ngIf="agendaMode === agendaModes.READONLY"

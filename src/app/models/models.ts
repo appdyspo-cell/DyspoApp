@@ -37,7 +37,8 @@ export interface AppSettings {
   receiveNotification: boolean;
   friendInvitation: boolean;
   actualiteDyspo: boolean;
-  biometricAuth: boolean;
+  //biometricAuth: boolean;
+  shareAgenda: boolean;
 }
 
 export interface Chatroom {
@@ -67,10 +68,17 @@ export interface AgendaEvent {
   end_time_formatted?: string;
 }
 
-export interface AgendaDyspo {
+export interface CrudFBAction {
+  MODIFIED: 'MODIFIED';
+  ADDDED: 'ADDED';
+  REMOVED: 'REMOVED';
+}
+
+export interface AgendaDyspoItem {
   uid?: string;
   time: number;
   userDyspo: UserDyspoStatus;
+  day: number;
   month: number;
   year: number;
 }
@@ -100,6 +108,7 @@ export enum UserDyspoStatus {
   DYSPO = 'DYSPO',
   DYSPOWITHKIDS = 'DYSPOWITHKIDS',
   NODYSPO = 'NODYSPO',
+  UNDEFINED = 'UNDEFINED',
 }
 
 export enum AgendaEventStatus {

@@ -66,7 +66,8 @@ export class ParametresPage implements OnInit {
     receiveNotification: true,
     friendInvitation: true,
     actualiteDyspo: true,
-    biometricAuth: true,
+
+    shareAgenda: true,
   };
   settingsBackup: AppSettings | undefined;
   avatar: string | undefined = '';
@@ -88,7 +89,8 @@ export class ParametresPage implements OnInit {
       receiveNotification: true,
       friendInvitation: true,
       actualiteDyspo: true,
-      biometricAuth: true,
+
+      shareAgenda: true,
     },
     tagline: '',
   };

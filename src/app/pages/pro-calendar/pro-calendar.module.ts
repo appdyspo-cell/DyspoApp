@@ -7,16 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { ProCalendarPageRoutingModule } from './pro-calendar-routing.module';
 
 import { ProCalendarPage } from './pro-calendar.page';
-import { NgCalendarModule  } from 'ionic2-calendar';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
-    NgCalendarModule,
+
     IonicModule,
-    ProCalendarPageRoutingModule
+    ProCalendarPageRoutingModule,
   ],
-  declarations: [ProCalendarPage]
+  declarations: [ProCalendarPage],
 })
 export class ProCalendarPageModule {}

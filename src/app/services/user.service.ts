@@ -108,7 +108,7 @@ export class UserService {
         receiveNotification: true,
         friendInvitation: true,
         actualiteDyspo: true,
-        biometricAuth: true,
+        shareAgenda: true,
       },
       tagline: '',
     };

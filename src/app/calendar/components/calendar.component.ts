@@ -23,6 +23,10 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import * as moment from 'moment';
 import { defaults, pickModes } from '../config';
 import { isIonIconsV4 } from '../utils/icons';
+import { AgendaService } from 'src/app/services/agenda.service';
+import { UtilsService } from 'src/app/services/utils.service';
+import Swal, { SweetAlertResult } from 'sweetalert2';
+import { resolve } from 'dns';
 
 export const ION_CAL_VALUE_ACCESSOR: Provider = {
   provide: NG_VALUE_ACCESSOR,
@@ -222,7 +226,11 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
 
   readonly MONTH_DATE_FORMAT = 'MMMM yyyy';
 
-  constructor(public calSvc: CalendarService) {
+  constructor(
+    public calSvc: CalendarService,
+    private agendaSvc: AgendaService,
+    private utils: UtilsService
+  ) {
     console.log('Create calen');
     if (isIonIconsV4()) {
       this._compatibleIcons = {
@@ -259,23 +267,79 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
     this.monthOpt = this.createMonth(this._payloadToTimeNumber(value));
   }
 
-  switchView(): void {
-    this._view = this._view === 'days' ? 'month' : 'days';
-  }
-
-  prev(): void {
-    if (this._view === 'days') {
-      this.backMonth();
+  async switchView(): Promise<void> {
+    // Check Save dyspos before change
+    if (this.agendaSvc.isModified) {
+      const canGo = await this.checkBeforeNavigate();
+      if (canGo) {
+        this._view = this._view === 'days' ? 'month' : 'days';
+      }
     } else {
-      this.prevYear();
+      this._view = this._view === 'days' ? 'month' : 'days';
     }
   }
 
-  next(): void {
-    if (this._view === 'days') {
-      this.nextMonth();
+  async checkBeforeNavigate() {
+    return new Promise(async (resolve, reject) => {
+      Swal.fire({
+        title: 'Voulez vous vraiment quitter?',
+        text: 'Tous vos changements seront perdus',
+        showDenyButton: false,
+        heightAuto: false,
+        showCancelButton: true,
+        confirmButtonText: 'Quitter',
+        cancelButtonText: 'Annuler',
+      });
+
+      const result: SweetAlertResult = await Swal.fire({
+        title: 'Voulez vous vraiment quitter?',
+        text: 'Tous vos changements seront perdus',
+        showDenyButton: false,
+        heightAuto: false,
+        showCancelButton: true,
+        confirmButtonText: 'Quitter',
+        cancelButtonText: 'Annuler',
+      });
+
+      resolve(result.isConfirmed);
+    });
+  }
+
+  async prev(): Promise<void> {
+    if (this.agendaSvc.isModified) {
+      const canGo = await this.checkBeforeNavigate();
+      if (canGo) {
+        if (this._view === 'days') {
+          this.backMonth();
+        } else {
+          this.prevYear();
+        }
+      }
     } else {
-      this.nextYear();
+      if (this._view === 'days') {
+        this.backMonth();
+      } else {
+        this.prevYear();
+      }
+    }
+  }
+
+  async next(): Promise<void> {
+    if (this.agendaSvc.isModified) {
+      const canGo = await this.checkBeforeNavigate();
+      if (canGo) {
+        if (this._view === 'days') {
+          this.nextMonth();
+        } else {
+          this.nextYear();
+        }
+      }
+    } else {
+      if (this._view === 'days') {
+        this.nextMonth();
+      } else {
+        this.nextYear();
+      }
     }
   }
 

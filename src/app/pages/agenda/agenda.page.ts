@@ -1,27 +1,14 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
+import { NavController } from '@ionic/angular';
 import {
-  Gesture,
-  GestureController,
-  GestureDetail,
-  IonDatetime,
-  NavController,
-} from '@ionic/angular';
-import {
-  formatISO,
+  getDate,
   getMonth,
   getYear,
   isAfter,
   isBefore,
   isSameDay,
   isSameMonth,
-  parse,
   parseISO,
 } from 'date-fns';
 import { Observable, Subscription } from 'rxjs';
@@ -29,16 +16,17 @@ import {
   CalendarComponentOptions,
   CalendarDay,
   CalendarMonth,
-  DayConfig,
 } from 'src/app/calendar';
 import { CalendarMode } from 'src/app/components/calendar';
 import {
-  AgendaDyspo,
+  AgendaDyspoItem,
   AgendaEvent,
   UserDyspoStatus,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
 import { UtilsService } from 'src/app/services/utils.service';
+
+import { cloneDeep } from 'lodash';
 
 export enum AgendaMode {
   SELECT,
@@ -71,8 +59,11 @@ export class AgendaPage implements AfterViewInit {
   agendaEvents: AgendaEvent[] = [];
   agendaEventsSubscription: Subscription;
 
-  agendaDyspos$: Observable<AgendaDyspo[]>;
-  agendaDyspos: AgendaDyspo[] = [];
+  agendaDyspos$: Observable<{
+    action: 'MODIFIED' | 'ADDED' | 'REMOVED';
+    items: AgendaDyspoItem[];
+  }>;
+  agendaDyspos: AgendaDyspoItem[] = [];
   agendaDysposSubscription: Subscription;
 
   agendaMode: AgendaMode = AgendaMode.READONLY;
@@ -81,10 +72,11 @@ export class AgendaPage implements AfterViewInit {
 
   agendaModes = AgendaMode;
   calendarMonthData!: CalendarMonth;
+  originalCalendarMonthData!: CalendarMonth;
+  isModified = false;
 
   constructor(
-    private gestureCtrl: GestureController,
-    private agendaSvc: AgendaService,
+    public agendaSvc: AgendaService,
     private navCtrl: NavController,
     private utils: UtilsService
   ) {
@@ -93,15 +85,17 @@ export class AgendaPage implements AfterViewInit {
       (agendaEvents: AgendaEvent[]) => {
         this.agendaEvents = agendaEvents;
         this.tagCalendarEventsData();
-        this.getAgendaEventsForSelectedDate();
       }
     );
 
     this.agendaDyspos$ = this.agendaSvc.agendaDyspos$;
     this.agendaDysposSubscription = this.agendaSvc.agendaDyspos$.subscribe(
-      (agendaDyspos: AgendaDyspo[]) => {
-        this.agendaDyspos = agendaDyspos;
-        this.tagCalendarUserDyspoData();
+      (agendaDyspos) => {
+        console.log(agendaDyspos.action);
+        if (agendaDyspos.action === 'ADDED') {
+          this.agendaDyspos = agendaDyspos.items;
+          this.tagCalendarUserDyspoData();
+        }
       }
     );
 
@@ -133,6 +127,7 @@ export class AgendaPage implements AfterViewInit {
 
   onChange(ev: any) {
     console.log('onChange', ev);
+    this.agendaSvc.isModified = true;
   }
   onItemSwipe(ev: any) {
     console.log('Sxipe');
@@ -144,29 +139,65 @@ export class AgendaPage implements AfterViewInit {
       this.selectedDate = ev;
       this.selectedDateFormatted = this.utils.formatDate(ev.time);
       this.selectedDateMs = ev.time;
-      //this.getAgendaEventsForSelectedDate();
     }
   }
 
   onCreateMonthEvent(calendarMonthData: CalendarMonth) {
     console.log('Month created !!!!', calendarMonthData);
     this.calendarMonthData = calendarMonthData;
+    this.originalCalendarMonthData = cloneDeep(this.calendarMonthData);
+    this.agendaSvc.isModified = false;
     this.tagCalendarEventsData();
+    this.tagCalendarUserDyspoData();
   }
 
   tagCalendarEventsData() {
     if (!this.calendarMonthData) {
       console.log('Can not tag calendar data');
     } else {
+      this.eventsForDate = [];
       this.calendarMonthData.days.forEach((day) => {
         this.agendaEvents.forEach((agendaEvent) => {
           if (isSameDay(day.time, parseISO(agendaEvent.startISO))) {
             day.isEvent = true;
+            this.eventsForDate.push(agendaEvent);
             //day.subTitle = agendaEvent.title?.substring(0, 5);
           }
         });
       });
+      this.eventsForDate.sort((item1, item2) => {
+        const date1 = parseISO(item1.startISO);
+        const date2 = parseISO(item2.startISO);
+        if (isBefore(date1, date2)) {
+          return -1; // item1 doit être trié avant item2
+        } else if (isAfter(date1, date2)) {
+          return 1; // item1 doit être trié après item2
+        } else {
+          return 0; // les dates sont égales
+        }
+      });
     }
+  }
+
+  getAgendaEventsForCurrentMonth() {
+    this.eventsForDate = [];
+    this.eventsForDate = this.agendaEvents.filter((elt: AgendaEvent) =>
+      isSameMonth(
+        this.calendarMonthData?.original.month,
+        parseISO(elt.startISO)
+      )
+    );
+    this.eventsForDate.sort((item1, item2) => {
+      const date1 = parseISO(item1.startISO);
+      const date2 = parseISO(item2.startISO);
+      if (isBefore(date1, date2)) {
+        return -1; // item1 doit être trié avant item2
+      } else if (isAfter(date1, date2)) {
+        return 1; // item1 doit être trié après item2
+      } else {
+        return 0; // les dates sont égales
+      }
+    });
   }
 
   tagCalendarUserDyspoData() {
@@ -174,10 +205,9 @@ export class AgendaPage implements AfterViewInit {
       console.log('Can not tag calendar data');
     } else {
       this.calendarMonthData.days.forEach((day) => {
-        this.agendaEvents.forEach((agendaEvent) => {
-          if (isSameDay(day.time, parseISO(agendaEvent.startISO))) {
-            day.isEvent = true;
-            //day.subTitle = agendaEvent.title?.substring(0, 5);
+        this.agendaDyspos.forEach((dyspoItem) => {
+          if (isSameDay(day.time, dyspoItem.time)) {
+            day.userDyspo = dyspoItem.userDyspo;
           }
         });
       });
@@ -191,8 +221,7 @@ export class AgendaPage implements AfterViewInit {
       this.selectedDate = ev;
       this.selectedDateFormatted = this.utils.formatDate(ev[0].time);
       this.selectedDateMs = ev[0].time;
-      //ev[0].marked = true;
-      // this.getAgendaEventsForSelectedDate();
+
       this.addEvent();
     }
   }
@@ -213,37 +242,53 @@ export class AgendaPage implements AfterViewInit {
     this.navCtrl.navigateForward('/agenda/create-event/edit', navigationExtras);
   }
 
-  getAgendaEventsForSelectedDate() {
-    this.eventsForDate = [];
-    this.eventsForDate = this.agendaEvents.filter((elt: AgendaEvent) =>
-      isSameMonth(this.selectedDateMs, parseISO(elt.startISO))
-    );
-    this.eventsForDate.sort((item1, item2) => {
-      const date1 = parseISO(item1.startISO);
-      const date2 = parseISO(item2.startISO);
-      if (isBefore(date1, date2)) {
-        return -1; // item1 doit être trié avant item2
-      } else if (isAfter(date1, date2)) {
-        return 1; // item1 doit être trié après item2
-      } else {
-        return 0; // les dates sont égales
-      }
-    });
-  }
-
   saveAgenda() {
     console.log('Save ', this.calendarMonthData);
 
-    const dyspos: AgendaDyspo[] = [];
+    const agendaDyspoItems: AgendaDyspoItem[] = [];
+
     this.calendarMonthData.days.forEach((day) => {
-      dyspos.push({
-        time: day.time,
-        userDyspo: day.userDyspo || UserDyspoStatus.NODYSPO,
-        month: getMonth(day.time),
-        year: getYear(day.time),
-      });
+      if (
+        day.userDyspo === UserDyspoStatus.DYSPO ||
+        day.userDyspo === UserDyspoStatus.DYSPOWITHKIDS ||
+        day.userDyspo === UserDyspoStatus.NODYSPO
+      )
+        agendaDyspoItems.push({
+          time: day.time,
+          userDyspo: day.userDyspo,
+          month: getMonth(day.time),
+          year: getYear(day.time),
+          day: getDate(day.time),
+        });
     });
 
-    console.log(dyspos);
+    console.log(agendaDyspoItems);
+
+    this.agendaSvc.saveDyspos(agendaDyspoItems);
+    this.agendaSvc.isModified = false;
+  }
+
+  cancelAgenda() {
+    // this.originalCalendarMonthData.days.forEach((origDay) => {
+    //   let day = this.calendarMonthData.days.find((elt) => {
+    //     return elt.time === origDay.time;
+    //   });
+    //   if (day) {
+    //     // Copy all props ?
+    //     day.userDyspo = origDay.userDyspo;
+    //   }
+    // });
+
+    this.originalCalendarMonthData.days.forEach((origDay) => {
+      let day = this.calendarMonthData.days.find((elt) => {
+        return elt.time === origDay.time;
+      });
+      if (day) {
+        // Copy all props ?
+        day.userDyspo = UserDyspoStatus.UNDEFINED;
+      }
+    });
+    this.tagCalendarUserDyspoData();
+    this.agendaSvc.isModified = false;
   }
 }

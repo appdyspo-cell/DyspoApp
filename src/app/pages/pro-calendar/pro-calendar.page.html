@@ -1,29 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title slot="start">{{ viewTitle }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button [disabled]="isToday" (click)="today()">Today</ion-button>
-      <ion-button (click)="changeMode('month')">M</ion-button>
-      <ion-button (click)="changeMode('week')">W</ion-button>
-      <ion-button (click)="changeMode('day')">D</ion-button>
-      <ion-button (click)="loadEvents()">Load</ion-button>
-    </ion-buttons>
+    <ion-title slot="start">PRO</ion-title>
   </ion-toolbar>
 </ion-header>
-<ion-content>
-  <calendar
-    [eventSource]="eventSource"
-    [queryMode]="calendar.queryMode"
-    [calendarMode]="calendar.mode"
-    [currentDate]="calendar.currentDate"
-    [step]="calendar.step"
-    [preserveScrollPosition]="calendar.preserveScrollPosition"
-    [startHour]="calendar.startHour"
-    (onCurrentDateChanged)="onCurrentDateChanged($event)"
-    (onEventSelected)="onEventSelected($event)"
-    (onTitleChanged)="onViewTitleChanged($event)"
-    (onTimeSelected)="onTimeSelected($event)"
-    (onDayHeaderSelected)="onDayHeaderSelected($event)"
-  >
-  </calendar>
-</ion-content>
+<ion-content> </ion-content>

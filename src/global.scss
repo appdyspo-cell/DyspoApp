@@ -41,7 +41,7 @@
   --text-black: #444444;
   --text-light: #c6cee0;
   --text-light2: #c9c9c9;
-  --text-no-dyspo: #d24c75;
+  --text-no-dyspo: #fb860a;
   --text-dyspo-with-kids: #e1e163;
   --text-dyspo: #3492d0;
 }
@@ -54,6 +54,10 @@
   }
 }
 
+// ion-action-sheet.dyspo-sheet .action-sheet-group {
+//   background: var(--bg-color);
+// }
+
 .bg_color {
   //--background: var(--bg-color);
   --background: radial-gradient(circle, var(--bg-color), var(--bg-color-dark));
@@ -65,6 +69,10 @@
 
 .bg-kid {
   background-color: var(--text-dyspo-with-kids);
+}
+
+.bg-nodyspo {
+  background-color: var(--text-no-dyspo);
 }
 
 .margin-bottom {
@@ -276,6 +284,18 @@ ion-modal {
   --background: rgba(0, 0, 0, 0) !important;
 }
 
+.dyspo-sheet-dyspo {
+  color: var(--text-dyspo) !important;
+}
+
+.dyspo-sheet-dyspo-with-kids {
+  color: var(--text-dyspo-with-kids) !important;
+}
+
+.dyspo-sheet-no-dyspo {
+  color: var(--text-no-dyspo) !important;
+}
+
 .action-sheet-wrapper {
   --background: var(--transparent);
   .action-sheet-group {
@@ -293,11 +313,11 @@ ion-modal {
       }
     }
     &.action-sheet-group-cancel {
-      background: var(--primary);
+      background: var(--primary) !important;
       border-radius: 0px 0px 5px 5px;
       margin-bottom: 7.5px;
       .action-sheet-button {
-        color: var(--white);
+        color: var(--text-black);
         font-weight: 400;
         text-align: center !important;
         display: block;

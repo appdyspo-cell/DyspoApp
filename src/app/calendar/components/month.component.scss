@@ -82,6 +82,11 @@
   color: #fff !important;
 }
 
+:host .on-selected-no-dyspo {
+  background-color: var(--text-no-dyspo) !important;
+  color: #fff !important;
+}
+
 :host .event-badge {
   width: 10px;
   height: 10px;
