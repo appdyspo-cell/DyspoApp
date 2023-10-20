@@ -1,106 +1,192 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-buttons>
-      <ion-back-button slot="start" title=""></ion-back-button>
+      <ion-back-button slot="start" text=""></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ pageTitle }}</ion-title>
+    <!-- <ion-title>{{ pageTitle }}</ion-title> -->
+    <ion-buttons slot="end">
+      <ion-button
+        fill="outline"
+        shape="round"
+        [disabled]=""
+        (click)="createEvent()"
+      >
+        Enregistrer
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">{{ pageTitle }}</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <ion-list>
+    <ion-list-header>Titre</ion-list-header>
+    <ion-item lines="none">
+      <ion-input
+        class="big-input"
+        [(ngModel)]="agendaEvent!.title"
+        placeholder="Saisissez un Titre"
+        required
+      ></ion-input>
+    </ion-item>
 
-  <ion-item>
-    <ion-input
-      [(ngModel)]="agendaEvent!.title"
-      label="Titre"
-      labelPlacement="floating"
-      placeholder="Saisissez un Titre"
-      required
-    ></ion-input>
-  </ion-item>
+    <!-- <div style="height: 50px; width: 100%"></div> -->
+    <ion-list-header>Quand?</ion-list-header>
 
-  <ion-item button="true" id="open-time-item" lines="none">
-    <ion-text slot="start">{{agendaEvent?.start_date_formatted}}</ion-text>
-    <ion-text slot="end">{{agendaEvent?.start_time_formatted}}</ion-text>
-    <ion-popover
-      #popover_time
-      trigger="open-time-item"
-      show-backdrop="false"
-      size="cover"
-    >
-      <ng-template>
-        <ion-datetime
-          #datetime_starttime
-          presentation="date-time"
-          showDefaultButtons="true"
-          doneText="OK"
-          hour-cycle="h23"
-          locale="fr-FR"
-          [value]="agendaEvent?.startISO"
-          cancelText="Annuler"
-          [min]="min_time_ISO_start"
-          [preferWheel]="true"
-          (ionChange)="onStartTimeChanged($event)"
-          ><span slot="time-label">Heure</span></ion-datetime
-        >
-      </ng-template>
-    </ion-popover>
-  </ion-item>
-
-  <ion-item button="true" id="open-end-time-item" lines="none">
-    <ion-text slot="start">{{agendaEvent?.end_date_formatted}}</ion-text>
-    <ion-text slot="end">{{agendaEvent?.end_time_formatted}}</ion-text>
-
-    <ion-popover
-      #popover_time
-      trigger="open-end-time-item"
-      show-backdrop="false"
-      size="cover"
-    >
-      <ng-template>
-        <ion-datetime
-          presentation="date-time"
-          [preferWheel]="true"
-          showDefaultButtons="true"
-          doneText="OK"
-          hour-cycle="h23"
-          locale="fr-FR"
-          [value]="agendaEvent?.endISO"
-          [min]="min_time_ISO_end"
-          cancelText="Annuler"
-          (ionChange)="onEndTimeChanged($event)"
-        >
-          <span slot="time-label">Heure</span></ion-datetime
-        >
-      </ng-template>
-    </ion-popover>
-  </ion-item>
-
-  <ion-card>
-    <ion-card-content>
-      <ion-icon slot="end" color="primary" icon="body-outline"></ion-icon>
-      <ion-radio-group [value]="agendaEvent?.type">
-        <ion-item lines="none" class="ion-no-margin ion-no-padding">
-          <ion-radio labelPlacement="start" [value]="agendaEventType.KIDS"
-            >Avec Enfants</ion-radio
+    <ion-item button="true" id="open-time-item" lines="none">
+      <ion-text slot="start">{{agendaEvent?.start_date_formatted}}</ion-text>
+      <ion-text slot="end">{{agendaEvent?.start_time_formatted}}</ion-text>
+      <ion-popover
+        #popover_time
+        trigger="open-time-item"
+        show-backdrop="false"
+        size="cover"
+      >
+        <ng-template>
+          <ion-datetime
+            #datetime_starttime
+            presentation="date-time"
+            showDefaultButtons="true"
+            doneText="OK"
+            hour-cycle="h23"
+            locale="fr-FR"
+            [value]="agendaEvent?.startISO"
+            cancelText="Annuler"
+            [min]="min_time_ISO_start"
+            [preferWheel]="true"
+            (ionChange)="onStartTimeChanged($event)"
+            ><span slot="time-label">Heure</span></ion-datetime
           >
+        </ng-template>
+      </ion-popover>
+    </ion-item>
+
+    <ion-item button="true" id="open-end-time-item" lines="none">
+      <ion-text slot="start">{{agendaEvent?.end_date_formatted}}</ion-text>
+      <ion-text slot="end">{{agendaEvent?.end_time_formatted}}</ion-text>
+
+      <ion-popover
+        #popover_time
+        trigger="open-end-time-item"
+        show-backdrop="false"
+        size="cover"
+      >
+        <ng-template>
+          <ion-datetime
+            presentation="date-time"
+            [preferWheel]="true"
+            showDefaultButtons="true"
+            doneText="OK"
+            hour-cycle="h23"
+            locale="fr-FR"
+            [value]="agendaEvent?.endISO"
+            [min]="min_time_ISO_end"
+            cancelText="Annuler"
+            (ionChange)="onEndTimeChanged($event)"
+          >
+            <span slot="time-label">Heure</span></ion-datetime
+          >
+        </ng-template>
+      </ion-popover>
+    </ion-item>
+
+    <ion-list>
+      <ion-radio-group [(ngModel)]="agendaEvent!.type">
+        <ion-item lines="none">
+          <ion-avatar slot="start">
+            <ion-img src="../../../../assets/dyspo-kid.png"></ion-img>
+          </ion-avatar>
+          <span style="color: var(--text-dyspo-with-kids)">Kids</span>
+
+          <ion-radio
+            slot="end"
+            class="ion-text-center"
+            [value]="agendaEventType.KIDS"
+          ></ion-radio>
         </ion-item>
-        <ion-item lines="none" class="ion-no-margin ion-no-padding">
-          <ion-radio labelPlacement="start" [value]="agendaEventType.NOKIDS"
-            >Sans Enfant</ion-radio
-          >
+        <ion-item lines="none">
+          <ion-avatar slot="start">
+            <ion-img src="../../../../assets/dyspo-nokid.png"></ion-img>
+          </ion-avatar>
+          <span style="color: var(--text-dyspo)">No Kids</span>
+
+          <ion-radio
+            slot="end"
+            class="ion-text-center"
+            [value]="agendaEventType.NOKIDS"
+          ></ion-radio>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-avatar slot="start">
+            <ion-img src="../../../../assets/dyspo-free.png"></ion-img>
+          </ion-avatar>
+          <span style="color: var(--text-dyspo-free)">Au choix</span>
+
+          <ion-radio
+            slot="end"
+            class="ion-text-center"
+            [value]="agendaEventType.FREE"
+          ></ion-radio>
         </ion-item>
       </ion-radio-group>
-    </ion-card-content>
-  </ion-card>
+    </ion-list>
+    <ion-list-header>
+      <ion-label>Qui prévenir ?</ion-label>
 
-  <ion-button expand="full" (click)="createEvent()"
-    ><ion-icon slot="start" name="checkmark-outline"></ion-icon>{{ saveLabel
-    }}</ion-button
-  >
+      <ion-button [routerLink]="['/friends-selection']">
+        <ion-icon name="people" slot="start"></ion-icon>Amis, Groupe</ion-button
+      >
+    </ion-list-header>
+
+    <ion-card>
+      <ion-list *ngIf="friends.length > 0">
+        <ion-item
+          *ngFor="let friend of friends ; let i = index;"
+          (click)="selectFriend(friend)"
+        >
+          <ion-avatar slot="start">
+            <!-- <img src="{{friend?.avatarPath}}" /> -->
+          </ion-avatar>
+
+          <div>
+            <ion-row class="ion-align-items-center">
+              <p class="ion-no-margin">NOM PRENOM</p>
+            </ion-row>
+            <ion-row class="ion-align-items-center">
+              <p class="ion-no-margin">5</p>
+            </ion-row>
+            <!-- <ion-row class="ion-align-items-center">
+              <rating [rating]="rate" (ratingChange)="onRateChanged($event)">
+              </rating>            
+            </ion-row> -->
+          </div>
+        </ion-item>
+      </ion-list>
+    </ion-card>
+
+    <ion-list-header>Lieu </ion-list-header>
+
+    <ion-searchbar
+      [(ngModel)]="autocompletePlaceInput.input"
+      (ngModelChange)="updateSearchResults()"
+      placeholder="Entrez une adresse"
+      (ionClear)="clearAutocomplete()"
+    >
+    </ion-searchbar>
+    <ion-list [hidden]="autocompletePlaces.length === 0">
+      <ion-item
+        *ngFor="let place of autocompletePlaces"
+        tappable
+        (click)="selectSearchResult(place)"
+      >
+        {{ place.description }}
+      </ion-item>
+    </ion-list>
+  </ion-list>
+  <ion-list-header
+    ><ion-label>Photo</ion-label>
+    <ion-button
+      ><ion-icon name="camera" slot="start"></ion-icon>Ajouter</ion-button
+    >
+  </ion-list-header>
 </ion-content>

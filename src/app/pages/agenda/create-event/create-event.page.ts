@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonDatetime, NavController } from '@ionic/angular';
+import { IonDatetime, ModalController, NavController } from '@ionic/angular';
+
 import {
   add,
   addHours,
@@ -15,13 +15,20 @@ import {
   setMinutes,
 } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { FriendsComponent } from 'src/app/components/friends/friends.component';
 import {
   AgendaEvent,
   AgendaEventStatus,
   AgendaEventType,
+  Friend,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
+import Swal from 'sweetalert2';
 
+export enum FriendSelectionType {
+  FRIENDS = 'Amis',
+  GROUP = 'Groupe',
+}
 @Component({
   selector: 'app-create-event',
   templateUrl: './create-event.page.html',
@@ -39,13 +46,27 @@ export class CreateEventPage implements OnInit {
   agendaEventType = AgendaEventType;
   pageTitle = '';
   saveLabel = '';
+  friendSelectionType = FriendSelectionType;
+  friendSelection: FriendSelectionType = FriendSelectionType.FRIENDS;
+
+  friends = [];
+
+  autocompletePlaces: google.maps.places.AutocompletePrediction[] = [];
+  inputSearch = '';
+
+  GoogleAutocompleteSvc: google.maps.places.AutocompleteService;
+  autocompletePlaceInput!: { input: string };
 
   constructor(
     private navCtrl: NavController,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private agendaSvc: AgendaService
+    private agendaSvc: AgendaService,
+    private modalCtrl: ModalController
   ) {
+    this.GoogleAutocompleteSvc = new google.maps.places.AutocompleteService();
+    this.autocompletePlaceInput = { input: '' };
+    this.autocompletePlaces = [];
     this.activatedRoute.params.subscribe((params) => {
       const mode = params['mode'];
       switch (mode) {
@@ -70,7 +91,7 @@ export class CreateEventPage implements OnInit {
               )
             ),
             title: undefined,
-            type: AgendaEventType.KIDS,
+            type: AgendaEventType.FREE,
             status: AgendaEventStatus.ACTIVE,
           };
 
@@ -105,12 +126,19 @@ export class CreateEventPage implements OnInit {
 
   ngOnInit() {}
 
+  selectFriend(friend: Friend) {}
+
   createEvent() {
     console.log(this.agendaEvent);
     if (this.agendaEvent?.title) {
       console.log('Événement créé :', this.agendaEvent);
       this.agendaSvc.addEvent(this.agendaEvent!);
       this.navCtrl.pop();
+    } else {
+      Swal.fire({
+        title: 'Veuillez donner un titre à l evt',
+        heightAuto: false,
+      });
     }
   }
 
@@ -162,5 +190,56 @@ export class CreateEventPage implements OnInit {
   formatTime(dateISO: string) {
     console.log(dateISO);
     return format(parseISO(dateISO), 'HH:mm');
+  }
+
+  selectSearchResult(prediction: google.maps.places.AutocompletePrediction) {
+    ///WE CAN CONFIGURE MORE COMPLEX FUNCTIONS SUCH AS UPLOAD DATA TO FIRESTORE OR LINK IT TO SOMETHING
+    //alert(JSON.stringify(item))
+    console.log(prediction);
+    this.autocompletePlaceInput.input = prediction.description;
+    this.agendaEvent!.place_id = prediction.place_id;
+
+    this.autocompletePlaces = [];
+  }
+
+  clearAutocomplete() {
+    this.autocompletePlaces = [];
+    this.autocompletePlaceInput.input = '';
+    this.agendaEvent!.place_id = '';
+  }
+
+  //AUTOCOMPLETE, SIMPLY LOAD THE PLACE USING GOOGLE PREDICTIONS AND RETURNING THE ARRAY.
+  updateSearchResults() {
+    if (this.autocompletePlaceInput.input == '') {
+      this.autocompletePlaces = [];
+      return;
+    }
+    this.GoogleAutocompleteSvc.getPlacePredictions(
+      { input: this.autocompletePlaceInput.input },
+      (predictions, status) => {
+        this.autocompletePlaces = [];
+        //this.zone.run(() => {
+        if (predictions) {
+          predictions.forEach((prediction) => {
+            this.autocompletePlaces.push(prediction);
+          });
+        }
+        //});
+      }
+    );
+  }
+
+  async openFriendsModal() {
+    const modal = await this.modalCtrl.create({
+      component: FriendsComponent,
+    });
+    modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+
+    console.log(data);
+    if (role === 'confirm') {
+      //this.message = `Hello, ${data}!`;
+    }
   }
 }

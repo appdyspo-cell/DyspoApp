@@ -31,53 +31,89 @@ const routes: Routes = [
   },
   {
     path: 'friends',
-    loadChildren: () => import('./pages/friends/friends.module').then( m => m.FriendsPageModule)
+    loadChildren: () =>
+      import('./pages/friends/friends.module').then((m) => m.FriendsPageModule),
   },
   {
     path: 'chat-home',
-    loadChildren: () => import('./pages/chat-home/chat-home.module').then( m => m.ChatHomePageModule)
+    loadChildren: () =>
+      import('./pages/chat-home/chat-home.module').then(
+        (m) => m.ChatHomePageModule
+      ),
   },
   {
     path: 'agenda',
-    loadChildren: () => import('./pages/agenda/agenda.module').then( m => m.AgendaPageModule)
+    loadChildren: () =>
+      import('./pages/agenda/agenda.module').then((m) => m.AgendaPageModule),
   },
   {
     path: 'user-status',
-    loadChildren: () => import('./pages/user-status/user-status.module').then( m => m.UserStatusPageModule)
+    loadChildren: () =>
+      import('./pages/user-status/user-status.module').then(
+        (m) => m.UserStatusPageModule
+      ),
   },
   {
     path: 'cgu',
-    loadChildren: () => import('./pages/cgu/cgu.module').then( m => m.CguPageModule)
+    loadChildren: () =>
+      import('./pages/cgu/cgu.module').then((m) => m.CguPageModule),
   },
   {
     path: 'register',
-    loadChildren: () => import('./pages/register/register.module').then( m => m.RegisterPageModule)
+    loadChildren: () =>
+      import('./pages/register/register.module').then(
+        (m) => m.RegisterPageModule
+      ),
   },
   {
     path: 'group-list',
-    loadChildren: () => import('./pages/chat/group-list/group-list.module').then( m => m.GroupListPageModule)
+    loadChildren: () =>
+      import('./pages/chat/group-list/group-list.module').then(
+        (m) => m.GroupListPageModule
+      ),
   },
   {
     path: 'group-info',
-    loadChildren: () => import('./pages/chat/group-info/group-info.module').then( m => m.GroupInfoPageModule)
+    loadChildren: () =>
+      import('./pages/chat/group-info/group-info.module').then(
+        (m) => m.GroupInfoPageModule
+      ),
   },
   {
     path: 'group-chatting',
-    loadChildren: () => import('./pages/chat/group-chatting/group-chatting.module').then( m => m.GroupChattingPageModule)
+    loadChildren: () =>
+      import('./pages/chat/group-chatting/group-chatting.module').then(
+        (m) => m.GroupChattingPageModule
+      ),
   },
   {
     path: 'create-group',
-    loadChildren: () => import('./pages/chat/create-group/create-group.module').then( m => m.CreateGroupPageModule)
+    loadChildren: () =>
+      import('./pages/chat/create-group/create-group.module').then(
+        (m) => m.CreateGroupPageModule
+      ),
   },
   {
     path: 'create-group-info',
-    loadChildren: () => import('./pages/chat/create-group-info/create-group-info.module').then( m => m.CreateGroupInfoPageModule)
+    loadChildren: () =>
+      import('./pages/chat/create-group-info/create-group-info.module').then(
+        (m) => m.CreateGroupInfoPageModule
+      ),
   },
   {
     path: 'pro-calendar',
-    loadChildren: () => import('./pages/pro-calendar/pro-calendar.module').then( m => m.ProCalendarPageModule)
+    loadChildren: () =>
+      import('./pages/pro-calendar/pro-calendar.module').then(
+        (m) => m.ProCalendarPageModule
+      ),
   },
-
+  {
+    path: 'friends-selection',
+    loadChildren: () =>
+      import('./pages/friends-selection/friends-selection.module').then(
+        (m) => m.FriendsSelectionPageModule
+      ),
+  },
 ];
 @NgModule({
   imports: [

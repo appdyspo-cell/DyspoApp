@@ -5,19 +5,20 @@
 export const environment = {
   production: false,
   debug: true,
-  firebaseConfig: {
-    apiKey: 'AIzaSyAqaorNocvLQKCp48JHcmKwcm1FZ0-3_Mk',
-    authDomain: 'dyspo-21d60.firebaseapp.com',
-    databaseURL:
-      'https://dyspo-21d60-default-rtdb.europe-west1.firebasedatabase.app',
-    projectId: 'dyspo-21d60',
-    storageBucket: 'dyspo-21d60.appspot.com',
-    messagingSenderId: '515901093848',
-    appId: '1:515901093848:web:0260f1acf86b32b1ae64ad',
-  },
   DEFAULT_AVATAR: './assets/img/user.png',
   dyspo_email: 'contact@dyspo.com',
   BIOMETRIC_KEY: 'dyspo_123456',
+  firebaseConfig: {
+    apiKey: 'AIzaSyB2Juhy49t_9N4d-aGfhcuQmC-o4ulvrwg',
+    authDomain: 'dyspo-stg.firebaseapp.com',
+    databaseURL:
+      'https://dyspo-stg-default-rtdb.europe-west1.firebasedatabase.app',
+    projectId: 'dyspo-stg',
+    storageBucket: 'dyspo-stg.appspot.com',
+    messagingSenderId: '935331269385',
+    appId: '1:935331269385:web:73394d7fb1e204e4f2e1d8',
+  },
+  googleMapsApiKey: 'AIzaSyB2Juhy49t_9N4d-aGfhcuQmC-o4ulvrwg',
 };
 
 /*

@@ -9,6 +9,7 @@ import { FriendsService } from './services/friends.service';
 import { TestService } from './test.service';
 import { ChatService } from './services/chat.service';
 import { AgendaService } from './services/agenda.service';
+import { NotificationService } from './services/notification.service';
 
 @Component({
   selector: 'app-root',
@@ -30,7 +31,8 @@ export class AppComponent {
     private logger: LoggerService,
     private friendsSvc: FriendsService,
     private agendaSvc: AgendaService,
-    private chatSvc: ChatService
+    private chatSvc: ChatService,
+    private notificationSvc: NotificationService
   ) {
     //Lang
     this.translate.setDefaultLang('fr');
@@ -92,6 +94,7 @@ export class AppComponent {
     this.friendsSvc.initService(uid);
     this.agendaSvc.initService(uid);
     this.chatSvc.initService(uid);
+    this.notificationSvc.initService(uid);
     // this.kdoSvc.initService(uid);
   }
 

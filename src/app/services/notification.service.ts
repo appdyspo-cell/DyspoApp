@@ -1,15 +1,10 @@
 import { Injectable, NgZone } from '@angular/core';
-import { environment } from 'src/environments/environment';
+
 import { AppUser, NotifSubjects } from '../models/models';
 import { NavigationExtras, Router } from '@angular/router';
-import { getFunctions, httpsCallable } from 'firebase/functions';
+import { httpsCallable } from 'firebase/functions';
 import { Functions } from '@angular/fire/functions';
 
-import {
-  ActionPerformed,
-  PushNotificationSchema,
-  PushNotifications,
-} from '@capacitor/push-notifications';
 import {
   Firestore,
   collection,
@@ -20,12 +15,19 @@ import {
 } from '@angular/fire/firestore';
 import { UtilsService } from './utils.service';
 import { UserService } from './user.service';
+import {
+  FirebaseMessaging,
+  GetTokenOptions,
+  NotificationActionPerformedEvent,
+  NotificationReceivedEvent,
+  Notification,
+} from '@capacitor-firebase/messaging';
 
 @Injectable({
   providedIn: 'root',
 })
 export class NotificationService {
-  notifications: PushNotificationSchema[] = [];
+  notifications: Notification[] = [];
   uid: any;
   constructor(
     private firestore: Firestore,
@@ -38,45 +40,48 @@ export class NotificationService {
 
   async initListeners() {
     console.log('NotificationService ---> initListeners');
-    PushNotifications.addListener('registration', (data) => {
-      // alert(JSON.stringify(data));
-      console.log('Registration OK : Good token');
-      console.log(data.value);
-      this.registerToken(this.uid, data.value);
-    });
-    // Some issue with our setup and push will not work
-    PushNotifications.addListener('registrationError', (error: any) => {
-      alert('Error on registration: ' + JSON.stringify(error));
-    });
-    PushNotifications.addListener(
-      'pushNotificationReceived',
-      (notification: PushNotificationSchema) => {
-        console.log('notification ' + JSON.stringify(notification));
-        this.zone.run(() => {
-          this.notifications.push(notification);
-        });
-      }
-    );
-    PushNotifications.addListener(
-      'pushNotificationActionPerformed',
-      (actionPerformed: ActionPerformed) => {
-        console.log(
-          'data ' + JSON.stringify(actionPerformed.notification.data)
-        );
-        this.goToChat(actionPerformed.notification.data.friend_uid);
-      }
-    );
+    // FirebaseMessaging.addListener('registration', (data) => {
+    //   // alert(JSON.stringify(data));
+    //   console.log('Registration OK : Good token');
+    //   console.log(data.value);
+    //   this.registerToken(this.uid, data.value);
+    // });
+
+    const { token } = await FirebaseMessaging.getToken();
+
+    if (token) {
+      console.log('ERR NotificationService ---> getToken() null');
+    } else {
+      FirebaseMessaging.addListener(
+        'notificationReceived',
+        (event: NotificationReceivedEvent) => {
+          console.log('notification ' + JSON.stringify(event.notification));
+          this.zone.run(() => {
+            this.notifications.push(event.notification);
+          });
+        }
+      );
+      FirebaseMessaging.addListener(
+        'notificationActionPerformed',
+        (actionPerformed: NotificationActionPerformedEvent) => {
+          console.log(
+            'data ' + JSON.stringify(actionPerformed.notification.data)
+          );
+          //this.goToChat(actionPerformed.notification.data.friend_uid);
+        }
+      );
+    }
   }
 
-  public initPermissions(uid: string) {
+  public initService(uid: string) {
     this.uid = uid;
     this.initListeners();
-    PushNotifications.requestPermissions().then((response) => {
+    FirebaseMessaging.requestPermissions().then((response) => {
       if (response.receive === 'granted') {
         // Register with Apple / Google to receive push via APNS/FCM
-        PushNotifications.register().then((res) => {
-          console.log(res);
-        });
+        // PushNotifications.register().then((res) => {
+        //   console.log(res);
+        // });
       } else {
         // Show some error
         alert('err');
@@ -99,12 +104,12 @@ export class NotificationService {
     /*FCM.deleteInstance()
     .then(() => console.log(`Token deleted`))
     .catch((err) => console.log(err));*/
-    PushNotifications.removeAllListeners()
+    FirebaseMessaging.removeAllListeners()
       .then((res) => {
-        console.log('PushNotifications.removeAllListeners()->', res);
+        console.log('FirebaseMessaging.removeAllListeners()->', res);
       })
       .catch((err) => {
-        console.log('Error PushNotifications.removeAllListeners()->', err);
+        console.log('Error FirebaseMessaging.removeAllListeners()->', err);
       });
 
     const userCollectionRef = collection(this.firestore, 'users');
@@ -126,7 +131,7 @@ export class NotificationService {
   }
 
   resetBadgeCount() {
-    PushNotifications.removeAllDeliveredNotifications();
+    FirebaseMessaging.removeAllDeliveredNotifications();
   }
 
   goToChat(friend_uid: string) {
