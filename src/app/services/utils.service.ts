@@ -46,6 +46,9 @@ export class UtilsService {
       case 'auth/user-not-found':
         return "L'utilisateur n'existe pas";
         break;
+      case 'auth/invalid-login-credentials':
+        return 'Mauvais identifiant / mot de passe incorrect';
+        break;
       case 'auth/invalid-email':
         return "L'email n'est pas valide";
         break;

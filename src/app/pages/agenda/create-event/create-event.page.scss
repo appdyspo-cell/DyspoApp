@@ -1,0 +1,56 @@
+ion-radio::part(container) {
+  width: 30px;
+  height: 30px;
+
+  border-radius: 18px;
+  border: 2px solid #ddd;
+}
+
+ion-radio::part(mark) {
+  background: none;
+  transition: none;
+  transform: none;
+  border-radius: 0;
+}
+
+ion-radio.radio-checked::part(container) {
+  background: var(--ion-color-primary);
+  border-color: transparent;
+}
+
+ion-radio.radio-checked::part(mark) {
+  width: 6px;
+  height: 10px;
+
+  border-width: 0px 2px 2px 0px;
+  border-style: solid;
+  border-color: #fff;
+
+  transform: rotate(45deg);
+}
+
+.kids {
+  background-color: var(--text-dyspo-with-kids);
+  color: var(--white);
+  //border-color: var(--text-dyspo);
+}
+
+.nokids {
+  background-color: var(--text-dyspo);
+  color: var(--white);
+  //color: var(--text-no-dyspo);
+}
+
+.free {
+  background-color: var(--text-dyspo-free);
+  color: var(--white);
+}
+
+.big-input {
+  font-size: 30px;
+}
+
+ion-list-header {
+  --border-width: 0 0 2px 0;
+  --border-color: #f24aec;
+}

@@ -9,7 +9,7 @@
             <img
               #title
               class="img-logo"
-              src="../../../assets/img/kompot_logo.png"
+              src="../../../assets/dyspo_black_logo.png"
             />
             <ion-text #title class="text-light">
               <h1 class="ion-no-margin ion-margin-vertical ion-text-center">
@@ -93,20 +93,24 @@
               (click)="submitLoginForm()"
               color="undefined"
               class="btn-transition"
-              ><strong style="color:#fff"
+              ><strong style="color: #fff"
                 >{{ 'LOGIN' | translate }}</strong
               ></ion-button
             >
           </ion-col>
         </ion-row>
         <ion-row *ngIf="showBiometricLogin">
-         
-          <ion-col >
-            <ion-button expand="block" (click)="biometricLogin()" color="undefined" class="btn-transition"><strong
-              class="white">Authentification biométrique</strong></ion-button>
-            
+          <ion-col>
+            <ion-button
+              expand="block"
+              (click)="biometricLogin()"
+              color="undefined"
+              class="btn-transition"
+              ><strong class="white"
+                >Authentification biométrique</strong
+              ></ion-button
+            >
           </ion-col>
-         
         </ion-row>
         <p>&nbsp;</p>
         <ion-row>
@@ -124,7 +128,7 @@
               (click)="signup()"
               color="undefined"
               class="btn-transition"
-              ><strong style="color:#fff"
+              ><strong style="color: #fff"
                 >{{ 'REGISTER' | translate }}</strong
               ></ion-button
             >

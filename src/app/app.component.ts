@@ -9,6 +9,8 @@ import { FriendsService } from './services/friends.service';
 import { TestService } from './test.service';
 import { ChatService } from './services/chat.service';
 import { AgendaService } from './services/agenda.service';
+import { NotificationService } from './services/notification.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -30,18 +32,20 @@ export class AppComponent {
     private logger: LoggerService,
     private friendsSvc: FriendsService,
     private agendaSvc: AgendaService,
-    private chatSvc: ChatService
+    private chatSvc: ChatService,
+    private notificationSvc: NotificationService
   ) {
     //Lang
     this.translate.setDefaultLang('fr');
+    this.loadScripts();
     const preferredLang = localStorage.getItem('lang');
     if (!preferredLang) {
       this.translate.use('fr');
     } else {
       this.translate.use(preferredLang);
     }
-    this.user$ = user(auth);
-    this.authState$ = authState(auth);
+    this.user$ = user(this.auth);
+    this.authState$ = authState(this.auth);
 
     // this.userSubscription = this.user$.subscribe((aUser: User | null) => {
     //   //handle user state changes here. Note, that user will be null if there is no currently logged in user.
@@ -92,10 +96,22 @@ export class AppComponent {
     this.friendsSvc.initService(uid);
     this.agendaSvc.initService(uid);
     this.chatSvc.initService(uid);
+    this.notificationSvc.initService(uid);
     // this.kdoSvc.initService(uid);
   }
 
   killAllServices() {
     //this.notifSvc.unsubscribeAllAfterLogoutEvent();
+  }
+
+  loadScripts() {
+    const node = document.createElement('script');
+    node.src =
+      'https://maps.googleapis.com/maps/api/js?key=' +
+      environment.googleMapsApiKey +
+      '&libraries=places&lang=fr-FR';
+    node.type = 'text/javascript';
+    node.async = false;
+    document.getElementsByTagName('head')[0].appendChild(node);
   }
 }

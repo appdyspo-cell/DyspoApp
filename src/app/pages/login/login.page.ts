@@ -82,6 +82,7 @@ export class LoginPage implements OnInit {
       return credentials;
     } catch (error: any) {
       this.utils.hideLoader();
+      console.log('Error login');
       this.utils.showFirebaseError(error);
       return null;
     }

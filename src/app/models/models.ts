@@ -66,6 +66,7 @@ export interface AgendaEvent {
   start_time_formatted?: string;
   end_date_formatted?: string;
   end_time_formatted?: string;
+  place_id?: string;
 }
 
 export interface CrudFBAction {
@@ -119,6 +120,7 @@ export enum AgendaEventStatus {
 export enum AgendaEventType {
   KIDS = 'KIDS',
   NOKIDS = 'NOKIDS',
+  FREE = 'FREE',
 }
 
 export enum FriendStatus {
