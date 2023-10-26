@@ -3,7 +3,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.rovincent.dyspo',
+  appId: 'com.rovincent.dyspo.staging',
   appName: 'dyspo',
   webDir: 'www',
   server: {
@@ -15,12 +15,13 @@ const config: CapacitorConfig = {
     },
   },
   ios: {
-    path: 'ios/prod',
+    path: 'ios/stg',
     appendUserAgent: 'ios:application',
     webContentsDebuggingEnabled: true,
   },
   android: {
-    path: 'android/prod',
+    path: 'android/stg',
+    webContentsDebuggingEnabled: true,
   },
 };
 

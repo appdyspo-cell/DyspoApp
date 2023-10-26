@@ -22,7 +22,6 @@ import Swal from 'sweetalert2';
 
 import { getApp } from '@angular/fire/app';
 import { environment } from 'src/environments/environment';
-import { NativeBiometric } from 'capacitor-native-biometric';
 
 @Injectable({
   providedIn: 'root',

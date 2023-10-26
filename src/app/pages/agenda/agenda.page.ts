@@ -59,10 +59,10 @@ export class AgendaPage implements AfterViewInit {
   agendaEvents: AgendaEvent[] = [];
   agendaEventsSubscription: Subscription;
 
-  agendaDyspos$: Observable<{
-    action: 'MODIFIED' | 'ADDED' | 'REMOVED';
-    items: AgendaDyspoItem[];
-  }>;
+  // agendaDyspos$: Observable<{
+  //   action: 'MODIFIED' | 'ADDED' | 'REMOVED';
+  //   items: AgendaDyspoItem[];
+  // }>;
   agendaDyspos: AgendaDyspoItem[] = [];
   agendaDysposSubscription: Subscription;
 
@@ -88,7 +88,7 @@ export class AgendaPage implements AfterViewInit {
       }
     );
 
-    this.agendaDyspos$ = this.agendaSvc.agendaDyspos$;
+    //this.agendaDyspos$ = this.agendaSvc.agendaDyspos$;
     this.agendaDysposSubscription = this.agendaSvc.agendaDyspos$.subscribe(
       (agendaDyspos) => {
         console.log(agendaDyspos.action);

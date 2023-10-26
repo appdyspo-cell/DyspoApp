@@ -7,7 +7,7 @@ import {
   ModalController,
   NavController,
 } from '@ionic/angular';
-import { OverlayEventDetail } from '@ionic/core/components';
+
 import { Subscription } from 'rxjs';
 import {
   AppSettings,
@@ -30,7 +30,6 @@ import { UserCredential } from '@angular/fire/auth';
   styleUrls: ['./parametres.page.scss'],
 })
 export class ParametresPage implements OnInit {
-  @ViewChild(IonModal) modal!: IonModal;
   dyspoStatus = UserDyspoStatus;
 
   presentingElement: any;
@@ -209,48 +208,5 @@ export class ParametresPage implements OnInit {
   openBlockedUsers() {
     //this.logger.logDebug('Open');
     this.navCtrl.navigateForward('banned-users');
-  }
-
-  openStatus() {
-    this.modalCtrl
-      .create({
-        component: UserStatusComponent,
-        cssClass: 'transparent-modal',
-      })
-      .then((modal) => {
-        modal.present();
-      });
-  }
-
-  cancel() {
-    this.modal.dismiss(null, 'cancel');
-  }
-
-  confirm() {
-    //this.modal.dismiss(this.name, 'confirm');
-  }
-
-  updateStatus(dyspoStatus: UserDyspoStatus) {
-    this.modal.dismiss(dyspoStatus, 'confirm');
-  }
-
-  onWillDismiss(event: Event) {
-    const ev = event as CustomEvent<OverlayEventDetail<string>>;
-    if (ev.detail.role === 'confirm') {
-      if (ev.detail.data !== this.userInfo.dyspoStatus) {
-        //this.message = `Hello, ${ev.detail.data}!`;
-        console.log(`Update status, ${ev.detail.data}!`);
-        this.userInfo.dyspoStatus = ev.detail.data as UserDyspoStatus;
-        const userInfoClone = Object.assign({}, this.userInfo) as AppUser;
-        this.userSvc
-          .updateUser(userInfoClone)
-          .then(() => {
-            this.utils.showToastSuccess('Le status a été mis à jour');
-          })
-          .catch((err) => {
-            this.utils.showToastError(err);
-          });
-      }
-    }
   }
 }

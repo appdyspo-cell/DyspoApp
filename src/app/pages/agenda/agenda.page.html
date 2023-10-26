@@ -46,7 +46,7 @@
     [format]="'YYYY-MM-DD'"
     [readonly]="agendaMode === agendaModes.READONLY"
   ></ion-calendar>
-  <div *ngIf="agendaMode === agendaModes.READONLY">
+  <div *ngIf="agendaMode === agendaModes.READONLY" style="padding-top: 5px">
     <!-- <ion-list-header> {{selectedDateFormatted}} </ion-list-header> -->
 
     <ion-list *ngIf="eventsForDate.length > 0">

@@ -9,7 +9,10 @@ import { signInWithEmailAndPassword, Auth } from '@angular/fire/auth';
 import { Firestore } from '@angular/fire/firestore';
 import { AuthService } from 'src/app/services/auth.service';
 import { LoggerService } from 'src/app/services/logger.service';
-import { BiometryType, NativeBiometric } from 'capacitor-native-biometric';
+import {
+  BiometryType,
+  NativeBiometric,
+} from '@capgo/capacitor-native-biometric';
 import { Capacitor } from '@capacitor/core';
 
 @Component({
@@ -63,16 +66,19 @@ export class LoginPage implements OnInit {
 
     try {
       const credentials = await this.authService.login(email, password);
-      if (!fromBiometric && Capacitor.getPlatform() !== 'web') {
-        // Save user's credentials
-        NativeBiometric.setCredentials({
-          username: email,
-          password: password,
-          server: environment.BIOMETRIC_KEY,
-        }).then(() => {
-          console.log('Credentials set');
-        });
-      }
+      // if (!fromBiometric && Capacitor.getPlatform() !== 'web') {
+      //   NativeBiometric.deleteCredentials({
+      //     server: environment.BIOMETRIC_KEY,
+      //   });
+      //   // Save user's credentials
+      //   NativeBiometric.setCredentials({
+      //     username: email,
+      //     password: password,
+      //     server: environment.BIOMETRIC_KEY,
+      //   }).then(() => {
+      //     console.log('Credentials set');
+      //   });
+      // }
 
       this.logger.logDebug('user logged');
       this.utils.hideLoader();

@@ -1,0 +1,76 @@
+.dyspo-button {
+  font-family: Atiba;
+  font-size: 36px;
+  padding: 16px;
+  width: 100%;
+  text-align: center;
+  border-radius: 8px;
+
+  overflow: hidden;
+
+  //border: 1px solid;
+}
+
+.dyspo-modal-btns-container {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.dyspo {
+  background-color: var(--text-dyspo);
+  color: var(--white);
+  //border-color: var(--text-dyspo);
+}
+
+.no-dyspo {
+  background-color: var(--text-no-dyspo);
+  color: var(--white);
+  //color: var(--text-no-dyspo);
+}
+
+.dyspo-with-kids {
+  background-color: var(--text-dyspo-with-kids);
+  color: var(--white);
+  //color: var(--text-dyspo-with-kids);
+}
+
+.next-agenda-container {
+  //width: 300px; /* Définissez la largeur du conteneur */
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.next-agenda-content {
+  width: auto; /* Laissez la largeur automatique pour s'adapter aux éléments enfants */
+  //font-size: 0; /* Pour supprimer l'espacement entre les éléments */
+  margin-top: 10px;
+}
+
+.next-agenda-element {
+  width: 150px; /* Largeur de chaque élément */
+  height: 170px; /* Hauteur de chaque élément, vous pouvez ajuster selon vos besoins */
+  background-color: #ccc; /* Ajoutez une couleur de fond pour les éléments */
+  display: inline-block; /* Afficher les éléments en ligne côte à côte */
+  margin-right: 10px; /* Ajoutez une marge à droite pour séparer les éléments */
+  margin-left: 0; /* La marge à gauche du premier élément */
+  border-radius: 5px;
+  padding: 3px;
+}
+
+.change-status-icon {
+  position: absolute;
+  top: 0; /* Placez le badge en haut */
+  right: 10px; /* Placez le badge à droite */
+  background-color: rgb(255, 255, 255); /* Couleur de fond du badge */
+  color: rgb(30, 30, 30); /* Couleur du texte du badge */
+  padding: 5px 8px; /* Ajoutez du rembourrage pour le badge */
+  border-radius: 50%; /* Pour créer un badge circulaire */
+  //  font-size: 14px; /* Taille du texte du badge */
+}
+
+.dyspo-btn-container {
+  width: 100%;
+  height: auto;
+  position: relative;
+}

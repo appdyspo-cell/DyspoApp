@@ -59,14 +59,14 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/tabs/agenda',
+        redirectTo: '/tabs/user-status',
         pathMatch: 'full',
       },
     ],
   },
   {
     path: '',
-    redirectTo: '/tabs/agenda',
+    redirectTo: '/tabs/user-status',
     pathMatch: 'full',
   },
 ];

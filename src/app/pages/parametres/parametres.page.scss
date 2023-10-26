@@ -22,43 +22,6 @@ ion-header {
   }
 }
 
-.dyspo-button {
-  font-family: Atiba;
-  font-size: 36px;
-  padding: 16px;
-  width: 100%;
-  text-align: center;
-  border-radius: 50px;
-  position: relative;
-  overflow: hidden;
-
-  //border: 1px solid;
-}
-
-.dyspo-btns-container {
-  width: 100%;
-  position: relative;
-  overflow: hidden;
-}
-
-.dyspo {
-  background-color: var(--text-dyspo);
-  color: var(--white);
-  //border-color: var(--text-dyspo);
-}
-
-.no-dyspo {
-  background-color: var(--text-no-dyspo);
-  color: var(--white);
-  //color: var(--text-no-dyspo);
-}
-
-.dyspo-with-kids {
-  background-color: var(--text-dyspo-with-kids);
-  color: var(--white);
-  //color: var(--text-dyspo-with-kids);
-}
-
 h2 {
   margin: 0;
   //color: var(--white);

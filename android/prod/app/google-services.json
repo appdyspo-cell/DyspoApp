@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "515901093848",
+    "firebase_url": "https://dyspo-21d60-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "dyspo-21d60",
+    "storage_bucket": "dyspo-21d60.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:515901093848:android:654728729855f628ae64ad",
+        "android_client_info": {
+          "package_name": "com.rovincent.dyspo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "515901093848-f5ip449hkqkhj6u9b2pcom8v10nv1hdr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC94eZh2WqKuP--c5eV2yeu3W_JRFcKff4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "515901093848-f5ip449hkqkhj6u9b2pcom8v10nv1hdr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

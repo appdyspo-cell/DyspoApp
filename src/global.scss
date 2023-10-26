@@ -33,14 +33,14 @@
   --white: #fff;
   --primary: #93b7ff;
   --bg-color: #f3f4f8;
-  --bg-color-dark: #7e97f1;
+  --bg-color-dark: #ced2de;
   --green_color: #00ff5a;
   --gray: #d5d5d5;
   --transparent: rgba(0, 0, 0, 0);
   --text-dark: #bdbdbe;
   --text-black: #444444;
-  --text-light: #c6cee0;
-  --text-light2: #c9c9c9;
+  --text-light: #8e8e8e;
+  --text-light2: #464646;
   --text-no-dyspo: #fb860a;
   --text-dyspo-with-kids: #e1e163;
   --text-dyspo: #3492d0;
@@ -444,5 +444,9 @@ ion-app[dir="rtl"] {
   }
   ion-header ion-toolbar ion-buttons ion-back-button {
     transform: rotate(180deg);
+  }
+
+  ion-button.btn.button-block {
+    --border-radius: 6px !important;
   }
 }

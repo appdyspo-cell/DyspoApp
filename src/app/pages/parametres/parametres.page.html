@@ -11,7 +11,7 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-list-header>
+  <!-- <ion-list-header>
     <h2>Mon Status</h2>
   </ion-list-header>
 
@@ -21,9 +21,7 @@
     class="ion-padding"
     style="background-color: transparent"
   >
-    <!-- <ion-avatar slot="start">
-      <ion-img [src]="avatar"></ion-img>
-      </ion-avatar> -->
+    
     <div
       class="dyspo-button dyspo ion-activatable"
       *ngIf="userInfo?.dyspoStatus === dyspoStatus.DYSPO"
@@ -56,9 +54,7 @@
       <ion-ripple-effect></ion-ripple-effect>
     </div>
 
-    <!-- <ion-icon slot="end" name="chevron-forward-outline" style="color: var(--ion-color-primary)"></ion-icon>
-       -->
-  </div>
+  </div> -->
 
   <ion-list-header>
     <h2>Mon Profil</h2>
@@ -95,7 +91,7 @@
         <ion-item>
           <ion-toggle
             color="primary"
-            [(ngModel)]="appSettings.receiveNotification"
+            [(ngModel)]="appSettings!.receiveNotification"
             slot="end"
           ></ion-toggle>
           <ion-label> Nouveau message reçu </ion-label>
@@ -113,14 +109,16 @@
         </ion-item>
       </div> -->
 
-      <!-- <div>
+      <div>
         <ion-item>
-          <ion-toggle color="primary" [(ngModel)]="appSettings.friendInvitation" slot="end" ></ion-toggle>
-          <ion-label>           
-            Demande en ami
-          </ion-label>
+          <ion-toggle
+            color="primary"
+            [(ngModel)]="appSettings!.friendInvitation"
+            slot="end"
+          ></ion-toggle>
+          <ion-label> Demande en ami </ion-label>
         </ion-item>
-      </div> -->
+      </div>
 
       <div *ngIf="appSettings">
         <ion-item>
@@ -236,76 +234,4 @@
     </ion-footer>
     <p class="excepTextSize">Version 0.0.1</p>
   </div>
-
-  <ion-modal
-    #statusmodal
-    trigger="open-status-modal"
-    (willDismiss)="onWillDismiss($event)"
-    [initialBreakpoint]="0.5"
-    [breakpoints]="[0, 0.5]"
-  >
-    <ng-template>
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>Changer mon Status</ion-title>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content class="ion-padding ion-margin">
-        <div class="dyspo-btns-container">
-          <!-- <ion-button
-          shape="round"
-          size="large"
-          color="success"
-          style="margin-bottom: 16px; font-family: Dyspo"
-          expand="full"
-          (click)="updateStatus(dyspoStatus.DYSPO)"
-          >Dyspo</ion-button
-        >
-        <ion-button
-          shape="round"
-          size="large"
-          color="secondary"
-          expand="full"
-          style="margin-bottom: 16px; font-family: Dyspo"
-          (click)="updateStatus(dyspoStatus.DYSPOWITHKIDS)"
-          >Dyspo with kids</ion-button
-        >
-        <ion-button
-          shape="round"
-          size="large"
-          color="warning"
-          expand="full"
-          style="margin-bottom: 16px; font-family: Dyspo"
-          (click)="updateStatus(dyspoStatus.NODYSPO)"
-          >No Dyspo</ion-button
-        > -->
-
-          <div
-            button
-            class="dyspo-button dyspo ion-activatable margin-bottom"
-            (click)="updateStatus(dyspoStatus.DYSPO)"
-          >
-            Dyspo
-            <ion-ripple-effect></ion-ripple-effect>
-          </div>
-          <div
-            button
-            class="dyspo-button dyspo-with-kids ion-activatable margin-bottom"
-            (click)="updateStatus(dyspoStatus.DYSPOWITHKIDS)"
-          >
-            Dyspo With Kids
-            <ion-ripple-effect></ion-ripple-effect>
-          </div>
-          <div
-            button
-            class="dyspo-button no-dyspo ion-activatable"
-            (click)="updateStatus(dyspoStatus.NODYSPO)"
-          >
-            No Dyspo
-            <ion-ripple-effect></ion-ripple-effect>
-          </div>
-        </div>
-      </ion-content>
-    </ng-template>
-  </ion-modal>
 </ion-content>

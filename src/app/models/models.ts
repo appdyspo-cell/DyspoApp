@@ -100,6 +100,19 @@ export interface DBUser {
   chatIds?: string[];
 }
 
+export interface Notif {
+  id?: string;
+  user_id: string;
+  title: string;
+  message: string;
+  subject: string;
+  data?: any;
+  avatarPath?: string;
+  create_at_ms: number;
+  create_at_ISO: string;
+  status: string;
+}
+
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
   DELETED = 'DELETED',

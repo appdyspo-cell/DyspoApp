@@ -6,21 +6,17 @@
       <ion-card-content>
         <ion-row class="row">
           <div class="fire-logo ion-text-center">
-            <img
-              #title
-              class="img-logo"
-              src="../../../assets/dyspo_black_logo.png"
-            />
-            <ion-text #title class="text-light">
-              <h1 class="ion-no-margin ion-margin-vertical ion-text-center">
+            <img #title class="img-logo" src="../../../assets/logo.svg" />
+            <ion-text #title class="text-light" style="font-size: 32px">
+              <div class="ion-no-margin ion-margin-vertical ion-text-center">
                 DYSPO
-              </h1>
+              </div>
             </ion-text>
           </div>
         </ion-row>
         <ion-row class="ion-margin-top">
           <ion-col>
-            <ion-item class="roundedInput8px margin-bottom-10">
+            <ion-item class="roundedInput8px margin-bottom-10" lines="none">
               <div
                 style="
                   border-right: 1px solid;
@@ -46,7 +42,7 @@
         </ion-row>
         <ion-row>
           <ion-col>
-            <ion-item class="roundedInput8px margin-bottom-10">
+            <ion-item class="roundedInput8px margin-bottom-10" lines="none">
               <div
                 style="
                   border-right: 1px solid;
@@ -99,7 +95,7 @@
             >
           </ion-col>
         </ion-row>
-        <ion-row *ngIf="showBiometricLogin">
+        <!-- <ion-row *ngIf="showBiometricLogin">
           <ion-col>
             <ion-button
               expand="block"
@@ -111,7 +107,7 @@
               ></ion-button
             >
           </ion-col>
-        </ion-row>
+        </ion-row> -->
         <p>&nbsp;</p>
         <ion-row>
           <ion-col>

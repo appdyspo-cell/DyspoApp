@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "935331269385",
+    "firebase_url": "https://dyspo-stg-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "dyspo-stg",
+    "storage_bucket": "dyspo-stg.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:935331269385:android:2c92e157a8f58206f2e1d8",
+        "android_client_info": {
+          "package_name": "com.rovincent.dyspo.staging"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADEBYdT1Ti7C2go39dWJyADtVnx0BmxwQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,58 +1,120 @@
 ion-list {
-    padding-bottom: 0px;
+  padding-bottom: 0px;
 }
 
 .empty-icon-circle {
-    border-radius: 50%;
-    padding: 20px;
-    margin-top: 5px;
-    margin-bottom: 25px;
-  }
-  .icon-large {
-    height: 180px;
-    width: 180px;
-  }
-  .icon-mid {
-    height: 100px;
-    width: 100px;
-  }
-  .icon-small {
-    height: 60px;
-    width: 60px;
-  }
-  .empty-icon-color {
-    background: #d6d9dd;
-    color: #fff;
-  }
-  
-  //
-  #container-suggestions {
-    text-align: center;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-  
-  #container-suggestions strong {
-    font-size: 20px;
-    line-height: 26px;
-  }
+  border-radius: 50%;
+  padding: 20px;
+  margin-top: 5px;
+  margin-bottom: 25px;
+}
+.icon-large {
+  height: 180px;
+  width: 180px;
+}
+.icon-mid {
+  height: 100px;
+  width: 100px;
+}
+.icon-small {
+  height: 60px;
+  width: 60px;
+}
+.empty-icon-color {
+  background: #d6d9dd;
+  color: #fff;
+}
 
-  #container-friends {
-    text-align: center;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
+//
+#container-suggestions {
+  text-align: center;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#container-suggestions strong {
+  font-size: 20px;
+  line-height: 26px;
+}
+
+#container-friends {
+  text-align: center;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#container-friends strong {
+  font-size: 20px;
+  line-height: 26px;
+}
+
+ion-row {
+  ion-col {
+    padding: 0;
+
+    ion-segment {
+      border: none !important;
+      width: fit-content;
+      margin: 0 auto;
+
+      ion-segment-button {
+        background: none !important;
+        position: relative;
+        font-size: 0.96rem;
+        font-weight: 600;
+        color: var(--text-light) !important;
+        text-transform: unset !important;
+        letter-spacing: 0;
+        --color-checked: var(--transparent) !important;
+        --background-checked: var(--transparent) !important;
+        --border-width: 0 !important;
+        --border-radius: 0 !important;
+        box-shadow: none !important;
+        --ripple-color: var(--transparent) !important;
+
+        &::after {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          margin: 0 auto;
+          height: 3px;
+          width: 0;
+          background: var(--primary) !important;
+          border-radius: 50px;
+          transition: all 0.3s;
+        }
+
+        &.segment-button-checked {
+          color: var(--primary) !important;
+
+          &::after {
+            width: 45px;
+          }
+        }
+      }
+    }
+
+    ion-select {
+      padding: 0;
+      width: fit-content;
+      width: fit-content;
+      display: flex;
+      align-items: center;
+      text-transform: none;
+      font-weight: 500;
+      letter-spacing: 0;
+      font-size: 0.95rem;
+      line-height: 50px;
+      color: var(--primary);
+      padding-right: 10px;
+    }
   }
-  
-  #container-friends strong {
-    font-size: 20px;
-    line-height: 26px;
-  }
-  
- 
-  
+}
