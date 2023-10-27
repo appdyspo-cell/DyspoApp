@@ -11,27 +11,26 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-row>
-    <ion-col size="8">
-      <ion-segment mode="md" [(ngModel)]="selectSegment" lines="none">
-        <ion-segment-button mode="md" value="friends">
-          <ion-icon name="person"></ion-icon>
-          <ion-label> Mes Amis </ion-label>
-        </ion-segment-button>
-        <ion-segment-button mode="md" value="suggestions">
-          <ion-icon name="person-add"></ion-icon>
-          <ion-label> Invitations </ion-label>
-          <ion-badge
-            *ngIf="friendsSuggested.length>0"
-            color="danger"
-            style="position: absolute; right: 15px"
-            >{{ friendsSuggested.length }}</ion-badge
-          >
-        </ion-segment-button>
-      </ion-segment>
-    </ion-col>
-    <ion-col size="4" class="d-flex"> </ion-col>
-  </ion-row>
+  <ion-segment mode="md" [(ngModel)]="selectSegment" lines="none">
+    <ion-segment-button mode="md" value="friends">
+      <ion-icon name="person"></ion-icon>
+      <ion-label> Amis </ion-label>
+    </ion-segment-button>
+    <ion-segment-button mode="md" value="friendsgroup">
+      <ion-icon name="people"></ion-icon>
+      <ion-label> Groupes</ion-label>
+    </ion-segment-button>
+    <ion-segment-button mode="md" value="suggestions">
+      <ion-icon name="person-add"></ion-icon>
+      <ion-label> Invitations </ion-label>
+      <ion-badge
+        *ngIf="friendsSuggested.length>0"
+        color="danger"
+        style="position: absolute; right: 15px"
+        >{{ friendsSuggested.length }}</ion-badge
+      >
+    </ion-segment-button>
+  </ion-segment>
 
   <!-- <ion-segment [(ngModel)]="selectSegment">
     <ion-segment-button value="friends" class="segmentButton" color="light">
@@ -135,6 +134,54 @@
     </ion-list>
   </div>
 
+  <div *ngIf="selectSegment === 'friendsgroup'" class="ion-no-margin">
+    <div id="container-friends-group" *ngIf="friendGroups.length === 0">
+      <ion-icon
+        name="people-outline"
+        class="empty-icon-circle icon-large empty-icon-color"
+      ></ion-icon>
+      <br />
+      <strong class="capitalize">
+        <ion-text style="color: rgb(100, 100, 100)"
+          >Vous n'avez pas encore de groupe d'amis</ion-text
+        >
+      </strong>
+    </div>
+    <ion-list *ngIf="friendGroups.length > 0">
+      <ion-item-sliding
+        [id]="'slidingItemGroup' + i"
+        *ngFor="let friendGroup of friendGroups ; let i = index;"
+      >
+        <ion-item-options>
+          <ion-item-option
+            (click)="promptDeleteFriendGroup(friendGroup, i)"
+            color="danger"
+          >
+            <ion-icon slot="icon-only" name="trash"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+        <ion-item (click)="showFriendGroup(friendGroup)">
+          <ion-avatar slot="start">
+            <img src="{{friendGroup.avatarPath}}" />
+          </ion-avatar>
+
+          <div>
+            <ion-row class="ion-align-items-center">
+              <p class="ion-no-margin">{{friendGroup.label}}</p>
+            </ion-row>
+            <ion-row class="ion-align-items-center">
+              <p class="ion-no-margin">5</p>
+            </ion-row>
+            <!-- <ion-row class="ion-align-items-center">
+              <rating [rating]="rate" (ratingChange)="onRateChanged($event)">
+              </rating>            
+            </ion-row> -->
+          </div>
+        </ion-item>
+      </ion-item-sliding>
+    </ion-list>
+  </div>
+
   <div *ngIf="selectSegment === 'suggestions'" class="ion-no-margin">
     <div id="container-suggestions" *ngIf="friendsSuggested.length === 0">
       <ion-icon
@@ -198,3 +245,13 @@
     </ion-list>
   </div>
 </ion-content>
+<ion-fab
+  *ngIf="selectSegment === 'friendsgroup'"
+  slot="fixed"
+  horizontal="end"
+  vertical="bottom"
+>
+  <ion-fab-button (click)="openFriendGroupForm()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>

@@ -1,8 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
-import { AlertController, AnimationController } from '@ionic/angular';
+import {
+  AlertController,
+  AnimationController,
+  NavController,
+} from '@ionic/angular';
 import { Observable, Subscription } from 'rxjs';
-import { AppUser, Friend, FriendStatus } from 'src/app/models/models';
+import {
+  AppUser,
+  Friend,
+  FriendGroup,
+  FriendStatus,
+} from 'src/app/models/models';
 import { FriendsService } from 'src/app/services/friends.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
@@ -18,14 +27,17 @@ export class FriendsPage implements OnInit {
   uid: any;
 
   friends$: Observable<Friend[]>;
+  friendGroups$: Observable<FriendGroup[]>;
 
   friends: Friend[] = [];
+  friendGroups: FriendGroup[] = [];
   friendsSuggested: Friend[] = [];
 
   inputSearch = '';
   autocompleteItems: AppUser[] = [];
   allOtherUsers: AppUser[] = [];
   friendsSubscrition: Subscription;
+  friendGroupsSubscrition: Subscription;
 
   constructor(
     public utils: UtilsService,
@@ -33,11 +45,22 @@ export class FriendsPage implements OnInit {
     public route: Router,
     private userSvc: UserService,
     public friendService: FriendsService,
-    public animationCtrl: AnimationController
+    public animationCtrl: AnimationController,
+    private navCtrl: NavController
   ) {
     this.friends$ = this.friendService.friends$;
+    this.friendGroups$ = this.friendService.friendGroups$;
 
     this.friendsSubscrition = this.friends$.subscribe((friends) => {
+      console.log('Friends  ', friends);
+      this.friends = friends.filter(
+        (elt) => elt.friend_status === FriendStatus.FRIEND
+      );
+      this.friendsSuggested = friends.filter(
+        (elt) => elt.friend_status === FriendStatus.SUGGESTED
+      );
+    });
+    this.friendGroupsSubscrition = this.friends$.subscribe((friends) => {
       console.log('Friends  ', friends);
       this.friends = friends.filter(
         (elt) => elt.friend_status === FriendStatus.FRIEND
@@ -91,6 +114,39 @@ export class FriendsPage implements OnInit {
       });
   }
 
+  promptDeleteFriendGroup(friendGroup: FriendGroup, i: number) {
+    this.alertCtrl
+      .create({
+        header: 'Suppression',
+        message: 'Etes-vous sur de vouloir supprimer ce groupe ?',
+
+        buttons: [
+          {
+            text: 'Annuler',
+            handler: (data: any) => {
+              console.log('Canceled', data);
+              const slidingItem = document.getElementById(
+                'slidingItemGroup' + i
+              ) as any;
+              slidingItem.close();
+            },
+          },
+          {
+            text: 'Oui',
+            handler: (data: any) => {
+              const slidingItem = document.getElementById(
+                'slidingItem' + i
+              ) as any;
+              this.deleteFriendGroup(friendGroup, slidingItem);
+            },
+          },
+        ],
+      })
+      .then((res) => {
+        res.present();
+      });
+  }
+
   async deleteFriend(friend: Friend, listElement: any) {
     const animationDeleteItem = this.animationCtrl
       .create()
@@ -104,6 +160,21 @@ export class FriendsPage implements OnInit {
     animationDeleteItem.play();
     this.friendService.deleteFriend(friend, listElement);
     this.utils.showToast('Ami supprimé');
+  }
+
+  async deleteFriendGroup(friendGroup: FriendGroup, listElement: any) {
+    const animationDeleteItem = this.animationCtrl
+      .create()
+      .addElement(listElement)
+      .duration(600)
+      .iterations(1)
+      .fromTo('height', '100px', 0)
+      .fromTo('transform', 'translateX(0px)', 'translateX(-1050px)')
+      .fromTo('opacity', 1, 0);
+
+    animationDeleteItem.play();
+    this.friendService.deleteFriendGroup(friendGroup, listElement);
+    this.utils.showToast('Groupe supprimé');
   }
 
   goToChat(friend: AppUser | undefined, event: any) {
@@ -124,6 +195,14 @@ export class FriendsPage implements OnInit {
 
   showProfile(friend: AppUser) {
     //this.utils.showModalPage(AmiFicheComponent, {friendListDoc: friend, userData: friend.userData});
+  }
+
+  showFriendGroup(friendGroup: FriendGroup) {
+    //this.utils.showModalPage(AmiFicheComponent, {friendListDoc: friend, userData: friend.userData});
+  }
+
+  async openFriendGroupForm() {
+    this.navCtrl.navigateForward('create-group');
   }
 
   async addFriend(friend: AppUser, index: number, event: any) {

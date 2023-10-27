@@ -61,53 +61,47 @@
   </div>
 
   <!-- <ion-list-header>  </ion-list-header> -->
-  <ion-card *ngIf="nextAgendaEvents.length > 0">
-    <ion-card-header color="primary">
-      <ion-card-title>
-        <span
-          class="wpf-raquette"
-          style="margin-right: 8px; font-size: 22px"
-        ></span>
-        Evenements a venir
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content style="background-color: #e9e7e8">
+  <div *ngIf="nextAgendaEvents.length > 0">
+    <ion-list-header>
+      <span style="margin-right: 8px; font-size: 22px"></span>
+      Evenements a venir
+    </ion-list-header>
+    <div style="background-color: #e9e7e8">
       <div class="next-agenda-container">
         <div class="next-agenda-content">
           <div
             *ngFor="let nextAgendaEvent of nextAgendaEvents"
             class="next-agenda-element"
           >
-            {{nextAgendaEvent.start_date_formatted}}<br />{{nextAgendaEvent.title}}
+            <span style="font-weight: bold"
+              >{{nextAgendaEvent.start_date_formatted}}</span
+            ><br />{{nextAgendaEvent.title}}
           </div>
         </div>
       </div>
-    </ion-card-content>
-  </ion-card>
+    </div>
+  </div>
 
-  <ion-card *ngIf="notifications.length > 0">
-    <ion-card-header color="primary">
-      <ion-card-title>
-        <span
-          class="wpf-raquette"
-          style="margin-right: 8px; font-size: 22px"
-        ></span>
-        Notifications
-      </ion-card-title>
-    </ion-card-header>
+  <div *ngIf="notifications.length > 0">
+    <ion-list-header>
+      <span
+        class="wpf-raquette"
+        style="margin-right: 8px; font-size: 22px"
+      ></span>
+      Notifications
+    </ion-list-header>
+
     <ion-card-content style="background-color: #e9e7e8">
       <div class="next-agenda-container">
         <div class="next-agenda-content">
-          <div
-            *ngFor="let nextAgendaEvent of nextAgendaEvents"
-            class="next-agenda-element"
-          >
-            {{nextAgendaEvent.start_date_formatted}}<br />{{nextAgendaEvent.title}}
+          <div *ngFor="let notif of notifications" class="next-agenda-element">
+            <span style="font-weight: bold">{{notif.title}}</span
+            ><br />{{notif.message}}
           </div>
         </div>
       </div>
     </ion-card-content>
-  </ion-card>
+  </div>
 
   <ion-modal
     #statusmodal

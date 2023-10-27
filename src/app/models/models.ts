@@ -32,6 +32,15 @@ export interface Friend extends AppUser {
   userData?: AppUser;
 }
 
+export interface FriendGroup {
+  uid: string;
+  label: string;
+  avatarPath?: string;
+  sinceDate?: number;
+  status: string;
+  members: AppUser[];
+}
+
 export interface AppSettings {
   receiveEmail: boolean;
   receiveNotification: boolean;

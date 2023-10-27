@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { NavigationExtras } from '@angular/router';
+import { NavigationExtras, Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import {
   getDate,
@@ -78,7 +78,8 @@ export class AgendaPage implements AfterViewInit {
   constructor(
     public agendaSvc: AgendaService,
     private navCtrl: NavController,
-    private utils: UtilsService
+    private utils: UtilsService,
+    private route: Router
   ) {
     this.agendaEvents$ = this.agendaSvc.agendaEvents$;
     this.agendaEventsSubscription = this.agendaSvc.agendaEvents$.subscribe(
@@ -233,7 +234,8 @@ export class AgendaPage implements AfterViewInit {
     };
     this.navCtrl.navigateForward('/agenda/create-event/new', navigationExtras);
   }
-  updateEvent(agendaEvent: AgendaEvent) {
+  updateEvent(agendaEvent: AgendaEvent, event: any) {
+    event.stopPropagation();
     const navigationExtras: NavigationExtras = {
       state: {
         agendaEvent,
@@ -290,5 +292,19 @@ export class AgendaPage implements AfterViewInit {
     });
     this.tagCalendarUserDyspoData();
     this.agendaSvc.isModified = false;
+  }
+
+  goToChat(agendaEvent: AgendaEvent | undefined, event: any) {
+    event.stopPropagation();
+    console.log('goToChat', agendaEvent);
+
+    if (agendaEvent) {
+      const navigationExtras: NavigationExtras = {
+        state: {
+          agendaEvent_uid: agendaEvent.uid,
+        },
+      };
+      this.route.navigate(['chat-home'], navigationExtras);
+    }
   }
 }

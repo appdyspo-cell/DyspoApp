@@ -52,14 +52,23 @@
     <ion-list *ngIf="eventsForDate.length > 0">
       <ion-item
         *ngFor="let agendaEvent of eventsForDate; let i=index "
-        type="button"
         mode="ios"
-        (click)="updateEvent(agendaEvent)"
       >
         <div slot="start">{{agendaEvent.startISO | dayDateFormat}}</div>
         {{agendaEvent.title}}<br />
         {{agendaEvent.start_time_formatted}} -
         {{agendaEvent.end_time_formatted}}
+        <ion-buttons slot="end">
+          <ion-button color="primary" (click)="goToChat(agendaEvent, $event)">
+            <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+          </ion-button>
+          <ion-button
+            color="primary"
+            (click)="updateEvent(agendaEvent, $event)"
+          >
+            <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-item>
     </ion-list>
     <ion-list *ngIf="!eventsForDate || eventsForDate?.length === 0">

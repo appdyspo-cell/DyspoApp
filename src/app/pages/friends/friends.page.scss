@@ -54,6 +54,20 @@ ion-list {
   line-height: 26px;
 }
 
+#container-friends-group {
+  text-align: center;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#container-friends-group strong {
+  font-size: 20px;
+  line-height: 26px;
+}
+
 ion-row {
   ion-col {
     padding: 0;

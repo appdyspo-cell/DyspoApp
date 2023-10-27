@@ -13,7 +13,7 @@ import {
   updateDoc,
   where,
 } from '@angular/fire/firestore';
-import { AppUser, Friend, FriendStatus } from '../models/models';
+import { AppUser, Friend, FriendGroup, FriendStatus } from '../models/models';
 import { UtilsService } from './utils.service';
 import { NotificationService } from './notification.service';
 import { UserService } from './user.service';
@@ -25,10 +25,13 @@ import { Database } from '@angular/fire/database';
 })
 export class FriendsService {
   public friends: Friend[] = [];
+  public friendGroups: FriendGroup[] = [];
   //public friendsSuggested: Friend[] = [];
   public friendsSubject = new BehaviorSubject<Friend[]>([]);
+  public friendGroupsSubject = new BehaviorSubject<FriendGroup[]>([]);
 
   public friends$!: Observable<Friend[]>;
+  public friendGroups$!: Observable<FriendGroup[]>;
   public friendsSuggested$!: Observable<Friend[]>;
 
   constructor(
@@ -39,6 +42,7 @@ export class FriendsService {
     private notificationSvc: NotificationService
   ) {
     this.friends$ = this.friendsSubject.asObservable();
+    this.friendGroups$ = this.friendGroupsSubject.asObservable();
   }
 
   async unblockFriend(friend: Friend) {
@@ -110,9 +114,14 @@ export class FriendsService {
     console.log('Init Friend Service...');
     const that = this;
     this.friends = [];
+    this.friendGroups = [];
     const friendsCollectionRef = collection(
       this.firestore,
       `friends/${uid}/friend_list`
+    );
+    const friendGroupsCollectionRef = collection(
+      this.firestore,
+      `friendGroups/${uid}/friendGroup_list`
     );
 
     onSnapshot(friendsCollectionRef, (snapshot) => {
@@ -162,6 +171,33 @@ export class FriendsService {
             this.friends.splice(foundIndex, 1);
           }
           this.friendsSubject.next(this.friends);
+        }
+      });
+    });
+
+    // Friend Groups
+    onSnapshot(friendGroupsCollectionRef, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        const friendGroupFetched = change.doc.data() as FriendGroup;
+        let foundItem = this.friendGroups.find((elt) => {
+          return elt.uid === friendGroupFetched.uid;
+        });
+        if (change.type === 'modified' && foundItem) {
+          foundItem = friendGroupFetched;
+          this.friendGroupsSubject.next(this.friendGroups);
+        }
+        if (change.type === 'added' && !foundItem) {
+          this.friendGroups.push(friendGroupFetched);
+          this.friendGroupsSubject.next(this.friendGroups);
+        }
+        if (change.type === 'removed') {
+          const foundIndex = this.friendGroups.findIndex(
+            (elt) => elt.uid === friendGroupFetched.uid
+          );
+          if (foundIndex >= 0) {
+            this.friendGroups.splice(foundIndex, 1);
+          }
+          this.friendGroupsSubject.next(this.friendGroups);
         }
       });
     });
@@ -232,6 +268,26 @@ export class FriendsService {
     );
     const querySnapshot = await getDocs(
       query(friendCollectionRef, where('friend_uid', '==', uid))
+    );
+    if (!querySnapshot.empty) {
+      deleteDoc(querySnapshot.docs[0].ref);
+    }
+  }
+
+  async deleteFriendGroup(friendGroup: FriendGroup, listElement: any) {
+    const uid = this.userSvc.userInfo?.uid;
+    await deleteDoc(
+      doc(
+        this.firestore,
+        `friendGroups/${uid}/friendGroup_list/${friendGroup.uid}`
+      )
+    );
+    const friendCollectionRef = collection(
+      this.firestore,
+      `friendGroups/${uid}/friendGroup_list`
+    );
+    const querySnapshot = await getDocs(
+      query(friendCollectionRef, where('uid', '==', uid))
     );
     if (!querySnapshot.empty) {
       deleteDoc(querySnapshot.docs[0].ref);

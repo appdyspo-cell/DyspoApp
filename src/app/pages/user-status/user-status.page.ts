@@ -66,7 +66,26 @@ export class UserStatusPage implements OnInit {
   loadInfos() {
     console.log('loadINFOS');
     this.userInfo = Object.assign({}, this.userSvc.userInfo);
-    //Real time appSettings changed
+    this.notifications = [
+      {
+        message: 'Demande en Ami',
+        title: 'Ami',
+        user_id: '',
+        create_at_ISO: '',
+        create_at_ms: 343434,
+        status: 'dsf',
+        subject: 'dfsdf',
+      },
+      {
+        message: 'Paul vous invite à un évènement',
+        title: 'Evt',
+        user_id: '',
+        create_at_ISO: '',
+        create_at_ms: 343434,
+        status: 'dsf',
+        subject: 'dfsdf',
+      },
+    ];
   }
 
   openStatus() {
