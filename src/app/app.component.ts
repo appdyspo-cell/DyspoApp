@@ -6,7 +6,6 @@ import { Observable, Subscription } from 'rxjs';
 import { UserService } from './services/user.service';
 import { LoggerService } from './services/logger.service';
 import { FriendsService } from './services/friends.service';
-import { TestService } from './test.service';
 import { ChatService } from './services/chat.service';
 import { AgendaService } from './services/agenda.service';
 import { NotificationService } from './services/notification.service';
