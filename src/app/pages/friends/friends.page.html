@@ -70,7 +70,7 @@
             </p>
           </ion-row>
         </ion-label>
-        <ion-button slot="end" (click)="selectSearchResult(user)">
+        <ion-button slot="end" (click)="inviteFriend(user)">
           <ion-icon name="person-add" slot="start"></ion-icon>
           Inviter
         </ion-button>
@@ -101,34 +101,31 @@
             <ion-icon slot="icon-only" name="trash"></ion-icon>
           </ion-item-option>
         </ion-item-options>
-        <ion-item (click)="showProfile(friendListDoc)">
-          <ion-avatar slot="start">
+        <ion-item
+          (click)="showProfile(friendListDoc)"
+          lines="none"
+          class="friend-item"
+        >
+          <ion-thumbnail slot="start">
             <img src="{{friendListDoc.userData?.avatarPath}}" />
-          </ion-avatar>
+          </ion-thumbnail>
+          <ion-label>
+            <ion-row class="ion-align-items-center">
+              {{friendListDoc.userData?.lastname | uppercase}}
+            </ion-row>
+            <ion-row class="ion-align-items-center">
+              {{friendListDoc.userData?.firstname}}
+            </ion-row>
+          </ion-label>
 
-          <div>
-            <ion-row class="ion-align-items-center">
-              <p class="ion-no-margin">
-                {{friendListDoc.userData?.lastname | uppercase}}
-                {{friendListDoc.userData?.firstname}}
-              </p>
-            </ion-row>
-            <ion-row class="ion-align-items-center">
-              <p class="ion-no-margin">5</p>
-            </ion-row>
-            <!-- <ion-row class="ion-align-items-center">
-              <rating [rating]="rate" (ratingChange)="onRateChanged($event)">
-              </rating>            
-            </ion-row> -->
-          </div>
-          <ion-buttons slot="end">
+          <!-- <ion-buttons slot="end">
             <ion-button
               color="primary"
               (click)="goToChat(friendListDoc.userData, $event)"
             >
               <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
             </ion-button>
-          </ion-buttons>
+          </ion-buttons> -->
         </ion-item>
       </ion-item-sliding>
     </ion-list>
@@ -170,7 +167,9 @@
               <p class="ion-no-margin">{{friendGroup.label}}</p>
             </ion-row>
             <ion-row class="ion-align-items-center">
-              <p class="ion-no-margin">5</p>
+              <p class="ion-no-margin">
+                {{friendGroup.members_uid.length}} membres
+              </p>
             </ion-row>
             <!-- <ion-row class="ion-align-items-center">
               <rating [rating]="rate" (ratingChange)="onRateChanged($event)">
@@ -218,24 +217,19 @@
             <ion-row class="ion-align-items-center">
               <p class="ion-no-margin">
                 {{friendSuggested.userData?.lastname | uppercase}}
-                {{friendSuggested.firstname}}
               </p>
             </ion-row>
             <ion-row class="ion-align-items-center">
-              <p class="ion-no-margin">4</p>
+              <p class="ion-no-margin">
+                {{friendSuggested.userData?.firstname}}
+              </p>
             </ion-row>
           </ion-label>
           <ion-buttons slot="end">
             <ion-button
               color="primary"
-              (click)="goToChat(friendSuggested, $event)"
-            >
-              <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
-            </ion-button>
-            <ion-button
-              color="primary"
               size="small"
-              (click)="addFriend(friendSuggested, i, $event)"
+              (click)="confirmFriendInvitation(friendSuggested, i, $event)"
             >
               <ion-icon [id]="'add'+i" name="person-add"></ion-icon>
             </ion-button>

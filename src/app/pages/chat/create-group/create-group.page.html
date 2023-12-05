@@ -1,260 +1,123 @@
 <ion-header [translucent]="true">
-    <ion-toolbar>
-        <ion-buttons slot="start">
-            <ion-back-button text="" icon="chevron-back-outline"></ion-back-button>
-        </ion-buttons>
-        <ion-title>{{'select_members' | translate}}
-            <!-- <span class="ion-float-end">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button text="" icon="chevron-back-outline"></ion-back-button>
+    </ion-buttons>
+    <ion-title
+      >{{pageTitle}}
+      <!-- <span class="ion-float-end">
  				<ion-icon class="zmdi zmdi-search ion-text-start"></ion-icon>
  			</span> -->
-        </ion-title>
-        <ion-buttons slot="end">
-            <ion-button>
-                <!-- <ion-icon slot="icon-only" class="zmdi zmdi-search ion-text-start"></ion-icon> -->
-                <ion-icon slot="icon-only" name="search"></ion-icon>
-            </ion-button>
-        </ion-buttons>
-    </ion-toolbar>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <!-- <ion-icon slot="icon-only" class="zmdi zmdi-search ion-text-start"></ion-icon> -->
+        <ion-icon slot="icon-only" name="search"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-    <ion-header collapse="condense">
-        <ion-toolbar>
-          
-            <ion-title>{{'select_members' | translate}}
-                <!-- <span class="ion-float-end">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title
+        >{{'select_members' | translate}}
+        <!-- <span class="ion-float-end">
                      <ion-icon class="zmdi zmdi-search ion-text-start"></ion-icon>
                  </span> -->
-            </ion-title>
-            
-        </ion-toolbar>
-    </ion-header>
-    <ion-list lines="none" class="">
-        <ion-item class="animated slideInRight delay_1">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/1.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Aditi Patel</span> </h2>
-                    <p class="d-flex"><span class="message">Travrlling with Nature</span></p>
-                </div>
-                <ion-checkbox checked="true" class="end"></ion-checkbox>
-            </div>
-        </ion-item>
-        <ion-item class=" animated slideInRight delay_2">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/5.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Ammy Drack</span></h2>
-                    <p class="d-flex"><span class="message">Feeling Awesome</span>
-                    </p>
-                </div>
-                <ion-checkbox checked="true" class="end"></ion-checkbox>
-            </div>
-        </ion-item>
-        <ion-item class="animated slideInRight delay_3">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/3.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Andy Reslow</span> </h2>
-                    <p class="d-flex">
-                        <span class="message">Minding own business</span>
-                    </p>
-                </div>
-                <ion-checkbox class="end"></ion-checkbox>
-            </div>
-        </ion-item>
-        <ion-item class="animated slideInRight delay_4">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/2.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Azler Hopson</span></h2>
-                    <p class="d-flex"><span class="message">Busy</span>
-                    </p>
-                </div>
-                <ion-checkbox checked="true" class="end"></ion-checkbox>
-            </div>
-        </ion-item>
-        <ion-item class="animated slideInRight delay_5">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/6.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Andy Reslow</span> </h2>
-                    <p class="d-flex"><span class="message">About to reach New York</span>
-                    </p>
-                </div>
-                <ion-checkbox class="end"></ion-checkbox>
-            </div>
-        </ion-item>
-        <ion-item class="animated slideInRight delay_6">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/8.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Ammy Drack</span> </h2>
-                    <p class="d-flex"><span class="message">Gyming</span>
-                    </p>
-                </div>
-                <ion-checkbox class="end"></ion-checkbox>
-            </div>
-        </ion-item>
-        <ion-item class="animated slideInRight delay_9">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/1.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Balton Smith</span> </h2>
-                    <p class="d-flex"><span class="message">About to reach New York</span></p>
-                </div>
-                <ion-checkbox checked="true" class="end"></ion-checkbox>
-            </div>
-        </ion-item>
-        <ion-item class=" animated slideInRight delay_10">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/5.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Byron kenny</span></h2>
-                    <p class="d-flex"><span class="message">Gyming</span>
-                    </p>
-                </div>
-                <ion-checkbox class="end"></ion-checkbox>
-            </div>
-        </ion-item>
-        <ion-item class="animated slideInRight delay_11">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/3.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Brinley</span> </h2>
-                    <p class="d-flex">
-                        <ion-icon class="ion-text-start zmdi zmdi-attachment"></ion-icon>
-                        <span class="message">Yes, I am Coming.</span>
-                    </p>
-                </div>
-                <ion-checkbox checked="true" class="end"></ion-checkbox>
-            </div>
-        </ion-item>
-        <ion-item class="animated slideInRight delay_12">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/2.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Brooklynn</span></h2>
-                    <p class="d-flex"><span class="message">Busy</span>
-                    </p>
-                </div>
-                <ion-checkbox checked="true" class="end"></ion-checkbox>
-            </div>
-        </ion-item>
-        <ion-item class="animated slideInRight delay_1">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/6.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Brenda</span> </h2>
-                    <p class="d-flex"><span class="message">About to reach New York</span>
-                    </p>
-                </div>
-                <ion-checkbox checked="true" class="end"></ion-checkbox>
-            </div>
-        </ion-item>
-        <ion-item class="animated slideInRight delay_2">
-            <div class="item_inner d-flex">
-                <div class="profile_img_box">
-                    <div class="profile_img">
-                        <img src="assets/img/8.png">
-                    </div>
-                </div>
-                <div class="text-box">
-                    <h2 class="d-flex"><span>Bernadette</span> </h2>
-                    <p class="d-flex"><span class="message">Gyming</span>
-                    </p>
-                </div>
-                <ion-checkbox class="end"></ion-checkbox>
-            </div>
-        </ion-item>
-    </ion-list>
+      </ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <div class="d-flex ion-align-items-center ion-justify-content-center">
+    <div
+      class="d-flex camera-wrapper ion-align-items-center ion-justify-content-center"
+    >
+      <ion-icon name="camera-outline"></ion-icon>
+    </div>
+  </div>
+
+  <ion-item lines="none" class="status">
+    <ion-input
+      type="text"
+      class="ion-text-center"
+      [(ngModel)]="friendGroup.label"
+      placeholder="{{'add_group_name' | translate}}"
+    ></ion-input>
+  </ion-item>
+
+  <ion-list lines="none" class="">
+    <ion-item
+      *ngFor="let checkedFriend of checkedFriends"
+      class="animated slideInRight delay_11"
+    >
+      <ion-thumbnail slot="start">
+        <img src="{{checkedFriend.friend.userData?.avatarPath}}" />
+      </ion-thumbnail>
+
+      <div class="text-box">
+        {{checkedFriend.friend.userData?.lastname}}
+        {{checkedFriend.friend.userData?.firstname}}
+      </div>
+      <ion-checkbox
+        [(ngModel)]="checkedFriend.isChecked"
+        (ionChange)="onCheckedFriendChange($event)"
+        slot="end"
+      ></ion-checkbox>
+    </ion-item>
+
+    <!-- <ion-item class="animated slideInRight delay_11">
+      <div class="item_inner d-flex">
+        <div class="profile_img_box">
+          <div class="profile_img">
+            <img src="assets/img/3.png" />
+          </div>
+        </div>
+        <div class="text-box">
+          <h2 class="d-flex"><span>Brinley</span></h2>
+          <p class="d-flex">
+            <ion-icon class="ion-text-start zmdi zmdi-attachment"></ion-icon>
+            <span class="message">Yes, I am Coming.</span>
+          </p>
+        </div>
+        <ion-checkbox checked="true" class="end"></ion-checkbox>
+      </div>
+    </ion-item> -->
+  </ion-list>
 </ion-content>
 
 <ion-footer class="ion-no-border animated slideInUp delay_4">
-    <h2 class="d-flex"><span> 6 {{'members_selected' | translate}}</span>
-        <ion-button slot="end" size="large" shape="round" class="btn end" (click)="creategroupinfo()">{{'next' | translate}}</ion-button>
-    </h2>
+  <h2 class="d-flex">
+    <span> {{countCheckedItems()}} {{'members_selected' | translate}}</span>
+    <ion-button
+      slot="end"
+      size="large"
+      shape="round"
+      class="btn end"
+      (click)="addFriendGroup()"
+      >{{saveLabel}}</ion-button
+    >
+  </h2>
 
-    <div class="scroll_container">
-        <div class="profile_img_box">
-            <div class="profile_img">
-                <img src="assets/img/1.png">
-            </div>
-            <ion-icon class="zmdi zmdi-close-circle"></ion-icon>
-        </div>
-        <div class="profile_img_box">
-            <div class="profile_img">
-                <img src="assets/img/2.png">
-            </div>
-            <ion-icon class="zmdi zmdi-close-circle"></ion-icon>
-        </div>
-        <div class="profile_img_box">
-            <div class="profile_img">
-                <img src="assets/img/3.png">
-            </div>
-            <ion-icon class="zmdi zmdi-close-circle"></ion-icon>
-        </div>
-        <div class="profile_img_box">
-            <div class="profile_img">
-                <img src="assets/img/4.png">
-            </div>
-            <ion-icon class="zmdi zmdi-close-circle"></ion-icon>
-        </div>
-        <div class="profile_img_box">
-            <div class="profile_img">
-                <img src="assets/img/5.png">
-            </div>
-            <ion-icon class="zmdi zmdi-close-circle"></ion-icon>
-        </div>
-        <div class="profile_img_box">
-            <div class="profile_img">
-                <img src="assets/img/6.png">
-            </div>
-            <ion-icon class="zmdi zmdi-close-circle"></ion-icon>
-        </div>
+  <!-- <div class="scroll_container">
+  
+    <div class="profile_img_box">
+      <div class="profile_img">
+        <img src="assets/img/4.png" />
+      </div>
+      <ion-icon class="zmdi zmdi-close-circle"></ion-icon>
     </div>
+    <div class="profile_img_box">
+      <div class="profile_img">
+        <img src="assets/img/5.png" />
+      </div>
+      <ion-icon class="zmdi zmdi-close-circle"></ion-icon>
+    </div>
+    <div class="profile_img_box">
+      <div class="profile_img">
+        <img src="assets/img/6.png" />
+      </div>
+      <ion-icon class="zmdi zmdi-close-circle"></ion-icon>
+    </div>
+  </div> -->
 </ion-footer>

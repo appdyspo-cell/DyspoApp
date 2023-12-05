@@ -100,6 +100,7 @@ export class AppComponent {
   }
 
   killAllServices() {
+    this.friendsSvc.unsubscribeAllAfterLogoutEvent();
     //this.notifSvc.unsubscribeAllAfterLogoutEvent();
   }
 

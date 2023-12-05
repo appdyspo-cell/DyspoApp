@@ -33,6 +33,8 @@ export class FriendsService {
   public friends$!: Observable<Friend[]>;
   public friendGroups$!: Observable<FriendGroup[]>;
   public friendsSuggested$!: Observable<Friend[]>;
+  onSnapshotFriendGroupsCancel!: import('@angular/fire/firestore').Unsubscribe;
+  onSnapshotFriendsCancel!: import('@angular/fire/firestore').Unsubscribe;
 
   constructor(
     private firestore: Firestore,
@@ -51,7 +53,7 @@ export class FriendsService {
       const uid = this.userSvc.userInfo?.uid;
       const docRef = doc(
         this.firestore,
-        `friends/${uid}/friend_list/${friend.uid}`
+        `friends/${uid}/friend_list/${friend.friend_uid}`
       );
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
@@ -121,86 +123,92 @@ export class FriendsService {
     );
     const friendGroupsCollectionRef = collection(
       this.firestore,
-      `friendGroups/${uid}/friendGroup_list`
+      `friend_groups`
     );
 
-    onSnapshot(friendsCollectionRef, (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        if (change.type === 'modified') {
-          const friendModified = change.doc.data() as Friend;
+    this.onSnapshotFriendsCancel = onSnapshot(
+      friendsCollectionRef,
+      (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === 'modified') {
+            const friendModified = change.doc.data() as Friend;
 
-          const foundIndex = this.friends.findIndex(
-            (elt) => elt.friend_uid === friendModified.friend_uid
-          );
-          if (foundIndex >= 0) {
-            const userData = this.friends[foundIndex].userData;
-            friendModified.userData = userData;
-            this.friends[foundIndex] = friendModified;
+            const foundIndex = this.friends.findIndex(
+              (elt) => elt.friend_uid === friendModified.friend_uid
+            );
+            if (foundIndex >= 0) {
+              const userData = this.friends[foundIndex].userData;
+              friendModified.userData = userData;
+              this.friends[foundIndex] = friendModified;
+              this.friendsSubject.next(this.friends);
+            }
+          }
+          if (change.type === 'added') {
+            const friendAdded = change.doc.data() as Friend;
+            friendAdded.friend_uid = change.doc.id;
+            const foundIndex = this.friends.findIndex(
+              (elt) => elt.friend_uid === friendAdded.friend_uid
+            );
+            if (foundIndex >= 0) {
+              //Do nothing
+            } else {
+              const friend = change.doc.data() as Friend;
+              friend.friend_uid = change.doc.id;
+              console.log(friend);
+              this.getFriendAndPush(friend)
+                .then((resPromise) => {
+                  console.log('Friend Hydrated ', resPromise);
+                  that.friendsSubject.next(that.friends);
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            }
+          }
+          if (change.type === 'removed') {
+            const friendRemoved = change.doc.data() as Friend;
+            friendRemoved.friend_uid = change.doc.id;
+            const foundIndex = this.friends.findIndex(
+              (elt) => elt.friend_uid === friendRemoved.friend_uid
+            );
+            if (foundIndex >= 0) {
+              this.friends.splice(foundIndex, 1);
+            }
             this.friendsSubject.next(this.friends);
           }
-        }
-        if (change.type === 'added') {
-          const friendAdded = change.doc.data() as Friend;
-          friendAdded.friend_uid = change.doc.id;
-          const foundIndex = this.friends.findIndex(
-            (elt) => elt.friend_uid === friendAdded.friend_uid
-          );
-          if (foundIndex >= 0) {
-            //Do nothing
-          } else {
-            const friend = change.doc.data() as Friend;
-            friend.friend_uid = change.doc.id;
-            console.log(friend);
-            this.getFriendAndPush(friend)
-              .then((resPromise) => {
-                console.log('Friend Hydrated ', resPromise);
-                that.friendsSubject.next(that.friends);
-              })
-              .catch((err) => {
-                console.log(err);
-              });
-          }
-        }
-        if (change.type === 'removed') {
-          const friendRemoved = change.doc.data() as Friend;
-          friendRemoved.friend_uid = change.doc.id;
-          const foundIndex = this.friends.findIndex(
-            (elt) => elt.friend_uid === friendRemoved.friend_uid
-          );
-          if (foundIndex >= 0) {
-            this.friends.splice(foundIndex, 1);
-          }
-          this.friendsSubject.next(this.friends);
-        }
-      });
-    });
+        });
+      }
+    );
 
     // Friend Groups
-    onSnapshot(friendGroupsCollectionRef, (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        const friendGroupFetched = change.doc.data() as FriendGroup;
-        let foundItem = this.friendGroups.find((elt) => {
-          return elt.uid === friendGroupFetched.uid;
-        });
-        if (change.type === 'modified' && foundItem) {
-          foundItem = friendGroupFetched;
-          this.friendGroupsSubject.next(this.friendGroups);
-        }
-        if (change.type === 'added' && !foundItem) {
-          this.friendGroups.push(friendGroupFetched);
-          this.friendGroupsSubject.next(this.friendGroups);
-        }
-        if (change.type === 'removed') {
-          const foundIndex = this.friendGroups.findIndex(
-            (elt) => elt.uid === friendGroupFetched.uid
-          );
-          if (foundIndex >= 0) {
-            this.friendGroups.splice(foundIndex, 1);
+    this.onSnapshotFriendGroupsCancel = onSnapshot(
+      friendGroupsCollectionRef,
+      (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          const friendGroupFetched = change.doc.data() as FriendGroup;
+          let foundItem = this.friendGroups.find((elt) => {
+            return elt.uid === friendGroupFetched.uid;
+          });
+          if (change.type === 'modified' && foundItem) {
+            foundItem = friendGroupFetched;
+            this.friendGroupsSubject.next(this.friendGroups);
           }
-          this.friendGroupsSubject.next(this.friendGroups);
-        }
-      });
-    });
+          if (change.type === 'added' && !foundItem) {
+            this.friendGroups.push(friendGroupFetched);
+            this.friendGroupsSubject.next(this.friendGroups);
+          }
+          if (change.type === 'removed') {
+            const foundIndex = this.friendGroups.findIndex(
+              (elt) => elt.uid === friendGroupFetched.uid
+            );
+            if (foundIndex >= 0) {
+              this.friendGroups.splice(foundIndex, 1);
+            }
+            this.friendGroupsSubject.next(this.friendGroups);
+          }
+        });
+      }
+    );
   }
 
   async invite(membre: AppUser) {
@@ -240,27 +248,44 @@ export class FriendsService {
     //this.notificationSvc.sendInviteFriendNotif(membre.uid);
   }
 
-  async addFriend(friend: AppUser) {
+  async addFriend(friend: Friend) {
+    console.log('Add friend');
     const uid = this.userSvc.userInfo?.uid || 'unknown';
 
-    updateDoc(doc(this.firestore, `friends/${uid}/friend_list/${friend.uid}`), {
-      friend_status: FriendStatus.FRIEND,
-      since: new Date().getTime(),
-    });
+    updateDoc(
+      doc(this.firestore, `friends/${uid}/friend_list/${friend.friend_uid}`),
+      {
+        friend_status: FriendStatus.FRIEND,
+        since: new Date().getTime(),
+      }
+    );
 
-    updateDoc(doc(this.firestore, `friends/${friend.uid}/friend_list/${uid}`), {
-      friend_status: FriendStatus.FRIEND,
-      since: new Date().getTime(),
-    });
+    updateDoc(
+      doc(this.firestore, `friends/${friend.friend_uid}/friend_list/${uid}`),
+      {
+        friend_status: FriendStatus.FRIEND,
+        since: new Date().getTime(),
+      }
+    );
 
     // Send notif ?
     // this.notification-service.sendConfirmFriend()
   }
 
-  async deleteFriend(friend: AppUser, listElement: any) {
+  async addFriendGroup(friendGroup: FriendGroup) {
+    setDoc(
+      doc(this.firestore, `friend_groups/`, friendGroup.uid!),
+      friendGroup
+    );
+
+    // Send notif ?
+    // this.notification-service.sendConfirmFriend()
+  }
+
+  async deleteFriend(friend: Friend, listElement: any) {
     const uid = this.userSvc.userInfo?.uid;
     await deleteDoc(
-      doc(this.firestore, `friends/${uid}/friend_list/${friend.uid}`)
+      doc(this.firestore, `friends/${uid}/friend_list/${friend.friend_uid}`)
     );
     const friendCollectionRef = collection(
       this.firestore,
@@ -298,7 +323,10 @@ export class FriendsService {
     // if (this.friendsObservable) {
     //   this.friendsObservable.unsubscribe();
     // }
-    // this.friends = [];
+    this.onSnapshotFriendsCancel();
+    this.onSnapshotFriendGroupsCancel();
+    this.friends = [];
+    this.friendGroups = [];
   }
 
   // getFriendStatus(friend_uid: string) {

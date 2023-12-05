@@ -37,8 +37,9 @@ export interface FriendGroup {
   label: string;
   avatarPath?: string;
   sinceDate?: number;
-  status: string;
-  members: AppUser[];
+  status: FriendGroupStatus;
+  admin_uid: string;
+  members_uid: string[];
 }
 
 export interface AppSettings {
@@ -150,6 +151,11 @@ export enum FriendStatus {
   PENDING = 'PENDING',
   INVITED = 'INVITED',
   SUGGESTED = 'SUGGESTED',
+}
+
+export enum FriendGroupStatus {
+  ACTIVE = 'ACTIVE',
+  DELETED = 'DELETED',
 }
 
 export enum NotifSubjects {

@@ -60,15 +60,13 @@ export class FriendsPage implements OnInit {
         (elt) => elt.friend_status === FriendStatus.SUGGESTED
       );
     });
-    this.friendGroupsSubscrition = this.friends$.subscribe((friends) => {
-      console.log('Friends  ', friends);
-      this.friends = friends.filter(
-        (elt) => elt.friend_status === FriendStatus.FRIEND
-      );
-      this.friendsSuggested = friends.filter(
-        (elt) => elt.friend_status === FriendStatus.SUGGESTED
-      );
-    });
+
+    this.friendGroupsSubscrition = this.friendGroups$.subscribe(
+      (friendGroups) => {
+        this.friendGroups = friendGroups;
+        console.log('Friend Groups  ', friendGroups);
+      }
+    );
   }
 
   async ngOnInit() {}
@@ -202,10 +200,10 @@ export class FriendsPage implements OnInit {
   }
 
   async openFriendGroupForm() {
-    this.navCtrl.navigateForward('create-group');
+    this.navCtrl.navigateForward('create-group/new');
   }
 
-  async addFriend(friend: AppUser, index: number, event: any) {
+  async confirmFriendInvitation(friend: AppUser, index: number, event: any) {
     event.stopPropagation();
     const slidingItem = document.getElementById('slidingItem' + index) as any;
     this.animateForward(document.querySelector('#add' + index), slidingItem);
@@ -262,7 +260,7 @@ export class FriendsPage implements OnInit {
     }
   }
 
-  selectSearchResult(user: AppUser) {
+  inviteFriend(user: AppUser) {
     this.autocompleteItems = [];
     this.inputSearch = '';
     this.friendService.invite(user);

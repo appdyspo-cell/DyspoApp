@@ -87,7 +87,7 @@ const routes: Routes = [
       ),
   },
   {
-    path: 'create-group',
+    path: 'create-group/:mode',
     loadChildren: () =>
       import('./pages/chat/create-group/create-group.module').then(
         (m) => m.CreateGroupPageModule
