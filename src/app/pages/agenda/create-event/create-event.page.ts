@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { IonDatetime, ModalController, NavController } from '@ionic/angular';
 
 import {
@@ -24,6 +24,7 @@ import {
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
 import { MediaService } from 'src/app/services/media.service';
+import { UserService } from 'src/app/services/user.service';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
 
@@ -59,6 +60,7 @@ export class CreateEventPage implements OnInit {
   GoogleAutocompleteSvc: google.maps.places.AutocompleteService;
   autocompletePlaceInput!: { input: string };
   mode: any;
+  uid = '';
 
   constructor(
     private navCtrl: NavController,
@@ -66,8 +68,10 @@ export class CreateEventPage implements OnInit {
     private router: Router,
     private agendaSvc: AgendaService,
     private modalCtrl: ModalController,
-    private mediaSvc: MediaService
+    private mediaSvc: MediaService,
+    private userSvc: UserService
   ) {
+    this.uid = this.userSvc.userInfo?.uid!;
     this.GoogleAutocompleteSvc = new google.maps.places.AutocompleteService();
     this.autocompletePlaceInput = { input: '' };
     this.autocompletePlaces = [];
@@ -81,6 +85,8 @@ export class CreateEventPage implements OnInit {
             this.router.getCurrentNavigation()?.extras.state?.['tsDate'];
 
           this.agendaEvent = {
+            admin_uid: this.uid,
+            members_uid: [this.uid],
             uid: 'agev_' + new Date().getTime(),
             startISO: formatISO(
               setHours(
@@ -122,6 +128,10 @@ export class CreateEventPage implements OnInit {
           this.pageTitle = 'Editer un evenement';
           this.agendaEvent =
             this.router.getCurrentNavigation()?.extras.state?.['agendaEvent'];
+          if (this.agendaEvent?.place_description) {
+            this.autocompletePlaceInput.input =
+              this.agendaEvent?.place_description;
+          }
 
           break;
       }
@@ -206,7 +216,7 @@ export class CreateEventPage implements OnInit {
     console.log(prediction);
     this.autocompletePlaceInput.input = prediction.description;
     this.agendaEvent!.place_id = prediction.place_id;
-
+    this.agendaEvent!.place_description = prediction.description;
     this.autocompletePlaces = [];
   }
 
@@ -240,6 +250,10 @@ export class CreateEventPage implements OnInit {
   async openFriendsModal() {
     const modal = await this.modalCtrl.create({
       component: FriendsComponent,
+      componentProps: {
+        agendaEvent: this.agendaEvent,
+        mode: this.mode,
+      },
     });
     modal.present();
 
@@ -247,7 +261,7 @@ export class CreateEventPage implements OnInit {
 
     console.log(data);
     if (role === 'confirm') {
-      //this.message = `Hello, ${data}!`;
+      this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!);
     }
   }
 
@@ -262,6 +276,25 @@ export class CreateEventPage implements OnInit {
       if (this.mode === 'edit') {
         this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!);
       }
+    }
+  }
+
+  goToFriendSelection() {
+    this.openFriendsModal();
+    return;
+  }
+
+  getNbFriendsInvited() {
+    const nbFriends = this.agendaEvent?.members_uid.filter(
+      (member_uid) => member_uid != this.uid
+    ).length;
+
+    if (nbFriends === 0) {
+      return '';
+    } else if (nbFriends === 1) {
+      return '1 ami invité';
+    } else {
+      return nbFriends + ' amis invités';
     }
   }
 }

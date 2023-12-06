@@ -133,10 +133,14 @@
     <ion-list-header>
       <ion-label>Qui prévenir ?</ion-label>
 
-      <ion-button [routerLink]="['/friends-selection']">
+      <ion-button (click)="goToFriendSelection()">
         <ion-icon name="people" slot="start"></ion-icon>Amis, Groupe</ion-button
       >
     </ion-list-header>
+
+    <ion-row class="friends-wrapper ion-padding">
+      <div>{{getNbFriendsInvited()}}</div>
+    </ion-row>
 
     <ion-card>
       <ion-list *ngIf="friends.length > 0">

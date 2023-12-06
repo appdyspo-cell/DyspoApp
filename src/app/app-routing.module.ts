@@ -107,13 +107,6 @@ const routes: Routes = [
         (m) => m.ProCalendarPageModule
       ),
   },
-  {
-    path: 'friends-selection',
-    loadChildren: () =>
-      import('./pages/friends-selection/friends-selection.module').then(
-        (m) => m.FriendsSelectionPageModule
-      ),
-  },
 ];
 @NgModule({
   imports: [

@@ -5,6 +5,9 @@
     </ion-buttons>
     <ion-buttons slot="end"> </ion-buttons>
     <ion-title>Amis</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="save()"> Enregistrer </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -47,27 +50,24 @@
         >
       </strong>
     </div>
-    <ion-list *ngIf="friends && friends.length > 0">
-      <ion-item *ngFor="let friend of friends">
-        <ion-avatar slot="start">
-          <img src="{{ friend.avatarPath }}" />
-        </ion-avatar>
+    <ion-list lines="none">
+      <ion-item
+        *ngFor="let checkedFriend of checkedFriends"
+        class="animated slideInRight delay_11"
+      >
+        <ion-thumbnail slot="start">
+          <img src="{{ checkedFriend.friend.userData?.avatarPath }}" />
+        </ion-thumbnail>
 
-        <div>
-          <ion-row class="ion-align-items-center">
-            <p class="ion-no-margin">
-              {{ friend.lastname | uppercase }} {{ friend.firstname }}
-            </p>
-          </ion-row>
-          <ion-row class="ion-align-items-center">
-            <p class="ion-no-margin">Dyspo?</p>
-          </ion-row>
+        <div class="text-box">
+          {{ checkedFriend.friend.userData?.lastname }}
+          {{ checkedFriend.friend.userData?.firstname }}
         </div>
-        <ion-buttons slot="end">
-          <ion-button color="primary" (click)="add(friend)">
-            <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
-          </ion-button>
-        </ion-buttons>
+        <ion-checkbox
+          [(ngModel)]="checkedFriend.isChecked"
+          (ionChange)="onCheckedFriendChange($event)"
+          slot="end"
+        ></ion-checkbox>
       </ion-item>
     </ion-list>
   </div>
@@ -94,27 +94,24 @@
         >
       </strong>
     </div>
-    <ion-list *ngIf="friends && friends.length > 0">
-      <ion-item *ngFor="let friend of friends">
-        <ion-avatar slot="start">
-          <img src="{{ friend.avatarPath }}" />
-        </ion-avatar>
+    <ion-list *ngIf="friendGroups && friendGroups.length > 0">
+      <ion-item
+        *ngFor="let checkedFriend of checkedFriends"
+        class="animated slideInRight delay_11"
+      >
+        <ion-thumbnail slot="start">
+          <img src="{{ checkedFriend.friend.userData?.avatarPath }}" />
+        </ion-thumbnail>
 
-        <div>
-          <ion-row class="ion-align-items-center">
-            <p class="ion-no-margin">
-              {{ friend.lastname | uppercase }} {{ friend.firstname }}
-            </p>
-          </ion-row>
-          <ion-row class="ion-align-items-center">
-            <p class="ion-no-margin">Dyspo?</p>
-          </ion-row>
+        <div class="text-box">
+          {{ checkedFriend.friend.userData?.lastname }}
+          {{ checkedFriend.friend.userData?.firstname }}
         </div>
-        <ion-buttons slot="end">
-          <ion-button color="primary" (click)="add(friend)">
-            <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
-          </ion-button>
-        </ion-buttons>
+        <ion-checkbox
+          [(ngModel)]="checkedFriend.isChecked"
+          (ionChange)="onCheckedFriendChange($event)"
+          slot="end"
+        ></ion-checkbox>
       </ion-item>
     </ion-list>
   </div>
