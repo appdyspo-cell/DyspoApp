@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NavController } from '@ionic/angular';
+import { AgendaEvent } from 'src/app/models/models';
 @Component({
   selector: 'app-group-chatting',
   templateUrl: './group-chatting.page.html',
@@ -7,7 +9,16 @@ import { Router } from '@angular/router';
 })
 export class GroupChattingPage implements OnInit {
   viewType: string = '';
-  constructor(private route: Router) {}
+  agendaEvent: AgendaEvent;
+  constructor(
+    private navCtrl: NavController,
+    private activatedRoute: ActivatedRoute,
+    private router: Router
+  ) {
+    this.agendaEvent =
+      this.router.getCurrentNavigation()?.extras.state?.['agendaEvent'];
+    console.log('Event uid', this.agendaEvent);
+  }
 
   ngOnInit() {}
 
@@ -15,6 +26,6 @@ export class GroupChattingPage implements OnInit {
     this.viewType = vt;
   }
   groupinfo() {
-    this.route.navigate(['./group-info']);
+    this.router.navigate(['./group-info']);
   }
 }

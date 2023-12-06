@@ -123,8 +123,10 @@ export class FriendsService {
     );
     const friendGroupsCollectionRef = collection(
       this.firestore,
-      `friend_groups`
+      `friend_groups/${uid}/friend_group_list`
     );
+    // Pas pour ici, mais pour les discussion par ex
+    //const queryFriendGroups = query(friendGroupsCollectionRef, where("members_uid", "array-contains", uid));
 
     this.onSnapshotFriendsCancel = onSnapshot(
       friendsCollectionRef,
@@ -273,8 +275,13 @@ export class FriendsService {
   }
 
   async addFriendGroup(friendGroup: FriendGroup) {
+    const uid = this.userSvc.userInfo?.uid || 'unknown';
     setDoc(
-      doc(this.firestore, `friend_groups/`, friendGroup.uid!),
+      doc(
+        this.firestore,
+        `friend_groups/${uid}/friend_group_list`,
+        friendGroup.uid!
+      ),
       friendGroup
     );
 
@@ -283,9 +290,13 @@ export class FriendsService {
   }
 
   async updateFriendGroup(friendGroup: FriendGroup) {
+    const uid = this.userSvc.userInfo?.uid || 'unknown';
     const friendGroupClone: any = { ...friendGroup };
     //delete appUserClone.id;
-    const ref = doc(this.firestore, `friend_groups/${friendGroupClone.uid}`);
+    const ref = doc(
+      this.firestore,
+      `friend_groups/${uid}/friend_group_list/${friendGroupClone.uid}`
+    );
     return updateDoc(ref, friendGroupClone);
   }
 

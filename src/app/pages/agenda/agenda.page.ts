@@ -304,10 +304,11 @@ export class AgendaPage implements AfterViewInit {
     if (agendaEvent) {
       const navigationExtras: NavigationExtras = {
         state: {
-          agendaEvent_uid: agendaEvent.uid,
+          agendaEvent,
         },
       };
-      this.route.navigate(['chat-home'], navigationExtras);
+      this.navCtrl.navigateForward('/group-chatting', navigationExtras);
+      //this.route.navigate(['chat-home'], navigationExtras);
     }
   }
 }

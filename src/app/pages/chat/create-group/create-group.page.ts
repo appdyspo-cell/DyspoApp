@@ -38,9 +38,6 @@ export class CreateGroupPage implements OnInit {
   ) {
     const uid = this.userSvc.userInfo?.uid!;
     this.friends = cloneDeep(this.friendsSvc.friends);
-    this.friends.forEach((friend) => {
-      this.checkedFriends.push({ friend, isChecked: false });
-    });
 
     this.activatedRoute.params.subscribe((params) => {
       this.mode = params['mode'];
@@ -60,6 +57,10 @@ export class CreateGroupPage implements OnInit {
             status: FriendGroupStatus.ACTIVE,
           };
 
+          this.friends.forEach((friend) => {
+            this.checkedFriends.push({ friend, isChecked: false });
+          });
+
           break;
         case 'edit':
           this.saveLabel = 'Mettre à jour';
@@ -67,6 +68,14 @@ export class CreateGroupPage implements OnInit {
           this.friendGroup =
             this.router.getCurrentNavigation()?.extras.state?.['friendGroup'];
 
+          console.log('edit group');
+          this.friends.forEach((friend) => {
+            if (this.friendGroup.members_uid.includes(friend.friend_uid!)) {
+              this.checkedFriends.push({ friend, isChecked: true });
+            } else {
+              this.checkedFriends.push({ friend, isChecked: false });
+            }
+          });
           break;
       }
     });
