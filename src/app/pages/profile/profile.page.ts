@@ -27,6 +27,7 @@ import {
 } from '@angular/fire/storage';
 import { LoggerService } from 'src/app/services/logger.service';
 import { Subscription } from 'rxjs';
+import { MediaService } from 'src/app/services/media.service';
 
 @Component({
   selector: 'app-profile',
@@ -47,12 +48,13 @@ export class ProfilePage implements OnInit {
     public router: Router,
     public userSvc: UserService,
     private utils: UtilsService,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private mediaSvc: MediaService
   ) {}
 
   ngOnInit() {
     this.user = this.userSvc.getEmptyUser();
-    this.userSubscription = this.userSvc.userInfoObs$.subscribe((user) => {
+    this.userSubscription = this.userSvc.appUserInfoObs$.subscribe((user) => {
       this.user = user;
       console.log('user subscription profile page', user);
     });
@@ -158,73 +160,18 @@ export class ProfilePage implements OnInit {
   }
 
   async changeAvatar() {
-    const actionSheet = await this.actionSheetController.create({
-      header: "Sélectionner la source de l'image",
-      buttons: [
-        {
-          text: 'Galerie',
-          handler: async () => {
-            try {
-              this.takePhotoAvatar(CameraSource.Photos);
-            } catch (e) {
-              this.utils.showAlert(e);
-              console.error(e);
-            }
-          },
-        },
-        {
-          text: 'Prendre une photo',
-          handler: async () => {
-            try {
-              this.takePhotoAvatar(CameraSource.Camera);
-            } catch (e: any) {
-              this.utils.showAlert(e);
-              console.error(e);
-            }
-          },
-        },
-        {
-          text: 'Annuler',
-          role: 'cancel',
-        },
-      ],
-    });
-    await actionSheet.present();
-  }
-
-  async takePhotoAvatar(source: any) {
-    const options = {
-      quality: 50,
-      allowEditing: true,
-      resultType: CameraResultType.Base64,
-      //destinationType: Camera.DestinationType.DATA_URL,
-      //encodingType: this.camera.EncodingType.JPEG,
-      //mediaType: this.camera.MediaType.PICTURE,
-      source,
-      correctOrientation: true,
-    };
-
-    const result = await Camera.getPhoto(options);
-    //const captureDataUrl = 'data:image/jpeg;base64,' + result.base64String;
-    const captureDataUrl = result.base64String;
-    this.logger.logDebug('Photo Transformed in base64 data');
-    if (captureDataUrl) this.uploadAvatar(captureDataUrl);
-  }
-
-  uploadAvatar(captureAvatarUrl: string) {
-    this.logger.logDebug('uploadAvatar');
     const user_id = this.user.uid;
-    const fileName = 'avatar_' + user_id + '.jpg';
-    const path = `avatarsStorage/${fileName}`;
-    const fileRef = ref(this.storage, path);
-
-    uploadString(fileRef, captureAvatarUrl, StringFormat.BASE64).then(() => {
-      getDownloadURL(fileRef).then((fpath: any) => {
-        this.user.avatarPath = fpath;
-        this.userSvc.updateUser(Object.assign({}, this.user));
-        this.avatarPath = fpath;
-      });
+    const filename = 'avatar_' + user_id + '.jpg';
+    const { filepath } = await this.mediaSvc.takePhotoPrompt({
+      firebasePath: environment.firebase_avatar_storage_path,
+      filename,
     });
+
+    if (filepath) {
+      this.user.avatarPath = filepath;
+      this.userSvc.updateUser(Object.assign({}, this.user));
+      this.avatarPath = filepath;
+    }
   }
 
   logout() {

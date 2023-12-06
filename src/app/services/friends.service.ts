@@ -282,6 +282,13 @@ export class FriendsService {
     // this.notification-service.sendConfirmFriend()
   }
 
+  async updateFriendGroup(friendGroup: FriendGroup) {
+    const friendGroupClone: any = { ...friendGroup };
+    //delete appUserClone.id;
+    const ref = doc(this.firestore, `friend_groups/${friendGroupClone.uid}`);
+    return updateDoc(ref, friendGroupClone);
+  }
+
   async deleteFriend(friend: Friend, listElement: any) {
     const uid = this.userSvc.userInfo?.uid;
     await deleteDoc(
@@ -320,13 +327,13 @@ export class FriendsService {
   }
 
   unsubscribeAllAfterLogoutEvent() {
-    // if (this.friendsObservable) {
-    //   this.friendsObservable.unsubscribe();
-    // }
     this.onSnapshotFriendsCancel();
+
     this.onSnapshotFriendGroupsCancel();
     this.friends = [];
     this.friendGroups = [];
+    this.friendGroupsSubject.next(this.friendGroups);
+    this.friendsSubject.next(this.friends);
   }
 
   // getFriendStatus(friend_uid: string) {

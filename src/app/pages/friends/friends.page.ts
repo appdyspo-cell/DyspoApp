@@ -195,8 +195,14 @@ export class FriendsPage implements OnInit {
     //this.utils.showModalPage(AmiFicheComponent, {friendListDoc: friend, userData: friend.userData});
   }
 
-  showFriendGroup(friendGroup: FriendGroup) {
-    //this.utils.showModalPage(AmiFicheComponent, {friendListDoc: friend, userData: friend.userData});
+  showFriendGroup(friendGroup: FriendGroup, event: any) {
+    event.stopPropagation();
+    const navigationExtras: NavigationExtras = {
+      state: {
+        friendGroup,
+      },
+    };
+    this.navCtrl.navigateForward('create-group/edit', navigationExtras);
   }
 
   async openFriendGroupForm() {

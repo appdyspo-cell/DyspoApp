@@ -29,14 +29,14 @@
       </ion-avatar> -->
     <div
       class="dyspo-button dyspo ion-activatable"
-      *ngIf="userInfo?.dyspoStatus === dyspoStatus.DYSPO"
+      *ngIf="todayDyspo?.userDyspo === dyspoStatus.DYSPO"
     >
       Dyspo
       <ion-ripple-effect></ion-ripple-effect>
     </div>
 
     <div
-      *ngIf="userInfo?.dyspoStatus === dyspoStatus.DYSPOWITHKIDS"
+      *ngIf="todayDyspo?.userDyspo === dyspoStatus.DYSPOWITHKIDS"
       class="dyspo-button dyspo-with-kids ion-activatable"
     >
       Dyspo With Kids
@@ -44,17 +44,14 @@
     </div>
 
     <div
-      *ngIf="userInfo?.dyspoStatus === dyspoStatus.NODYSPO"
+      *ngIf="todayDyspo?.userDyspo === dyspoStatus.NODYSPO"
       class="dyspo-button no-dyspo ion-activatable"
     >
       No Dyspo
       <ion-ripple-effect></ion-ripple-effect>
     </div>
 
-    <div
-      *ngIf="!userInfo?.dyspoStatus"
-      class="dyspo-button no-dyspo ion-activatable"
-    >
+    <div *ngIf="!todayDyspo" class="dyspo-button no-dyspo ion-activatable">
       Dyspo ?
       <ion-ripple-effect></ion-ripple-effect>
     </div>

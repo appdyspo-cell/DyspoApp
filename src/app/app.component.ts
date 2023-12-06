@@ -56,8 +56,9 @@ export class AppComponent {
     this.authStateSubscription = this.authState$.subscribe(
       (aUser: User | null) => {
         //handle auth state changes here. Note, that user will be null if there is no currently logged in user.
-        this.logger.logDebug(aUser);
+
         if (aUser) {
+          this.logger.logDebug('authStateSubscription', aUser);
           // Init user svc
           this.userSvc
             .subscribeUserInfo(aUser.uid)
@@ -73,7 +74,9 @@ export class AppComponent {
               //SplashScreen.hide();
             });
         } else {
-          this.logger.logDebug('navigateRoot: Login');
+          this.logger.logDebug(
+            'authStateSubscription NOUSER -> navigateRoot: Login'
+          );
           this.navController.navigateRoot('/login');
 
           this.menuCtrl.enable(false);
@@ -101,6 +104,7 @@ export class AppComponent {
 
   killAllServices() {
     this.friendsSvc.unsubscribeAllAfterLogoutEvent();
+    this.agendaSvc.unsubscribeAllAfterLogoutEvent();
     //this.notifSvc.unsubscribeAllAfterLogoutEvent();
   }
 

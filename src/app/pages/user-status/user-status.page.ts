@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { IonModal, ModalController } from '@ionic/angular';
 import { UserStatusComponent } from 'src/app/components/user-status/user-status.component';
 import {
+  AgendaDyspoItem,
   AgendaEvent,
   AppUser,
   Notif,
@@ -37,7 +38,9 @@ export class UserStatusPage implements OnInit {
   nextAgendaEvents: AgendaEvent[] = [];
   notifications: Notif[] = [];
   agendaEventsSubscription: Subscription;
+  agendaDysposSubscription: Subscription;
   todayFormatted = format(new Date(), 'iii dd MMM yyyy', { locale: fr });
+  todayDyspo!: AgendaDyspoItem;
 
   constructor(
     private userSvc: UserService,
@@ -55,6 +58,36 @@ export class UserStatusPage implements OnInit {
         });
 
         //this.tagCalendarUserDyspoData();
+      }
+    );
+    this.agendaDysposSubscription = this.agendaSvc.agendaDyspos$.subscribe(
+      (agendaDyspos) => {
+        console.log('Agenda dyspos', agendaDyspos);
+        const today = new Date().getTime();
+
+        console.log('date ', getDate(today));
+        console.log('month ', getMonth(today));
+        console.log('year ', getYear(today));
+
+        const result = agendaDyspos.items.filter((item) => {
+          return (
+            item.day === getDate(today) &&
+            item.month === getMonth(today) &&
+            item.year === getYear(today)
+          );
+        });
+
+        if (result?.length > 0) {
+          this.todayDyspo = result[0];
+        } else {
+          // this.todayDyspo = {
+          //   time: today,
+          //   userDyspo: UserDyspoStatus.DYSPO,
+          //   month: getMonth(today),
+          //   year: getYear(today),
+          //   day: getDate(today),
+          // };
+        }
       }
     );
   }
@@ -115,20 +148,24 @@ export class UserStatusPage implements OnInit {
   onWillDismiss(event: Event) {
     const ev = event as CustomEvent<OverlayEventDetail<string>>;
     if (ev.detail.role === 'confirm') {
-      if (ev.detail.data !== this.userInfo!.dyspoStatus) {
-        //this.message = `Hello, ${ev.detail.data}!`;
-        console.log(`Update status, ${ev.detail.data}!`);
-        this.userInfo!.dyspoStatus = ev.detail.data as UserDyspoStatus;
-        const userInfoClone = Object.assign({}, this.userInfo) as AppUser;
-        this.userSvc
-          .updateUser(userInfoClone)
-          .then(() => {
-            this.utils.showToastSuccess('Le status a été mis à jour');
-          })
-          .catch((err) => {
-            this.utils.showToastError(err);
-          });
-      }
+      console.log('Update dyspo');
+      this.todayDyspo.userDyspo = ev.detail.data as UserDyspoStatus;
+      this.agendaSvc.updateOrCreateDyspo(this.todayDyspo);
+
+      // if (ev.detail.data !== this.userInfo!.dyspoStatus) {
+      //   //this.message = `Hello, ${ev.detail.data}!`;
+      //   console.log(`Update status, ${ev.detail.data}!`);
+      //   this.userInfo!.dyspoStatus = ev.detail.data as UserDyspoStatus;
+      //   const userInfoClone = Object.assign({}, this.userInfo) as AppUser;
+      //   this.userSvc
+      //     .updateUser(userInfoClone)
+      //     .then(() => {
+      //       this.utils.showToastSuccess('Le status a été mis à jour');
+      //     })
+      //     .catch((err) => {
+      //       this.utils.showToastError(err);
+      //     });
+      // }
     }
   }
 }

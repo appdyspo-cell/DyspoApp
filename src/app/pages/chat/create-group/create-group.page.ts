@@ -6,6 +6,8 @@ import { cloneDeep } from 'lodash';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { NavController } from '@ionic/angular';
+import { environment } from 'src/environments/environment';
+import { MediaService } from 'src/app/services/media.service';
 
 interface CheckedFriends {
   friend: Friend;
@@ -23,6 +25,7 @@ export class CreateGroupPage implements OnInit {
   friendGroup!: FriendGroup;
   pageTitle = '';
   saveLabel = '';
+  mode = '';
 
   constructor(
     private router: Router,
@@ -30,7 +33,8 @@ export class CreateGroupPage implements OnInit {
     private activatedRoute: ActivatedRoute,
     private userSvc: UserService,
     public utils: UtilsService,
-    private navCtrl: NavController
+    private navCtrl: NavController,
+    private mediaSvc: MediaService
   ) {
     const uid = this.userSvc.userInfo?.uid!;
     this.friends = cloneDeep(this.friendsSvc.friends);
@@ -39,8 +43,8 @@ export class CreateGroupPage implements OnInit {
     });
 
     this.activatedRoute.params.subscribe((params) => {
-      const mode = params['mode'];
-      switch (mode) {
+      this.mode = params['mode'];
+      switch (this.mode) {
         case 'new':
           this.pageTitle = 'Créer un groupe';
           this.saveLabel = 'Sauvegarder';
@@ -52,6 +56,7 @@ export class CreateGroupPage implements OnInit {
             label: '',
             admin_uid: uid,
             members_uid: [],
+            avatarPath: environment.DEFAULT_AVATAR_GROUP,
             status: FriendGroupStatus.ACTIVE,
           };
 
@@ -107,5 +112,19 @@ export class CreateGroupPage implements OnInit {
     console.log('Add friend group ', this.friendGroup);
     this.friendsSvc.addFriendGroup(this.friendGroup);
     this.navCtrl.pop();
+  }
+
+  async takePhotoPrompt() {
+    const { filepath } = await this.mediaSvc.takePhotoPrompt({
+      firebasePath: environment.firebase_avatar_group_storage_path,
+      filename: 'avatar_group_' + this.friendGroup.uid + '.jpg',
+    });
+
+    if (filepath) {
+      this.friendGroup.avatarPath = filepath;
+      if (this.mode === 'edit') {
+        this.friendsSvc.updateFriendGroup(this.friendGroup);
+      }
+    }
   }
 }

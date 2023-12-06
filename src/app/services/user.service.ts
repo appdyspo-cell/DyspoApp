@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AppUser, UserDyspoStatus, UserStatus } from '../models/models';
 import {
+  DocumentData,
   Firestore,
   collection,
   collectionSnapshots,
@@ -21,52 +22,59 @@ import { LoggerService } from './logger.service';
   providedIn: 'root',
 })
 export class UserService {
-  private _userInfo: AppUser | undefined;
-  private _userInfoSubject = new BehaviorSubject<AppUser>(this.getEmptyUser());
+  private _appUserInfo: AppUser | undefined;
+  private _appUserInfoSubject = new BehaviorSubject<AppUser>(
+    this.getEmptyUser()
+  );
 
-  userInfoFirebaseObs$!: Observable<AppUser>;
-  userInfoObs$!: Observable<AppUser>;
-  userInfoSubscription: Subscription = new Subscription();
+  private docDataObs$: Observable<any> | undefined;
+  private docDataSubscribtion: Subscription = new Subscription();
+
+  //userInfoFirebaseObs$!: Observable<AppUser>;
+  appUserInfoObs$!: Observable<AppUser>;
+  appUserInfoSubscription: Subscription = new Subscription();
 
   constructor(
     private firestore: Firestore,
     private authSvc: AuthService,
     private logger: LoggerService
   ) {
-    this.userInfoObs$ = this._userInfoSubject.asObservable();
+    this.appUserInfoObs$ = this._appUserInfoSubject.asObservable();
   }
 
   get userInfo(): AppUser | undefined {
-    return this._userInfo;
+    return this._appUserInfo;
   }
   set userInfo(val: AppUser | undefined) {
-    this._userInfo = val;
+    this._appUserInfo = val;
   }
 
   public async subscribeUserInfo(uid: string) {
     return new Promise<AppUser>((resolve, reject) => {
-      if (this.userInfoSubscription) {
+      if (this.docDataSubscribtion) {
         console.log('Unsubscribe previous user');
-        this.userInfoSubscription.unsubscribe();
+        this.docDataSubscribtion.unsubscribe();
       }
       if (uid) {
         this.logger.logDebug('userSvc subscribe to ----- ', uid);
         const docRef = doc(this.firestore, 'users', uid);
-        this.userInfoObs$ = docData(docRef) as Observable<AppUser>;
-        this.userInfoSubscription = this.userInfoObs$.subscribe((appUser) => {
-          if (!appUser) {
-            reject('NOTFOUND');
-          } else {
-            appUser.uid = uid;
-            this.userInfo = { ...appUser };
-            this._userInfoSubject.next(this.userInfo);
-            //Si l'utilisateur a été effacé
-            if (appUser.status === UserStatus.DELETED) {
-              this.authSvc.logout();
+        this.docDataSubscribtion = docData(docRef).subscribe(
+          (firebaseUserDocData: any) => {
+            if (!firebaseUserDocData) {
+              console.error('User not found');
+              reject('NOTFOUND');
+            } else {
+              firebaseUserDocData['uid'] = uid;
+              this.userInfo = { ...firebaseUserDocData };
+              this._appUserInfoSubject.next(this.userInfo!);
+              //Si l'utilisateur a été effacé
+              if (firebaseUserDocData.status === UserStatus.DELETED) {
+                this.authSvc.logout();
+              }
+              resolve(this.userInfo!);
             }
-            resolve(this.userInfo!);
           }
-        });
+        );
       } else {
         reject('NOUID');
       }
@@ -74,12 +82,10 @@ export class UserService {
   }
 
   public async unsubscribeUserInfo() {
-    return new Promise((resolve, reject) => {
-      if (this.userInfoSubscription) {
-        this.userInfoSubscription.unsubscribe();
-      }
-      this.userInfo = undefined;
-    });
+    if (this.docDataSubscribtion) {
+      this.docDataSubscribtion.unsubscribe();
+    }
+    this.userInfo = undefined;
   }
 
   async updateUser(appUser: AppUser) {

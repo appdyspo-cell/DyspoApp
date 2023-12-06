@@ -12,7 +12,10 @@ export const environment = {
     appId: '1:515901093848:web:0260f1acf86b32b1ae64ad',
   },
   DEFAULT_AVATAR: './assets/img/user.png',
+  DEFAULT_AVATAR_GROUP: './assets/group_icon.png',
   dyspo_email: 'contact@dyspo.com',
   BIOMETRIC_KEY: 'dyspo_123456',
   googleMapsApiKey: 'AIzaSyAqaorNocvLQKCp48JHcmKwcm1FZ0-3_Mk',
+  firebase_avatar_storage_path: 'avatarsStorage/',
+  firebase_avatar_group_storage_path: 'avatarGroupsStorage/',
 };

@@ -35,6 +35,8 @@ export class AgendaService {
     items: AgendaDyspoItem[];
   }>;
   public isModified = false;
+  eventsOnSnapshotCancel!: import('@angular/fire/firestore').Unsubscribe;
+  dysposOnSpnashotCancel!: import('@angular/fire/firestore').Unsubscribe;
 
   constructor(private firestore: Firestore) {
     this.agendaEvents$ = this.agendaEventsSubject.asObservable();
@@ -57,92 +59,99 @@ export class AgendaService {
       `agenda_dyspos/${uid}/dyspo_list`
     );
 
-    onSnapshot(agendaEventsCollectionRef, (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        if (change.type === 'modified') {
-          const agendaEventModified = change.doc.data() as AgendaEvent;
+    this.eventsOnSnapshotCancel = onSnapshot(
+      agendaEventsCollectionRef,
+      (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === 'modified') {
+            const agendaEventModified = change.doc.data() as AgendaEvent;
 
-          const foundIndex = this.agendaEvents.findIndex(
-            (elt) => elt.uid === agendaEventModified.uid
-          );
-          if (foundIndex >= 0) {
-            this.agendaEvents[foundIndex] = agendaEventModified;
+            const foundIndex = this.agendaEvents.findIndex(
+              (elt) => elt.uid === agendaEventModified.uid
+            );
+            if (foundIndex >= 0) {
+              this.agendaEvents[foundIndex] = agendaEventModified;
+              this.agendaEventsSubject.next(this.agendaEvents);
+            }
+          }
+          if (change.type === 'added') {
+            const agendaEventAdded = change.doc.data() as AgendaEvent;
+            agendaEventAdded.uid = change.doc.id;
+            const foundIndex = this.agendaEvents.findIndex(
+              (elt) => elt.uid === agendaEventAdded.uid
+            );
+            if (foundIndex >= 0) {
+              //Do nothing
+            } else {
+              const agendaEvent = change.doc.data() as AgendaEvent;
+              agendaEvent.uid = change.doc.id;
+
+              this.agendaEvents.push(agendaEvent);
+              this.agendaEventsSubject.next(this.agendaEvents);
+              // this.getAgendaEventAndPush(agendaEvent)
+              //   .then((resPromise: any) => {
+              //     console.log('agendaEvent Hydrated ', resPromise);
+              //     that.agendaEventsSubject.next(that.agendaEvents);
+              //   })
+              //   .catch((err: any) => {
+              //     console.log(err);
+              //   });
+            }
+          }
+          if (change.type === 'removed') {
+            const agendaEventRemoved = change.doc.data() as AgendaEvent;
+            agendaEventRemoved.uid = change.doc.id;
+            const foundIndex = this.agendaEvents.findIndex(
+              (elt) => elt.uid === agendaEventRemoved.uid
+            );
+            if (foundIndex >= 0) {
+              this.agendaEvents.splice(foundIndex, 1);
+            }
             this.agendaEventsSubject.next(this.agendaEvents);
           }
-        }
-        if (change.type === 'added') {
-          const agendaEventAdded = change.doc.data() as AgendaEvent;
-          agendaEventAdded.uid = change.doc.id;
-          const foundIndex = this.agendaEvents.findIndex(
-            (elt) => elt.uid === agendaEventAdded.uid
-          );
-          if (foundIndex >= 0) {
-            //Do nothing
-          } else {
-            const agendaEvent = change.doc.data() as AgendaEvent;
-            agendaEvent.uid = change.doc.id;
-
-            this.agendaEvents.push(agendaEvent);
-            this.agendaEventsSubject.next(this.agendaEvents);
-            // this.getAgendaEventAndPush(agendaEvent)
-            //   .then((resPromise: any) => {
-            //     console.log('agendaEvent Hydrated ', resPromise);
-            //     that.agendaEventsSubject.next(that.agendaEvents);
-            //   })
-            //   .catch((err: any) => {
-            //     console.log(err);
-            //   });
-          }
-        }
-        if (change.type === 'removed') {
-          const agendaEventRemoved = change.doc.data() as AgendaEvent;
-          agendaEventRemoved.uid = change.doc.id;
-          const foundIndex = this.agendaEvents.findIndex(
-            (elt) => elt.uid === agendaEventRemoved.uid
-          );
-          if (foundIndex >= 0) {
-            this.agendaEvents.splice(foundIndex, 1);
-          }
-          this.agendaEventsSubject.next(this.agendaEvents);
-        }
-      });
-    });
+        });
+      }
+    );
 
     //Dyspos
-    onSnapshot(agendaDysposCollectionRef, (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        const agendaDyspoFetched = change.doc.data() as AgendaDyspoItem;
-        let foundItem = this.agendaDyspos.find((elt) => {
-          return elt.time === agendaDyspoFetched.time;
-        });
-        if (change.type === 'modified' && foundItem) {
-          foundItem.userDyspo = agendaDyspoFetched.userDyspo;
-          this.agendaDysposSubject.next({
-            action: 'MODIFIED',
-            items: this.agendaDyspos,
+    this.dysposOnSpnashotCancel = onSnapshot(
+      agendaDysposCollectionRef,
+      (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          console.log('Dyspo changed');
+          const agendaDyspoFetched = change.doc.data() as AgendaDyspoItem;
+          let foundItem = this.agendaDyspos.find((elt) => {
+            return elt.time === agendaDyspoFetched.time;
           });
-        }
-        if (change.type === 'added' && !foundItem) {
-          this.agendaDyspos.push(agendaDyspoFetched);
-          this.agendaDysposSubject.next({
-            action: 'ADDED',
-            items: this.agendaDyspos,
-          });
-        }
-        if (change.type === 'removed') {
-          const foundIndex = this.agendaDyspos.findIndex(
-            (elt) => elt.time === agendaDyspoFetched.time
-          );
-          if (foundIndex >= 0) {
-            this.agendaDyspos.splice(foundIndex, 1);
+          if (change.type === 'modified' && foundItem) {
+            foundItem.userDyspo = agendaDyspoFetched.userDyspo;
+            this.agendaDysposSubject.next({
+              action: 'MODIFIED',
+              items: this.agendaDyspos,
+            });
           }
-          this.agendaDysposSubject.next({
-            action: 'REMOVED',
-            items: this.agendaDyspos,
-          });
-        }
-      });
-    });
+          if (change.type === 'added' && !foundItem) {
+            this.agendaDyspos.push(agendaDyspoFetched);
+            this.agendaDysposSubject.next({
+              action: 'ADDED',
+              items: this.agendaDyspos,
+            });
+          }
+          if (change.type === 'removed') {
+            const foundIndex = this.agendaDyspos.findIndex(
+              (elt) => elt.time === agendaDyspoFetched.time
+            );
+            if (foundIndex >= 0) {
+              this.agendaDyspos.splice(foundIndex, 1);
+            }
+            this.agendaDysposSubject.next({
+              action: 'REMOVED',
+              items: this.agendaDyspos,
+            });
+          }
+        });
+      }
+    );
   }
 
   async addEvent(agendaEvent: AgendaEvent) {
@@ -199,6 +208,28 @@ export class AgendaService {
         ),
         item
       );
+    });
+  }
+
+  public updateOrCreateDyspo(agendaDyspo: AgendaDyspoItem) {
+    const agendaDyspoClone: any = { ...agendaDyspo };
+    const ref = doc(
+      this.firestore,
+      `agenda_dyspos/${this.uid}/dyspo_list`,
+      agendaDyspo.year + '_' + agendaDyspo.month + '_' + agendaDyspo.day
+    );
+    setDoc(ref, agendaDyspoClone);
+  }
+
+  unsubscribeAllAfterLogoutEvent() {
+    if (this.dysposOnSpnashotCancel) this.dysposOnSpnashotCancel();
+    if (this.eventsOnSnapshotCancel) this.eventsOnSnapshotCancel();
+    this.agendaEvents = [];
+    this.agendaDyspos = [];
+    this.agendaEventsSubject.next(this.agendaEvents);
+    this.agendaDysposSubject.next({
+      action: 'REMOVED',
+      items: this.agendaDyspos,
     });
   }
 }

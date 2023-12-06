@@ -157,10 +157,14 @@
             <ion-icon slot="icon-only" name="trash"></ion-icon>
           </ion-item-option>
         </ion-item-options>
-        <ion-item (click)="showFriendGroup(friendGroup)">
-          <ion-avatar slot="start">
+        <ion-item
+          (click)="showFriendGroup(friendGroup, $event)"
+          class="friend-item"
+          lines="none"
+        >
+          <ion-thumbnail slot="start">
             <img src="{{friendGroup.avatarPath}}" />
-          </ion-avatar>
+          </ion-thumbnail>
 
           <div>
             <ion-row class="ion-align-items-center">
@@ -246,6 +250,6 @@
   vertical="bottom"
 >
   <ion-fab-button (click)="openFriendGroupForm()">
-    <ion-icon name="add"></ion-icon>
+    <ion-icon class="zmdi zmdi-accounts-add"></ion-icon>
   </ion-fab-button>
 </ion-fab>

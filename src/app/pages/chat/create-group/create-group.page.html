@@ -29,11 +29,18 @@
       </ion-title>
     </ion-toolbar>
   </ion-header>
-  <div class="d-flex ion-align-items-center ion-justify-content-center">
+  <div
+    class="d-flex ion-align-items-center ion-justify-content-center"
+    button
+    (click)="takePhotoPrompt()"
+  >
     <div
       class="d-flex camera-wrapper ion-align-items-center ion-justify-content-center"
     >
-      <ion-icon name="camera-outline"></ion-icon>
+      <!-- <ion-icon name="camera-outline"></ion-icon> -->
+      <ion-thumbnail>
+        <img src="{{friendGroup.avatarPath}}" />
+      </ion-thumbnail>
     </div>
   </div>
 
@@ -46,7 +53,7 @@
     ></ion-input>
   </ion-item>
 
-  <ion-list lines="none" class="">
+  <ion-list lines="none">
     <ion-item
       *ngFor="let checkedFriend of checkedFriends"
       class="animated slideInRight delay_11"

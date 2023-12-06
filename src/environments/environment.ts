@@ -6,6 +6,7 @@ export const environment = {
   production: false,
   debug: true,
   DEFAULT_AVATAR: './assets/img/user.png',
+  DEFAULT_AVATAR_GROUP: './assets/group_icon.png',
   dyspo_email: 'contact@dyspo.com',
   BIOMETRIC_KEY: 'dyspo_123456',
   firebaseConfig: {
@@ -19,6 +20,8 @@ export const environment = {
     appId: '1:935331269385:web:73394d7fb1e204e4f2e1d8',
   },
   googleMapsApiKey: 'AIzaSyB2Juhy49t_9N4d-aGfhcuQmC-o4ulvrwg',
+  firebase_avatar_storage_path: 'avatarsStorage/',
+  firebase_avatar_group_storage_path: 'avatarGroupsStorage/',
 };
 
 /*

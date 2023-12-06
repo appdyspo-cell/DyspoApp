@@ -93,7 +93,10 @@ export class AgendaPage implements AfterViewInit {
     this.agendaDysposSubscription = this.agendaSvc.agendaDyspos$.subscribe(
       (agendaDyspos) => {
         console.log(agendaDyspos.action);
-        if (agendaDyspos.action === 'ADDED') {
+        if (
+          agendaDyspos.action === 'ADDED' ||
+          agendaDyspos.action === 'MODIFIED'
+        ) {
           this.agendaDyspos = agendaDyspos.items;
           this.tagCalendarUserDyspoData();
         }

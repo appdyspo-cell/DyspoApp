@@ -16,6 +16,14 @@ ion-header ion-toolbar ion-title {
 
   border-radius: 50%;
   border: 1px solid var(--text-light);
+  ion-thumbnail {
+    height: 120px;
+    width: 120px;
+    --border-radius: 50%;
+
+    padding: 5px;
+    //border: 1px solid #fd6a58;
+  }
   ion-icon {
     font-size: 60px;
   }
@@ -29,15 +37,6 @@ ion-header ion-toolbar ion-title {
   }
 }
 
-ion-thumbnail {
-  height: 70px;
-  width: 70px;
-  --border-radius: 50%;
-  margin-right: 10px;
-  padding: 5px;
-  border: 1px solid #fd6a58;
-}
-
 ion-list {
   padding: 0px;
   background: var(--transparent) !important;
@@ -48,6 +47,15 @@ ion-list {
     --padding-start: 0;
     --inner-padding-end: 0px;
     --inner-min-height: unset !important;
+
+    ion-thumbnail {
+      height: 70px;
+      width: 70px;
+      --border-radius: 50%;
+      margin-right: 10px;
+      padding: 5px;
+      border: 1px solid #fd6a58;
+    }
 
     &::after {
       content: "";
