@@ -19,17 +19,6 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-toolbar style="--background: transparent">
-    <ion-title size="large">Calendrier</ion-title>
-    <ion-buttons slot="end">
-      <ion-toggle
-        labelPlacement="start"
-        [enableOnOffLabels]="true"
-        (ionChange)="onChangeMode($event)"
-        >Edit</ion-toggle
-      >
-    </ion-buttons>
-  </ion-toolbar>
   <div class="container">
     <ion-chip [outline]="true"
       ><div class="chip-evt bg-kid">&nbsp;</div>
@@ -63,6 +52,7 @@
     <ion-list *ngIf="eventsForDate.length > 0">
       <ion-item
         *ngFor="let agendaEvent of eventsForDate; let i=index "
+        (click)="updateEvent(agendaEvent, $event)"
         mode="ios"
       >
         <div slot="start">{{agendaEvent.startISO | dayDateFormat}}</div>
@@ -71,12 +61,6 @@
         {{agendaEvent.end_time_formatted}}
         <ion-buttons slot="end">
           <ion-button color="primary" (click)="goToChat(agendaEvent, $event)">
-            <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
-          </ion-button>
-          <ion-button
-            color="primary"
-            (click)="updateEvent(agendaEvent, $event)"
-          >
             <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
           </ion-button>
         </ion-buttons>

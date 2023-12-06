@@ -18,4 +18,5 @@ export const environment = {
   googleMapsApiKey: 'AIzaSyAqaorNocvLQKCp48JHcmKwcm1FZ0-3_Mk',
   firebase_avatar_storage_path: 'avatarsStorage/',
   firebase_avatar_group_storage_path: 'avatarGroupsStorage/',
+  firebase_avatar_event_storage_path: 'avatarEventsStorage/',
 };

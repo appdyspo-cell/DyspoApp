@@ -154,7 +154,7 @@ export class AgendaService {
     );
   }
 
-  async addEvent(agendaEvent: AgendaEvent) {
+  async saveOrUpdateEvent(agendaEvent: AgendaEvent) {
     setDoc(
       doc(
         this.firestore,

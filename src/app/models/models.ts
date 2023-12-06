@@ -77,6 +77,7 @@ export interface AgendaEvent {
   end_date_formatted?: string;
   end_time_formatted?: string;
   place_id?: string;
+  avatar?: string;
 }
 
 export interface CrudFBAction {

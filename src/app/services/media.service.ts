@@ -15,6 +15,7 @@ export interface TakePhotoOptions {
   source?: CameraSource;
   allowEditing?: boolean;
   firebasePath: string;
+  noUpload?: boolean;
 }
 
 @Injectable({
@@ -88,6 +89,9 @@ export class MediaService {
       const captureDataUrl = result.base64String;
 
       if (captureDataUrl) {
+        if (opt.noUpload) {
+          return { filepath: result.dataUrl };
+        }
         const path = `${opt.firebasePath}${opt.filename}`;
         const fileRef = ref(this.storage, path);
 

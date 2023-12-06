@@ -9,7 +9,7 @@
         fill="outline"
         shape="round"
         [disabled]=""
-        (click)="createEvent()"
+        (click)="saveOrUpdateEvent()"
       >
         Enregistrer
       </ion-button>
@@ -185,8 +185,11 @@
   </ion-list>
   <ion-list-header
     ><ion-label>Photo</ion-label>
-    <ion-button
+    <ion-button (click)="takePhotoPrompt()"
       ><ion-icon name="camera" slot="start"></ion-icon>Ajouter</ion-button
     >
   </ion-list-header>
+  <div *ngIf="agendaEvent?.avatar">
+    <ion-img src="{{agendaEvent?.avatar}}" />
+  </div>
 </ion-content>

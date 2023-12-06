@@ -23,6 +23,8 @@ import {
   Friend,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
+import { MediaService } from 'src/app/services/media.service';
+import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
 
 export enum FriendSelectionType {
@@ -56,20 +58,22 @@ export class CreateEventPage implements OnInit {
 
   GoogleAutocompleteSvc: google.maps.places.AutocompleteService;
   autocompletePlaceInput!: { input: string };
+  mode: any;
 
   constructor(
     private navCtrl: NavController,
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private agendaSvc: AgendaService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private mediaSvc: MediaService
   ) {
     this.GoogleAutocompleteSvc = new google.maps.places.AutocompleteService();
     this.autocompletePlaceInput = { input: '' };
     this.autocompletePlaces = [];
     this.activatedRoute.params.subscribe((params) => {
-      const mode = params['mode'];
-      switch (mode) {
+      this.mode = params['mode'];
+      switch (this.mode) {
         case 'new':
           this.pageTitle = 'Créer un evenement';
           this.saveLabel = 'Sauvegarder';
@@ -128,18 +132,22 @@ export class CreateEventPage implements OnInit {
 
   selectFriend(friend: Friend) {}
 
-  createEvent() {
+  saveOrUpdateEvent() {
     console.log(this.agendaEvent);
     if (this.agendaEvent?.title) {
       console.log('Événement créé :', this.agendaEvent);
-      this.agendaSvc.addEvent(this.agendaEvent!);
+      this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!);
       this.navCtrl.pop();
     } else {
       Swal.fire({
         title: 'Veuillez donner un titre à l evt',
         heightAuto: false,
       });
+      return;
     }
+    // if (this.mode === 'new') {
+    // } else if (this.mode === 'edit') {
+    // }
   }
 
   removeEvent() {
@@ -240,6 +248,20 @@ export class CreateEventPage implements OnInit {
     console.log(data);
     if (role === 'confirm') {
       //this.message = `Hello, ${data}!`;
+    }
+  }
+
+  async takePhotoPrompt() {
+    const { filepath } = await this.mediaSvc.takePhotoPrompt({
+      firebasePath: environment.firebase_avatar_event_storage_path,
+      filename: 'avatar_event_' + this.agendaEvent!.uid + '.jpg',
+    });
+
+    if (filepath) {
+      this.agendaEvent!.avatar = filepath;
+      if (this.mode === 'edit') {
+        this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!);
+      }
     }
   }
 }

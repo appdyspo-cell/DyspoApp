@@ -22,6 +22,7 @@ export const environment = {
   googleMapsApiKey: 'AIzaSyB2Juhy49t_9N4d-aGfhcuQmC-o4ulvrwg',
   firebase_avatar_storage_path: 'avatarsStorage/',
   firebase_avatar_group_storage_path: 'avatarGroupsStorage/',
+  firebase_avatar_event_storage_path: 'avatarEventsStorage/',
 };
 
 /*
