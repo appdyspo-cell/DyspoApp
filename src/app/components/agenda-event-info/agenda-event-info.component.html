@@ -1,0 +1,19 @@
+<div class="category_div">
+  <div class="menu">
+    <div class="item" (click)="onProfile()">
+      <ion-thumbnail>
+        <img src="assets/images/p5.jpg" />
+        <ion-icon name="add" color="light"></ion-icon>
+      </ion-thumbnail>
+      <ion-label>You</ion-label>
+    </div>
+  </div>
+  <div class="menu">
+    <div class="item" *ngFor="let item of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]">
+      <ion-thumbnail>
+        <img src="assets/images/p2.jpg" />
+      </ion-thumbnail>
+      <ion-label>Dodiya Talli</ion-label>
+    </div>
+  </div>
+</div>

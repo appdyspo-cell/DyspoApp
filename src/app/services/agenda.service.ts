@@ -4,17 +4,23 @@ import {
   AgendaEvent,
   AgendaEventStatus,
   CrudFBAction,
+  FriendDyspo,
+  UserDyspoStatus,
 } from '../models/models';
 import {
   Firestore,
   collection,
   doc,
+  getDoc,
   getDocs,
   onSnapshot,
+  query,
   setDoc,
   updateDoc,
+  where,
 } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { getDate, getMonth, getYear } from 'date-fns';
 
 @Injectable({
   providedIn: 'root',
@@ -22,7 +28,9 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class AgendaService {
   private uid!: string;
   public agendaEvents: AgendaEvent[] = [];
+  public agendaEventInvitations: AgendaEvent[] = [];
   public agendaEventsSubject = new BehaviorSubject<AgendaEvent[]>([]);
+  public agendaEventInvitationsSubject = new BehaviorSubject<AgendaEvent[]>([]);
   public agendaDyspos: AgendaDyspoItem[] = [];
   public agendaDysposSubject = new BehaviorSubject<{
     action: 'MODIFIED' | 'ADDED' | 'REMOVED';
@@ -30,16 +38,20 @@ export class AgendaService {
   }>({ action: 'ADDED', items: [] });
 
   public agendaEvents$!: Observable<AgendaEvent[]>;
+  public agendaEventInvitations$!: Observable<AgendaEvent[]>;
   public agendaDyspos$!: Observable<{
     action: 'MODIFIED' | 'ADDED' | 'REMOVED';
     items: AgendaDyspoItem[];
   }>;
   public isModified = false;
   eventsOnSnapshotCancel!: import('@angular/fire/firestore').Unsubscribe;
+  eventInvitationsOnSnapshotCancel!: import('@angular/fire/firestore').Unsubscribe;
   dysposOnSpnashotCancel!: import('@angular/fire/firestore').Unsubscribe;
 
   constructor(private firestore: Firestore) {
     this.agendaEvents$ = this.agendaEventsSubject.asObservable();
+    this.agendaEventInvitations$ =
+      this.agendaEventInvitationsSubject.asObservable();
     this.agendaDyspos$ = this.agendaDysposSubject.asObservable();
   }
 
@@ -48,10 +60,21 @@ export class AgendaService {
     this.uid = uid;
     const that = this;
     this.agendaEvents = [];
+    this.agendaEventInvitations = [];
     this.agendaDyspos = [];
+
     const agendaEventsCollectionRef = collection(
       this.firestore,
-      `agenda_events/${uid}/event_list`
+      `agenda_events/`
+    );
+
+    const queryAgendaEvents = query(
+      agendaEventsCollectionRef,
+      where('members_uid', 'array-contains', uid)
+    );
+    const queryAgendaEventInvitations = query(
+      agendaEventsCollectionRef,
+      where('members_invited_uid', 'array-contains', uid)
     );
 
     const agendaDysposCollectionRef = collection(
@@ -59,56 +82,83 @@ export class AgendaService {
       `agenda_dyspos/${uid}/dyspo_list`
     );
 
-    this.eventsOnSnapshotCancel = onSnapshot(
-      agendaEventsCollectionRef,
-      (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-          if (change.type === 'modified') {
-            const agendaEventModified = change.doc.data() as AgendaEvent;
+    this.eventsOnSnapshotCancel = onSnapshot(queryAgendaEvents, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === 'modified') {
+          const agendaEventModified = change.doc.data() as AgendaEvent;
 
-            const foundIndex = this.agendaEvents.findIndex(
-              (elt) => elt.uid === agendaEventModified.uid
-            );
-            if (foundIndex >= 0) {
-              this.agendaEvents[foundIndex] = agendaEventModified;
-              this.agendaEventsSubject.next(this.agendaEvents);
-            }
-          }
-          if (change.type === 'added') {
-            const agendaEventAdded = change.doc.data() as AgendaEvent;
-            agendaEventAdded.uid = change.doc.id;
-            const foundIndex = this.agendaEvents.findIndex(
-              (elt) => elt.uid === agendaEventAdded.uid
-            );
-            if (foundIndex >= 0) {
-              //Do nothing
-            } else {
-              const agendaEvent = change.doc.data() as AgendaEvent;
-              agendaEvent.uid = change.doc.id;
-
-              this.agendaEvents.push(agendaEvent);
-              this.agendaEventsSubject.next(this.agendaEvents);
-              // this.getAgendaEventAndPush(agendaEvent)
-              //   .then((resPromise: any) => {
-              //     console.log('agendaEvent Hydrated ', resPromise);
-              //     that.agendaEventsSubject.next(that.agendaEvents);
-              //   })
-              //   .catch((err: any) => {
-              //     console.log(err);
-              //   });
-            }
-          }
-          if (change.type === 'removed') {
-            const agendaEventRemoved = change.doc.data() as AgendaEvent;
-            agendaEventRemoved.uid = change.doc.id;
-            const foundIndex = this.agendaEvents.findIndex(
-              (elt) => elt.uid === agendaEventRemoved.uid
-            );
-            if (foundIndex >= 0) {
-              this.agendaEvents.splice(foundIndex, 1);
-            }
+          const foundIndex = this.agendaEvents.findIndex(
+            (elt) => elt.uid === agendaEventModified.uid
+          );
+          if (foundIndex >= 0) {
+            this.agendaEvents[foundIndex] = agendaEventModified;
             this.agendaEventsSubject.next(this.agendaEvents);
           }
+        }
+        if (change.type === 'added') {
+          const agendaEventAdded = change.doc.data() as AgendaEvent;
+          agendaEventAdded.uid = change.doc.id;
+          const foundIndex = this.agendaEvents.findIndex(
+            (elt) => elt.uid === agendaEventAdded.uid
+          );
+          if (foundIndex >= 0) {
+            //Do nothing
+          } else {
+            const agendaEvent = change.doc.data() as AgendaEvent;
+            agendaEvent.uid = change.doc.id;
+
+            this.agendaEvents.push(agendaEvent);
+            this.agendaEventsSubject.next(this.agendaEvents);
+            // this.getAgendaEventAndPush(agendaEvent)
+            //   .then((resPromise: any) => {
+            //     console.log('agendaEvent Hydrated ', resPromise);
+            //     that.agendaEventsSubject.next(that.agendaEvents);
+            //   })
+            //   .catch((err: any) => {
+            //     console.log(err);
+            //   });
+          }
+        }
+        if (change.type === 'removed') {
+          const agendaEventRemoved = change.doc.data() as AgendaEvent;
+          agendaEventRemoved.uid = change.doc.id;
+          const foundIndex = this.agendaEvents.findIndex(
+            (elt) => elt.uid === agendaEventRemoved.uid
+          );
+          if (foundIndex >= 0) {
+            this.agendaEvents.splice(foundIndex, 1);
+          }
+          this.agendaEventsSubject.next(this.agendaEvents);
+        }
+      });
+    });
+
+    // Invitation evenement
+    this.eventInvitationsOnSnapshotCancel = onSnapshot(
+      queryAgendaEventInvitations,
+      (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          const invitFetched = change.doc.data() as AgendaEvent;
+          let foundItem = this.agendaEventInvitations.find((elt) => {
+            return elt.uid === invitFetched.uid;
+          });
+          if (change.type === 'modified' && foundItem) {
+            foundItem = invitFetched;
+          }
+          if (change.type === 'added' && !foundItem) {
+            this.agendaEventInvitations.push(invitFetched);
+          }
+          if (change.type === 'removed') {
+            const invitRemoved = change.doc.data() as AgendaEvent;
+            invitRemoved.uid = change.doc.id;
+            const foundIndex = this.agendaEventInvitations.findIndex(
+              (elt) => elt.uid === invitRemoved.uid
+            );
+            if (foundIndex >= 0) {
+              this.agendaEventInvitations.splice(foundIndex, 1);
+            }
+          }
+          this.agendaEventInvitationsSubject.next(this.agendaEventInvitations);
         });
       }
     );
@@ -156,11 +206,7 @@ export class AgendaService {
 
   async saveOrUpdateEvent(agendaEvent: AgendaEvent) {
     setDoc(
-      doc(
-        this.firestore,
-        `agenda_events/${this.uid}/event_list/`,
-        agendaEvent.uid!
-      ),
+      doc(this.firestore, `agenda_events/`, agendaEvent.uid!),
       agendaEvent
     );
 
@@ -221,11 +267,52 @@ export class AgendaService {
     setDoc(ref, agendaDyspoClone);
   }
 
+  async getDyspos(
+    uids: string[],
+    agendaEvent: AgendaEvent
+  ): Promise<FriendDyspo[]> {
+    const dateToCheck = new Date(agendaEvent.startISO);
+    const agenda_dyspo_uid =
+      getYear(dateToCheck) +
+      '_' +
+      getMonth(dateToCheck) +
+      '_' +
+      getDate(dateToCheck);
+    const dyspos: FriendDyspo[] = [];
+    for (let uid of uids) {
+      const docRef = doc(
+        this.firestore,
+        `agenda_dyspos/${uid}/dyspo_list`,
+        agenda_dyspo_uid
+      );
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        console.log('Document data:', docSnap.data());
+        const agendaDyspo = docSnap.data() as AgendaDyspoItem;
+        dyspos.push({
+          friend_dyspo: agendaDyspo.userDyspo,
+          friend_uid: uid,
+          dyspo_date_ISO: agendaEvent.startISO,
+        });
+      } else {
+        dyspos.push({
+          friend_dyspo: UserDyspoStatus.UNDEFINED,
+          friend_uid: uid,
+          dyspo_date_ISO: agendaEvent.startISO,
+        });
+        console.log('No such document!');
+      }
+    }
+    return dyspos;
+  }
+
   unsubscribeAllAfterLogoutEvent() {
     if (this.dysposOnSpnashotCancel) this.dysposOnSpnashotCancel();
     if (this.eventsOnSnapshotCancel) this.eventsOnSnapshotCancel();
     this.agendaEvents = [];
     this.agendaDyspos = [];
+    this.agendaEventInvitations = [];
+    this.agendaEventInvitationsSubject.next(this.agendaEventInvitations);
     this.agendaEventsSubject.next(this.agendaEvents);
     this.agendaDysposSubject.next({
       action: 'REMOVED',

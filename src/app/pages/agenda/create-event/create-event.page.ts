@@ -87,6 +87,7 @@ export class CreateEventPage implements OnInit {
           this.agendaEvent = {
             admin_uid: this.uid,
             members_uid: [this.uid],
+            members_invited_uid: [],
             uid: 'agev_' + new Date().getTime(),
             startISO: formatISO(
               setHours(
@@ -100,7 +101,7 @@ export class CreateEventPage implements OnInit {
                 getHours(add(new Date(), { hours: 2 }))
               )
             ),
-            title: undefined,
+            title: '',
             type: AgendaEventType.FREE,
             status: AgendaEventStatus.ACTIVE,
           };
@@ -163,8 +164,6 @@ export class CreateEventPage implements OnInit {
   removeEvent() {
     this.agendaSvc.removeEvent(this.agendaEvent!);
   }
-
-  updateEvent() {}
 
   onStartTimeChanged(ev: any) {
     console.log(ev);
@@ -284,17 +283,31 @@ export class CreateEventPage implements OnInit {
     return;
   }
 
-  getNbFriendsInvited() {
-    const nbFriends = this.agendaEvent?.members_uid.filter(
-      (member_uid) => member_uid != this.uid
-    ).length;
+  // getNbFriendsInvited() {
+  //   const nbFriends = this.agendaEvent?.members_uid.filter(
+  //     (member_uid) => member_uid != this.uid
+  //   ).length;
 
-    if (nbFriends === 0) {
+  //   if (nbFriends === 0) {
+  //     return '';
+  //   } else if (nbFriends === 1) {
+  //     return '1 ami invité';
+  //   } else {
+  //     return nbFriends + ' amis invités';
+  //   }
+  // }
+
+  getNbMembers() {
+    const nbMembers =
+      this.agendaEvent!.members_uid.length +
+      this.agendaEvent!.members_invited_uid.length;
+
+    if (nbMembers === 0) {
       return '';
-    } else if (nbFriends === 1) {
-      return '1 ami invité';
+    } else if (nbMembers === 1) {
+      return '1 participant';
     } else {
-      return nbFriends + ' amis invités';
+      return nbMembers + ' participants';
     }
   }
 }

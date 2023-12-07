@@ -55,7 +55,14 @@
         *ngFor="let checkedFriend of checkedFriends"
         class="animated slideInRight delay_11"
       >
-        <ion-thumbnail slot="start">
+        <ion-thumbnail
+          slot="start"
+          [ngClass]="{
+            kid: checkedFriend.dyspo === UserDyspoStatus.DYSPOWITHKIDS,
+            nokids: checkedFriend.dyspo === UserDyspoStatus.DYSPO,
+            nodyspo: checkedFriend.dyspo === UserDyspoStatus.NODYSPO
+          }"
+        >
           <img src="{{ checkedFriend.friend.userData?.avatarPath }}" />
         </ion-thumbnail>
 
@@ -64,6 +71,7 @@
           {{ checkedFriend.friend.userData?.firstname }}
         </div>
         <ion-checkbox
+          [disabled]="checkedFriend.disable"
           [(ngModel)]="checkedFriend.isChecked"
           (ionChange)="onCheckedFriendChange($event)"
           slot="end"

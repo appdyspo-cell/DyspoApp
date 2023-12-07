@@ -1,0 +1,17 @@
+ion-thumbnail {
+  height: 70px;
+  width: 70px;
+  --border-radius: 50%;
+  margin-right: 10px;
+  padding: 5px;
+}
+
+.kid {
+  border: 3px solid var(--text-dyspo-with-kids);
+}
+.nokids {
+  border: 3px solid var(--text-dyspo);
+}
+.nodyspo {
+  border: 3px solid var(--text-no-dyspo);
+}

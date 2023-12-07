@@ -80,7 +80,14 @@ export interface AgendaEvent {
   place_description?: string;
   avatar?: string;
   members_uid: string[];
+  members_invited_uid: string[];
   admin_uid: string;
+}
+
+export interface FriendDyspo {
+  friend_uid: string;
+  friend_dyspo: UserDyspoStatus;
+  dyspo_date_ISO: string;
 }
 
 export interface CrudFBAction {

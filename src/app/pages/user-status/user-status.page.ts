@@ -4,6 +4,7 @@ import { UserStatusComponent } from 'src/app/components/user-status/user-status.
 import {
   AgendaDyspoItem,
   AgendaEvent,
+  AgendaEventType,
   AppUser,
   Notif,
   UserDyspoStatus,
@@ -37,10 +38,13 @@ export class UserStatusPage implements OnInit {
   dyspoStatus = UserDyspoStatus;
   nextAgendaEvents: AgendaEvent[] = [];
   notifications: Notif[] = [];
+  invitations: AgendaEvent[] = [];
   agendaEventsSubscription: Subscription;
   agendaDysposSubscription: Subscription;
+  invitationsSubscription: Subscription;
   todayFormatted = format(new Date(), 'iii dd MMM yyyy', { locale: fr });
   todayDyspo!: AgendaDyspoItem;
+  agendaEventType = AgendaEventType;
 
   constructor(
     private userSvc: UserService,
@@ -60,6 +64,12 @@ export class UserStatusPage implements OnInit {
         //this.tagCalendarUserDyspoData();
       }
     );
+
+    this.invitationsSubscription =
+      this.agendaSvc.agendaEventInvitations$.subscribe((invitations) => {
+        this.invitations = invitations;
+      });
+
     this.agendaDysposSubscription = this.agendaSvc.agendaDyspos$.subscribe(
       (agendaDyspos) => {
         console.log('Agenda dyspos', agendaDyspos);
@@ -167,5 +177,9 @@ export class UserStatusPage implements OnInit {
       //     });
       // }
     }
+  }
+
+  openAgendaEventInfo() {
+    throw new Error('Method not implemented.');
   }
 }
