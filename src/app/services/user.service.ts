@@ -7,6 +7,7 @@ import {
   collectionSnapshots,
   doc,
   docData,
+  getDoc,
   getDocs,
   query,
   setDoc,
@@ -139,5 +140,33 @@ export class UserService {
       });
       resolve(users);
     });
+  }
+
+  public async getUserInfos(uids: string[]): Promise<AppUser[]> {
+    const appUsers: AppUser[] = [];
+    for (let uid of uids) {
+      const docRef = doc(this.firestore, `users`, uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const result = docSnap.data() as AppUser;
+        appUsers.push(result);
+      }
+    }
+    return appUsers;
+  }
+
+  public async getUserInfosExceptMe(uids: string[]): Promise<AppUser[]> {
+    const appUsers: AppUser[] = [];
+    for (let uid of uids) {
+      if (uid !== this.userInfo?.uid) {
+        const docRef = doc(this.firestore, `users`, uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const result = docSnap.data() as AppUser;
+          appUsers.push(result);
+        }
+      }
+    }
+    return appUsers;
   }
 }

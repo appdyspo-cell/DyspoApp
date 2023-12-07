@@ -1,37 +1,119 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-buttons slot="start">
-      <ion-button (click)="close()">
-        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-    <ion-buttons slot="end"> </ion-buttons>
-    <ion-title>Evenement</ion-title>
-    <!-- <ion-buttons slot="end">
-      <ion-button fill="outline" shape="round" (click)="save()">
-        Enregistrer
-      </ion-button>
-    </ion-buttons> -->
+<ion-content
+  [fullscreen]="true"
+  [ngClass]="{
+    'bg-kids': agendaEvent.type === agendaEventType.KIDS,
+    'bg-nokids': agendaEvent.type === agendaEventType.NOKIDS,
+    'bg-free': agendaEvent.type === agendaEventType.FREE,
+  }"
+>
+  <ion-toolbar>
+    <ion-button slot="start" (click)="close()" fill="clear">
+      <ion-icon
+        slot="icon-only"
+        name="close-circle-outline"
+        size="large"
+      ></ion-icon>
+    </ion-button>
+    <ion-button *ngIf="!isInvitation" slot="end" (click)="menu()" fill="clear">
+      <ion-icon
+        slot="icon-only"
+        name="ellipsis-vertical-outline"
+        size="large"
+      ></ion-icon>
+    </ion-button>
   </ion-toolbar>
-</ion-header>
-<ion-content>
-  <div class="category_div">
-    <div class="menu">
-      <div class="item" (click)="onProfile()">
-        <ion-thumbnail>
-          <img src="assets/images/p5.jpg" />
-          <ion-icon name="add" color="light"></ion-icon>
+
+  <div
+    [ngClass]="{
+      'bg-kids-secondary': agendaEvent.type === agendaEventType.KIDS,
+      'bg-nokids-secondary': agendaEvent.type === agendaEventType.NOKIDS,
+      'bg-free-secondary': agendaEvent.type === agendaEventType.FREE,
+      'header-container': true,
+      
+    }"
+  >
+    <div class="header-inner ion-padding">
+      <div class="admin-ct d-flex">
+        <ion-thumbnail slot="start">
+          <img src="{{ admin.avatarPath }}" />
+          <!-- <ion-icon name="add" color="light"></ion-icon> -->
         </ion-thumbnail>
-        <ion-label>You</ion-label>
+        <div>
+          <span style="font-weight: bold; font-size: 1.15rem">{{
+            admin.firstname
+          }}</span
+          ><br />
+          propose un évenement
+        </div>
+      </div>
+      <div
+        class="d-flex ion-padding ion-align-items-center ion-justify-content-center"
+      >
+        <div>
+          <div>
+            Le {{ agendaEvent.start_date_formatted }} à
+            {{ agendaEvent.start_time_formatted }}
+          </div>
+          <div class="ion-text-center">
+            Avec
+            <span style="font-size: 1.3rem; font-weight: bold">{{
+              members.length + 1
+            }}</span>
+            participants
+          </div>
+        </div>
       </div>
     </div>
-    <div class="menu">
-      <div class="item" *ngFor="let item of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]">
-        <ion-thumbnail>
-          <img src="assets/images/p2.jpg" />
-        </ion-thumbnail>
-        <ion-label>Dodiya Talli</ion-label>
+    <div class="category_div">
+      <div class="menu">
+        <div class="item" (click)="onProfile()">
+          <ion-thumbnail>
+            <img src="{{ userSvc.userInfo?.avatarPath }}" />
+            <!-- <ion-icon name="add" color="light"></ion-icon> -->
+          </ion-thumbnail>
+          <ion-label>Vous</ion-label>
+        </div>
+      </div>
+      <div class="menu">
+        <div class="item" *ngFor="let member of members">
+          <ion-thumbnail>
+            <img src="{{ member.avatarPath }}" />
+          </ion-thumbnail>
+          <ion-label>{{ member.firstname }}</ion-label>
+        </div>
       </div>
     </div>
+  </div>
+
+  <div
+    class="body-inner d-flex ion-margin-top ion-margin-bottom ion-justify-content-center"
+  >
+    <div class="ion-margin-top ion-text-center">
+      <div class="d-flex ion-justify-content-center">
+        <div
+          class="bg-avatar d-flex ion-justify-content-center ion-margin-bottom"
+        >
+          <ion-img src="{{ agendaEvent.avatar }}"></ion-img>
+        </div>
+      </div>
+
+      <span style="font-size: 1.3rem; font-weight: bold">{{
+        agendaEvent.title
+      }}</span
+      ><br />
+      {{ agendaEvent.place_description }}
+    </div>
+  </div>
+  <div
+    *ngIf="isInvitation"
+    class="d-flex ion-justify-content-center ion-margin-top"
+    style="color: #eee"
+  >
+    <ion-button (click)="acceptInvitation()" class="form-btn" fill="clear"
+      >Dyspo! <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon
+    ></ion-button>
+    <ion-button (click)="declineInvitation()" class="form-btn" fill="clear"
+      >No Dyspo <ion-icon slot="start" name="close-circle-outline"></ion-icon
+    ></ion-button>
   </div>
 </ion-content>

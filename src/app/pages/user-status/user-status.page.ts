@@ -6,6 +6,8 @@ import {
   AgendaEvent,
   AgendaEventType,
   AppUser,
+  Friend,
+  FriendStatus,
   Notif,
   UserDyspoStatus,
 } from 'src/app/models/models';
@@ -13,7 +15,7 @@ import { UserService } from 'src/app/services/user.service';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { UtilsService } from 'src/app/services/utils.service';
 import { AgendaService } from 'src/app/services/agenda.service';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import {
   format,
   getDate,
@@ -27,6 +29,7 @@ import {
 } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { AgendaEventInfoComponent } from 'src/app/components/agenda-event-info/agenda-event-info.component';
+import { FriendsService } from 'src/app/services/friends.service';
 
 @Component({
   selector: 'app-user-status',
@@ -40,9 +43,12 @@ export class UserStatusPage implements OnInit {
   nextAgendaEvents: AgendaEvent[] = [];
   notifications: Notif[] = [];
   invitations: AgendaEvent[] = [];
+  friendsSuggested: Friend[] = [];
+  friends$: Observable<Friend[]>;
   agendaEventsSubscription: Subscription;
   agendaDysposSubscription: Subscription;
   invitationsSubscription: Subscription;
+  friendsSubscrition: Subscription;
   todayFormatted = format(new Date(), 'iii dd MMM yyyy', { locale: fr });
   todayDyspo!: AgendaDyspoItem;
   agendaEventType = AgendaEventType;
@@ -51,8 +57,10 @@ export class UserStatusPage implements OnInit {
     private userSvc: UserService,
     private modalCtrl: ModalController,
     private utils: UtilsService,
-    private agendaSvc: AgendaService
+    private agendaSvc: AgendaService,
+    private friendService: FriendsService
   ) {
+    this.friends$ = this.friendService.friends$;
     this.agendaEventsSubscription = this.agendaSvc.agendaEvents$.subscribe(
       (agendaEvents) => {
         console.log(agendaEvents);
@@ -65,6 +73,12 @@ export class UserStatusPage implements OnInit {
         //this.tagCalendarUserDyspoData();
       }
     );
+
+    this.friendsSubscrition = this.friends$.subscribe((friends) => {
+      this.friendsSuggested = friends.filter(
+        (elt) => elt.friend_status === FriendStatus.SUGGESTED
+      );
+    });
 
     this.invitationsSubscription =
       this.agendaSvc.agendaEventInvitations$.subscribe((invitations) => {
@@ -91,13 +105,13 @@ export class UserStatusPage implements OnInit {
         if (result?.length > 0) {
           this.todayDyspo = result[0];
         } else {
-          // this.todayDyspo = {
-          //   time: today,
-          //   userDyspo: UserDyspoStatus.DYSPO,
-          //   month: getMonth(today),
-          //   year: getYear(today),
-          //   day: getDate(today),
-          // };
+          this.todayDyspo = {
+            time: today,
+            userDyspo: UserDyspoStatus.UNDEFINED,
+            month: getMonth(today),
+            year: getYear(today),
+            day: getDate(today),
+          };
         }
       }
     );
@@ -185,6 +199,25 @@ export class UserStatusPage implements OnInit {
       component: AgendaEventInfoComponent,
       componentProps: {
         agendaEvent,
+        isInvitation: false,
+      },
+    });
+    modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+
+    console.log(data);
+    if (role === 'confirm') {
+      //this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!);
+    }
+  }
+
+  async openInvitation(agendaEvent: AgendaEvent) {
+    const modal = await this.modalCtrl.create({
+      component: AgendaEventInfoComponent,
+      componentProps: {
+        agendaEvent,
+        isInvitation: true,
       },
     });
     modal.present();

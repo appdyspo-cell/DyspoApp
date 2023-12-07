@@ -20,9 +20,9 @@
     class="ion-padding dyspo-btn-container"
     style="background-color: transparent"
   >
-    <div class="change-status-icon">
+    <!-- <div class="change-status-icon">
       <ion-icon name="create-outline" size="large"></ion-icon>
-    </div>
+    </div> -->
 
     <!-- <ion-avatar slot="start">
       <ion-img [src]="avatar"></ion-img>
@@ -51,7 +51,10 @@
       <ion-ripple-effect></ion-ripple-effect>
     </div>
 
-    <div *ngIf="!todayDyspo" class="dyspo-button no-dyspo ion-activatable">
+    <div
+      *ngIf="todayDyspo.userDyspo === dyspoStatus.UNDEFINED "
+      class="dyspo-button no-dyspo ion-activatable"
+    >
       Dyspo ?
       <ion-ripple-effect></ion-ripple-effect>
     </div>
@@ -92,7 +95,7 @@
           <app-agenda-event-mini
             *ngFor="let invit of invitations"
             [agendaEvent]="invit"
-            (click)="openAgendaEventInfo(invit)"
+            (click)="openInvitation(invit)"
           >
           </app-agenda-event-mini>
         </div>
@@ -100,6 +103,24 @@
     </ion-card-content>
   </div>
 
+  <div *ngIf="friendsSuggested.length >= 0">
+    <ion-list-header>
+      <span
+        class="wpf-raquette"
+        style="margin-right: 8px; font-size: 22px"
+      ></span>
+      Demande d'Amis
+    </ion-list-header>
+
+    <ion-card-content>
+      Vous avez
+      <span style="font-size: 1.3rem; font-weight: bold"
+        >{{friendsSuggested.length}}</span
+      >
+      demandes d'ami en attente
+    </ion-card-content>
+  </div>
+  <!-- 
   <div *ngIf="notifications.length > 0">
     <ion-list-header>
       <span
@@ -119,7 +140,7 @@
         </div>
       </div>
     </ion-card-content>
-  </div>
+  </div> -->
 
   <ion-modal
     #statusmodal

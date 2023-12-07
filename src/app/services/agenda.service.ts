@@ -3,6 +3,7 @@ import {
   AgendaDyspoItem,
   AgendaEvent,
   AgendaEventStatus,
+  AppUser,
   CrudFBAction,
   FriendDyspo,
   UserDyspoStatus,
@@ -265,6 +266,31 @@ export class AgendaService {
       agendaDyspo.year + '_' + agendaDyspo.month + '_' + agendaDyspo.day
     );
     setDoc(ref, agendaDyspoClone);
+  }
+
+  public acceptEventInvitation(invitation: AgendaEvent) {
+    const foundIndex = invitation.members_invited_uid.findIndex(
+      (uid) => uid === this.uid
+    );
+    if (foundIndex >= 0) {
+      invitation.members_invited_uid.splice(foundIndex, 1);
+      invitation.members_uid.push(this.uid);
+      this.saveOrUpdateEvent(invitation);
+    } else {
+      console.error('Can not find invitation uid in members invited');
+    }
+  }
+
+  public declineEventInvitation(invitation: AgendaEvent) {
+    const foundIndex = invitation.members_invited_uid.findIndex(
+      (uid) => uid === this.uid
+    );
+    if (foundIndex >= 0) {
+      invitation.members_invited_uid.splice(foundIndex, 1);
+      this.saveOrUpdateEvent(invitation);
+    } else {
+      console.error('Can not find invitation uid in members invited');
+    }
   }
 
   async getDyspos(
