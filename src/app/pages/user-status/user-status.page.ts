@@ -26,6 +26,7 @@ import {
   parseISO,
 } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { AgendaEventInfoComponent } from 'src/app/components/agenda-event-info/agenda-event-info.component';
 
 @Component({
   selector: 'app-user-status',
@@ -179,7 +180,20 @@ export class UserStatusPage implements OnInit {
     }
   }
 
-  openAgendaEventInfo() {
-    throw new Error('Method not implemented.');
+  async openAgendaEventInfo(agendaEvent: AgendaEvent) {
+    const modal = await this.modalCtrl.create({
+      component: AgendaEventInfoComponent,
+      componentProps: {
+        agendaEvent,
+      },
+    });
+    modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+
+    console.log(data);
+    if (role === 'confirm') {
+      //this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!);
+    }
   }
 }

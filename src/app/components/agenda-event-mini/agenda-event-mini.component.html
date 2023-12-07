@@ -1,6 +1,6 @@
 <div class="agenda-event-container">
   <ion-row style="border-bottom: 1px solid">
-    <ion-col size="3">
+    <ion-col size="2">
       <ion-avatar class="event-type-avatar">
         <ion-img
           *ngIf="agendaEvent.type === agendaEventType.KIDS"
@@ -16,17 +16,22 @@
         ></ion-img>
       </ion-avatar>
     </ion-col>
-    <ion-col class="ion-align-items-center ion-text-center title-notif">{{
-      agendaEvent.title
-    }}</ion-col></ion-row
+    <ion-col size="10" style="margin-left: 0px !important">
+      <div
+        style="white-space: no-wrap; text-overflow: ellipsis; overflow: hidden"
+        class="ion-align-items-center title-notif"
+      >
+        {{ agendaEvent.title }}
+      </div></ion-col
+    ></ion-row
   >
   <ion-row>
-    <ion-col size="3" *ngIf="agendaEvent.avatar">
+    <ion-col size="4" *ngIf="agendaEvent.avatar">
       <ion-thumbnail style="border-radius: 5px; overflow: hidden">
         <img src="{{ agendaEvent.avatar }}" />
       </ion-thumbnail>
     </ion-col>
-    <ion-col class="ion-align-items-center ion-text-center">
+    <ion-col size="8" class="ion-align-items-center ion-text-center">
       {{ agendaEvent.start_date_formatted }}<br />
       <ion-text style="font-size: 0.85rem"
         >{{ agendaEvent.start_time_formatted }} -

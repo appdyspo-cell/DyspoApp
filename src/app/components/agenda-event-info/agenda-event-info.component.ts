@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import { AgendaEvent, AgendaEventType } from 'src/app/models/models';
 
 @Component({
@@ -10,9 +11,15 @@ export class AgendaEventInfoComponent implements OnInit {
   @Output() outevt = new EventEmitter<string>();
   @Input() agendaEvent!: AgendaEvent;
   agendaEventType = AgendaEventType;
-  constructor() {}
+  constructor(private modalCtrl: ModalController) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log(this.agendaEvent);
+  }
 
   onProfile() {}
+
+  close() {
+    this.modalCtrl.dismiss({});
+  }
 }

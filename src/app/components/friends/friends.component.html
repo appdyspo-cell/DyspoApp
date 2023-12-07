@@ -1,12 +1,16 @@
 <ion-header>
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-button (click)="close()">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
     </ion-buttons>
     <ion-buttons slot="end"> </ion-buttons>
     <ion-title>Amis</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="save()"> Enregistrer </ion-button>
+      <ion-button fill="outline" shape="round" (click)="save()">
+        Enregistrer
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>

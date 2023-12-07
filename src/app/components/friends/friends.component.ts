@@ -168,4 +168,8 @@ export class FriendsComponent implements OnInit {
       'confirm'
     );
   }
+
+  close() {
+    this.modalCtrl.dismiss({}, 'cancel');
+  }
 }
