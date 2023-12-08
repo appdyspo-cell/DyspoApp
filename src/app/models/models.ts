@@ -82,6 +82,7 @@ export interface AgendaEvent {
   members_uid: string[];
   members_invited_uid: string[];
   admin_uid: string;
+  all_can_edit: boolean;
 }
 
 export interface FriendDyspo {

@@ -1,8 +1,23 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  NgZone,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
+import { NavigationExtras } from '@angular/router';
+import {
+  AlertController,
+  ModalController,
+  NavController,
+} from '@ionic/angular';
 import { AgendaEvent, AgendaEventType, AppUser } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
 import { UserService } from 'src/app/services/user.service';
+import { UtilsService } from 'src/app/services/utils.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-agenda-event-info',
@@ -13,33 +28,141 @@ export class AgendaEventInfoComponent implements OnInit {
   @Output() outevt = new EventEmitter<string>();
   @Input() agendaEvent!: AgendaEvent;
   @Input() isInvitation!: boolean;
+  @ViewChild('popovermenu') popoverMenu: any;
 
   agendaEventType = AgendaEventType;
-  members: AppUser[] = [];
+  members_presence_confirmed: AppUser[] = [];
+  members_presence_not_confirmed: AppUser[] = [];
+  new_admin_candidates: AppUser[] = [];
   admin!: AppUser;
+  modalNewAdminOpened = false;
+  isPopoverOpen = false;
+  allowEdit = false;
+  isSoloEvent!: boolean;
 
   constructor(
     private modalCtrl: ModalController,
     private agendaSvc: AgendaService,
-    public userSvc: UserService
+    public userSvc: UserService,
+    private alertCtrl: AlertController,
+    private utils: UtilsService,
+    private navCtrl: NavController,
+
+    private ngZone: NgZone
   ) {}
 
   async ngOnInit() {
     console.log(this.agendaEvent);
+
+    this.allowEdit =
+      this.agendaEvent.admin_uid === this.userSvc.userInfo?.uid ||
+      this.agendaEvent.all_can_edit;
+
+    this.isSoloEvent =
+      this.agendaEvent.admin_uid === this.userSvc.userInfo?.uid &&
+      this.agendaEvent.members_invited_uid.length === 0 &&
+      this.agendaEvent.members_uid.length === 1;
     // Get members info
 
-    this.members = await this.userSvc.getUserInfosExceptMe(
-      this.agendaEvent!.members_uid.concat(
-        this.agendaEvent!.members_invited_uid
-      )
+    this.members_presence_not_confirmed = await this.userSvc.getUserInfos(
+      this.agendaEvent!.members_invited_uid
     );
 
-    this.admin = this.members.filter(
-      (member) => member.uid === this.agendaEvent.admin_uid
-    )[0];
+    this.members_presence_confirmed = await this.userSvc.getUserInfos(
+      this.agendaEvent!.members_uid
+    );
+
+    if (this.agendaEvent.admin_uid === this.userSvc.userInfo?.uid) {
+      this.admin = this.userSvc.userInfo;
+      this.new_admin_candidates = this.members_presence_confirmed.filter(
+        (m) => {
+          return m.uid !== this.userSvc.userInfo?.uid;
+        }
+      );
+    } else {
+      this.admin = this.members_presence_confirmed.filter(
+        (member) => member.uid === this.agendaEvent.admin_uid
+      )[0];
+    }
   }
 
-  onProfile() {}
+  openPopoverMenu(e: Event) {
+    this.popoverMenu.event = e;
+    this.isPopoverOpen = true;
+  }
+
+  // async confirmQuitEvent(newAdminUid?: string) {
+  //   Swal.fire({
+  //     title: 'Voulez-vous quitter cet evenement ?',
+  //     showDenyButton: true,
+  //     customClass: { confirmButton: 'btn btn-success' },
+  //     heightAuto: false,
+  //     confirmButtonText: 'Oui',
+  //     denyButtonText: `Non`,
+  //   }).then(async (result) => {
+  //     /* Read more about isConfirmed, isDenied below */
+  //     if (result.isConfirmed) {
+  //       this.agendaSvc
+  //         .quitEvent(this.agendaEvent, newAdminUid)
+  //         .then((res) => {
+  //           this.close();
+  //         })
+  //         .catch((err) => {
+  //           this.utils.showToastError(err);
+  //           this.close();
+  //         });
+  //     } else if (result.isDenied) {
+  //     }
+  //   });
+  // }
+
+  async editEvent() {
+    this.isPopoverOpen = false;
+    await this.close();
+    const navigationExtras: NavigationExtras = {
+      state: {
+        agendaEvent: this.agendaEvent,
+      },
+    };
+    this.navCtrl.navigateForward('/agenda/create-event/edit', navigationExtras);
+  }
+
+  async quitEvent() {
+    this.isPopoverOpen = false;
+    // I am the admin
+    if (this.agendaEvent.admin_uid === this.userSvc.userInfo?.uid) {
+      if (this.new_admin_candidates.length > 0) {
+        this.modalNewAdminOpened = true;
+        return;
+      }
+      // No candidates => Delete event
+      else {
+        this.agendaSvc
+          .quitEvent(this.agendaEvent)
+          .then((res) => {
+            this.close();
+          })
+          .catch((err) => {
+            this.utils.showToastError(err);
+            this.close();
+          });
+      }
+    } else {
+      this.agendaSvc
+        .quitEvent(this.agendaEvent)
+        .then((res) => {
+          this.close();
+        })
+        .catch((err) => {
+          this.utils.showToastError(err);
+          this.close();
+        });
+    }
+  }
+
+  onProfile() {
+    //open calendar
+  }
 
   acceptInvitation() {
     this.agendaSvc.acceptEventInvitation(this.agendaEvent);
@@ -52,8 +175,29 @@ export class AgendaEventInfoComponent implements OnInit {
   }
 
   close() {
-    this.modalCtrl.dismiss({});
+    return this.modalCtrl.dismiss({});
   }
 
-  menu() {}
+  confirmNewAdmin(newAdmin: AppUser) {
+    this.modalNewAdminOpened = false;
+
+    this.utils.showLoader();
+    this.agendaSvc
+      .quitEvent(this.agendaEvent, newAdmin.uid)
+      .then((res) => {
+        setTimeout(() => {
+          this.utils.hideLoader();
+          this.close();
+        }, 1000);
+
+        console.log('New admin has been set-> Close');
+      })
+      .catch((err) => {
+        setTimeout(() => {
+          this.utils.hideLoader();
+          this.utils.showToastError(err);
+          this.close();
+        }, 1000);
+      });
+  }
 }

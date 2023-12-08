@@ -11,6 +11,7 @@ import {
 import {
   Firestore,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -22,6 +23,8 @@ import {
 } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { getDate, getMonth, getYear } from 'date-fns';
+import { UtilsService } from './utils.service';
+import { cloneDeep } from 'lodash';
 
 @Injectable({
   providedIn: 'root',
@@ -49,7 +52,7 @@ export class AgendaService {
   eventInvitationsOnSnapshotCancel!: import('@angular/fire/firestore').Unsubscribe;
   dysposOnSpnashotCancel!: import('@angular/fire/firestore').Unsubscribe;
 
-  constructor(private firestore: Firestore) {
+  constructor(private firestore: Firestore, private utils: UtilsService) {
     this.agendaEvents$ = this.agendaEventsSubject.asObservable();
     this.agendaEventInvitations$ =
       this.agendaEventInvitationsSubject.asObservable();
@@ -216,14 +219,7 @@ export class AgendaService {
   }
 
   async removeEvent(agendaEvent: AgendaEvent) {
-    setDoc(
-      doc(
-        this.firestore,
-        `agenda_events/${this.uid}/event_list`,
-        agendaEvent.uid!
-      ),
-      agendaEvent
-    );
+    deleteDoc(doc(this.firestore, `agenda_events/`, agendaEvent.uid!));
   }
 
   public getAgendaEvents() {
@@ -291,6 +287,62 @@ export class AgendaService {
     } else {
       console.error('Can not find invitation uid in members invited');
     }
+  }
+
+  public async quitEvent(agendaEvent: AgendaEvent, newAdminUid?: string) {
+    return new Promise(async (resolve, reject) => {
+      // Evt solo
+      const isSoloEvent =
+        agendaEvent.admin_uid === this.uid &&
+        agendaEvent.members_uid.length === 1 &&
+        agendaEvent.members_uid[0] === this.uid;
+
+      if (isSoloEvent) {
+        console.log('Remove solo event ', agendaEvent);
+        this.removeEvent(agendaEvent);
+        resolve(true);
+      }
+      // Evt multi
+      else {
+        console.log('Quit Event myId => ', this.uid);
+        console.log('Event before I quit ', agendaEvent);
+        const foundIndex = agendaEvent.members_uid.findIndex(
+          (uid) => uid === this.uid
+        );
+        if (foundIndex >= 0) {
+          const updatedAgendaEvent = cloneDeep(agendaEvent);
+          //Remove me from list
+          updatedAgendaEvent.members_uid.splice(foundIndex, 1);
+
+          // Change admin
+          if (newAdminUid) {
+            // Check in BD before setting new Admin (He should had left the event)
+            const docSnap = await getDoc(
+              doc(this.firestore, `agenda_events/`, agendaEvent.uid!)
+            );
+            if (docSnap.exists()) {
+              const eventFetched = docSnap.data() as AgendaEvent;
+              if (eventFetched.members_uid.includes(newAdminUid)) {
+                updatedAgendaEvent.admin_uid = newAdminUid;
+                console.log('Set new admin before quit ', newAdminUid);
+              }
+              // Error, can not update => Future New admin has quit the event !!
+              else {
+                reject('Future new admin has left the event');
+              }
+            } else {
+              reject('Can not find agenda event');
+            }
+          }
+          console.log('Quit event ', updatedAgendaEvent);
+          await this.saveOrUpdateEvent(updatedAgendaEvent);
+          resolve(true);
+        } else {
+          reject('Can not find uid in agenda event members');
+          console.error('Can not find uid in agenda event members');
+        }
+      }
+    });
   }
 
   async getDyspos(

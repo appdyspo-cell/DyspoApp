@@ -14,7 +14,12 @@
         size="large"
       ></ion-icon>
     </ion-button>
-    <ion-button *ngIf="!isInvitation" slot="end" (click)="menu()" fill="clear">
+    <ion-button
+      *ngIf="!isInvitation"
+      slot="end"
+      (click)="openPopoverMenu($event)"
+      fill="clear"
+    >
       <ion-icon
         slot="icon-only"
         name="ellipsis-vertical-outline"
@@ -22,6 +27,42 @@
       ></ion-icon>
     </ion-button>
   </ion-toolbar>
+
+  <ion-popover
+    #popovermenu
+    [isOpen]="isPopoverOpen"
+    (didDismiss)="isPopoverOpen = false"
+  >
+    <ng-template>
+      <ion-content>
+        <ion-list>
+          <ion-item *ngIf="allowEdit" tappable (click)="editEvent()">
+            <ion-icon
+              name="create-outline"
+              style="margin-right: 15px"
+            ></ion-icon>
+            <ion-text>Editer l'évenement</ion-text>
+          </ion-item>
+          <ion-item tappable (click)="quitEvent()" lines="none">
+            <ion-icon
+              name="ban"
+              color="danger"
+              style="margin-right: 15px"
+            ></ion-icon>
+            <ion-text>Supprimer l'évenement</ion-text>
+          </ion-item>
+          <!-- <ion-item (click)="requestReport()" lines="none">
+            <ion-icon
+              name="stop"
+              color="danger"
+              style="margin-right: 15px"
+            ></ion-icon>
+            <ion-text>Signaler l'utilisateur</ion-text>
+          </ion-item> -->
+        </ion-list></ion-content
+      >
+    </ng-template>
+  </ion-popover>
 
   <div
     [ngClass]="{
@@ -35,12 +76,12 @@
     <div class="header-inner ion-padding">
       <div class="admin-ct d-flex">
         <ion-thumbnail slot="start">
-          <img src="{{ admin.avatarPath }}" />
+          <img src="{{ admin?.avatarPath }}" />
           <!-- <ion-icon name="add" color="light"></ion-icon> -->
         </ion-thumbnail>
-        <div>
+        <div *ngIf="!isSoloEvent">
           <span style="font-weight: bold; font-size: 1.15rem">{{
-            admin.firstname
+            admin?.firstname
           }}</span
           ><br />
           propose un évenement
@@ -54,10 +95,11 @@
             Le {{ agendaEvent.start_date_formatted }} à
             {{ agendaEvent.start_time_formatted }}
           </div>
-          <div class="ion-text-center">
+          <div class="ion-text-center" *ngIf="!isSoloEvent">
             Avec
             <span style="font-size: 1.3rem; font-weight: bold">{{
-              members.length + 1
+              members_presence_confirmed.length +
+                members_presence_not_confirmed.length
             }}</span>
             participants
           </div>
@@ -65,21 +107,37 @@
       </div>
     </div>
     <div class="category_div">
-      <div class="menu">
+      <!-- <div class="menu">
         <div class="item" (click)="onProfile()">
           <ion-thumbnail>
             <img src="{{ userSvc.userInfo?.avatarPath }}" />
-            <!-- <ion-icon name="add" color="light"></ion-icon> -->
+             <ion-icon name="add" color="light"></ion-icon>
           </ion-thumbnail>
           <ion-label>Vous</ion-label>
         </div>
-      </div>
+      </div> -->
       <div class="menu">
-        <div class="item" *ngFor="let member of members">
+        <div class="item" *ngFor="let member of members_presence_confirmed">
           <ion-thumbnail>
             <img src="{{ member.avatarPath }}" />
           </ion-thumbnail>
           <ion-label>{{ member.firstname }}</ion-label>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="agendaEvent.members_invited_uid.length > 0">
+      En attente de réponse
+      <div class="category_div">
+        <div class="menu">
+          <div
+            class="item"
+            *ngFor="let member of members_presence_not_confirmed"
+          >
+            <ion-thumbnail>
+              <img src="{{ member.avatarPath }}" />
+            </ion-thumbnail>
+            <ion-label>{{ member.firstname }}</ion-label>
+          </div>
         </div>
       </div>
     </div>
@@ -89,7 +147,7 @@
     class="body-inner d-flex ion-margin-top ion-margin-bottom ion-justify-content-center"
   >
     <div class="ion-margin-top ion-text-center">
-      <div class="d-flex ion-justify-content-center">
+      <div *ngIf="agendaEvent.avatar" class="d-flex ion-justify-content-center">
         <div
           class="bg-avatar d-flex ion-justify-content-center ion-margin-bottom"
         >
@@ -116,4 +174,36 @@
       >No Dyspo <ion-icon slot="start" name="close-circle-outline"></ion-icon
     ></ion-button>
   </div>
+  <ion-modal
+    [isOpen]="modalNewAdminOpened"
+    [initialBreakpoint]="0.4"
+    [breakpoints]="[0, 0.4, 1]"
+    (didDismiss)="modalNewAdminOpened = false"
+  >
+    <ng-template>
+      <ion-content class="ion-padding">
+        <div
+          class="d-flex ion-text-center ion-justify-content-center ion-padding"
+        >
+          <ion-text>Sélectionnez un nouvel admin</ion-text>
+        </div>
+        <ion-list lines="none">
+          <ion-item
+            (click)="confirmNewAdmin(candidate)"
+            *ngFor="let candidate of new_admin_candidates"
+            class="animated slideInRight delay_11"
+          >
+            <ion-thumbnail slot="start">
+              <img src="{{ candidate.avatarPath }}" />
+            </ion-thumbnail>
+
+            <div class="text-box">
+              {{ candidate.lastname }}
+              {{ candidate.firstname }}
+            </div>
+          </ion-item>
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

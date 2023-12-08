@@ -187,6 +187,16 @@
       </ion-item>
     </ion-list>
   </ion-list>
+
+  <ion-list-header>
+    <ion-label>Autorisations</ion-label>
+  </ion-list-header>
+  <div class="ion-padding">
+    <ion-checkbox [(ngModel)]="allCanEdit" labelPlacement="end"
+      >Autoriser l'édition pour tout le monde</ion-checkbox
+    >
+  </div>
+
   <ion-list-header
     ><ion-label>Photo</ion-label>
     <ion-button (click)="takePhotoPrompt()"

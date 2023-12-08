@@ -61,6 +61,7 @@ export class CreateEventPage implements OnInit {
   autocompletePlaceInput!: { input: string };
   mode: any;
   uid = '';
+  allCanEdit: boolean = false;
 
   constructor(
     private navCtrl: NavController,
@@ -104,6 +105,7 @@ export class CreateEventPage implements OnInit {
             title: '',
             type: AgendaEventType.FREE,
             status: AgendaEventStatus.ACTIVE,
+            all_can_edit: false,
           };
 
           // Hydrate agendaEvent
@@ -134,6 +136,8 @@ export class CreateEventPage implements OnInit {
               this.agendaEvent?.place_description;
           }
 
+          this.allCanEdit = this.agendaEvent!.all_can_edit;
+
           break;
       }
     });
@@ -147,6 +151,7 @@ export class CreateEventPage implements OnInit {
     console.log(this.agendaEvent);
     if (this.agendaEvent?.title) {
       console.log('Événement créé :', this.agendaEvent);
+      this.agendaEvent.all_can_edit = this.allCanEdit;
       this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!);
       this.navCtrl.pop();
     } else {
