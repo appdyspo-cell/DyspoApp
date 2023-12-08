@@ -10,6 +10,16 @@ ion-toolbar {
   --background: #363636;
 }
 
+.thumb-kid {
+  border: 3px solid var(--text-dyspo-with-kids);
+}
+.thumb-nokids {
+  border: 3px solid var(--text-dyspo);
+}
+.thumb-nodyspo {
+  border: 3px solid var(--text-no-dyspo);
+}
+
 .bg-kids {
   --background: #8c8c1f;
   color: var(--white);
@@ -111,8 +121,23 @@ ion-toolbar {
         height: 60px;
         width: 60px;
         --background: transparent;
-        border: 2px solid rgb(255, 95, 122);
+        //border: 2px solid rgb(255, 95, 122);
         position: relative;
+
+        ion-badge {
+          position: absolute;
+          top: -5px; /* Ajustez cette valeur pour positionner verticalement */
+          right: -5px; /* Ajustez cette valeur pour positionner horizontalement */
+          font-size: 12px; /* Taille du texte du badge */
+          width: 20px; /* Largeur du badge */
+          height: 20px; /* Hauteur du badge */
+          border-radius: 50%; /* Pour créer un badge circulaire */
+          background-color: red; /* Couleur de fond du badge */
+          color: white; /* Couleur du texte du badge */
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
         ion-icon {
           background: rgb(255, 102, 209);
           border-radius: 20px;

@@ -101,6 +101,21 @@ ion-list {
   line-height: 26px;
 }
 
+.segment-badge {
+  position: absolute;
+  top: 5px; /* Ajustez cette valeur pour positionner verticalement */
+  right: 15px; /* Ajustez cette valeur pour positionner horizontalement */
+  font-size: 12px; /* Taille du texte du badge */
+  width: 20px; /* Largeur du badge */
+  height: 20px; /* Hauteur du badge */
+  border-radius: 50%; /* Pour créer un badge circulaire */
+  background-color: red; /* Couleur de fond du badge */
+  color: white; /* Couleur du texte du badge */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 ion-row {
   ion-col {
     padding: 0;

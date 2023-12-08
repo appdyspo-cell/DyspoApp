@@ -7,9 +7,13 @@ import {
   addHours,
   format,
   formatISO,
+  getDate,
   getHours,
+  getMonth,
+  getYear,
   isAfter,
   isEqual,
+  isSameDay,
   parseISO,
   setHours,
   setMinutes,
@@ -106,6 +110,9 @@ export class CreateEventPage implements OnInit {
             type: AgendaEventType.FREE,
             status: AgendaEventStatus.ACTIVE,
             all_can_edit: false,
+            day: getDate(new Date(this.tsInputDate)),
+            month: getMonth(new Date(this.tsInputDate)),
+            year: getYear(new Date(this.tsInputDate)),
           };
 
           // Hydrate agendaEvent
@@ -122,8 +129,10 @@ export class CreateEventPage implements OnInit {
             this.agendaEvent.endISO
           );
 
-          this.min_time_ISO_start = this.agendaEvent.startISO;
-          this.min_time_ISO_end = this.agendaEvent.startISO;
+          if (isSameDay(this.tsInputDate, new Date())) {
+            this.min_time_ISO_start = this.agendaEvent.startISO;
+            this.min_time_ISO_end = this.agendaEvent.startISO;
+          }
 
           break;
         case 'edit':
@@ -175,6 +184,9 @@ export class CreateEventPage implements OnInit {
     this.agendaEvent!.start_date_formatted = this.formatDate(ev.detail.value);
     this.agendaEvent!.start_time_formatted = this.formatTime(ev.detail.value);
     this.agendaEvent!.startISO = ev.detail.value;
+    this.agendaEvent!.day = getDate(parseISO(this.agendaEvent!.startISO));
+    this.agendaEvent!.month = getMonth(parseISO(this.agendaEvent!.startISO));
+    this.agendaEvent!.year = getYear(parseISO(this.agendaEvent!.startISO));
 
     this.min_time_ISO_end = ev.detail.value;
     if (

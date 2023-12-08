@@ -4,6 +4,7 @@ import { ModalController, NavController } from '@ionic/angular';
 import { cloneDeep } from 'lodash';
 import {
   AgendaEvent,
+  CheckedFriends,
   Friend,
   FriendDyspo,
   FriendGroup,
@@ -14,13 +15,6 @@ import { AgendaService } from 'src/app/services/agenda.service';
 import { FriendsService } from 'src/app/services/friends.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
-
-interface CheckedFriends {
-  friend: Friend;
-  isChecked: boolean;
-  disable: boolean;
-  dyspo?: UserDyspoStatus;
-}
 
 @Component({
   selector: 'app-friends',
@@ -57,49 +51,55 @@ export class FriendsComponent implements OnInit {
     this.friends = cloneDeep(this.friendsSvc.friends);
     this.friendGroups = cloneDeep(this.friendsSvc.friendGroups);
 
-    const friendsToCheck = this.agendaEvent.members_uid.concat(
-      this.agendaEvent.members_invited_uid
-    );
+    await this.fillCheckedFriends();
 
-    this.friends.forEach(async (friend) => {
-      // Dyspos
-      friend_uids.push(friend.friend_uid!);
-
-      const dyspo = (
-        await this.agendaSvc.getDyspos([friend.friend_uid!], this.agendaEvent)
-      )[0];
-      const dyspoStatus = dyspo.friend_dyspo;
-      // Event members ?
-      if (friendsToCheck.includes(friend.friend_uid!)) {
-        this.checkedFriends.push({
-          friend,
-          isChecked: true,
-          disable: true,
-          dyspo: dyspoStatus,
-        });
-      } else {
-        this.checkedFriends.push({
-          friend,
-          isChecked: false,
-          disable: false,
-          dyspo: dyspoStatus,
-        });
-      }
+    console.log('Set group friends');
+    this.friendGroups.forEach(async (group) => {
+      group.checked_friends = this.checkedFriends.filter((checkedFriend) => {
+        return group.members_uid.includes(checkedFriend.friend.friend_uid!);
+      });
     });
+  }
 
-    console.log(this.checkedFriends);
+  fillCheckedFriends() {
+    return new Promise(async (resolve, reject) => {
+      const friendsToCheck = this.agendaEvent.members_uid.concat(
+        this.agendaEvent.members_invited_uid
+      );
 
-    // Get dyspos
-    // this.friendDyspos = await this.agendaSvc.getDyspos(
-    //   friend_uids,
-    //   this.agendaEvent
-    // );
+      for (let friend of this.friends) {
+        // Dyspos
+        const dyspo = (
+          await this.agendaSvc.getDyspos([friend.friend_uid!], this.agendaEvent)
+        )[0];
 
-    // for(let f of this.checkedFriends){
+        // Fetch events of members
+        const events = await this.agendaSvc.getUserAgendaEvents(
+          friend.friend_uid!,
+          this.agendaEvent
+        );
 
-    // }
-
-    // console.log(' Friend dyspos', this.friendDyspos);
+        const dyspoStatus = dyspo.friend_dyspo;
+        if (friendsToCheck.includes(friend.friend_uid!)) {
+          this.checkedFriends.push({
+            friend,
+            isChecked: true,
+            disable: true,
+            dyspo: dyspoStatus,
+            agendaEvents: events.agendaEvents,
+          });
+        } else {
+          this.checkedFriends.push({
+            friend,
+            isChecked: false,
+            disable: false,
+            dyspo: dyspoStatus,
+            agendaEvents: events.agendaEvents,
+          });
+        }
+      }
+      resolve(this.checkedFriends);
+    });
   }
 
   segmentChanged(ev: any) {
@@ -125,17 +125,7 @@ export class FriendsComponent implements OnInit {
   getCheckedFriendsUid(): string[] {
     const uids: string[] = [];
     for (const item of this.checkedFriends) {
-      if (item.isChecked) {
-        uids.push(item.friend.friend_uid!);
-      }
-    }
-    return uids;
-  }
-
-  getCheckedFriendGroupsUid(): string[] {
-    const uids: string[] = [];
-    for (const item of this.checkedFriends) {
-      if (item.isChecked) {
+      if (item.isChecked && !item.disable) {
         uids.push(item.friend.friend_uid!);
       }
     }
@@ -143,30 +133,30 @@ export class FriendsComponent implements OnInit {
   }
 
   save() {
-    const friendsUid = this.getCheckedFriendsUid();
-    const friendGroupsUid = this.getCheckedFriendGroupsUid();
-    this.agendaEvent.members_invited_uid = friendsUid;
+    console.log('save invits');
+    const friends_uid = this.getCheckedFriendsUid();
 
-    for (let friendInvitedUid of friendsUid) {
-      if (!this.agendaEvent.members_invited_uid.includes(friendInvitedUid)) {
-        this.agendaEvent.members_invited_uid.push(friendInvitedUid);
-      }
-    }
-
-    for (let frGrpUid of friendGroupsUid) {
-      if (!this.agendaEvent.members_invited_uid.includes(frGrpUid)) {
-        this.agendaEvent.members_invited_uid.push(frGrpUid);
+    for (let uid of friends_uid) {
+      if (!this.agendaEvent.members_invited_uid.includes(uid)) {
+        this.agendaEvent.members_invited_uid.push(uid);
       }
     }
 
     console.log('Agenda event ', this.agendaEvent);
     this.modalCtrl.dismiss(
       {
-        friendsUid,
-        friendGroupsUid,
+        friendsUid: friends_uid,
       },
       'confirm'
     );
+  }
+
+  addGroup(group: FriendGroup) {
+    this.checkedFriends.forEach((item) => {
+      if (group.members_uid.includes(item.friend.friend_uid!)) {
+        item.isChecked = true;
+      }
+    });
   }
 
   close() {

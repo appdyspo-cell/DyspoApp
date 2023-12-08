@@ -6,6 +6,7 @@ import {
   AppUser,
   CrudFBAction,
   FriendDyspo,
+  UserAgendaEventsByDay,
   UserDyspoStatus,
 } from '../models/models';
 import {
@@ -382,6 +383,57 @@ export class AgendaService {
       }
     }
     return dyspos;
+  }
+
+  async getUserAgendaEvents(
+    uid: string,
+    agendaEventToCompare: AgendaEvent
+  ): Promise<UserAgendaEventsByDay> {
+    const agendaEventsCollectionRef = collection(
+      this.firestore,
+      `agenda_events/`
+    );
+
+    const queryAgendaEvents = query(
+      agendaEventsCollectionRef,
+      where('members_uid', 'array-contains', uid),
+      where('day', '==', agendaEventToCompare.day),
+      where('month', '==', agendaEventToCompare.month),
+      where('year', '==', agendaEventToCompare.year)
+    );
+
+    const querySnapshots = await getDocs(queryAgendaEvents);
+
+    const events: AgendaEvent[] = [];
+    querySnapshots.forEach((snapshot) => {
+      const eventResult = snapshot.data() as AgendaEvent;
+      if (eventResult.uid !== agendaEventToCompare.uid) {
+        events.push(eventResult);
+      }
+    });
+
+    const result: UserAgendaEventsByDay = {
+      uid,
+      agendaEvents: events,
+      day: agendaEventToCompare.day,
+      month: agendaEventToCompare.month,
+      year: agendaEventToCompare.year,
+    };
+
+    console.log(
+      'Get ' +
+        events.length +
+        'user events for uid ' +
+        uid +
+        '=>' +
+        result.day +
+        '_' +
+        result.month +
+        '_' +
+        result.year,
+      result
+    );
+    return result;
   }
 
   unsubscribeAllAfterLogoutEvent() {

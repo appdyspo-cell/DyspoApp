@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
-import { NavController } from '@ionic/angular';
+import { ModalController, NavController } from '@ionic/angular';
 import {
   getDate,
   getMonth,
@@ -27,6 +27,7 @@ import { AgendaService } from 'src/app/services/agenda.service';
 import { UtilsService } from 'src/app/services/utils.service';
 
 import { cloneDeep } from 'lodash';
+import { AgendaEventInfoComponent } from 'src/app/components/agenda-event-info/agenda-event-info.component';
 
 export enum AgendaMode {
   SELECT,
@@ -79,6 +80,7 @@ export class AgendaPage implements AfterViewInit {
     public agendaSvc: AgendaService,
     private navCtrl: NavController,
     private utils: UtilsService,
+    private modalCtrl: ModalController,
     private route: Router
   ) {
     this.agendaEvents$ = this.agendaSvc.agendaEvents$;
@@ -245,6 +247,23 @@ export class AgendaPage implements AfterViewInit {
       },
     };
     this.navCtrl.navigateForward('/agenda/create-event/edit', navigationExtras);
+  }
+
+  async openEvent(agendaEvent: AgendaEvent, event: any) {
+    const modal = await this.modalCtrl.create({
+      component: AgendaEventInfoComponent,
+      componentProps: {
+        agendaEvent,
+        isInvitation: false,
+      },
+    });
+    modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+
+    console.log(data);
+    if (role === 'confirm') {
+    }
   }
 
   saveAgenda() {

@@ -32,6 +32,10 @@ export interface Friend extends AppUser {
   userData?: AppUser;
 }
 
+export interface AppUserWithEvents extends AppUser {
+  agendaEvents?: AgendaEvent[];
+}
+
 export interface FriendGroup {
   uid: string;
   label: string;
@@ -40,6 +44,15 @@ export interface FriendGroup {
   status: FriendGroupStatus;
   admin_uid: string;
   members_uid: string[];
+  checked_friends?: CheckedFriends[];
+}
+
+export interface CheckedFriends {
+  friend: Friend;
+  isChecked: boolean;
+  disable: boolean;
+  dyspo?: UserDyspoStatus;
+  agendaEvents: AgendaEvent[];
 }
 
 export interface AppSettings {
@@ -83,6 +96,17 @@ export interface AgendaEvent {
   members_invited_uid: string[];
   admin_uid: string;
   all_can_edit: boolean;
+  day: number;
+  month: number;
+  year: number;
+}
+
+export interface UserAgendaEventsByDay {
+  uid: string;
+  agendaEvents: AgendaEvent[];
+  day: number;
+  month: number;
+  year: number;
 }
 
 export interface FriendDyspo {

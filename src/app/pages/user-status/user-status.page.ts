@@ -54,7 +54,7 @@ export class UserStatusPage implements OnInit {
   agendaEventType = AgendaEventType;
 
   constructor(
-    private userSvc: UserService,
+    public userSvc: UserService,
     private modalCtrl: ModalController,
     private utils: UtilsService,
     private agendaSvc: AgendaService,
@@ -118,33 +118,34 @@ export class UserStatusPage implements OnInit {
   }
 
   ngOnInit() {
-    this.loadInfos();
+    //this.loadInfos();
   }
 
-  loadInfos() {
-    console.log('loadINFOS');
-    this.userInfo = Object.assign({}, this.userSvc.userInfo);
-    this.notifications = [
-      {
-        message: 'Demande en Ami',
-        title: 'Ami',
-        user_id: '',
-        create_at_ISO: '',
-        create_at_ms: 343434,
-        status: 'dsf',
-        subject: 'dfsdf',
-      },
-      {
-        message: 'Paul vous invite à un évènement',
-        title: 'Evt',
-        user_id: '',
-        create_at_ISO: '',
-        create_at_ms: 343434,
-        status: 'dsf',
-        subject: 'dfsdf',
-      },
-    ];
-  }
+  // loadInfos() {
+  //   console.log('loadINFOS');
+
+  //   this.userInfo = this.userSvc.userInfo;
+  //   this.notifications = [
+  //     {
+  //       message: 'Demande en Ami',
+  //       title: 'Ami',
+  //       user_id: '',
+  //       create_at_ISO: '',
+  //       create_at_ms: 343434,
+  //       status: 'dsf',
+  //       subject: 'dfsdf',
+  //     },
+  //     {
+  //       message: 'Paul vous invite à un évènement',
+  //       title: 'Evt',
+  //       user_id: '',
+  //       create_at_ISO: '',
+  //       create_at_ms: 343434,
+  //       status: 'dsf',
+  //       subject: 'dfsdf',
+  //     },
+  //   ];
+  // }
 
   openStatus() {
     this.modalCtrl
@@ -208,7 +209,6 @@ export class UserStatusPage implements OnInit {
 
     console.log(data);
     if (role === 'confirm') {
-      //this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!);
     }
   }
 

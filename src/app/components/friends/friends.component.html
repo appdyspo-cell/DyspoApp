@@ -22,11 +22,15 @@
     (ionChange)="segmentChanged($event)"
     style="z-index: 1000"
   >
-    <ion-segment-button value="friends" class="segmentButton" color="light">
+    <ion-segment-button
+      value="{{ friendSelectionType.FRIENDS }}"
+      class="segmentButton"
+      color="light"
+    >
       <ion-icon name="person"></ion-icon>
       <ion-label>Mes amis</ion-label>
     </ion-segment-button>
-    <ion-segment-button value="suggestions" color="light">
+    <ion-segment-button value="{{ friendSelectionType.GROUP }}" color="light">
       <ion-icon name="person-add"></ion-icon>
       <ion-label>Mes groupes</ion-label>
     </ion-segment-button>
@@ -54,7 +58,7 @@
         >
       </strong>
     </div>
-    <ion-list lines="none">
+    <ion-list lines="none" class="friends-ct">
       <ion-item
         *ngFor="let checkedFriend of checkedFriends"
         class="animated slideInRight delay_11"
@@ -64,15 +68,32 @@
           [ngClass]="{
             kid: checkedFriend.dyspo === UserDyspoStatus.DYSPOWITHKIDS,
             nokids: checkedFriend.dyspo === UserDyspoStatus.DYSPO,
-            nodyspo: checkedFriend.dyspo === UserDyspoStatus.NODYSPO
+            nodyspo: checkedFriend.dyspo === UserDyspoStatus.NODYSPO,
+            'ion-thumbnail-friend': true
           }"
         >
           <img src="{{ checkedFriend.friend.userData?.avatarPath }}" />
+          <ion-badge
+            *ngIf="checkedFriend.agendaEvents.length > 0"
+            name="warning-outline"
+            color="danger"
+            class="thumbnail-badge"
+            >{{ checkedFriend.agendaEvents.length }}</ion-badge
+          >
         </ion-thumbnail>
 
         <div class="text-box">
-          {{ checkedFriend.friend.userData?.lastname }}
-          {{ checkedFriend.friend.userData?.firstname }}
+          <div>
+            {{ checkedFriend.friend.userData?.lastname }}
+            {{ checkedFriend.friend.userData?.firstname }}
+          </div>
+          <div *ngIf="checkedFriend.agendaEvents.length > 0">
+            <div *ngFor="let e of checkedFriend.agendaEvents">
+              <ion-text color="danger" style="font-size: 0.7rem"
+                >A un autre evenement a {{ e.start_time_formatted }}
+              </ion-text>
+            </div>
+          </div>
         </div>
         <ion-checkbox
           [disabled]="checkedFriend.disable"
@@ -91,7 +112,7 @@
   >
     <div
       id="contsainer-friends"
-      *ngIf="friends && friends.length === 0"
+      *ngIf="friendGroups && friendGroups.length === 0"
       style="width: 100%; text-align: center"
     >
       <ion-icon
@@ -107,24 +128,75 @@
       </strong>
     </div>
     <ion-list *ngIf="friendGroups && friendGroups.length > 0">
-      <ion-item
-        *ngFor="let checkedFriend of checkedFriends"
-        class="animated slideInRight delay_11"
-      >
-        <ion-thumbnail slot="start">
-          <img src="{{ checkedFriend.friend.userData?.avatarPath }}" />
-        </ion-thumbnail>
+      <div class="groups-ct" *ngFor="let group of friendGroups">
+        <ion-card>
+          <ion-card-header class="ion-no-padding">
+            <div class="d-flex ion-justify-space-between" style="padding: 5px">
+              <div class="d-flex">
+                <ion-thumbnail class="ion-thumbnail-group">
+                  <img src="{{ group.avatarPath }}" />
+                </ion-thumbnail>
 
-        <div class="text-box">
-          {{ checkedFriend.friend.userData?.lastname }}
-          {{ checkedFriend.friend.userData?.firstname }}
-        </div>
-        <ion-checkbox
-          [(ngModel)]="checkedFriend.isChecked"
-          (ionChange)="onCheckedFriendChange($event)"
-          slot="end"
-        ></ion-checkbox>
-      </ion-item>
+                <div style="font-size: 1.5rem; font-weight: bold">
+                  {{ group.label }}
+                </div>
+              </div>
+
+              <ion-button size="small" (click)="addGroup(group)" fill="outline"
+                >Ajouter</ion-button
+              >
+            </div>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list lines="none">
+              <ion-item
+                *ngFor="let checkedFriend of group.checked_friends"
+                class="animated slideInRight delay_11"
+              >
+                <ion-thumbnail
+                  slot="start"
+                  [ngClass]="{
+                    kid: checkedFriend.dyspo === UserDyspoStatus.DYSPOWITHKIDS,
+                    nokids: checkedFriend.dyspo === UserDyspoStatus.DYSPO,
+                    nodyspo: checkedFriend.dyspo === UserDyspoStatus.NODYSPO,
+                    'ion-thumbnail-friend': true
+                  }"
+                >
+                  <img src="{{ checkedFriend.friend.userData?.avatarPath }}" />
+                  <ion-badge
+                    *ngIf="checkedFriend.agendaEvents.length > 0"
+                    name="warning-outline"
+                    color="danger"
+                    class="thumbnail-badge"
+                    >{{ checkedFriend.agendaEvents.length }}</ion-badge
+                  >
+                </ion-thumbnail>
+
+                <div>
+                  <div class="text-box">
+                    {{ checkedFriend.friend.userData?.lastname }}
+                    {{ checkedFriend.friend.userData?.firstname }}
+                  </div>
+                  <div *ngIf="checkedFriend.agendaEvents.length > 0">
+                    <div *ngFor="let e of checkedFriend.agendaEvents">
+                      <ion-text color="danger" style="font-size: 0.7rem"
+                        >A un autre evenement a {{ e.start_time_formatted }}
+                      </ion-text>
+                    </div>
+                  </div>
+                </div>
+
+                <ion-checkbox
+                  [disabled]="checkedFriend.disable"
+                  [(ngModel)]="checkedFriend.isChecked"
+                  (ionChange)="onCheckedFriendChange($event)"
+                  slot="end"
+                ></ion-checkbox>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </div>
     </ion-list>
   </div>
 </ion-content>

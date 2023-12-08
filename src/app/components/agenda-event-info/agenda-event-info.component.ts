@@ -13,7 +13,13 @@ import {
   ModalController,
   NavController,
 } from '@ionic/angular';
-import { AgendaEvent, AgendaEventType, AppUser } from 'src/app/models/models';
+import {
+  AgendaEvent,
+  AgendaEventType,
+  AppUser,
+  AppUserWithEvents,
+  UserDyspoStatus,
+} from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
@@ -29,16 +35,20 @@ export class AgendaEventInfoComponent implements OnInit {
   @Input() agendaEvent!: AgendaEvent;
   @Input() isInvitation!: boolean;
   @ViewChild('popovermenu') popoverMenu: any;
+  @ViewChild('popoverUserEvents') popoverUserEvents: any;
 
+  UserDyspoStatus = UserDyspoStatus;
   agendaEventType = AgendaEventType;
-  members_presence_confirmed: AppUser[] = [];
-  members_presence_not_confirmed: AppUser[] = [];
+  members_presence_confirmed: AppUserWithEvents[] = [];
+  members_presence_not_confirmed: AppUserWithEvents[] = [];
   new_admin_candidates: AppUser[] = [];
   admin!: AppUser;
   modalNewAdminOpened = false;
   isPopoverOpen = false;
+  isPopoverUserEventsOpen = false;
   allowEdit = false;
   isSoloEvent!: boolean;
+  selectedUserEvents: AgendaEvent[] | undefined;
 
   constructor(
     private modalCtrl: ModalController,
@@ -84,11 +94,41 @@ export class AgendaEventInfoComponent implements OnInit {
         (member) => member.uid === this.agendaEvent.admin_uid
       )[0];
     }
+
+    // Get dyspos
+    const allMembers = this.members_presence_confirmed.concat(
+      this.members_presence_not_confirmed
+    );
+    for (let member of allMembers) {
+      // Dyspos
+      const dyspo = (
+        await this.agendaSvc.getDyspos([member.uid], this.agendaEvent)
+      )[0];
+      const dyspoStatus = dyspo.friend_dyspo;
+      // Hydrate AppUser with dyspo status
+      member.dyspoStatus = dyspoStatus;
+
+      // Fetch events of members
+      const events = await this.agendaSvc.getUserAgendaEvents(
+        member.uid,
+        this.agendaEvent
+      );
+
+      member.agendaEvents = events.agendaEvents;
+    }
   }
 
   openPopoverMenu(e: Event) {
     this.popoverMenu.event = e;
     this.isPopoverOpen = true;
+  }
+
+  onSelectUser(user: AppUserWithEvents, e: Event) {
+    this.selectedUserEvents = user.agendaEvents;
+    if (this.selectedUserEvents && this.selectedUserEvents?.length > 0) {
+      this.popoverUserEvents.event = e;
+      this.isPopoverUserEventsOpen = true;
+    }
   }
 
   // async confirmQuitEvent(newAdminUid?: string) {

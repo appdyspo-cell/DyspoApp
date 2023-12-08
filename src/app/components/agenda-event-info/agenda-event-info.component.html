@@ -28,42 +28,6 @@
     </ion-button>
   </ion-toolbar>
 
-  <ion-popover
-    #popovermenu
-    [isOpen]="isPopoverOpen"
-    (didDismiss)="isPopoverOpen = false"
-  >
-    <ng-template>
-      <ion-content>
-        <ion-list>
-          <ion-item *ngIf="allowEdit" tappable (click)="editEvent()">
-            <ion-icon
-              name="create-outline"
-              style="margin-right: 15px"
-            ></ion-icon>
-            <ion-text>Editer l'évenement</ion-text>
-          </ion-item>
-          <ion-item tappable (click)="quitEvent()" lines="none">
-            <ion-icon
-              name="ban"
-              color="danger"
-              style="margin-right: 15px"
-            ></ion-icon>
-            <ion-text>Supprimer l'évenement</ion-text>
-          </ion-item>
-          <!-- <ion-item (click)="requestReport()" lines="none">
-            <ion-icon
-              name="stop"
-              color="danger"
-              style="margin-right: 15px"
-            ></ion-icon>
-            <ion-text>Signaler l'utilisateur</ion-text>
-          </ion-item> -->
-        </ion-list></ion-content
-      >
-    </ng-template>
-  </ion-popover>
-
   <div
     [ngClass]="{
       'bg-kids-secondary': agendaEvent.type === agendaEventType.KIDS,
@@ -74,19 +38,20 @@
     }"
   >
     <div class="header-inner ion-padding">
-      <div class="admin-ct d-flex">
+      <div class="admin-ct d-flex" *ngIf="!isSoloEvent">
         <ion-thumbnail slot="start">
           <img src="{{ admin?.avatarPath }}" />
           <!-- <ion-icon name="add" color="light"></ion-icon> -->
         </ion-thumbnail>
-        <div *ngIf="!isSoloEvent">
+        <div>
           <span style="font-weight: bold; font-size: 1.15rem">{{
             admin?.firstname
           }}</span
           ><br />
-          propose un évenement
+          <span>propose un évenement</span>
         </div>
       </div>
+
       <div
         class="d-flex ion-padding ion-align-items-center ion-justify-content-center"
       >
@@ -95,13 +60,32 @@
             Le {{ agendaEvent.start_date_formatted }} à
             {{ agendaEvent.start_time_formatted }}
           </div>
-          <div class="ion-text-center" *ngIf="!isSoloEvent">
-            Avec
-            <span style="font-size: 1.3rem; font-weight: bold">{{
-              members_presence_confirmed.length +
-                members_presence_not_confirmed.length
-            }}</span>
-            participants
+          <div class="ion-text-center">
+            <span
+              style="font-size: 1.3rem; font-weight: bold; margin-right: 5px"
+              >{{
+                members_presence_confirmed.length +
+                  members_presence_not_confirmed.length
+              }}</span
+            >
+            <span
+              *ngIf="
+                members_presence_confirmed.length +
+                  members_presence_not_confirmed.length <=
+                1
+              "
+            >
+              participant</span
+            >
+            <span
+              *ngIf="
+                members_presence_confirmed.length +
+                  members_presence_not_confirmed.length >
+                1
+              "
+            >
+              participants</span
+            >
           </div>
         </div>
       </div>
@@ -118,23 +102,54 @@
       </div> -->
       <div class="menu">
         <div class="item" *ngFor="let member of members_presence_confirmed">
-          <ion-thumbnail>
+          <ion-thumbnail
+            (click)="onSelectUser(member, $event)"
+            [ngClass]="{
+              'thumb-kid': member.dyspoStatus === UserDyspoStatus.DYSPOWITHKIDS,
+              'thumb-nokids': member.dyspoStatus === UserDyspoStatus.DYSPO,
+              'thumb-nodyspo': member.dyspoStatus === UserDyspoStatus.NODYSPO
+            }"
+          >
             <img src="{{ member.avatarPath }}" />
+            <ion-badge
+              *ngIf="member.agendaEvents!.length > 0"
+              name="warning-outline"
+              color="danger"
+              class="thumbnail-badge"
+              >{{ member.agendaEvents!.length }}</ion-badge
+            >
           </ion-thumbnail>
           <ion-label>{{ member.firstname }}</ion-label>
         </div>
       </div>
     </div>
     <div *ngIf="agendaEvent.members_invited_uid.length > 0">
-      En attente de réponse
+      <span style="margin-left: 3px; font-size: 0.8rem"
+        >En attente de réponse</span
+      >
       <div class="category_div">
         <div class="menu">
           <div
             class="item"
             *ngFor="let member of members_presence_not_confirmed"
           >
-            <ion-thumbnail>
+            <ion-thumbnail
+              (click)="onSelectUser(member, $event)"
+              [ngClass]="{
+                'thumb-kid':
+                  member.dyspoStatus === UserDyspoStatus.DYSPOWITHKIDS,
+                'thumb-nokids': member.dyspoStatus === UserDyspoStatus.DYSPO,
+                'thumb-nodyspo': member.dyspoStatus === UserDyspoStatus.NODYSPO
+              }"
+            >
               <img src="{{ member.avatarPath }}" />
+              <ion-badge
+                *ngIf="member.agendaEvents!.length > 0"
+                name="warning-outline"
+                color="danger"
+                class="thumbnail-badge"
+                >{{ member.agendaEvents!.length }}</ion-badge
+              >
             </ion-thumbnail>
             <ion-label>{{ member.firstname }}</ion-label>
           </div>
@@ -174,6 +189,46 @@
       >No Dyspo <ion-icon slot="start" name="close-circle-outline"></ion-icon
     ></ion-button>
   </div>
+
+  <ion-popover
+    #popovermenu
+    [isOpen]="isPopoverOpen"
+    (didDismiss)="isPopoverOpen = false"
+  >
+    <ng-template>
+      <ion-list>
+        <ion-item *ngIf="allowEdit" tappable (click)="editEvent()">
+          <ion-icon name="create-outline" style="margin-right: 15px"></ion-icon>
+          <ion-text>Editer l'évenement</ion-text>
+        </ion-item>
+        <ion-item tappable (click)="quitEvent()" lines="none">
+          <ion-icon
+            name="ban"
+            color="danger"
+            style="margin-right: 15px"
+          ></ion-icon>
+          <ion-text>Supprimer l'évenement</ion-text>
+        </ion-item>
+      </ion-list>
+    </ng-template>
+  </ion-popover>
+
+  <ion-popover
+    #popoverUserEvents
+    [isOpen]="isPopoverUserEventsOpen"
+    (didDismiss)="isPopoverUserEventsOpen = false"
+  >
+    <ng-template>
+      <ion-list>
+        <ion-item *ngFor="let agEv of selectedUserEvents">
+          <ion-text color="danger" style="font-size: 0.75rem"
+            >Autre evenement à {{ agEv.start_time_formatted }}</ion-text
+          >
+        </ion-item>
+      </ion-list>
+    </ng-template>
+  </ion-popover>
+
   <ion-modal
     [isOpen]="modalNewAdminOpened"
     [initialBreakpoint]="0.4"

@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
-import { AppUser, UserDyspoStatus, UserStatus } from '../models/models';
+import {
+  AppUser,
+  AppUserWithEvents,
+  UserDyspoStatus,
+  UserStatus,
+} from '../models/models';
 import {
   DocumentData,
   Firestore,
@@ -142,27 +147,34 @@ export class UserService {
     });
   }
 
-  public async getUserInfos(uids: string[]): Promise<AppUser[]> {
-    const appUsers: AppUser[] = [];
+  public async getUserInfos(
+    uids: string[],
+    withEvents = false
+  ): Promise<AppUserWithEvents[]> {
+    const appUsers: AppUserWithEvents[] = [];
     for (let uid of uids) {
       const docRef = doc(this.firestore, `users`, uid);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        const result = docSnap.data() as AppUser;
+        const result = docSnap.data() as AppUserWithEvents;
+        result.agendaEvents = [];
         appUsers.push(result);
       }
     }
     return appUsers;
   }
 
-  public async getUserInfosExceptMe(uids: string[]): Promise<AppUser[]> {
-    const appUsers: AppUser[] = [];
+  public async getUserInfosExceptMe(
+    uids: string[]
+  ): Promise<AppUserWithEvents[]> {
+    const appUsers: AppUserWithEvents[] = [];
     for (let uid of uids) {
       if (uid !== this.userInfo?.uid) {
         const docRef = doc(this.firestore, `users`, uid);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          const result = docSnap.data() as AppUser;
+          const result = docSnap.data() as AppUserWithEvents;
+          result.agendaEvents = [];
           appUsers.push(result);
         }
       }
