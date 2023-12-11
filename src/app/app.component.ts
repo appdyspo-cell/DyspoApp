@@ -105,6 +105,7 @@ export class AppComponent {
   killAllServices() {
     this.friendsSvc.unsubscribeAllAfterLogoutEvent();
     this.agendaSvc.unsubscribeAllAfterLogoutEvent();
+    this.chatSvc.unsubscribeAllAfterLogoutEvent();
     //this.notifSvc.unsubscribeAllAfterLogoutEvent();
   }
 

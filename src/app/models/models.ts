@@ -65,16 +65,18 @@ export interface AppSettings {
 }
 
 export interface Chatroom {
-  chatroomKey: string;
-  description: string;
+  uid?: string;
+  description?: string;
   count: number;
-  lastMessage: string;
+  lastMessageRead?: string;
+  //lastMessage: string;
   startMessageId: number;
   nextMessageId: number;
   blocked?: boolean;
   blockedBy?: string;
   blockedTime?: string;
   blockedTimeMs?: number;
+  quit_chatroom_at?: number;
   isArchived?: boolean;
 }
 
@@ -99,6 +101,13 @@ export interface AgendaEvent {
   day: number;
   month: number;
   year: number;
+  [member_uid: string]:
+    | string
+    | number
+    | undefined
+    | string[]
+    | boolean
+    | Chatroom;
 }
 
 export interface UserAgendaEventsByDay {
@@ -159,6 +168,49 @@ export interface Notif {
   status: string;
 }
 
+export interface ReportMsg {
+  id?: string;
+  report_chat_key: string;
+  report_chatroom_key: string;
+  report_date_ms: number;
+  report_date_ISO?: string;
+  from_user_id: string;
+  from_user_data?: AppUser;
+  report_user_data?: AppUser;
+  report_user_id: string;
+  report_text?: string;
+  status: string;
+  result_user_status?: string;
+  result_msg_status?: string;
+}
+
+export interface ReportUser {
+  id?: string;
+  report_date_ms: number;
+  report_date_ISO?: string;
+  from_user_id: string;
+  from_user_data?: AppUser;
+  report_user_data?: AppUser;
+  report_user_id: string;
+  report_text: string;
+  result_user_status?: string;
+}
+
+export interface ChatMessage {
+  uid: string;
+  sender: string;
+  time: string;
+  time_ms: number;
+  message?: string;
+  image?: string;
+  video?: string;
+  map?: string;
+  //id: number;
+  //status: string;
+  date?: string;
+  is_deleted?: boolean;
+}
+
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
   DELETED = 'DELETED',
@@ -197,4 +249,5 @@ export enum FriendGroupStatus {
 export enum NotifSubjects {
   MESSAGE = 'MESSAGE',
   INVITE = 'INVITE',
+  AGENDA_EVENT = 'AGENDA_EVENT',
 }

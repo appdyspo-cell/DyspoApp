@@ -107,7 +107,11 @@
           class="friend-item"
         >
           <ion-thumbnail slot="start">
-            <img src="{{friendListDoc.userData?.avatarPath}}" />
+            <img
+              [defaultImage]="defaultImage"
+              [lazyLoad]="friendListDoc.userData?.avatarPath!"
+              class="crop_img fade-img"
+            />
           </ion-thumbnail>
           <ion-label>
             <ion-row class="ion-align-items-center">

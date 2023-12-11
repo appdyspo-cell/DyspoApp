@@ -4,6 +4,7 @@ import {
   AgendaEvent,
   AgendaEventStatus,
   AppUser,
+  Chatroom,
   CrudFBAction,
   FriendDyspo,
   UserAgendaEventsByDay,
@@ -272,6 +273,15 @@ export class AgendaService {
     if (foundIndex >= 0) {
       invitation.members_invited_uid.splice(foundIndex, 1);
       invitation.members_uid.push(this.uid);
+      //Add chatroom info for me
+      const userChatroom: Chatroom = {
+        count: 0,
+        lastMessageRead: '',
+        startMessageId: 0,
+        nextMessageId: 0,
+      };
+      invitation!['user_' + this.uid] = userChatroom;
+
       this.saveOrUpdateEvent(invitation);
     } else {
       console.error('Can not find invitation uid in members invited');
@@ -312,6 +322,11 @@ export class AgendaService {
         );
         if (foundIndex >= 0) {
           const updatedAgendaEvent = cloneDeep(agendaEvent);
+          // Remove me from chatroom
+
+          const chatroom = agendaEvent!['user_' + this.uid] as Chatroom;
+          chatroom.quit_chatroom_at = new Date().getTime();
+
           //Remove me from list
           updatedAgendaEvent.members_uid.splice(foundIndex, 1);
 

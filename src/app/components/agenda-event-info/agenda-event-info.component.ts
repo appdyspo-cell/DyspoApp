@@ -49,6 +49,7 @@ export class AgendaEventInfoComponent implements OnInit {
   allowEdit = false;
   isSoloEvent!: boolean;
   selectedUserEvents: AgendaEvent[] | undefined;
+  defaultImage = 'assets/logo.svg';
 
   constructor(
     private modalCtrl: ModalController,

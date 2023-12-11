@@ -29,7 +29,7 @@
       <ion-img [src]="avatar"></ion-img>
       </ion-avatar> -->
     <div
-      class="dyspo-button dyspo ion-activatable"
+      class="dyspo-button dyspo ion-activatable animate__animated animate__fadeIn"
       *ngIf="todayDyspo?.userDyspo === dyspoStatus.DYSPO"
     >
       Dyspo
@@ -38,7 +38,7 @@
 
     <div
       *ngIf="todayDyspo?.userDyspo === dyspoStatus.DYSPOWITHKIDS"
-      class="dyspo-button dyspo-with-kids ion-activatable"
+      class="dyspo-button dyspo-with-kids ion-activatable animate__animated animate__fadeIn"
     >
       Dyspo With Kids
       <ion-ripple-effect></ion-ripple-effect>
@@ -46,7 +46,7 @@
 
     <div
       *ngIf="todayDyspo?.userDyspo === dyspoStatus.NODYSPO"
-      class="dyspo-button no-dyspo ion-activatable"
+      class="dyspo-button no-dyspo ion-activatable animate__animated animate__fadeIn"
     >
       No Dyspo
       <ion-ripple-effect></ion-ripple-effect>
@@ -54,7 +54,7 @@
 
     <div
       *ngIf="todayDyspo.userDyspo === dyspoStatus.UNDEFINED "
-      class="dyspo-button no-dyspo ion-activatable"
+      class="dyspo-button no-dyspo ion-activatable animate__animated animate__fadeIn"
     >
       Dyspo ?
       <ion-ripple-effect></ion-ripple-effect>
@@ -72,7 +72,9 @@
         <div class="next-agenda-content">
           <app-agenda-event-mini
             *ngFor="let nextEvent of nextAgendaEvents"
+            class="animate__animated animate__fadeIn"
             [agendaEvent]="nextEvent"
+            [isInvitation]="false"
             (click)="openAgendaEventInfo(nextEvent)"
           >
           </app-agenda-event-mini>
@@ -83,10 +85,7 @@
 
   <div *ngIf="invitations.length > 0">
     <ion-list-header>
-      <span
-        class="wpf-raquette"
-        style="margin-right: 8px; font-size: 22px"
-      ></span>
+      <span style="margin-right: 8px; font-size: 22px"></span>
       Invitations
     </ion-list-header>
 
@@ -96,6 +95,7 @@
           <app-agenda-event-mini
             *ngFor="let invit of invitations"
             [agendaEvent]="invit"
+            [isInvitation]="true"
             (click)="openInvitation(invit)"
           >
           </app-agenda-event-mini>

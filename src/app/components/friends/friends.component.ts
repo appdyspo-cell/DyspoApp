@@ -135,10 +135,14 @@ export class FriendsComponent implements OnInit {
   save() {
     console.log('save invits');
     const friends_uid = this.getCheckedFriendsUid();
+    const newInvits: string[] = [];
 
     for (let uid of friends_uid) {
       if (!this.agendaEvent.members_invited_uid.includes(uid)) {
+        newInvits.push(uid);
         this.agendaEvent.members_invited_uid.push(uid);
+
+        //
       }
     }
 
@@ -146,6 +150,7 @@ export class FriendsComponent implements OnInit {
     this.modalCtrl.dismiss(
       {
         friendsUid: friends_uid,
+        newInvits,
       },
       'confirm'
     );

@@ -450,3 +450,12 @@ ion-app[dir="rtl"] {
     --border-radius: 6px !important;
   }
 }
+
+.fade-img {
+  transition: opacity 1s;
+  opacity: 0;
+}
+
+.fade-img.ng-lazyloaded {
+  opacity: 1;
+}

@@ -3,7 +3,15 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { UtilsService } from './utils.service';
 
-import { AppUser, Chatroom, DBUser } from '../models/models';
+import {
+  AgendaEvent,
+  AppUser,
+  ChatMessage,
+  Chatroom,
+  DBUser,
+  ReportMsg,
+  ReportUser,
+} from '../models/models';
 import {
   Database,
   child,
@@ -13,7 +21,21 @@ import {
   onChildRemoved,
   ref,
 } from '@angular/fire/database';
-import { Firestore, doc, getDoc } from '@angular/fire/firestore';
+import {
+  Firestore,
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  query,
+  setDoc,
+  updateDoc,
+  where,
+} from '@angular/fire/firestore';
+import { environment } from 'src/environments/environment';
 //import { Firestore, doc, getDoc } from '@firebase/firestore';
 
 @Injectable({
@@ -21,9 +43,16 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 })
 export class ChatService {
   public chatrooms: Chatroom[] = [];
+  public messages: ChatMessage[] = [];
+  chatroomsOnSnapshotCancel!: import('@angular/fire/firestore').Unsubscribe;
+  messagesOnSnapshotCancel!: import('@angular/fire/firestore').Unsubscribe;
 
   public chatroomsSubject = new BehaviorSubject<any[]>([]);
+  public messagesSubject = new BehaviorSubject<any[]>([]);
   chatrooms$: Observable<Chatroom[]>;
+  messages$: Observable<ChatMessage[]>;
+  uid!: string;
+  chatroomsCollectionRef!: string;
 
   constructor(
     public utils: UtilsService,
@@ -34,70 +63,142 @@ export class ChatService {
     //this.blockChatroom(data.friendUid);
     //});
     this.chatrooms$ = this.chatroomsSubject.asObservable();
+    this.messages$ = this.messagesSubject.asObservable();
   }
 
   /**************************************************
    ******************  Chatrooms ********************
    ***************************************************/
 
+  sendMsg(message: ChatMessage, agendaEvent: AgendaEvent) {
+    setDoc(
+      doc(
+        this.firestore,
+        `agenda_events/${agendaEvent.uid}/messages_list`,
+        message.uid
+      ),
+      message,
+      { merge: true }
+    );
+
+    agendaEvent.members_uid.forEach((member_uid) => {
+      if (member_uid !== this.uid) {
+        const chatroom = agendaEvent['user_' + member_uid] as Chatroom;
+        chatroom.count = chatroom.count + 1;
+      }
+    });
+
+    console.log(agendaEvent);
+    updateDoc(
+      doc(this.firestore, `agenda_events/${agendaEvent.uid}`),
+      agendaEvent
+    );
+  }
+
+  markMessagesAsRead(agendaEvent: AgendaEvent) {
+    if (this.uid) {
+      console.log('MArk as read');
+      const docRef = doc(this.firestore, `agenda_events/${agendaEvent.uid}`);
+      updateDoc(docRef, { ['user_' + this.uid + '.count']: 0 });
+    }
+  }
+
+  createUsersChatroom(newInvits: string[], agendaEvent: AgendaEvent) {
+    newInvits.forEach((newInvitUid) => {
+      //addDoc()
+    });
+  }
+
   getUnreadMessagesCount() {}
 
   createChatroom() {}
 
-  async initService(idUser: string) {
-    this.chatrooms = [];
-    // on recupere les chatrooms du user
-    console.log('Init Chat Service...');
+  listenMessages(agendaEvent: AgendaEvent) {
+    this.messages = [];
+    const messagesCollectionRef = collection(
+      this.firestore,
+      `agenda_events/${agendaEvent.uid}/messages_list`
+    );
 
-    const chat_user = (
-      await get(child(ref(this.db), 'chat_users/' + idUser))
-    ).val() as DBUser;
+    this.messagesOnSnapshotCancel = onSnapshot(
+      messagesCollectionRef,
+      (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          const msgFetched = change.doc.data() as ChatMessage;
+          console.log('msg fetched', msgFetched);
+          let foundItem = this.messages.find((elt) => {
+            return elt.uid === msgFetched.uid;
+          });
+          if (change.type === 'modified' && foundItem) {
+            foundItem = msgFetched;
+          }
+          if (change.type === 'added' && !foundItem) {
+            this.messages.push(msgFetched);
+          }
+          if (change.type === 'removed') {
+            const msgRemoved = change.doc.data() as ChatMessage;
+            msgRemoved.uid = change.doc.id;
+            const foundIndex = this.messages.findIndex(
+              (elt) => elt.uid === msgRemoved.uid
+            );
+            if (foundIndex >= 0) {
+              this.messages.splice(foundIndex, 1);
+            }
+          }
 
-    chat_user?.chatIds?.forEach(async (chatroomKey) => {
-      // Get Chatroom
-      const chatroom = (
-        await get(child(ref(this.db), 'chats/' + chatroomKey))
-      ).val() as Chatroom;
-      this.chatrooms.push(chatroom);
-      this.chatroomsSubject.next(this.chatrooms);
-
-      // Listeners
-      onChildChanged(ref(this.db, 'chats/' + chatroomKey), (snapshot) => {
-        const chatroom = snapshot.val() as Chatroom;
-        const foundIndex = this.chatrooms.findIndex(
-          (chat) => chat.chatroomKey === chatroomKey
-        );
-        if (foundIndex >= 0) {
-          this.chatrooms[foundIndex] = chatroom;
-        } else {
-          this.chatrooms.push(chatroom);
-        }
-        this.chatroomsSubject.next(this.chatrooms);
-      });
-
-      onChildAdded(ref(this.db, 'chats/' + chatroomKey), (snapshot) => {
-        const chatroom = snapshot.val() as Chatroom;
-        this.chatrooms.push(chatroom);
-        this.chatroomsSubject.next(this.chatrooms);
-      });
-
-      onChildRemoved(ref(this.db, 'chats/' + chatroomKey), (snapshot) => {
-        const chatroom = snapshot.val() as Chatroom;
-        const foundIndex = this.chatrooms.findIndex(
-          (ch) => ch.chatroomKey === snapshot.key
-        );
-        if (foundIndex >= 0) {
-          this.chatrooms.splice(foundIndex, 1);
-          this.chatroomsSubject.next(this.chatrooms);
-        }
-      });
-    });
-
-    // -------------------------------
+          this.messagesSubject.next(this.messages);
+        });
+      }
+    );
   }
 
-  deleteChatroom(chatroom: Chatroom) {
-    const chatroomRef = ref(this.db, 'chats/' + chatroom.chatroomKey);
+  removeListenMessages() {
+    this.messages = [];
+    if (this.messagesOnSnapshotCancel) {
+      this.messagesOnSnapshotCancel();
+    }
+  }
+
+  async initService(uid: string) {
+    this.uid = uid;
+    this.chatrooms = [];
+    this.chatroomsCollectionRef = `chatrooms/${uid}/chatroom_list`;
+    console.log('Init Chat Service...');
+    //const usersCollectionRef = collection(this.firestore, 'users');
+    const queryChats = collection(this.firestore, this.chatroomsCollectionRef);
+
+    // Invitation evenement
+    this.chatroomsOnSnapshotCancel = onSnapshot(queryChats, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        const chatroomFetched = change.doc.data() as Chatroom;
+        let foundItem = this.chatrooms.find((elt) => {
+          return elt.uid === chatroomFetched.uid;
+        });
+        if (change.type === 'modified' && foundItem) {
+          foundItem = chatroomFetched;
+        }
+        if (change.type === 'added' && !foundItem) {
+          this.chatrooms.push(chatroomFetched);
+        }
+        if (change.type === 'removed') {
+          const invitRemoved = change.doc.data() as Chatroom;
+          invitRemoved.uid = change.doc.id;
+          const foundIndex = this.chatrooms.findIndex(
+            (elt) => elt.uid === invitRemoved.uid
+          );
+          if (foundIndex >= 0) {
+            this.chatrooms.splice(foundIndex, 1);
+          }
+        }
+        this.chatroomsSubject.next(this.chatrooms);
+      });
+    });
+  }
+
+  async deleteChatroom(chatroom: Chatroom) {
+    await deleteDoc(
+      doc(this.firestore, this.chatroomsCollectionRef + chatroom.uid)
+    );
 
     //On cache uniquement le salon de celui qui veut supprimer le chatroom
     // this.afDB
@@ -133,8 +234,147 @@ export class ChatService {
     });
   }
 
+  async blockUser(uid: string) {
+    return true;
+    // return new Promise(async (resolve, reject) => {
+    //   const user_id = this.utils.userInfo.id;
+    //   const my_id = this.utils.userInfo.id;
+
+    //   this.afs
+    //     .collection<Friend>(`friends`)
+    //     .doc(this.user_id)
+    //     .collection('friend_list', (ref) =>
+    //       ref.where('friend_id', '==', friend_id)
+    //     )
+    //     .get()
+    //     .subscribe((snaps) => {
+    //       const snap = snaps.docs[0];
+    //       //On met le status de l'ami à 'BLOCKED' chez nous et 'BEENBLOCKED' chez lui
+    //       this.afs
+    //         .collection<Friend>(`friends`)
+    //         .doc(this.user_id)
+    //         .collection('friend_list')
+    //         .doc(snap.id)
+    //         .update({ status: 'BLOCKED', since: new Date().getTime() })
+    //         .then(() => {
+    //           console.log('Finish update my friend list');
+
+    //           this.afs
+    //             .collection<Friend>(`friends`)
+    //             .doc(friend_id)
+    //             .collection('friend_list', (ref) =>
+    //               ref.where('friend_id', '==', this.user_id)
+    //             )
+    //             .get()
+    //             .subscribe((snapsB) => {
+    //               const snapB = snapsB.docs[0];
+    //               this.afs
+    //                 .collection<Friend>(`friends`)
+    //                 .doc(friend_id)
+    //                 .collection('friend_list')
+    //                 .doc(snapB.id)
+    //                 .update({
+    //                   status: 'BEENBLOCKED',
+    //                   since: new Date().getTime(),
+    //                 })
+    //                 .then(() => {
+    //                   console.log('Finish update his friend list');
+    //                   //this.eventService.publishReloadFriends(this.user_id);
+    //                 });
+    //             });
+    //         });
+    //     });
+    // });
+  }
+
+  async reportUser(report_user_id: string, report_text: string) {
+    return true;
+    // return new Promise(async (resolve, reject) => {
+    //   const my_id = this.utils.userInfo.id;
+    //   const now = new Date();
+    //   const now_ISO = now.toISOString();
+    //   const report_data: ReportUser = {
+    //     report_date_ms: now.getTime(),
+    //     report_date_ISO: now_ISO,
+    //     from_user_id: my_id,
+    //     report_user_id,
+    //     report_text,
+    //   };
+
+    //   const report_user_data = await this.getUserByID(report_user_id);
+
+    //   report_data.report_user_data = report_user_data;
+    //   report_data.from_user_data = this.utils.userInfo;
+    //   this.afs
+    //     .collection<ReportUser>(`report_users`)
+    //     .add(report_data)
+    //     .then((res) => {
+    //       this.afs
+    //         .collection('mail')
+    //         .add({
+    //           to: environment.email,
+    //           message: {
+    //             subject: 'Signalement utilisateur',
+    //             html:
+    //               this.utils.userInfo.firstname +
+    //               ' ' +
+    //               this.utils.userInfo.lastname +
+    //               ' a signalé un utilisateur :<br><br><b>' +
+    //               report_user_data.firstname +
+    //               ' ' +
+    //               report_user_data.lastname +
+    //               ' (id: ' +
+    //               report_user_id +
+    //               ')</b><br><br>  Message :<br><br>' +
+    //               report_text,
+    //           },
+    //         })
+    //         .then(() => {
+    //           resolve(true);
+    //         })
+    //         .catch((error: any) => {
+    //           reject(error);
+    //         });
+    //       resolve(res);
+    //     })
+    //     .catch((err: any) => {
+    //       reject(err);
+    //     });
+    // });
+  }
+
+  async reportMsg(report: ReportMsg) {
+    return true;
+    // return new Promise(async (resolve, reject) => {
+    //   this.afs
+    //     .collection<ReportMsg>(`report_msg`)
+    //     .add(report)
+    //     .then((res) => {
+    //       this.afs
+    //         .collection('mail')
+    //         .add({
+    //           to: environment.email,
+    //           message: {
+    //             subject: 'Signalement message',
+    //             html:
+    //               'Un message a été signalé. Contenu du message:<br><br>' +
+    //               report.report_text,
+    //           },
+    //         })
+    //         .then(() => {
+    //           resolve(true);
+    //         })
+    //         .catch((error) => {
+    //           reject(error);
+    //         });
+    //     });
+    // });
+  }
+
   unsubscribeAllAfterLogoutEvent() {
     this.chatrooms = [];
+    if (this.chatroomsOnSnapshotCancel) this.chatroomsOnSnapshotCancel();
+    this.chatroomsSubject.next([]);
     //off(ref(this.db, 'chats/' + chatroomKey))
   }
 }

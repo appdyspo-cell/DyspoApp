@@ -5,7 +5,11 @@
     </ion-buttons>
     <ion-title>
       <div class="profile d-flex active">
-        <div class="profile_img_box" (click)="groupinfo()">
+        <div
+          *ngIf="agendaEvent.avatar"
+          class="profile_img_box"
+          (click)="groupinfo()"
+        >
           <div class="profile_img">
             <img src="{{agendaEvent.avatar}}" />
           </div>
@@ -16,26 +20,39 @@
         </span>
       </div>
     </ion-title>
+    <ion-buttons slot="end">
+      <ion-icon
+        tappable
+        slot="end"
+        name="ellipsis-vertical"
+        color="light"
+        (click)="openMenu($event)"
+      >
+      </ion-icon>
+      <ion-icon
+        *ngIf="msgSelected"
+        tappable
+        slot="end"
+        name="trash-outline"
+        color="light"
+        (click)="deleteMsg($event)"
+      >
+      </ion-icon>
+      <ion-icon
+        *ngIf="msgSelected"
+        tappable
+        slot="end"
+        name="warning-outline"
+        color="light"
+        (click)="reportMsg($event)"
+      >
+      </ion-icon>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <div class="chat_container d-flex">
-    <div class="chat-box d-flex received">
-      <div class="chat">
-        <div class="chat_detail">
-          <div class="profile_img center_img">
-            <img src="assets/img/1.png" class="crop_img" />
-          </div>
-          <div class="text">
-            <h6>Luicy Williams</h6>
-            <h2>Hello, Guys?</h2>
-          </div>
-        </div>
-      </div>
-      <p>12:01 pm</p>
-    </div>
-
+  <div class="chat_container d-flex" (scrollPosition)="onScroll($event)">
     <div class="chat-box d-flex received">
       <div class="chat">
         <div class="chat_detail">
@@ -45,36 +62,6 @@
           <div class="text">
             <h6>Azler Hopson</h6>
             <h2>Hey, Whats up?</h2>
-          </div>
-        </div>
-      </div>
-      <p>12:02 pm</p>
-    </div>
-
-    <div class="chat-box d-flex send">
-      <p>12:02 pm</p>
-      <div class="chat">
-        <div class="chat_detail">
-          <div class="text">
-            <h6>You</h6>
-            <h2>What's the weekend plan?</h2>
-          </div>
-          <div class="profile_img center_img">
-            <img src="assets/img/8.png" class="crop_img" />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="chat-box d-flex received">
-      <div class="chat">
-        <div class="chat_detail">
-          <div class="profile_img center_img">
-            <img src="assets/img/1.png" class="crop_img" />
-          </div>
-          <div class="text">
-            <h6>Luicy Williams</h6>
-            <h2>Let's met & plan something !</h2>
           </div>
         </div>
       </div>
@@ -114,10 +101,57 @@
       </div>
       <p>12:04 pm</p>
     </div>
+
+    <ng-container *ngFor="let msg of msgList">
+      <div *ngIf="msg.sender !== my_uid" class="chat-box d-flex received">
+        <div class="chat">
+          <div class="chat_detail">
+            <div class="profile_img center_img">
+              <img
+                class="animate__animated animated__fadeIn"
+                *ngIf="member_infos_obj[msg.sender]"
+                [defaultImage]="defaultAvatar"
+                [lazyLoad]="member_infos_obj[msg.sender].avatarPath!"
+                class="crop_img"
+              />
+              <img
+                *ngIf="!member_infos_obj[msg.sender]"
+                [src]="defaultAvatar"
+                class="crop_img"
+              />
+            </div>
+            <div class="text">
+              <h6>{{member_infos_obj[msg.sender]?.firstname}}</h6>
+              <h2>{{msg.message}}</h2>
+            </div>
+          </div>
+
+          <div class="attachment" *ngIf="msg.image">
+            <img src="assets/img/map.png" />
+          </div>
+        </div>
+        <p>{{msg.date! | dateChatFormat}}</p>
+      </div>
+
+      <div *ngIf="msg.sender === my_uid" class="chat-box d-flex send">
+        <p>{{msg.date! | dateChatFormat}}</p>
+        <div class="chat">
+          <div class="chat_detail">
+            <div class="text">
+              <h6>Vous</h6>
+              <h2>{{msg.message}}</h2>
+            </div>
+            <div class="profile_img center_img">
+              <img src="{{my_avatar}}" class="crop_img" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
   </div>
 </ion-content>
 
-<ion-footer class="form animated slideInUp delay_3">
+<ion-footer class="form animate__animated animate__slideInUp delay_3">
   <ion-list
     lines="none"
     [ngClass]="viewType === 'active' ? 'list active':'list'"
@@ -135,9 +169,15 @@
       <div class="item_inner d-flex">
         <ion-icon class="zmdi zmdi-mood" ion-text-start></ion-icon>
         <ion-input
-          type="text "
+          type="text"
+          [(ngModel)]="userInput"
           placeholder="{{ 'type_your_message' | translate}} "
         ></ion-input>
+        <div>
+          <ion-button fill="clear" slot="end" (click)=" sendMsg()">
+            <ion-icon name="send" color="medium" size="large"> </ion-icon>
+          </ion-button>
+        </div>
         <div class="end icon_box">
           <ion-icon
             class="zmdi zmdi-attachment-alt ion-text-end"

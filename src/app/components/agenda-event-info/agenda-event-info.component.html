@@ -90,7 +90,7 @@
         </div>
       </div>
     </div>
-    <div class="category_div">
+    <div class="category_div animate__animated animate__zoomIn">
       <!-- <div class="menu">
         <div class="item" (click)="onProfile()">
           <ion-thumbnail>
@@ -101,7 +101,10 @@
         </div>
       </div> -->
       <div class="menu">
-        <div class="item" *ngFor="let member of members_presence_confirmed">
+        <div
+          class="item animate__animated animate__fadeIn"
+          *ngFor="let member of members_presence_confirmed"
+        >
           <ion-thumbnail
             (click)="onSelectUser(member, $event)"
             [ngClass]="{
@@ -123,14 +126,17 @@
         </div>
       </div>
     </div>
-    <div *ngIf="agendaEvent.members_invited_uid.length > 0">
+    <div
+      *ngIf="agendaEvent.members_invited_uid.length > 0"
+      class="animate__animated animate__fadeInDown"
+    >
       <span style="margin-left: 3px; font-size: 0.8rem"
         >En attente de réponse</span
       >
       <div class="category_div">
         <div class="menu">
           <div
-            class="item"
+            class="item animate__animated animate__zoomIn"
             *ngFor="let member of members_presence_not_confirmed"
           >
             <ion-thumbnail
@@ -166,7 +172,11 @@
         <div
           class="bg-avatar d-flex ion-justify-content-center ion-margin-bottom"
         >
-          <ion-img src="{{ agendaEvent.avatar }}"></ion-img>
+          <img
+            [defaultImage]="defaultImage"
+            [lazyLoad]="agendaEvent.avatar"
+            class="fade-img"
+          />
         </div>
       </div>
 

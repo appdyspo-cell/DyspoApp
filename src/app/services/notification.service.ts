@@ -189,4 +189,50 @@ export class NotificationService {
       }
     }
   }
+
+  async sendInviteAgendaEvent(uids: string[]) {
+    // Send notification
+    console.log('Check to send notif or not');
+
+    const q = query(
+      collection(this.firestore, 'users'),
+      where('uid', 'array-contains', uids)
+    );
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      const ref = querySnapshot.docs[0].ref;
+      const friendUser = querySnapshot.docs[0].data() as AppUser;
+      if (
+        friendUser.notificationToken &&
+        friendUser.appSettings?.receiveNotification
+      ) {
+        if (this.userSvc.userInfo) {
+          const avatarPath = this.userSvc.userInfo.avatarPath;
+
+          const message =
+            this.userSvc.userInfo.firstname +
+            ' ' +
+            this.userSvc.userInfo.lastname +
+            ' propose un évenement';
+          const f = httpsCallable(this.functions, 'sendNotification');
+          f({
+            message,
+            subject: NotifSubjects.AGENDA_EVENT,
+            token: friendUser.notificationToken,
+            username:
+              this.userSvc.userInfo.firstname +
+              ' ' +
+              this.userSvc.userInfo.lastname,
+            avatarPath,
+          })
+            .then((res) => {
+              console.log(res);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+      }
+    }
+  }
 }

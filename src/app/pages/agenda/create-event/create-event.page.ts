@@ -24,9 +24,11 @@ import {
   AgendaEvent,
   AgendaEventStatus,
   AgendaEventType,
+  Chatroom,
   Friend,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
+import { ChatService } from 'src/app/services/chat.service';
 import { MediaService } from 'src/app/services/media.service';
 import { UserService } from 'src/app/services/user.service';
 import { environment } from 'src/environments/environment';
@@ -74,7 +76,8 @@ export class CreateEventPage implements OnInit {
     private agendaSvc: AgendaService,
     private modalCtrl: ModalController,
     private mediaSvc: MediaService,
-    private userSvc: UserService
+    private userSvc: UserService,
+    private chatSvc: ChatService
   ) {
     this.uid = this.userSvc.userInfo?.uid!;
     this.GoogleAutocompleteSvc = new google.maps.places.AutocompleteService();
@@ -278,6 +281,24 @@ export class CreateEventPage implements OnInit {
     console.log(data);
     if (role === 'confirm') {
       this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!);
+      if (data.newInvits.length > 0) {
+        const userChatroom: Chatroom = {
+          count: 0,
+          lastMessageRead: '',
+          startMessageId: 0,
+          nextMessageId: 0,
+        };
+        this.agendaEvent!['user_' + this.uid] = userChatroom;
+        // data.newInvits.forEach((newInvit: string) => {
+        //   const userChatroom: Chatroom = {
+        //     count: 0,
+        //     lastMessageRead: '',
+        //     startMessageId: 0,
+        //     nextMessageId: 0,
+        //   };
+        //   this.agendaEvent!['user_' + newInvit] = userChatroom;
+        // });
+      }
     }
   }
 

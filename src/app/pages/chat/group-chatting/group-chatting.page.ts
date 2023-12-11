@@ -1,26 +1,273 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NavController } from '@ionic/angular';
-import { AgendaEvent } from 'src/app/models/models';
+import { IonContent, NavController, PopoverController } from '@ionic/angular';
+import { format } from 'date-fns';
+import { Subscription } from 'rxjs';
+import { ChatMenuComponent } from 'src/app/components/chat-menu/chat-menu.component';
+import { AgendaEvent, AppUser, ChatMessage } from 'src/app/models/models';
+import { ChatService } from 'src/app/services/chat.service';
+import { UserService } from 'src/app/services/user.service';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-group-chatting',
   templateUrl: './group-chatting.page.html',
   styleUrls: ['./group-chatting.page.scss'],
 })
 export class GroupChattingPage implements OnInit {
+  @ViewChild(IonContent) content!: IonContent;
+  loading = false;
+
+  allIsLoaded = false;
+  //Maximum of messages per batch
+  limit = 50;
+  //Maximum of messages can be displayed
+  maxMsg = 150;
+
+  paramData: any;
+  msgList: ChatMessage[] = [];
   viewType: string = '';
   agendaEvent: AgendaEvent;
+  msgSelected: any;
+  userInput = '';
+  my_uid!: string;
+  my_avatar!: string;
+  messagesSubscription: Subscription;
+  member_infos: AppUser[] = [];
+  member_infos_obj: Record<string, AppUser> = {};
+  defaultAvatar = 'assets/img/user.png';
+
   constructor(
     private navCtrl: NavController,
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private popCtrl: PopoverController,
+    private router: Router,
+    private chatSvc: ChatService,
+    private userSvc: UserService
   ) {
     this.agendaEvent =
       this.router.getCurrentNavigation()?.extras.state?.['agendaEvent'];
     console.log('Event uid', this.agendaEvent);
+    this.my_uid = this.userSvc.userInfo?.uid!;
+    this.my_avatar = this.userSvc.userInfo?.avatarPath!;
+
+    this.chatSvc.listenMessages(this.agendaEvent);
+
+    this.messagesSubscription = this.chatSvc.messages$.subscribe(
+      (messages: ChatMessage[]) => {
+        this.msgList = messages;
+        this.scrollDown();
+        // Set zero to unread msgs
+        this.chatSvc.markMessagesAsRead(this.agendaEvent);
+      }
+    );
   }
 
-  ngOnInit() {}
+  async ngOnInit() {
+    this.member_infos = await this.userSvc.getUserInfos(
+      this.agendaEvent.members_uid
+    );
+    // transform
+    this.member_infos_obj = this.member_infos.reduce((acc, user: AppUser) => {
+      acc[user.uid as string] = user;
+      return acc;
+    }, {} as Record<string, AppUser>);
+  }
+
+  async openMenu(ev: any) {
+    const modal = await this.popCtrl.create({
+      component: ChatMenuComponent,
+      componentProps: {
+        friend_id: null,
+        username: null,
+      },
+      translucent: true,
+      event: ev,
+      mode: 'md',
+    });
+    //TODO FILTER
+    modal.onDidDismiss().then((modelData) => {
+      if (modelData && modelData.data && modelData.data.filters) {
+        console.log('fiters', modelData.data.filters);
+        //this.filterLayerGroups();
+      }
+    });
+    modal.present();
+  }
+
+  ionViewWillLeave() {
+    this.chatSvc.removeListenMessages();
+  }
+
+  async sendMsg() {
+    console.log('Send msg');
+
+    if (this.userInput !== '') {
+      const timeMoment = format(new Date(), 'dd/MM/yyyy HH:mm');
+      const d = new Date();
+
+      const message: ChatMessage = {
+        sender: this.my_uid,
+        time: timeMoment,
+        time_ms: d.getTime(),
+        message: this.userInput,
+        uid: 'msg_' + d.getTime(),
+        date: d.toISOString(),
+      };
+
+      this.chatSvc.sendMsg(message, this.agendaEvent);
+      //this.msgList.push(message);
+
+      // this.afDB
+      //   .list('chatrooms_messages/' + this.chatroomKey + '/')
+      //   .push(message);
+
+      //this.updateChatrooms(timeMoment, message);
+
+      //this.sendNotificationToUser(this.userInput);
+      this.userInput = '';
+      this.scrollDown();
+      /*setTimeout(() => {
+        this.senderSends();
+      }, 500);*/
+    }
+    //this.show = false;
+  }
+
+  getMore() {
+    // this.loading = true;
+    // const previousMsgList = [];
+    // const firstId = this.msgList[0].id;
+    // let startAt = firstId - this.limit;
+    // if (startAt < this.myChatroom.startMessageId) {
+    //   startAt = this.myChatroom.startMessageId;
+    // }
+    // const firstMessage = this.msgList[0];
+    // this.afDB
+    //   .list('chatrooms_messages/' + this.chatroomKey + '/', (ref) =>
+    //     ref.orderByChild('id').limitToFirst(this.limit).startAt(startAt)
+    //   )
+    //   .snapshotChanges(['child_added', 'child_changed'])
+    //   .pipe(take(1))
+    //   .subscribe((actions) => {
+    //     actions.forEach((action) => {
+    //       const incomingMessage = action.payload.val() as Message;
+    //       if (firstMessage && firstMessage.id <= incomingMessage.id) {
+    //       } else {
+    //         previousMsgList.push(incomingMessage);
+    //       }
+    //     });
+    //     if (previousMsgList.length === 0) {
+    //       this.allIsLoaded = true;
+    //     } else {
+    //       this.msgList = previousMsgList.concat(this.msgList);
+    //       //Set the scroll at the same y coord of the first Message before loading more
+    //       setTimeout(() => {
+    //         const yPosition = document
+    //           .getElementById('msg_' + firstId)
+    //           .getBoundingClientRect().y;
+    //         console.log(yPosition);
+    //         this.msgScrollableContainer.nativeElement.scrollTo({
+    //           top: yPosition - 150,
+    //           left: 0,
+    //           behavior: 'auto',
+    //         });
+    //       }, 20);
+    //     }
+    //     console.log(previousMsgList);
+    //     console.log(this.msgList);
+    //     this.loading = false;
+    //   });
+  }
+
+  onScroll(event: any): void {
+    console.log('onScroll', event);
+    if (
+      this.loading ||
+      this.msgList.length >= this.maxMsg ||
+      this.allIsLoaded
+    ) {
+      console.log(
+        'loading:' +
+          this.loading +
+          ' Msg:' +
+          this.msgList.length +
+          ' allIsLoaded:' +
+          this.allIsLoaded
+      );
+      return;
+    } else {
+      if (event === 'top') {
+        this.loading = true;
+        setTimeout(() => {
+          this.getMore();
+        }, 200);
+      }
+    }
+  }
+
+  scrollDown() {
+    setTimeout(() => {
+      this.content.scrollToBottom(400);
+    }, 100);
+  }
+
+  deleteMsg(ev: any) {
+    // Swal.fire({
+    //   title: 'Voulez-vous supprimer ce message ?',
+    //   showDenyButton: true,
+    //   heightAuto: false,
+    //   confirmButtonText: 'Oui',
+    //   denyButtonText: `Non`,
+    // }).then((result) => {
+    //   if (result.isConfirmed) {
+    //     this.afDB
+    //     .object(
+    //       'chatrooms_messages/' + this.chatroomKey + '/' + this.msgSelected.message_key
+    //     )
+    //     .update({ is_deleted: true }).then(res=>{
+    //       console.log('Msg deleted');
+    //     })
+    //     .catch(err=>{
+    //       console.log(err);
+    //     });
+    //   }
+    // });
+  }
+
+  reportMsg(ev: any) {
+    // Swal.fire({
+    //   title: 'Voulez-vous signaler ce message ?',
+    //   showDenyButton: true,
+    //   heightAuto: false,
+    //   confirmButtonText: 'Oui',
+    //   denyButtonText: `Non`,
+    // }).then(async (result) => {
+    //   if (result.isConfirmed) {
+    //     console.log('Close modal');
+    //     const my_id = this.utils.userInfo.id;
+    //     const now = new Date();
+    //     const now_ISO = now.toISOString();
+    //     const report_data: ReportMsg = {
+    //       report_chat_key: this.msgSelected.message_key,
+    //       report_chatroom_key: this.chatroomKey,
+    //       report_date_ms: now.getTime(),
+    //       report_date_ISO: now_ISO,
+    //       from_user_id: my_id,
+    //       report_user_id: this.friend_id,
+    //       report_text: this.msgSelected.message,
+    //       status: environment.report_msg_status.CREATED,
+    //       from_user_data: this.utils.userInfo,
+    //       report_user_data: await this.firestoreService.getUserByID(this.friend_id)
+    //     };
+    //         this.firestoreService.reportMsg(report_data).then(res => {
+    //           this.utils.swalSuccess('OK', 'Le message a été signalé. Votre requête sera examinée sous 48 heures.');
+    //           this.modalCtrl.dismiss();
+    //       }).catch( err => {
+    //         this.utils.swalError(err);
+    //       });
+    //   }
+    // });
+  }
 
   setViewType(vt: string) {
     this.viewType = vt;

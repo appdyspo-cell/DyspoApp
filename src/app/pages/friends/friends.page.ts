@@ -22,6 +22,7 @@ import { UtilsService } from 'src/app/services/utils.service';
   styleUrls: ['./friends.page.scss'],
 })
 export class FriendsPage implements OnInit {
+  defaultImage = 'assets/logo.svg';
   selectSegment = 'friends';
   rate = 3;
   uid: any;

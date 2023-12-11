@@ -8,15 +8,20 @@ import { IonicModule } from '@ionic/angular';
 import { GroupChattingPageRoutingModule } from './group-chatting-routing.module';
 
 import { GroupChattingPage } from './group-chatting.page';
+import { LazyLoadImageModule } from 'ng-lazyload-image';
+
+import { SharedPipesModule } from 'src/app/modules/shared-pipes/shared-pipes.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-	TranslateModule,  
-    GroupChattingPageRoutingModule
+    TranslateModule,
+    LazyLoadImageModule,
+    SharedPipesModule,
+    GroupChattingPageRoutingModule,
   ],
-  declarations: [GroupChattingPage]
+  declarations: [GroupChattingPage],
 })
 export class GroupChattingPageModule {}
