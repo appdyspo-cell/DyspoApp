@@ -92,8 +92,8 @@ ion-content {
     margin-bottom: 13px;
     position: relative;
     overflow: hidden;
-    min-width: 20%;
-    width: fit-content !important;
+
+    // width: fit-content !important;
     align-items: flex-start !important;
 
     p {
@@ -149,9 +149,9 @@ ion-content {
     }
 
     &.received {
-      margin-left: 0;
-      margin-right: auto;
-
+      // margin-left: 0;
+      // margin-right: auto;
+      justify-content: flex-start;
       p {
         text-align: right;
       }
@@ -175,9 +175,9 @@ ion-content {
     }
 
     &.send {
-      margin-right: 0;
-      margin-left: auto;
-
+      //margin-right: 0;
+      //margin-left: auto;
+      justify-content: flex-end;
       p {
         text-align: left;
       }
