@@ -1,4 +1,10 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, NavController, PopoverController } from '@ionic/angular';
 import { format } from 'date-fns';
@@ -22,7 +28,7 @@ import Swal from 'sweetalert2';
   templateUrl: './group-chatting.page.html',
   styleUrls: ['./group-chatting.page.scss'],
 })
-export class GroupChattingPage implements OnInit {
+export class GroupChattingPage implements OnInit, OnDestroy {
   UserDyspoStatus = UserDyspoStatus;
 
   @ViewChild(IonContent) content!: IonContent;
@@ -42,7 +48,7 @@ export class GroupChattingPage implements OnInit {
   userInput = '';
   my_uid!: string;
   my_avatar!: string;
-  messagesSubscription: Subscription;
+  messagesSubscription!: Subscription;
   member_infos: AppUser[] = [];
   member_infos_obj: Record<string, AppUser> = {};
   defaultAvatar = 'assets/img/user.png';
@@ -62,29 +68,34 @@ export class GroupChattingPage implements OnInit {
     console.log('Event uid', this.agendaEvent);
     this.my_uid = this.userSvc.userInfo?.uid!;
     this.my_avatar = this.userSvc.userInfo?.avatarPath!;
+  }
 
-    this.chatSvc.listenMessages(this.agendaEvent);
-
-    this.messagesSubscription = this.chatSvc.messages$.subscribe(
-      (messages: ChatMessage[]) => {
-        this.msgList = messages;
-        this.scrollDown();
-        //Wait the last message Set zero to unread msgs
-        if (this.agendaEvent.last_message) {
-          if (
-            this.agendaEvent.last_message.time_ms <
-            messages[messages.length - 1].time_ms
-          ) {
-            this.chatSvc.markMessagesAsRead(this.agendaEvent);
-          }
-        } else {
-          this.chatSvc.markMessagesAsRead(this.agendaEvent);
-        }
-      }
-    );
+  ngOnDestroy(): void {
+    if (this.messagesSubscription) {
+      this.messagesSubscription.unsubscribe();
+    }
   }
 
   async ngOnInit() {
+    // Messages
+    this.chatSvc.removeListenMessages();
+    this.msgList = await this.chatSvc.getMessages(this.agendaEvent);
+
+    this.chatSvc.listenMessages(this.agendaEvent);
+
+    this.messagesSubscription = this.chatSvc.messages$.subscribe((data) => {
+      this.msgList = data.messages;
+      this.scrollDown();
+      //Wait the last message Set zero to unread msgs
+      if (data.action === 'ADDED') {
+        let lastMessage: ChatMessage | undefined;
+        if (data.messages?.length > 0) {
+          lastMessage = data.messages[data.messages.length - 1];
+        }
+        this.chatSvc.markLastMessageRead(this.agendaEvent, lastMessage);
+      }
+    });
+
     // Infos on members confirmed of the chat
     this.member_infos = await this.userSvc.getUserInfos(
       this.agendaEvent.members_uid

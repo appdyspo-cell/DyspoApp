@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { UtilsService } from './utils.service';
 
 import {
@@ -48,10 +48,16 @@ export class ChatService {
   chatroomsOnSnapshotCancel!: import('@angular/fire/firestore').Unsubscribe;
   messagesOnSnapshotCancel!: import('@angular/fire/firestore').Unsubscribe;
 
-  public chatroomsSubject = new BehaviorSubject<any[]>([]);
-  public messagesSubject = new BehaviorSubject<any[]>([]);
+  public chatroomsSubject = new BehaviorSubject<Chatroom[]>([]);
+  public messagesSubject = new Subject<{
+    action: 'MODIFIED' | 'ADDED' | 'REMOVED';
+    messages: ChatMessage[];
+  }>();
   chatrooms$: Observable<Chatroom[]>;
-  messages$: Observable<ChatMessage[]>;
+  messages$: Observable<{
+    action: 'MODIFIED' | 'ADDED' | 'REMOVED';
+    messages: ChatMessage[];
+  }>;
   uid!: string;
   chatroomsCollectionRef!: string;
 
@@ -117,16 +123,17 @@ export class ChatService {
     }
   }
 
-  async markMessagesAsRead(agendaEvent: AgendaEvent) {
+  async markLastMessageRead(agendaEvent: AgendaEvent, message?: ChatMessage) {
     if (this.uid) {
-      console.log('Mark message read');
+      console.log(
+        'Mark last message as read ' + message?.message + ' and reset count'
+      );
       const agendaDocRef = doc(
         this.firestore,
         `agenda_events`,
         agendaEvent.uid!
       );
 
-      console.log('Mark last message as read and reset count');
       await runTransaction(this.firestore, async (transaction) => {
         const agendaDoc = await transaction.get(agendaDocRef);
         if (!agendaDoc.exists()) {
@@ -139,13 +146,20 @@ export class ChatService {
 
         if (agendaFetched['user_' + this.uid]) {
           updateObject['user_' + this.uid + '.count'] = 0;
+          if (message) {
+            updateObject['user_' + this.uid + '.last_message_read_uid'] =
+              message.uid;
+            updateObject['user_' + this.uid + '.last_message_read_time'] =
+              message.time_ms;
+          }
+
           transaction.update(agendaDocRef, updateObject);
         }
-        const lastMessage = agendaFetched.last_message;
-        if (lastMessage) {
-          lastMessage.read_by.push(this.uid);
-          updateObject.last_message.read_by = lastMessage.read_by;
-        }
+        // const lastMessage = agendaFetched.last_message;
+        // if (lastMessage) {
+        //   lastMessage.read_by.push(this.uid);
+        //   updateObject.last_message.read_by = lastMessage.read_by;
+        // }
 
         transaction.update(agendaDocRef, updateObject);
       });
@@ -162,20 +176,23 @@ export class ChatService {
 
   createChatroom() {}
 
-  getMessages(agendaEvent: AgendaEvent) {
+  async getMessages(agendaEvent: AgendaEvent): Promise<ChatMessage[]> {
     const messagesCollectionRef = collection(
       this.firestore,
       `agenda_events/${agendaEvent.uid}/messages_list`
     );
 
-    getDocs(messagesCollectionRef);
+    const docs = await getDocs(messagesCollectionRef);
+    docs.forEach((doc) => {
+      this.messages.push(doc.data() as ChatMessage);
+    });
+    return this.messages;
   }
 
   listenMessages(agendaEvent: AgendaEvent) {
     if (this.messagesOnSnapshotCancel) {
       this.messagesOnSnapshotCancel();
     }
-    this.messages = [];
     const messagesCollectionRef = collection(
       this.firestore,
       `agenda_events/${agendaEvent.uid}/messages_list`
@@ -192,9 +209,18 @@ export class ChatService {
           });
           if (change.type === 'modified' && foundItem) {
             foundItem = msgFetched;
+            this.messagesSubject.next({
+              action: 'MODIFIED',
+              messages: this.messages,
+            });
           }
           if (change.type === 'added' && !foundItem) {
             this.messages.push(msgFetched);
+            console.log('Chat Svc messageSubject ADDED', msgFetched.message);
+            this.messagesSubject.next({
+              action: 'ADDED',
+              messages: this.messages,
+            });
           }
           if (change.type === 'removed') {
             const msgRemoved = change.doc.data() as ChatMessage;
@@ -204,10 +230,12 @@ export class ChatService {
             );
             if (foundIndex >= 0) {
               this.messages.splice(foundIndex, 1);
+              this.messagesSubject.next({
+                action: 'REMOVED',
+                messages: this.messages,
+              });
             }
           }
-
-          this.messagesSubject.next(this.messages);
         });
       }
     );
