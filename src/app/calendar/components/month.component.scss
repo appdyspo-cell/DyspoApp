@@ -88,13 +88,41 @@
 }
 
 :host .event-badge {
-  width: 10px;
-  height: 10px;
+  //width: 10px;
+  //height: 10px;
   background-color: red;
-  position: absolute;
-  top: 5px;
-  border-radius: 5px;
+  //position: absolute;
+
+  //border-radius: 5px;
   z-index: 15;
+
+  position: absolute;
+  top: -4px; /* Ajustez cette valeur pour positionner verticalement */
+  right: 0px; /* Ajustez cette valeur pour positionner horizontalement */
+  font-size: 12px; /* Taille du texte du badge */
+  width: 12px; /* Largeur du badge */
+  height: 12px; /* Hauteur du badge */
+  border-radius: 50%; /* Pour créer un badge circulaire */
+  background-color: red; /* Couleur de fond du badge */
+  color: white; /* Couleur du texte du badge */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+ion-badge {
+  position: absolute;
+  top: -5px; /* Ajustez cette valeur pour positionner verticalement */
+  right: -5px; /* Ajustez cette valeur pour positionner horizontalement */
+  font-size: 12px; /* Taille du texte du badge */
+  width: 20px; /* Largeur du badge */
+  height: 20px; /* Hauteur du badge */
+  border-radius: 50%; /* Pour créer un badge circulaire */
+  background-color: red; /* Couleur de fond du badge */
+  color: white; /* Couleur du texte du badge */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 :host .primary .startSelection {

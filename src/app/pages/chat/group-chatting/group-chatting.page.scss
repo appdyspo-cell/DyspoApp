@@ -249,7 +249,7 @@ ion-footer {
         align-items: center;
 
         ion-icon {
-          min-width: 35px;
+          // min-width: 35px;
 
           &.zmdi-mic {
             color: var(--primary);
@@ -284,7 +284,8 @@ ion-footer {
 
     &.active {
       .option {
-        width: calc(100% - 47px);
+        //width: calc(100% - 47px);
+        width: 230px;
         transition: all 0.2s;
 
         ion-icon {

@@ -89,8 +89,9 @@ export const MONTH_VALUE_ACCESSOR: any = {
                     {{ day.title }}
                   </p>
                   <small *ngIf="day.subTitle">{{ day?.subTitle }}</small>
+                  <!-- <ion-badge>2</ion-badge> -->
+                  <div *ngIf="day.isEvent" class="event-badge">&nbsp;</div>
                 </button>
-                <div *ngIf="day.isEvent" class="event-badge">&nbsp;</div>
               </ng-container>
             </div>
           </ng-template>

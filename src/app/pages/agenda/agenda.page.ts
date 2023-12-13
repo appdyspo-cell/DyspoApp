@@ -86,6 +86,7 @@ export class AgendaPage implements AfterViewInit {
     this.agendaEvents$ = this.agendaSvc.agendaEvents$;
     this.agendaEventsSubscription = this.agendaSvc.agendaEvents$.subscribe(
       (agendaEvents: AgendaEvent[]) => {
+        console.log('Ag events');
         this.agendaEvents = agendaEvents;
         this.tagCalendarEventsData();
       }
@@ -163,6 +164,7 @@ export class AgendaPage implements AfterViewInit {
     } else {
       this.eventsForDate = [];
       this.calendarMonthData.days.forEach((day) => {
+        day.isEvent = false;
         this.agendaEvents.forEach((agendaEvent) => {
           if (isSameDay(day.time, parseISO(agendaEvent.startISO))) {
             day.isEvent = true;

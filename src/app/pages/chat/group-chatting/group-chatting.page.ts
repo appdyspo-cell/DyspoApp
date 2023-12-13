@@ -6,6 +6,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CameraSource } from '@capacitor/camera';
 import { IonContent, NavController, PopoverController } from '@ionic/angular';
 import { format } from 'date-fns';
 import { cloneDeep, reduce } from 'lodash';
@@ -21,7 +22,9 @@ import {
 import { AgendaService } from 'src/app/services/agenda.service';
 import { ChatService } from 'src/app/services/chat.service';
 import { FriendsService } from 'src/app/services/friends.service';
+import { MediaService } from 'src/app/services/media.service';
 import { UserService } from 'src/app/services/user.service';
+import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
 @Component({
   selector: 'app-group-chatting',
@@ -52,6 +55,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   member_infos: AppUser[] = [];
   member_infos_obj: Record<string, AppUser> = {};
   defaultAvatar = 'assets/img/user.png';
+  pendingAttachment: string | undefined;
 
   constructor(
     private navCtrl: NavController,
@@ -61,7 +65,8 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     private chatSvc: ChatService,
     private userSvc: UserService,
     private agendaSvc: AgendaService,
-    private friendsSvc: FriendsService
+    private friendsSvc: FriendsService,
+    private mediaSvc: MediaService
   ) {
     this.agendaEvent =
       this.router.getCurrentNavigation()?.extras.state?.['agendaEvent'];
@@ -80,7 +85,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     // Messages
     this.chatSvc.removeListenMessages();
     this.msgList = await this.chatSvc.getMessages(this.agendaEvent);
-
+    this.scrollDown();
     this.chatSvc.listenMessages(this.agendaEvent);
 
     this.messagesSubscription = this.chatSvc.messages$.subscribe((data) => {
@@ -167,7 +172,12 @@ export class GroupChattingPage implements OnInit, OnDestroy {
         read_by: [],
       };
 
+      if (this.pendingAttachment) {
+        message.image = this.pendingAttachment;
+      }
+
       this.chatSvc.sendMsg(message, this.agendaEvent);
+      this.pendingAttachment = undefined;
       //this.msgList.push(message);
 
       // this.afDB
@@ -261,7 +271,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   scrollDown() {
     setTimeout(() => {
       this.content.scrollToBottom(400);
-    }, 100);
+    }, 250);
   }
 
   deleteMsg(ev: any) {
@@ -327,6 +337,33 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   }
   groupinfo() {
     this.router.navigate(['./group-info']);
+  }
+
+  async takePhoto() {
+    this.viewType = '';
+    const { filepath } = await this.mediaSvc.takePhoto({
+      firebasePath:
+        environment.firebase_event_root + '/' + this.agendaEvent.uid,
+      filename: 'att_' + new Date().getTime() + '.jpg',
+      source: CameraSource.Camera,
+    });
+    this.pendingAttachment = filepath;
+    this.scrollDown();
+  }
+  async openGallery() {
+    this.viewType = '';
+    const { filepath } = await this.mediaSvc.takePhoto({
+      firebasePath:
+        environment.firebase_event_root + '/' + this.agendaEvent.uid,
+      filename: 'att_' + new Date().getTime() + '.jpg',
+      source: CameraSource.Photos,
+    });
+    this.pendingAttachment = filepath;
+    this.scrollDown();
+  }
+
+  openImage(msg: ChatMessage) {
+    throw new Error('Method not implemented.');
   }
 
   onSelectUser(user: AppUserWithEvents, $event: MouseEvent) {
