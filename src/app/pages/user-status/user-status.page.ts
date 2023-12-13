@@ -63,10 +63,9 @@ export class UserStatusPage implements OnInit {
     this.friends$ = this.friendService.friends$;
     this.agendaEventsSubscription = this.agendaSvc.agendaEvents$.subscribe(
       (agendaEvents) => {
-        console.log(agendaEvents);
+        console.log('User Status -> get Agenda Events', agendaEvents);
 
         this.nextAgendaEvents = agendaEvents.filter((agEvent) => {
-          console.log(new Date(agEvent.startISO));
           return isAfter(parseISO(agEvent.startISO), new Date());
         });
 
@@ -87,12 +86,7 @@ export class UserStatusPage implements OnInit {
 
     this.agendaDysposSubscription = this.agendaSvc.agendaDyspos$.subscribe(
       (agendaDyspos) => {
-        console.log('Agenda dyspos', agendaDyspos);
         const today = new Date().getTime();
-
-        console.log('date ', getDate(today));
-        console.log('month ', getMonth(today));
-        console.log('year ', getYear(today));
 
         const result = agendaDyspos.items.filter((item) => {
           return (

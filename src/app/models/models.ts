@@ -21,6 +21,7 @@ export interface AppUser {
   nb_rates?: number;
   created_at_ms?: number;
   is_phoneVerified?: boolean;
+  is_my_friend?: boolean;
 }
 
 export interface Friend extends AppUser {
@@ -101,12 +102,15 @@ export interface AgendaEvent {
   day: number;
   month: number;
   year: number;
+  date_index: string;
+  last_message?: ChatMessage;
   [member_uid: string]:
     | string
     | number
     | undefined
     | string[]
     | boolean
+    | ChatMessage
     | Chatroom;
 }
 
@@ -205,9 +209,8 @@ export interface ChatMessage {
   image?: string;
   video?: string;
   map?: string;
-  //id: number;
-  //status: string;
-  date?: string;
+  read_by: string[];
+  date_ISO: string;
   is_deleted?: boolean;
 }
 

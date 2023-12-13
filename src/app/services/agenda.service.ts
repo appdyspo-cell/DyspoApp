@@ -19,6 +19,7 @@ import {
   getDocs,
   onSnapshot,
   query,
+  runTransaction,
   setDoc,
   updateDoc,
   where,
@@ -361,6 +362,45 @@ export class AgendaService {
     });
   }
 
+  async _getDyspos(
+    uids: string[],
+    agendaEvent: AgendaEvent
+  ): Promise<FriendDyspo[]> {
+    const dateToCheck = new Date(agendaEvent.startISO);
+    const agenda_dyspo_uid =
+      getYear(dateToCheck) +
+      '_' +
+      getMonth(dateToCheck) +
+      '_' +
+      getDate(dateToCheck);
+    const dyspos: FriendDyspo[] = [];
+    for (let uid of uids) {
+      const docRef = doc(
+        this.firestore,
+        `agenda_dyspos/${uid}/dyspo_list`,
+        agenda_dyspo_uid
+      );
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        console.log('Document data:', docSnap.data());
+        const agendaDyspo = docSnap.data() as AgendaDyspoItem;
+        dyspos.push({
+          friend_dyspo: agendaDyspo.userDyspo,
+          friend_uid: uid,
+          dyspo_date_ISO: agendaEvent.startISO,
+        });
+      } else {
+        dyspos.push({
+          friend_dyspo: UserDyspoStatus.UNDEFINED,
+          friend_uid: uid,
+          dyspo_date_ISO: agendaEvent.startISO,
+        });
+        console.log('No such document!');
+      }
+    }
+    return dyspos;
+  }
+
   async getDyspos(
     uids: string[],
     agendaEvent: AgendaEvent
@@ -412,9 +452,7 @@ export class AgendaService {
     const queryAgendaEvents = query(
       agendaEventsCollectionRef,
       where('members_uid', 'array-contains', uid),
-      where('day', '==', agendaEventToCompare.day),
-      where('month', '==', agendaEventToCompare.month),
-      where('year', '==', agendaEventToCompare.year)
+      where('date_index', '==', agendaEventToCompare.date_index)
     );
 
     const querySnapshots = await getDocs(queryAgendaEvents);

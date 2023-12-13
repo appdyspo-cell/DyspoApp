@@ -98,7 +98,7 @@ export class FriendsService {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        console.log('Document data:', docSnap.data());
+        // console.log('Document data:', docSnap.data());
         const userData = docSnap.data() as AppUser;
         friend.userData = userData;
         friend.userData.uid = docSnap.id;
@@ -156,10 +156,9 @@ export class FriendsService {
             } else {
               const friend = change.doc.data() as Friend;
               friend.friend_uid = change.doc.id;
-              console.log(friend);
+
               this.getFriendAndPush(friend)
                 .then((resPromise) => {
-                  console.log('Friend Hydrated ', resPromise);
                   that.friendsSubject.next(that.friends);
                 })
                 .catch((err) => {
@@ -213,41 +212,59 @@ export class FriendsService {
     );
   }
 
-  async invite(membre: AppUser) {
-    const uid = this.userSvc.userInfo?.uid || 'unknown';
-    console.log(membre);
-    //Check if membre has been blocked
-    //this.friendService
-    this.utils.showLoader();
+  isMyFriend(uid: string): boolean {
+    const my_uid = this.userSvc.userInfo?.uid || 'unknown';
+    const myFriendsUids = this.friends.map((friend) => friend.friend_uid);
+    if (my_uid !== uid) {
+      return myFriendsUids.includes(uid);
+    } else {
+      return true;
+    }
+  }
 
-    const myInviteData = {
-      friend_uid: membre.uid,
-      friendLastname: membre.lastname,
-      friendFirstname: membre.firstname,
-      friend_status: FriendStatus.INVITED,
-      requestDate: new Date().getTime(),
-    };
-    await setDoc(
-      doc(this.firestore, `friends/${uid}/friend_list`, membre.uid),
-      myInviteData,
-      { merge: true }
-    );
+  async invite(membre: AppUser, showToast = false): Promise<boolean> {
+    try {
+      const uid = this.userSvc.userInfo?.uid || 'unknown';
+      console.log(membre);
+      //Check if membre has been blocked
+      //this.friendService
+      this.utils.showLoader();
 
-    const hisSuggestionData = {
-      friend_uid: uid,
-      friendLastname: this.userSvc.userInfo?.lastname,
-      friendFirstname: this.userSvc.userInfo?.firstname,
-      friend_status: FriendStatus.SUGGESTED,
-      requestDate: new Date().getTime(),
-    };
-    await setDoc(
-      doc(this.firestore, `friends/${membre.uid}/friend_list`, uid),
-      hisSuggestionData,
-      { merge: true }
-    );
+      const myInviteData = {
+        friend_uid: membre.uid,
+        friendLastname: membre.lastname,
+        friendFirstname: membre.firstname,
+        friend_status: FriendStatus.INVITED,
+        requestDate: new Date().getTime(),
+      };
+      await setDoc(
+        doc(this.firestore, `friends/${uid}/friend_list`, membre.uid),
+        myInviteData,
+        { merge: true }
+      );
 
-    this.utils.hideLoader();
-    //this.notificationSvc.sendInviteFriendNotif(membre.uid);
+      const hisSuggestionData = {
+        friend_uid: uid,
+        friendLastname: this.userSvc.userInfo?.lastname,
+        friendFirstname: this.userSvc.userInfo?.firstname,
+        friend_status: FriendStatus.SUGGESTED,
+        requestDate: new Date().getTime(),
+      };
+      await setDoc(
+        doc(this.firestore, `friends/${membre.uid}/friend_list`, uid),
+        hisSuggestionData,
+        { merge: true }
+      );
+
+      this.utils.hideLoader();
+      if (showToast) this.utils.showToastSuccess('Invitation envoyée');
+      return true;
+      //this.notificationSvc.sendInviteFriendNotif(membre.uid);
+    } catch (err: any) {
+      this.utils.hideLoader();
+      this.utils.showToastError('Erreur');
+      return false;
+    }
   }
 
   async addFriend(friend: Friend) {

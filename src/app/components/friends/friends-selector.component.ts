@@ -17,11 +17,11 @@ import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
 
 @Component({
-  selector: 'app-friends',
-  templateUrl: './friends.component.html',
-  styleUrls: ['./friends.component.scss'],
+  selector: 'app-friends-selector',
+  templateUrl: './friends-selector.component.html',
+  styleUrls: ['./friends-selector.component.scss'],
 })
-export class FriendsComponent implements OnInit {
+export class FriendsSelectorComponent implements OnInit {
   UserDyspoStatus = UserDyspoStatus;
   friendSelectionType = FriendSelectionType;
   selectSegment = FriendSelectionType.FRIENDS;

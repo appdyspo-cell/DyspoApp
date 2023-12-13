@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FriendsComponent } from 'src/app/components/friends/friends.component';
+import { FriendsSelectorComponent } from 'src/app/components/friends/friends-selector.component';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { PictureComponent } from 'src/app/components/picture/picture.component';
@@ -11,7 +11,7 @@ import { ChatMenuComponent } from 'src/app/components/chat-menu/chat-menu.compon
 
 @NgModule({
   declarations: [
-    FriendsComponent,
+    FriendsSelectorComponent,
     PictureComponent,
     AgendaEventMiniComponent,
     AgendaEventInfoComponent,
@@ -19,7 +19,7 @@ import { ChatMenuComponent } from 'src/app/components/chat-menu/chat-menu.compon
   ],
   imports: [CommonModule, IonicModule, FormsModule, LazyLoadImageModule],
   exports: [
-    FriendsComponent,
+    FriendsSelectorComponent,
     PictureComponent,
     AgendaEventMiniComponent,
     ChatMenuComponent,

@@ -21,6 +21,7 @@ import {
   UserDyspoStatus,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
+import { FriendsService } from 'src/app/services/friends.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import Swal from 'sweetalert2';
@@ -58,7 +59,7 @@ export class AgendaEventInfoComponent implements OnInit {
     private alertCtrl: AlertController,
     private utils: UtilsService,
     private navCtrl: NavController,
-
+    private friendsSvc: FriendsService,
     private ngZone: NgZone
   ) {}
 
@@ -83,6 +84,7 @@ export class AgendaEventInfoComponent implements OnInit {
       this.agendaEvent!.members_uid
     );
 
+    // New Admin candidates
     if (this.agendaEvent.admin_uid === this.userSvc.userInfo?.uid) {
       this.admin = this.userSvc.userInfo;
       this.new_admin_candidates = this.members_presence_confirmed.filter(
@@ -101,6 +103,9 @@ export class AgendaEventInfoComponent implements OnInit {
       this.members_presence_not_confirmed
     );
     for (let member of allMembers) {
+      // Is he my friend ?
+      member.is_my_friend = this.friendsSvc.isMyFriend(member.uid);
+
       // Dyspos
       const dyspo = (
         await this.agendaSvc.getDyspos([member.uid], this.agendaEvent)
@@ -240,5 +245,11 @@ export class AgendaEventInfoComponent implements OnInit {
           this.close();
         }, 1000);
       });
+  }
+
+  invite(user: AppUserWithEvents) {
+    this.friendsSvc.invite(user, true).then(() => {
+      user.is_my_friend = true;
+    });
   }
 }

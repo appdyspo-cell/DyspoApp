@@ -19,7 +19,7 @@ import {
   setMinutes,
 } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { FriendsComponent } from 'src/app/components/friends/friends.component';
+import { FriendsSelectorComponent } from 'src/app/components/friends/friends-selector.component';
 import {
   AgendaEvent,
   AgendaEventStatus,
@@ -116,6 +116,13 @@ export class CreateEventPage implements OnInit {
             day: getDate(new Date(this.tsInputDate)),
             month: getMonth(new Date(this.tsInputDate)),
             year: getYear(new Date(this.tsInputDate)),
+            avatar: 'assets/event.png',
+            date_index:
+              getDate(new Date(this.tsInputDate)).toString() +
+              '_' +
+              getMonth(new Date(this.tsInputDate)).toString() +
+              '_' +
+              getYear(new Date(this.tsInputDate)).toString(),
           };
 
           // Hydrate agendaEvent
@@ -131,6 +138,15 @@ export class CreateEventPage implements OnInit {
           this.agendaEvent.end_time_formatted = this.formatTime(
             this.agendaEvent.endISO
           );
+
+          // Create chatroom
+          const userChatroom: Chatroom = {
+            count: 0,
+            lastMessageRead: '',
+            startMessageId: 0,
+            nextMessageId: 0,
+          };
+          this.agendaEvent!['user_' + this.uid] = userChatroom;
 
           if (isSameDay(this.tsInputDate, new Date())) {
             this.min_time_ISO_start = this.agendaEvent.startISO;
@@ -190,8 +206,13 @@ export class CreateEventPage implements OnInit {
     this.agendaEvent!.day = getDate(parseISO(this.agendaEvent!.startISO));
     this.agendaEvent!.month = getMonth(parseISO(this.agendaEvent!.startISO));
     this.agendaEvent!.year = getYear(parseISO(this.agendaEvent!.startISO));
-
-    this.min_time_ISO_end = ev.detail.value;
+    (this.agendaEvent!.date_index =
+      getDate(new Date(this.tsInputDate)).toString() +
+      '_' +
+      getMonth(new Date(this.tsInputDate)).toString() +
+      '_' +
+      getYear(new Date(this.tsInputDate)).toString()),
+      (this.min_time_ISO_end = ev.detail.value);
     if (
       isAfter(
         parseISO(this.agendaEvent!.startISO),
@@ -268,7 +289,7 @@ export class CreateEventPage implements OnInit {
 
   async openFriendsModal() {
     const modal = await this.modalCtrl.create({
-      component: FriendsComponent,
+      component: FriendsSelectorComponent,
       componentProps: {
         agendaEvent: this.agendaEvent,
         mode: this.mode,
@@ -282,13 +303,13 @@ export class CreateEventPage implements OnInit {
     if (role === 'confirm') {
       this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!);
       if (data.newInvits.length > 0) {
-        const userChatroom: Chatroom = {
-          count: 0,
-          lastMessageRead: '',
-          startMessageId: 0,
-          nextMessageId: 0,
-        };
-        this.agendaEvent!['user_' + this.uid] = userChatroom;
+        // const userChatroom: Chatroom = {
+        //   count: 0,
+        //   lastMessageRead: '',
+        //   startMessageId: 0,
+        //   nextMessageId: 0,
+        // };
+        // this.agendaEvent!['user_' + this.uid] = userChatroom;
         // data.newInvits.forEach((newInvit: string) => {
         //   const userChatroom: Chatroom = {
         //     count: 0,

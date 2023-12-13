@@ -121,6 +121,11 @@
               class="thumbnail-badge"
               >{{ member.agendaEvents!.length }}</ion-badge
             >
+            <ion-icon
+              (click)="invite(member)"
+              *ngIf="member.is_my_friend === false"
+              class="zmdi zmdi-plus end"
+            ></ion-icon>
           </ion-thumbnail>
           <ion-label>{{ member.firstname }}</ion-label>
         </div>
@@ -156,6 +161,11 @@
                 class="thumbnail-badge"
                 >{{ member.agendaEvents!.length }}</ion-badge
               >
+              <ion-icon
+                (click)="invite(member)"
+                *ngIf="member.is_my_friend === false"
+                class="zmdi zmdi-plus end"
+              ></ion-icon>
             </ion-thumbnail>
             <ion-label>{{ member.firstname }}</ion-label>
           </div>

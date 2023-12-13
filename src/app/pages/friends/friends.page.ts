@@ -242,8 +242,7 @@ export class FriendsPage implements OnInit {
 
     animation.onFinish(() => {
       animationDeleteItem.play();
-      this.utils.showToast('Ami ajouté');
-      console.log('Add friend ');
+      this.utils.showToastSuccess('Ami ajouté');
     });
   }
 

@@ -31,6 +31,7 @@ import {
   getDocs,
   onSnapshot,
   query,
+  runTransaction,
   setDoc,
   updateDoc,
   where,
@@ -70,36 +71,84 @@ export class ChatService {
    ******************  Chatrooms ********************
    ***************************************************/
 
-  sendMsg(message: ChatMessage, agendaEvent: AgendaEvent) {
-    setDoc(
-      doc(
+  async sendMsg(message: ChatMessage, agendaEvent: AgendaEvent) {
+    try {
+      const agendaDocRef = doc(
+        this.firestore,
+        `agenda_events`,
+        agendaEvent.uid!
+      );
+
+      const messageCollectionRef = doc(
         this.firestore,
         `agenda_events/${agendaEvent.uid}/messages_list`,
         message.uid
-      ),
-      message,
-      { merge: true }
-    );
+      );
 
-    agendaEvent.members_uid.forEach((member_uid) => {
-      if (member_uid !== this.uid) {
-        const chatroom = agendaEvent['user_' + member_uid] as Chatroom;
-        chatroom.count = chatroom.count + 1;
-      }
-    });
+      await runTransaction(this.firestore, async (transaction) => {
+        const agendaDoc = await transaction.get(agendaDocRef);
+        if (!agendaDoc.exists()) {
+          throw 'Document does not exist!';
+        }
 
-    console.log(agendaEvent);
-    updateDoc(
-      doc(this.firestore, `agenda_events/${agendaEvent.uid}`),
-      agendaEvent
-    );
+        //agenda fetched-> Write values
+        const agendaFetched = agendaDoc.data() as AgendaEvent;
+
+        for (let member_uid of agendaFetched.members_uid) {
+          if (member_uid !== this.uid) {
+            if (agendaFetched['user_' + member_uid]) {
+              const chatroom = agendaFetched['user_' + member_uid] as Chatroom;
+              const newCount = chatroom.count + 1;
+
+              const updateObject: any = {};
+              updateObject['user_' + member_uid + '.count'] = newCount;
+
+              transaction.update(agendaDocRef, updateObject);
+            }
+          }
+        }
+
+        transaction.update(agendaDocRef, { last_message: message });
+        transaction.set(messageCollectionRef, message);
+      });
+      console.log('Transaction successfully committed!');
+    } catch (e) {
+      console.log('Transaction failed: ', e);
+    }
   }
 
-  markMessagesAsRead(agendaEvent: AgendaEvent) {
+  async markMessagesAsRead(agendaEvent: AgendaEvent) {
     if (this.uid) {
-      console.log('MArk as read');
-      const docRef = doc(this.firestore, `agenda_events/${agendaEvent.uid}`);
-      updateDoc(docRef, { ['user_' + this.uid + '.count']: 0 });
+      console.log('Mark message read');
+      const agendaDocRef = doc(
+        this.firestore,
+        `agenda_events`,
+        agendaEvent.uid!
+      );
+
+      console.log('Mark last message as read and reset count');
+      await runTransaction(this.firestore, async (transaction) => {
+        const agendaDoc = await transaction.get(agendaDocRef);
+        if (!agendaDoc.exists()) {
+          throw 'Document does not exist!';
+        }
+
+        //agenda fetched-> Write values
+        const agendaFetched = agendaDoc.data() as AgendaEvent;
+        const updateObject: any = {};
+
+        if (agendaFetched['user_' + this.uid]) {
+          updateObject['user_' + this.uid + '.count'] = 0;
+          transaction.update(agendaDocRef, updateObject);
+        }
+        const lastMessage = agendaFetched.last_message;
+        if (lastMessage) {
+          lastMessage.read_by.push(this.uid);
+          updateObject.last_message.read_by = lastMessage.read_by;
+        }
+
+        transaction.update(agendaDocRef, updateObject);
+      });
     }
   }
 
@@ -113,7 +162,19 @@ export class ChatService {
 
   createChatroom() {}
 
+  getMessages(agendaEvent: AgendaEvent) {
+    const messagesCollectionRef = collection(
+      this.firestore,
+      `agenda_events/${agendaEvent.uid}/messages_list`
+    );
+
+    getDocs(messagesCollectionRef);
+  }
+
   listenMessages(agendaEvent: AgendaEvent) {
+    if (this.messagesOnSnapshotCancel) {
+      this.messagesOnSnapshotCancel();
+    }
     this.messages = [];
     const messagesCollectionRef = collection(
       this.firestore,

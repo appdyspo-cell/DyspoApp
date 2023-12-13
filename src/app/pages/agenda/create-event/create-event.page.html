@@ -203,7 +203,10 @@
       ><ion-icon name="camera" slot="start"></ion-icon>Ajouter</ion-button
     >
   </ion-list-header>
-  <div *ngIf="agendaEvent?.avatar">
+  <div
+    *ngIf="agendaEvent?.avatar"
+    style="max-width: 80%; padding: 16px; margin: auto"
+  >
     <ion-img src="{{agendaEvent?.avatar}}" />
   </div>
 </ion-content>

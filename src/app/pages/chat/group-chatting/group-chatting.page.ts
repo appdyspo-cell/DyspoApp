@@ -2,10 +2,19 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, NavController, PopoverController } from '@ionic/angular';
 import { format } from 'date-fns';
+import { cloneDeep, reduce } from 'lodash';
 import { Subscription } from 'rxjs';
 import { ChatMenuComponent } from 'src/app/components/chat-menu/chat-menu.component';
-import { AgendaEvent, AppUser, ChatMessage } from 'src/app/models/models';
+import {
+  AgendaEvent,
+  AppUser,
+  AppUserWithEvents,
+  ChatMessage,
+  UserDyspoStatus,
+} from 'src/app/models/models';
+import { AgendaService } from 'src/app/services/agenda.service';
 import { ChatService } from 'src/app/services/chat.service';
+import { FriendsService } from 'src/app/services/friends.service';
 import { UserService } from 'src/app/services/user.service';
 import Swal from 'sweetalert2';
 @Component({
@@ -14,6 +23,8 @@ import Swal from 'sweetalert2';
   styleUrls: ['./group-chatting.page.scss'],
 })
 export class GroupChattingPage implements OnInit {
+  UserDyspoStatus = UserDyspoStatus;
+
   @ViewChild(IonContent) content!: IonContent;
   loading = false;
 
@@ -42,7 +53,9 @@ export class GroupChattingPage implements OnInit {
     private popCtrl: PopoverController,
     private router: Router,
     private chatSvc: ChatService,
-    private userSvc: UserService
+    private userSvc: UserService,
+    private agendaSvc: AgendaService,
+    private friendsSvc: FriendsService
   ) {
     this.agendaEvent =
       this.router.getCurrentNavigation()?.extras.state?.['agendaEvent'];
@@ -56,21 +69,49 @@ export class GroupChattingPage implements OnInit {
       (messages: ChatMessage[]) => {
         this.msgList = messages;
         this.scrollDown();
-        // Set zero to unread msgs
-        this.chatSvc.markMessagesAsRead(this.agendaEvent);
+        //Wait the last message Set zero to unread msgs
+        if (this.agendaEvent.last_message) {
+          if (
+            this.agendaEvent.last_message.time_ms <
+            messages[messages.length - 1].time_ms
+          ) {
+            this.chatSvc.markMessagesAsRead(this.agendaEvent);
+          }
+        } else {
+          this.chatSvc.markMessagesAsRead(this.agendaEvent);
+        }
       }
     );
   }
 
   async ngOnInit() {
+    // Infos on members confirmed of the chat
     this.member_infos = await this.userSvc.getUserInfos(
       this.agendaEvent.members_uid
     );
+
     // transform
     this.member_infos_obj = this.member_infos.reduce((acc, user: AppUser) => {
       acc[user.uid as string] = user;
       return acc;
     }, {} as Record<string, AppUser>);
+
+    // Get dyspos
+
+    for (let member of this.member_infos) {
+      // Dyspos
+      const dyspo = (
+        await this.agendaSvc.getDyspos([member.uid], this.agendaEvent)
+      )[0];
+      const dyspoStatus = dyspo.friend_dyspo;
+      // Hydrate AppUser with dyspo status
+      member.dyspoStatus = dyspoStatus;
+
+      // Is he my friend ?
+      for (let member of this.member_infos) {
+        member.is_my_friend = this.friendsSvc.isMyFriend(member.uid);
+      }
+    }
   }
 
   async openMenu(ev: any) {
@@ -111,7 +152,8 @@ export class GroupChattingPage implements OnInit {
         time_ms: d.getTime(),
         message: this.userInput,
         uid: 'msg_' + d.getTime(),
-        date: d.toISOString(),
+        date_ISO: d.toISOString(),
+        read_by: [],
       };
 
       this.chatSvc.sendMsg(message, this.agendaEvent);
@@ -274,5 +316,13 @@ export class GroupChattingPage implements OnInit {
   }
   groupinfo() {
     this.router.navigate(['./group-info']);
+  }
+
+  onSelectUser(user: AppUserWithEvents, $event: MouseEvent) {
+    if (!user.is_my_friend) {
+      this.friendsSvc.invite(user, true).then(() => {
+        user.is_my_friend = true;
+      });
+    }
   }
 }

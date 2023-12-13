@@ -49,6 +49,36 @@
       </ion-icon>
     </ion-buttons>
   </ion-toolbar>
+  <div class="category_div">
+    <div class="menu">
+      <div class="item" *ngFor="let member of member_infos">
+        <ion-thumbnail
+          (click)="onSelectUser(member, $event)"
+          [ngClass]="{
+          'thumb-kid': member.dyspoStatus === UserDyspoStatus.DYSPOWITHKIDS,
+          'thumb-nokids': member.dyspoStatus === UserDyspoStatus.DYSPO,
+          'thumb-nodyspo': member.dyspoStatus === UserDyspoStatus.NODYSPO,
+          'animate__animated animate__zoomIn': true
+        }"
+        >
+          <img src="{{ member.avatarPath }}" />
+          <!-- <ion-badge
+          *ngIf="member.agendaEvents!.length > 0"
+          name="warning-outline"
+          color="danger"
+          class="thumbnail-badge"
+          >{{ member.agendaEvents!.length }}</ion-badge
+        > -->
+          <ion-icon
+            *ngIf="member.is_my_friend === false"
+            class="zmdi zmdi-plus end"
+          ></ion-icon>
+        </ion-thumbnail>
+
+        <ion-label>{{ member.firstname }}</ion-label>
+      </div>
+    </div>
+  </div>
 </ion-header>
 
 <ion-content>
@@ -130,11 +160,11 @@
             <img src="assets/img/map.png" />
           </div>
         </div>
-        <p>{{msg.date! | dateChatFormat}}</p>
+        <p>{{msg.date_ISO | dateChatFormat}}</p>
       </div>
 
       <div *ngIf="msg.sender === my_uid" class="chat-box d-flex send">
-        <p>{{msg.date! | dateChatFormat}}</p>
+        <p>{{msg.date_ISO | dateChatFormat}}</p>
         <div class="chat">
           <div class="chat_detail">
             <div class="text">
