@@ -107,7 +107,7 @@
             </div>
           </div>
 
-          <div class="attachment" *ngIf="msg.image">
+          <div class="attachment" *ngIf="msg.image" (click)="openImage(msg)">
             <img src="{{msg.image}}" />
           </div>
         </div>

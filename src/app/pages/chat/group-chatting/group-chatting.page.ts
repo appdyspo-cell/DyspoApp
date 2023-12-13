@@ -7,11 +7,17 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CameraSource } from '@capacitor/camera';
-import { IonContent, NavController, PopoverController } from '@ionic/angular';
+import {
+  IonContent,
+  ModalController,
+  NavController,
+  PopoverController,
+} from '@ionic/angular';
 import { format } from 'date-fns';
 import { cloneDeep, reduce } from 'lodash';
 import { Subscription } from 'rxjs';
 import { ChatMenuComponent } from 'src/app/components/chat-menu/chat-menu.component';
+import { DyspoViewerComponent } from 'src/app/components/dyspo-viewer/dyspo-viewer.component';
 import {
   AgendaEvent,
   AppUser,
@@ -66,7 +72,8 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     private userSvc: UserService,
     private agendaSvc: AgendaService,
     private friendsSvc: FriendsService,
-    private mediaSvc: MediaService
+    private mediaSvc: MediaService,
+    private modalCtrl: ModalController
   ) {
     this.agendaEvent =
       this.router.getCurrentNavigation()?.extras.state?.['agendaEvent'];
@@ -362,8 +369,14 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     this.scrollDown();
   }
 
-  openImage(msg: ChatMessage) {
-    throw new Error('Method not implemented.');
+  async openImage(msg: ChatMessage) {
+    const modal = await this.modalCtrl.create({
+      component: DyspoViewerComponent,
+      componentProps: {
+        message: msg,
+      },
+    });
+    modal.present();
   }
 
   onSelectUser(user: AppUserWithEvents, $event: MouseEvent) {

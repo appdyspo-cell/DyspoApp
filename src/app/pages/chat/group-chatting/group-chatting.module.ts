@@ -11,6 +11,7 @@ import { GroupChattingPage } from './group-chatting.page';
 import { LazyLoadImageModule } from 'ng-lazyload-image';
 
 import { SharedPipesModule } from 'src/app/modules/shared-pipes/shared-pipes.module';
+import { SharedModule } from 'src/app/modules/shared/shared.module';
 
 @NgModule({
   imports: [
@@ -20,6 +21,7 @@ import { SharedPipesModule } from 'src/app/modules/shared-pipes/shared-pipes.mod
     TranslateModule,
     LazyLoadImageModule,
     SharedPipesModule,
+    SharedModule,
     GroupChattingPageRoutingModule,
   ],
   declarations: [GroupChattingPage],

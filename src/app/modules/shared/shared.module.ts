@@ -9,6 +9,8 @@ import { AgendaEventInfoComponent } from 'src/app/components/agenda-event-info/a
 import { LazyLoadImageModule } from 'ng-lazyload-image';
 import { ChatMenuComponent } from 'src/app/components/chat-menu/chat-menu.component';
 
+import { DyspoViewerComponent } from 'src/app/components/dyspo-viewer/dyspo-viewer.component';
+
 @NgModule({
   declarations: [
     FriendsSelectorComponent,
@@ -16,6 +18,7 @@ import { ChatMenuComponent } from 'src/app/components/chat-menu/chat-menu.compon
     AgendaEventMiniComponent,
     AgendaEventInfoComponent,
     ChatMenuComponent,
+    DyspoViewerComponent,
   ],
   imports: [CommonModule, IonicModule, FormsModule, LazyLoadImageModule],
   exports: [
@@ -24,6 +27,7 @@ import { ChatMenuComponent } from 'src/app/components/chat-menu/chat-menu.compon
     AgendaEventMiniComponent,
     ChatMenuComponent,
     AgendaEventInfoComponent,
+    DyspoViewerComponent,
   ],
 })
 export class SharedModule {}
