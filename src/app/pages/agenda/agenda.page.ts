@@ -251,7 +251,7 @@ export class AgendaPage implements AfterViewInit {
     this.navCtrl.navigateForward('/agenda/create-event/edit', navigationExtras);
   }
 
-  async openEvent(agendaEvent: AgendaEvent, event: any) {
+  async openEvent(agendaEvent: AgendaEvent) {
     const modal = await this.modalCtrl.create({
       component: AgendaEventInfoComponent,
       componentProps: {

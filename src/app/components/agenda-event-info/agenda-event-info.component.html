@@ -182,11 +182,10 @@
         <div
           class="bg-avatar d-flex ion-justify-content-center ion-margin-bottom"
         >
-          <img
-            [defaultImage]="defaultImage"
-            [lazyLoad]="agendaEvent.avatar"
-            class="fade-img"
-          />
+          <ion-img
+            src="{{ agendaEvent.avatar }}"
+            class="animate__animated animate__fadeIn"
+          ></ion-img>
         </div>
       </div>
 

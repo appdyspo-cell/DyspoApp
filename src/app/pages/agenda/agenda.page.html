@@ -45,7 +45,7 @@
     <ion-list *ngIf="eventsForDate.length > 0">
       <ion-item
         *ngFor="let agendaEvent of eventsForDate; let i=index "
-        (click)="openEvent(agendaEvent, $event)"
+        (click)="openEvent(agendaEvent)"
         mode="ios"
       >
         <div slot="start">{{agendaEvent.startISO | dayDateFormat}}</div>
