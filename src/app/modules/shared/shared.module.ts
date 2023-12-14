@@ -11,6 +11,10 @@ import { ChatMenuComponent } from 'src/app/components/chat-menu/chat-menu.compon
 
 import { DyspoViewerComponent } from 'src/app/components/dyspo-viewer/dyspo-viewer.component';
 
+import { NgxPanZoomModule } from 'ngx-panzoom';
+import { SwiperModule } from 'swiper/angular';
+import { ReportComponent } from 'src/app/components/report/report.component';
+
 @NgModule({
   declarations: [
     FriendsSelectorComponent,
@@ -19,8 +23,16 @@ import { DyspoViewerComponent } from 'src/app/components/dyspo-viewer/dyspo-view
     AgendaEventInfoComponent,
     ChatMenuComponent,
     DyspoViewerComponent,
+    ReportComponent,
   ],
-  imports: [CommonModule, IonicModule, FormsModule, LazyLoadImageModule],
+  imports: [
+    CommonModule,
+    IonicModule,
+    FormsModule,
+    LazyLoadImageModule,
+    NgxPanZoomModule,
+    SwiperModule,
+  ],
   exports: [
     FriendsSelectorComponent,
     PictureComponent,
@@ -28,6 +40,7 @@ import { DyspoViewerComponent } from 'src/app/components/dyspo-viewer/dyspo-view
     ChatMenuComponent,
     AgendaEventInfoComponent,
     DyspoViewerComponent,
+    ReportComponent,
   ],
 })
 export class SharedModule {}

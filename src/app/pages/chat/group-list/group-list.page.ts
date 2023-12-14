@@ -72,4 +72,12 @@ export class GroupListPage implements OnInit {
     }
     return formattedLastMessageDate;
   }
+
+  getDelayClass(index: number): string {
+    if (index <= 11) {
+      return 'animated delay_' + index;
+    } else {
+      return 'animated delay_12';
+    }
+  }
 }

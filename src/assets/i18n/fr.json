@@ -33,12 +33,11 @@
   "add_group_name": "Ajouter un nom de groupe",
   "description": "Ajouter une description de Brier",
   "create_group": "Créer un groupe",
-  "edit": "Éditer",
   "members_in_group": "Membres du groupe",
   "call_logs": "Journaux d'appels",
   "more": "Suite",
   "my_profile": "Mon profil",
-  "logout": "Se déconnecter",
+
   "chat_setting": "Réglage de discussion",
   "media_auto_download": "Media Auto Télécharger",
   "when_using_mobile_data": "Lorsque vous utilisez des données mobiles",
@@ -285,11 +284,10 @@
   "verification_text": "Ajouter le code de vérification envoyé sur votre numéro.",
   "resend": "Recevoir à nouveau",
   "order_text": "Catégories alimentaires",
-  "view_all": "Voir tout",
+
   "restaurants_near": "Près de toi",
   "my_details": "Mes Details",
-  "my_profile": "Mon profil",
-  "buy_this_app": "Acheter cette appli",
+
   "change_language": "Changer de langue",
   "select_languge": "Sélectionnez languge",
   "items": "Articles",
@@ -299,7 +297,7 @@
   "low_to_high": "De bas en haut",
   "recent_searches": "recherches récentes",
   "message_restro": "Rétro message",
-  "continue": "Continuez",
+  "continue": "Continuer",
   "languges": "langues",
   "select_preferred_language": "Sélectionnez la langue préférée",
   "select_language": "Choisir la langue",
@@ -391,5 +389,7 @@
   "option": "Option",
   "only_one_option": "Une seule option",
   "multiple_option": "Option multiple",
-  "customer": "Client"
+  "customer": "Client",
+
+  "discussions": "Discussions"
 }

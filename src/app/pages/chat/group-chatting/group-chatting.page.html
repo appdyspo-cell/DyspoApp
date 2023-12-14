@@ -1,4 +1,4 @@
-<ion-header class="bg_transparent">
+<ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button text="" icon="chevron-back-outline"></ion-back-button>
@@ -15,9 +15,9 @@
           </div>
         </div>
         <h2 (click)="groupinfo()">{{agendaEvent.title}}</h2>
-        <span class="end">
+        <!-- <span class="end">
           <ion-icon class="zmdi zmdi-more-vert ion-text-center"></ion-icon>
-        </span>
+        </span> -->
       </div>
     </ion-title>
     <ion-buttons slot="end">
@@ -25,7 +25,7 @@
         tappable
         slot="end"
         name="ellipsis-vertical"
-        color="light"
+        color="primary"
         (click)="openMenu($event)"
       >
       </ion-icon>
@@ -163,8 +163,8 @@
       <ion-icon class="zmdi zmdi-headset-mic"></ion-icon>
       <ion-icon class="zmdi zmdi-account-calendar"></ion-icon>
       <ion-icon class="zmdi zmdi-pin"></ion-icon>-->
-      <ion-icon class="zmdi zmdi-image" (click)="takePhoto()"></ion-icon>
-      <ion-icon class="zmdi zmdi-camera" (click)="openGallery()"></ion-icon>
+      <ion-icon class="zmdi zmdi-image" (click)="openGallery()"></ion-icon>
+      <ion-icon class="zmdi zmdi-camera" (click)="takePhoto()"></ion-icon>
       <ion-icon class="zmdi zmdi-close" (click)="setViewType('')"></ion-icon>
     </div>
     <ion-item lines="none">

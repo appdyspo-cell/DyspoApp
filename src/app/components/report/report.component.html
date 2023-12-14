@@ -1,3 +1,38 @@
-<p>
-  report works!
-</p>
+<ion-content>
+  <div class="content">
+    <ion-card
+      *ngFor="let report of reportData"
+      style="padding-bottom: 0px !important"
+    >
+      <div class="avatarAbs">
+        <ion-avatar
+          [ngStyle]="{
+            background: 'url(' + report.image + ')',
+            'background-size': 'cover'
+          }"
+        ></ion-avatar>
+      </div>
+      <ion-item>
+        <ion-label>
+          <h2 class="ion-text-center">{{ report.head }}</h2>
+          <p class="ion-text-wrap ion-text-center">{{ report.desc }}</p>
+        </ion-label>
+      </ion-item>
+      <ion-list>
+        <ion-item counter="true" class="desc-inner" lines="none">
+          <ion-label position="floating">Description</ion-label>
+          <ion-textarea
+            [(ngModel)]="report_text"
+            rows="5"
+            maxlength="300"
+            placeholder="Décrivez le motif de votre signalement..."
+          ></ion-textarea>
+        </ion-item>
+      </ion-list>
+      <ion-button expand="full" (click)="sendReport()"> Envoyer </ion-button>
+      <ion-button expand="full" (click)="modalCtrl.dismiss()">
+        Annuler
+      </ion-button>
+    </ion-card>
+  </div>
+</ion-content>

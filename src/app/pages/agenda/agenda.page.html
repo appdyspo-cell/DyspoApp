@@ -1,24 +1,17 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>Calendrier</ion-title>
+    <ion-title size="large">Calendrier</ion-title>
+    <ion-buttons slot="end">
+      <ion-toggle
+        labelPlacement="start"
+        [enableOnOffLabels]="true"
+        (ionChange)="onChangeMode($event)"
+        >Edit</ion-toggle
+      >
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
-<ion-content [fullscreen]="true" class="bg_color">
-  <ion-header collapse="condense">
-    <ion-toolbar style="--background: transparent">
-      <ion-title size="large">Calendrier</ion-title>
-      <ion-buttons slot="end">
-        <ion-toggle
-          labelPlacement="start"
-          [enableOnOffLabels]="true"
-          (ionChange)="onChangeMode($event)"
-          >Edit</ion-toggle
-        >
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
-
+<ion-content class="bg_color">
   <div class="container">
     <ion-chip [outline]="true"
       ><div class="chip-evt bg-kid">&nbsp;</div>

@@ -85,6 +85,10 @@ export class MediaService {
         correctOrientation: true,
       };
 
+      if (opt.allowEditing === false) {
+        options.allowEditing = false;
+      }
+
       const result = await Camera.getPhoto(options);
       const captureDataUrl = result.base64String;
 

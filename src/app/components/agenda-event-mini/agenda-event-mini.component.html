@@ -1,5 +1,5 @@
-<div class="agenda-event-container">
-  <ion-row style="border-bottom: 1px solid">
+<div class="agenda-event-container box-1">
+  <ion-row style="border-bottom: 1px solid" class="ion-align-items-center">
     <ion-col size="2">
       <ion-avatar class="event-type-avatar">
         <ion-img
@@ -25,9 +25,12 @@
       </div></ion-col
     ></ion-row
   >
-  <ion-row>
+  <ion-row class="ion-align-items-center">
     <ion-col *ngIf="agendaEvent.avatar" size="3">
-      <ion-thumbnail style="border-radius: 5px; overflow: hidden">
+      <ion-thumbnail
+        class="event-avatar"
+        style="border-radius: 5px; overflow: hidden"
+      >
         <img src="{{ agendaEvent.avatar }}" />
       </ion-thumbnail>
     </ion-col>

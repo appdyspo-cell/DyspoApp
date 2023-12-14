@@ -12,6 +12,7 @@ def capacitor_pods
   pod 'Capacitor', :path => '../../../node_modules/@capacitor/ios'
   pod 'CapacitorCordova', :path => '../../../node_modules/@capacitor/ios'
   pod 'CapacitorCommunityContacts', :path => '../../../node_modules/@capacitor-community/contacts'
+  pod 'CapacitorFirebaseApp', :path => '../../../node_modules/@capacitor-firebase/app'
   pod 'CapacitorFirebaseMessaging', :path => '../../../node_modules/@capacitor-firebase/messaging'
   pod 'CapacitorApp', :path => '../../../node_modules/@capacitor/app'
   pod 'CapacitorCamera', :path => '../../../node_modules/@capacitor/camera'
@@ -21,7 +22,6 @@ def capacitor_pods
   pod 'CapacitorSplashScreen', :path => '../../../node_modules/@capacitor/splash-screen'
   pod 'CapacitorStatusBar', :path => '../../../node_modules/@capacitor/status-bar'
   pod 'CapacitorEmailComposer', :path => '../../../node_modules/capacitor-email-composer'
-  pod 'CapacitorNativeBiometric', :path => '../../../node_modules/capacitor-native-biometric'
 end
 
 target 'App' do

@@ -18,7 +18,7 @@ ion-header {
   ion-title {
     padding: 0 0px !important;
     .profile {
-      padding-left: 30px;
+      padding-left: 2px;
       .profile_img_box {
         position: relative;
         min-width: 39px;
@@ -142,7 +142,7 @@ ion-content {
       }
 
       .attachment {
-        max-height: 100px;
+        max-height: 200px;
         width: 100%;
         overflow: hidden;
       }

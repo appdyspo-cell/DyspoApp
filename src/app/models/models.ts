@@ -61,7 +61,6 @@ export interface AppSettings {
   receiveNotification: boolean;
   friendInvitation: boolean;
   actualiteDyspo: boolean;
-  //biometricAuth: boolean;
   shareAgenda: boolean;
 }
 

@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title
-      >{{'groups' | translate}}
+      >{{'discussions' | translate}}
       <ion-icon class="ion-float-end zmdi zmdi-search ion-text-end"></ion-icon>
     </ion-title>
   </ion-toolbar>
@@ -9,13 +9,14 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">{{'groups' | translate}}</ion-title>
+      <ion-title size="large">{{'discussions' | translate}}</ion-title>
     </ion-toolbar>
   </ion-header>
   <ion-list lines="none" class="">
     <ion-item
-      *ngFor="let agendaEvent of agendaEvents"
-      class="animate__animated animate__slideInRight animated delay_2"
+      *ngFor="let agendaEvent of agendaEvents; let i=index;"
+      [ngClass]="getDelayClass(i)"
+      class="animate__animated animate__slideInRight"
       (click)="goToChat(agendaEvent, $event)"
     >
       <div class="item_inner d-flex">
@@ -30,6 +31,10 @@
             <small>{{getLastMessageDate(agendaEvent)}}</small>
           </h2>
           <p class="d-flex">
+            <ion-icon
+              *ngIf="agendaEvent.last_message?.image"
+              class="ion-text-start zmdi zmdi-attachment"
+            ></ion-icon>
             <span class="message">{{agendaEvent.last_message?.message}}</span>
 
             <ng-container
@@ -37,26 +42,6 @@
             >
               <span class="end">{{chatrooms[agendaEvent.uid!].count}}</span>
             </ng-container>
-          </p>
-        </div>
-      </div>
-    </ion-item>
-
-    <ion-item
-      class="animate__animated animate__slideInRight animated delay_3"
-      (click)="goToChat(undefined, $event)"
-    >
-      <div class="item_inner d-flex">
-        <div class="profile_img_box">
-          <div class="profile_img">
-            <img src="assets/img/g3.png" />
-          </div>
-        </div>
-        <div class="text-box">
-          <h2 class="d-flex"><span>Fitness Groupr</span> <small>26m</small></h2>
-          <p class="d-flex">
-            <ion-icon class="ion-text-start zmdi zmdi-attachment"></ion-icon>
-            <span class="message">You shared a file. </span>
           </p>
         </div>
       </div>

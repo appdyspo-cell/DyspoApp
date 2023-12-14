@@ -5,15 +5,10 @@ import { UtilsService } from 'src/app/services/utils.service';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
 import { TranslateService } from '@ngx-translate/core';
-import { signInWithEmailAndPassword, Auth } from '@angular/fire/auth';
+import { Auth } from '@angular/fire/auth';
 import { Firestore } from '@angular/fire/firestore';
 import { AuthService } from 'src/app/services/auth.service';
 import { LoggerService } from 'src/app/services/logger.service';
-import {
-  BiometryType,
-  NativeBiometric,
-} from '@capgo/capacitor-native-biometric';
-import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-login',
@@ -110,26 +105,26 @@ export class LoginPage implements OnInit {
     }
   }
 
-  async biometricLogin() {
-    const result = await NativeBiometric.isAvailable();
+  // async biometricLogin() {
+  //   const result = await NativeBiometric.isAvailable();
 
-    if (!result.isAvailable) return;
+  //   if (!result.isAvailable) return;
 
-    const isFaceID = result.biometryType == BiometryType.FACE_ID;
+  //   const isFaceID = result.biometryType == BiometryType.FACE_ID;
 
-    const verified = await NativeBiometric.verifyIdentity({
-      reason: 'Empreinte digitale / Reconnaissance faciale',
-      title: 'Authentification',
-      negativeButtonText: 'Annuler',
-    })
-      .then(() => true)
-      .catch(() => false);
+  //   const verified = await NativeBiometric.verifyIdentity({
+  //     reason: 'Empreinte digitale / Reconnaissance faciale',
+  //     title: 'Authentification',
+  //     negativeButtonText: 'Annuler',
+  //   })
+  //     .then(() => true)
+  //     .catch(() => false);
 
-    const credentials = await NativeBiometric.getCredentials({
-      server: environment.BIOMETRIC_KEY,
-    });
-    if (credentials) {
-      this.login(credentials.username, credentials.password, true);
-    }
-  }
+  //   const credentials = await NativeBiometric.getCredentials({
+  //     server: environment.BIOMETRIC_KEY,
+  //   });
+  //   if (credentials) {
+  //     this.login(credentials.username, credentials.password, true);
+  //   }
+  // }
 }

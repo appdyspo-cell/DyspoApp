@@ -64,8 +64,10 @@
   <!-- <ion-list-header>  </ion-list-header> -->
   <div *ngIf="nextAgendaEvents.length > 0">
     <ion-list-header>
-      <span style="margin-right: 8px; font-size: 22px"></span>
-      Evenements a venir
+      <div class="header-dot"></div>
+      <span style="margin-right: 8px; font-size: 22px"
+        ><h2>Evenements a venir</h2></span
+      >
     </ion-list-header>
     <ion-card-content>
       <div class="next-agenda-container">
@@ -85,8 +87,8 @@
 
   <div *ngIf="invitations.length > 0">
     <ion-list-header>
-      <span style="margin-right: 8px; font-size: 22px"></span>
-      Invitations
+      <div class="header-dot"></div>
+      <span style="margin-right: 8px"><h2>Invitations</h2></span>
     </ion-list-header>
 
     <ion-card-content>
@@ -106,11 +108,10 @@
 
   <div *ngIf="friendsSuggested.length >= 0">
     <ion-list-header>
-      <span
-        class="wpf-raquette"
-        style="margin-right: 8px; font-size: 22px"
-      ></span>
-      Demande d'Amis
+      <div class="header-dot"></div>
+      <span class="wpf-raquette" style="margin-right: 8px"
+        ><h2>Demande d'Amis</h2></span
+      >
     </ion-list-header>
 
     <ion-card-content>

@@ -27,25 +27,11 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root',
 })
 export class AuthService {
-  private BIOMETRIC_KEY = environment.BIOMETRIC_KEY;
-
   constructor(
     private afAuth: Auth,
     private firestore: Firestore,
     private utils: UtilsService
-  ) {
-    // Initialize Remote Config and get a reference to the service
-    // const remoteConfig = getRemoteConfig(getApp());
-    // console.log(remoteConfig);
-    // fetchAndActivate(remoteConfig)
-    //   .then(() => {
-    //     this.BIOMETRIC_KEY = getValue(remoteConfig, 'BIOMETRIC_KEY').asString();
-    //     console.log(this.BIOMETRIC_KEY);
-    //   })
-    //   .catch((err) => {
-    //     // ...
-    //   });
-  }
+  ) {}
 
   login(email: string, password: string): Promise<UserCredential> {
     return signInWithEmailAndPassword(this.afAuth, email, password);

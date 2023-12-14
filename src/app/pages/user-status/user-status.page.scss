@@ -83,3 +83,11 @@
   height: auto;
   position: relative;
 }
+
+.header-dot {
+  border-right: 8px solid;
+  height: 32px;
+  margin-right: 11px;
+  width: 1px;
+  color: var(--ion-color-primary);
+}

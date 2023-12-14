@@ -1,6 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { ChatMessage } from 'src/app/models/models';
+import {
+  PanZoomConfig,
+  PanZoomAPI,
+  PanZoomModel,
+  PanZoomConfigOptions,
+} from 'ngx-panzoom';
 
 @Component({
   selector: 'app-dyspo-viewer',
@@ -10,8 +16,16 @@ import { ChatMessage } from 'src/app/models/models';
 export class DyspoViewerComponent implements OnInit {
   message!: ChatMessage;
   url: any;
+  panZoomConfig: PanZoomConfig;
 
-  constructor(private modalCtrl: ModalController) {}
+  constructor(private modalCtrl: ModalController) {
+    this.panZoomConfig = new PanZoomConfig({
+      keepInBounds: true,
+      scalePerZoomLevel: 3,
+      zoomLevels: 5,
+      zoomOnDoubleClick: true,
+    });
+  }
 
   ngOnInit() {
     this.url = this.message.image;

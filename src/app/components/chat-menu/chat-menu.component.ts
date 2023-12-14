@@ -70,6 +70,36 @@ export class ChatMenuComponent implements OnInit {
     this.popCtrl.dismiss();
   }
 
+  async quitEvent() {
+    const alert = await this.alertCtrl.create({
+      //cssClass: 'my-custom-class',
+      header: 'Confirmation',
+      message:
+        "Voulez-vous vraiment quitter ce groupe ? Ceci effacera l'evenement de votre agenda",
+      buttons: [
+        {
+          text: 'NON',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            console.log('Confirm Cancel: blah');
+          },
+        },
+        {
+          text: 'OUI',
+          handler: () => {
+            this.confirmQuitEvent();
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+  confirmQuitEvent() {
+    this.popCtrl.dismiss({ friend: undefined }, 'quitevent');
+  }
+
   async requestReport() {
     this.popCtrl.dismiss();
     const modal = await this.modalCtrl.create({

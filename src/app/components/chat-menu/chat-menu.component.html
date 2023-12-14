@@ -6,11 +6,19 @@
     </ion-item>
     <ion-item (click)="requestReport()" lines="none">
       <ion-icon
-        name="stop"
+        name="stop-outline"
         color="danger"
         style="margin-right: 15px"
       ></ion-icon>
       <ion-text>Signaler l'utilisateur</ion-text>
+    </ion-item>
+    <ion-item (click)="quitEvent()" lines="none">
+      <ion-icon
+        name="remove-circle-outline"
+        color="danger"
+        style="margin-right: 15px"
+      ></ion-icon>
+      <ion-text>Quitter le groupe</ion-text>
     </ion-item>
   </ion-list>
 </ion-content>

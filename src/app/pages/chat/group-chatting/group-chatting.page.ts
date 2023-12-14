@@ -31,7 +31,10 @@ import { FriendsService } from 'src/app/services/friends.service';
 import { MediaService } from 'src/app/services/media.service';
 import { UserService } from 'src/app/services/user.service';
 import { environment } from 'src/environments/environment';
+import { Keyboard } from '@capacitor/keyboard';
 import Swal from 'sweetalert2';
+import { Device, DeviceInfo } from '@capacitor/device';
+import { UtilsService } from 'src/app/services/utils.service';
 @Component({
   selector: 'app-group-chatting',
   templateUrl: './group-chatting.page.html',
@@ -62,6 +65,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   member_infos_obj: Record<string, AppUser> = {};
   defaultAvatar = 'assets/img/user.png';
   pendingAttachment: string | undefined;
+  deviceInfo!: DeviceInfo;
 
   constructor(
     private navCtrl: NavController,
@@ -73,7 +77,8 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     private agendaSvc: AgendaService,
     private friendsSvc: FriendsService,
     private mediaSvc: MediaService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private utils: UtilsService
   ) {
     this.agendaEvent =
       this.router.getCurrentNavigation()?.extras.state?.['agendaEvent'];
@@ -89,6 +94,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    this.deviceInfo = await Device.getInfo();
     // Messages
     this.chatSvc.removeListenMessages();
     this.msgList = await this.chatSvc.getMessages(this.agendaEvent);
@@ -97,7 +103,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
 
     this.messagesSubscription = this.chatSvc.messages$.subscribe((data) => {
       this.msgList = data.messages;
-      this.scrollDown();
+
       //Wait the last message Set zero to unread msgs
       if (data.action === 'ADDED') {
         let lastMessage: ChatMessage | undefined;
@@ -105,6 +111,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
           lastMessage = data.messages[data.messages.length - 1];
         }
         this.chatSvc.markLastMessageRead(this.agendaEvent, lastMessage);
+        this.scrollDown();
       }
     });
 
@@ -148,14 +155,29 @@ export class GroupChattingPage implements OnInit, OnDestroy {
       event: ev,
       mode: 'md',
     });
-    //TODO FILTER
-    modal.onDidDismiss().then((modelData) => {
-      if (modelData && modelData.data && modelData.data.filters) {
-        console.log('fiters', modelData.data.filters);
-        //this.filterLayerGroups();
-      }
-    });
+
     modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+
+    if (role === 'quitevent') {
+      if (this.agendaEvent.admin_uid === this.userSvc.userInfo?.uid) {
+        this.utils.showAlert(
+          "Vous devez d'abord désigner un nouvel administrateur avant de quitter cet événement"
+        );
+        return;
+      }
+      this.utils.showLoader();
+      this.agendaSvc
+        .quitEvent(this.agendaEvent)
+        .then((res) => {
+          this.utils.hideLoader();
+          this.navCtrl.pop();
+        })
+        .catch((err) => {
+          this.utils.showToastError(err);
+        });
+    }
   }
 
   ionViewWillLeave() {
@@ -164,6 +186,10 @@ export class GroupChattingPage implements OnInit, OnDestroy {
 
   async sendMsg() {
     console.log('Send msg');
+
+    if (this.deviceInfo.platform !== 'web') {
+      Keyboard.hide();
+    }
 
     if (this.userInput !== '') {
       const timeMoment = format(new Date(), 'dd/MM/yyyy HH:mm');
@@ -277,8 +303,8 @@ export class GroupChattingPage implements OnInit, OnDestroy {
 
   scrollDown() {
     setTimeout(() => {
-      this.content.scrollToBottom(400);
-    }, 250);
+      this.content.scrollToBottom(500);
+    }, 350);
   }
 
   deleteMsg(ev: any) {
@@ -353,6 +379,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
         environment.firebase_event_root + '/' + this.agendaEvent.uid,
       filename: 'att_' + new Date().getTime() + '.jpg',
       source: CameraSource.Camera,
+      allowEditing: false,
     });
     this.pendingAttachment = filepath;
     this.scrollDown();
@@ -364,6 +391,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
         environment.firebase_event_root + '/' + this.agendaEvent.uid,
       filename: 'att_' + new Date().getTime() + '.jpg',
       source: CameraSource.Photos,
+      allowEditing: false,
     });
     this.pendingAttachment = filepath;
     this.scrollDown();

@@ -18,6 +18,7 @@
           <ion-col>
             <ion-item class="roundedInput8px margin-bottom-10" lines="none">
               <div
+                slot="start"
                 style="
                   border-right: 1px solid;
                   border-color: rgb(155, 155, 155);
@@ -44,6 +45,7 @@
           <ion-col>
             <ion-item class="roundedInput8px margin-bottom-10" lines="none">
               <div
+                slot="start"
                 style="
                   border-right: 1px solid;
                   border-color: rgb(155, 155, 155);
@@ -61,7 +63,7 @@
                 type="password"
                 placeholder="Mot de passe"
                 [(ngModel)]="userInfo.password"
-                class="ion-padding-start ion-padding-horizontal"
+                class="ion-padding-start"
                 clear-input="true"
               ></ion-input>
             </ion-item>

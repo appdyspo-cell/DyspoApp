@@ -91,6 +91,9 @@ ion-item {
 }
 
 .animated {
+  &.delay_0 {
+    animation-duration: 200ms;
+  }
   &.delay_1 {
     animation-duration: 250ms;
   }
@@ -121,10 +124,10 @@ ion-item {
   &.delay_10 {
     animation-duration: 700ms;
   }
-  &.delay_10 {
+  &.delay_11 {
     animation-duration: 750ms;
   }
-  &.delay_10 {
+  &.delay_12 {
     animation-duration: 800ms;
   }
 }
@@ -500,4 +503,31 @@ ion-app[dir="rtl"] {
 
 .fade-img.ng-lazyloaded {
   opacity: 1;
+}
+
+.box-1 {
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}
+
+.styledInput {
+  --border-color: #eee;
+  --border-width: 1px;
+  --box-shadow: 0px #eee;
+  --highlight-height: 0;
+  --background: #f8f9fa;
+
+  margin-bottom: 5px;
+}
+
+.roundedInput8px {
+  @extend .styledInput;
+  --border-radius: 8px;
+}
+.roundedInput12px {
+  @extend .styledInput;
+  --border-radius: 12px;
+}
+.roundedInput25px {
+  @extend .styledInput;
+  --border-radius: 25px;
 }

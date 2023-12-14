@@ -1,4 +1,4 @@
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" scrollY="false">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-button fill="clear" (click)="close()">
@@ -6,10 +6,15 @@
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
-  <div class="img-ct d-flex ion-align-items-center ion-justify-content-center">
-    <ion-img
-      [src]="message.image"
-      class="animate__animated animate__fadeIn"
-    ></ion-img>
+  <!-- <lib-ngx-image-zoom
+    class="animate__animated animate__fadeIn"
+    [fullImage]="url"
+  ></lib-ngx-image-zoom> -->
+  <div style="position: absolute; top: 50px; bottom: 0; left: 0; right: 0">
+    <pan-zoom [config]="panZoomConfig">
+      <div style="position: relative">
+        <img [src]="message.image" />
+      </div>
+    </pan-zoom>
   </div>
 </ion-content>
