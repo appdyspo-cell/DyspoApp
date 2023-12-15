@@ -327,6 +327,7 @@ export class CreateEventPage implements OnInit {
     const { filepath } = await this.mediaSvc.takePhotoPrompt({
       firebasePath: environment.firebase_avatar_event_storage_path,
       filename: 'avatar_event_' + this.agendaEvent!.uid + '.jpg',
+      allowEditing: false,
     });
 
     if (filepath) {

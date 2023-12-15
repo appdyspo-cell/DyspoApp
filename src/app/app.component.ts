@@ -10,6 +10,7 @@ import { ChatService } from './services/chat.service';
 import { AgendaService } from './services/agenda.service';
 import { NotificationService } from './services/notification.service';
 import { environment } from 'src/environments/environment';
+import { SplashScreen } from '@capacitor/splash-screen';
 
 @Component({
   selector: 'app-root',
@@ -66,12 +67,12 @@ export class AppComponent {
               this.initAllServices(appUser.uid!);
               this.logger.logDebug('validateAuthState userInfo ---> ', appUser);
               this.navController.navigateRoot('/tabs');
-              //SplashScreen.hide();
+              SplashScreen.hide();
             })
             .catch((err) => {
               this.logger.logDebug('ERR validateAuthState ', err);
               this.navController.navigateRoot('/login');
-              //SplashScreen.hide();
+              SplashScreen.hide();
             });
         } else {
           this.logger.logDebug(

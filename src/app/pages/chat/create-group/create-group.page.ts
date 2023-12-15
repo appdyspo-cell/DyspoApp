@@ -127,6 +127,7 @@ export class CreateGroupPage implements OnInit {
     const { filepath } = await this.mediaSvc.takePhotoPrompt({
       firebasePath: environment.firebase_avatar_group_storage_path,
       filename: 'avatar_group_' + this.friendGroup.uid + '.jpg',
+      allowEditing: false,
     });
 
     if (filepath) {
