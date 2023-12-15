@@ -368,6 +368,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
 
   setViewType(vt: string) {
     this.viewType = vt;
+    console.log(this.viewType);
   }
   groupinfo() {
     this.router.navigate(['./group-info']);

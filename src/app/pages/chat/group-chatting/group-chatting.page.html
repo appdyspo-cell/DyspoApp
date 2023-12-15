@@ -153,46 +153,38 @@
   </div>
 </ion-content>
 
-<ion-footer class="form animate__animated animate__slideInUp delay_3">
-  <ion-list
-    lines="none"
-    [ngClass]="viewType === 'active' ? 'list active':'list'"
+<ion-footer class="animate__animated animate__slideInUp delay_3">
+  <div
+    class="bg-theme d-flex"
+    [ngClass]="viewType === '' ? 'option':'option active'"
   >
-    <div class="option bg-theme d-flex">
-      <!-- <ion-icon class="zmdi zmdi-file-text"></ion-icon>
-      <ion-icon class="zmdi zmdi-headset-mic"></ion-icon>
-      <ion-icon class="zmdi zmdi-account-calendar"></ion-icon>
-      <ion-icon class="zmdi zmdi-pin"></ion-icon>-->
-      <ion-icon class="zmdi zmdi-image" (click)="openGallery()"></ion-icon>
-      <ion-icon class="zmdi zmdi-camera" (click)="takePhoto()"></ion-icon>
-      <ion-icon class="zmdi zmdi-close" (click)="setViewType('')"></ion-icon>
+    <ion-icon class="zmdi zmdi-image" (click)="openGallery()"></ion-icon>
+    <ion-icon class="zmdi zmdi-camera" (click)="takePhoto()"></ion-icon>
+    <ion-icon class="zmdi zmdi-close" (click)="setViewType('')"></ion-icon>
+  </div>
+
+  <ion-toolbar>
+    <div slot="start">
+      <ion-button fill="clear" (click)="setViewType('active')">
+        <ion-icon
+          color="medium"
+          name="attach-outline"
+          slot="icon-only"
+        ></ion-icon>
+      </ion-button>
     </div>
     <ion-item lines="none">
-      <div class="item_inner d-flex">
-        <!-- <ion-icon class="zmdi zmdi-mood" ion-text-start></ion-icon> -->
-        <ion-icon
-          class="zmdi zmdi-attachment-alt ion-text-start"
-          (click)="setViewType('active')"
-        ></ion-icon>
-        <ion-input
-          #txtInput
-          type="text"
-          [(ngModel)]="userInput"
-          placeholder="{{ 'type_your_message' | translate}} "
-        ></ion-input>
-
-        <div class="end icon_box">
-          <ion-icon
-            name="send"
-            color="medium"
-            size="normal"
-            (click)=" sendMsg()"
-          >
-          </ion-icon>
-
-          <!-- <ion-icon class="zmdi zmdi-mic ion-text-end"></ion-icon> -->
-        </div>
-      </div>
+      <ion-input
+        type="text"
+        [(ngModel)]="userInput"
+        placeholder="{{ 'type_your_message' | translate}} "
+      ></ion-input>
     </ion-item>
-  </ion-list>
+
+    <ion-button slot="end" fill="clear" (click)=" sendMsg()">
+      <ion-icon name="send" color="medium" slot="icon-only"> </ion-icon>
+
+      <!-- <ion-icon class="zmdi zmdi-mic ion-text-end"></ion-icon> -->
+    </ion-button>
+  </ion-toolbar>
 </ion-footer>
