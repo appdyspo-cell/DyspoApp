@@ -279,7 +279,7 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
 
   async presentAction() {
     const actionSheet = await this.actionSheetCtrl.create({
-      header: 'Dyspo',
+      header: 'Saisissez vos disponibilités',
       cssClass: 'dyspo-sheet',
       buttons: [
         {

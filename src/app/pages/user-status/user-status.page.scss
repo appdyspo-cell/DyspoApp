@@ -1,5 +1,5 @@
 .dyspo-button {
-  font-family: Atiba;
+  font-family: Dyspo;
   font-size: 24px;
   padding: 10px;
   width: 100%;
@@ -90,4 +90,38 @@
   margin-right: 11px;
   width: 1px;
   color: var(--ion-color-primary);
+}
+
+.shape {
+  background-color: var(--ion-color-primary);
+  width: 100%;
+  height: 50px;
+  border-bottom-left-radius: 50%;
+  border-bottom-right-radius: 50%;
+}
+.header-ct {
+  background: var(--ion-color-primary);
+  padding: 16px;
+  .header {
+    display: flex;
+    flex-direction: row;
+    overflow: scroll;
+    color: white;
+    .cat {
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      padding: 10px;
+      align-items: center;
+      color: white;
+
+      img {
+        color: white;
+        width: 40px;
+      }
+      ion-label {
+        font-size: 14px;
+      }
+    }
+  }
 }

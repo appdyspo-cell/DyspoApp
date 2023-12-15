@@ -175,6 +175,7 @@
           (click)="setViewType('active')"
         ></ion-icon>
         <ion-input
+          #txtInput
           type="text"
           [(ngModel)]="userInput"
           placeholder="{{ 'type_your_message' | translate}} "

@@ -9,12 +9,20 @@
  				<ion-icon class="zmdi zmdi-search ion-text-start"></ion-icon>
  			</span> -->
     </ion-title>
-    <!-- <ion-buttons slot="end">
-      <ion-button>
+    <ion-buttons slot="end">
+      <ion-button
+        slot="end"
+        size="large"
+        shape="round"
+        class="btn end"
+        (click)="addFriendGroup()"
+        >{{saveLabel}}</ion-button
+      >
+      <!-- <ion-button>
        <ion-icon slot="icon-only" class="zmdi zmdi-search ion-text-start"></ion-icon>
        
-      </ion-button>
-    </ion-buttons> -->
+      </ion-button> -->
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -47,6 +55,8 @@
   <ion-item lines="none" class="status">
     <ion-input
       type="text"
+      maxlength="20"
+      autocapitalize="words"
       class="ion-text-center"
       [(ngModel)]="friendGroup.label"
       placeholder="{{'add_group_name' | translate}}"
@@ -96,14 +106,6 @@
 <ion-footer class="ion-no-border animated slideInUp delay_4">
   <h2 class="d-flex">
     <span> {{countCheckedItems()}} {{'members_selected' | translate}}</span>
-    <ion-button
-      slot="end"
-      size="large"
-      shape="round"
-      class="btn end"
-      (click)="addFriendGroup()"
-      >{{saveLabel}}</ion-button
-    >
   </h2>
 
   <!-- <div class="scroll_container">

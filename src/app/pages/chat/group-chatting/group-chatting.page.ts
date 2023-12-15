@@ -44,6 +44,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   UserDyspoStatus = UserDyspoStatus;
 
   @ViewChild(IonContent) content!: IonContent;
+  @ViewChild('txtInput') txtInput!: ElementRef;
   loading = false;
 
   allIsLoaded = false;
@@ -187,10 +188,6 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   async sendMsg() {
     console.log('Send msg');
 
-    if (this.deviceInfo.platform !== 'web') {
-      Keyboard.hide();
-    }
-
     if (this.userInput !== '') {
       const timeMoment = format(new Date(), 'dd/MM/yyyy HH:mm');
       const d = new Date();
@@ -221,6 +218,10 @@ export class GroupChattingPage implements OnInit, OnDestroy {
 
       //this.sendNotificationToUser(this.userInput);
       this.userInput = '';
+      if (this.deviceInfo.platform !== 'web') {
+        Keyboard.hide();
+      }
+      //this.txtInput.nativeElement.blur();
       this.scrollDown();
       /*setTimeout(() => {
         this.senderSends();

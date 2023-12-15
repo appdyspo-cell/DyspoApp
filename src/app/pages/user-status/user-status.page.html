@@ -1,70 +1,61 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Accueil</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true" class="bg_color">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Accueil</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  <ion-list-header>
-    <h2>Aujourd'hui {{todayFormatted}}</h2>
-  </ion-list-header>
-
-  <!-- <h1>Bonjour {{userSvc.userInfo?.firstname}}</h1> -->
-  <div
-    button
-    id="open-status-modal"
-    class="ion-padding dyspo-btn-container"
-    style="background-color: transparent"
-  >
-    <!-- <div class="change-status-icon">
+  <div class="header-ct">
+    <div class="header">
+      <h2>Aujourd'hui {{todayFormatted}}</h2>
+      <div
+        button
+        id="open-status-modal"
+        class="ion-padding dyspo-btn-container"
+        style="background-color: transparent"
+      >
+        <!-- <div class="change-status-icon">
       <ion-icon name="create-outline" size="large"></ion-icon>
     </div> -->
 
-    <!-- <ion-avatar slot="start">
+        <!-- <ion-avatar slot="start">
       <ion-img [src]="avatar"></ion-img>
       </ion-avatar> -->
-    <div
-      class="dyspo-button dyspo ion-activatable animate__animated animate__fadeIn"
-      *ngIf="todayDyspo?.userDyspo === dyspoStatus.DYSPO"
-    >
-      Dyspo
-      <ion-ripple-effect></ion-ripple-effect>
-    </div>
+        <div
+          class="dyspo-button dyspo ion-activatable animate__animated animate__fadeIn"
+          *ngIf="todayDyspo?.userDyspo === dyspoStatus.DYSPO"
+        >
+          Dyspo
+          <ion-ripple-effect></ion-ripple-effect>
+        </div>
 
-    <div
-      *ngIf="todayDyspo?.userDyspo === dyspoStatus.DYSPOWITHKIDS"
-      class="dyspo-button dyspo-with-kids ion-activatable animate__animated animate__fadeIn"
-    >
-      Dyspo With Kids
-      <ion-ripple-effect></ion-ripple-effect>
-    </div>
+        <div
+          *ngIf="todayDyspo?.userDyspo === dyspoStatus.DYSPOWITHKIDS"
+          class="dyspo-button dyspo-with-kids ion-activatable animate__animated animate__fadeIn"
+        >
+          Dyspo With Kids
+          <ion-ripple-effect></ion-ripple-effect>
+        </div>
 
-    <div
-      *ngIf="todayDyspo?.userDyspo === dyspoStatus.NODYSPO"
-      class="dyspo-button no-dyspo ion-activatable animate__animated animate__fadeIn"
-    >
-      No Dyspo
-      <ion-ripple-effect></ion-ripple-effect>
-    </div>
+        <div
+          *ngIf="todayDyspo?.userDyspo === dyspoStatus.NODYSPO"
+          class="dyspo-button no-dyspo ion-activatable animate__animated animate__fadeIn"
+        >
+          No Dyspo
+          <ion-ripple-effect></ion-ripple-effect>
+        </div>
 
-    <div
-      *ngIf="todayDyspo.userDyspo === dyspoStatus.UNDEFINED "
-      class="dyspo-button no-dyspo ion-activatable animate__animated animate__fadeIn"
-    >
-      Dyspo ?
-      <ion-ripple-effect></ion-ripple-effect>
+        <div
+          *ngIf="todayDyspo.userDyspo === dyspoStatus.UNDEFINED "
+          class="dyspo-button no-dyspo ion-activatable animate__animated animate__fadeIn"
+        >
+          Dyspo ?
+          <ion-ripple-effect></ion-ripple-effect>
+        </div>
+      </div>
     </div>
   </div>
+  <div class="shape"></div>
 
-  <!-- <ion-list-header>  </ion-list-header> -->
-  <div *ngIf="nextAgendaEvents.length > 0">
+  <!-- <h1>Bonjour {{userSvc.userInfo?.firstname}}</h1> -->
+
+  <div *ngIf="nextAgendaEvents.length > 0" style="padding-top: 24px">
     <ion-list-header>
-      <div class="header-dot"></div>
+      <!-- <div class="header-dot"></div> -->
       <span style="margin-right: 8px; font-size: 22px"
         ><h2>Evenements a venir</h2></span
       >
@@ -87,7 +78,7 @@
 
   <div *ngIf="invitations.length > 0">
     <ion-list-header>
-      <div class="header-dot"></div>
+      <!-- <div class="header-dot"></div> -->
       <span style="margin-right: 8px"><h2>Invitations</h2></span>
     </ion-list-header>
 
@@ -106,9 +97,9 @@
     </ion-card-content>
   </div>
 
-  <div *ngIf="friendsSuggested.length >= 0">
+  <div *ngIf="friendsSuggested.length > 0">
     <ion-list-header>
-      <div class="header-dot"></div>
+      <!-- <div class="header-dot"></div> -->
       <span class="wpf-raquette" style="margin-right: 8px"
         ><h2>Demande d'Amis</h2></span
       >
@@ -148,8 +139,8 @@
     #statusmodal
     trigger="open-status-modal"
     (willDismiss)="onWillDismiss($event)"
-    [initialBreakpoint]="0.5"
-    [breakpoints]="[0, 0.5]"
+    [initialBreakpoint]="0.4"
+    [breakpoints]="[0, 0.4]"
   >
     <ng-template>
       <ion-header>

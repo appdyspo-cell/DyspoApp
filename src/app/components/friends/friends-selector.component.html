@@ -17,7 +17,7 @@
 
 <ion-content>
   <ion-segment
-    mode="ios"
+    mode="md"
     [(ngModel)]="selectSegment"
     (ionChange)="segmentChanged($event)"
     style="z-index: 1000"
@@ -58,10 +58,11 @@
         >
       </strong>
     </div>
-    <ion-list lines="none" class="friends-ct">
+    <ion-list class="friends-ct">
       <ion-item
-        *ngFor="let checkedFriend of checkedFriends"
-        class="animated slideInRight delay_11"
+        *ngFor="let checkedFriend of checkedFriends; let i = index"
+        [ngClass]="getDelayClass(i)"
+        class="animate__animated animate__slideInRight"
       >
         <ion-thumbnail
           slot="start"

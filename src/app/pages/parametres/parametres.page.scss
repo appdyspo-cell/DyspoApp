@@ -155,3 +155,47 @@ ion-range {
 ion-button {
   font-weight: bold;
 }
+
+.header-ct {
+  background: var(--ion-color-primary);
+  padding: 10px;
+  color: white;
+  .header {
+    display: flex;
+    flex-direction: row;
+    overflow: scroll;
+    color: white;
+    .cat {
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      padding: 10px;
+      align-items: center;
+      color: white;
+
+      img {
+        color: white;
+        width: 40px;
+      }
+      ion-label {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+ion-toolbar {
+  --background: transparent;
+  ion-title {
+    --color: white;
+  }
+}
+
+.shape {
+  background-color: var(--ion-color-primary);
+  width: 100%;
+  height: 50px;
+  z-index: 100;
+  border-bottom-left-radius: 50%;
+  border-bottom-right-radius: 50%;
+}

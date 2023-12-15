@@ -1,17 +1,27 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title size="large">Calendrier</ion-title>
-    <ion-buttons slot="end">
-      <ion-toggle
-        labelPlacement="start"
-        [enableOnOffLabels]="true"
-        (ionChange)="onChangeMode($event)"
-        >Edit</ion-toggle
-      >
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
 <ion-content class="bg_color">
+  <div class="header-ct">
+    <div class="header">
+      <ion-toolbar>
+        <ion-thumbnail
+          slot="start"
+          class="animate__animated animate__fadeInLeft"
+        >
+          <ion-img src="assets/agenda.png"></ion-img>
+        </ion-thumbnail>
+        <ion-title> <h1>Calendrier</h1></ion-title>
+        <ion-buttons slot="end">
+          <ion-toggle
+            color="secondary"
+            labelPlacement="start"
+            [enableOnOffLabels]="true"
+            (ionChange)="onChangeMode($event)"
+            >Edit</ion-toggle
+          >
+        </ion-buttons>
+      </ion-toolbar>
+    </div>
+  </div>
+  <div class="shape"></div>
   <div class="container">
     <ion-chip [outline]="true"
       ><div class="chip-evt bg-kid">&nbsp;</div>
@@ -46,12 +56,20 @@
       <ion-item
         *ngFor="let agendaEvent of eventsForDate; let i=index "
         (click)="openEvent(agendaEvent)"
-        mode="ios"
       >
-        <div slot="start">{{agendaEvent.startISO | dayDateFormat}}</div>
-        {{agendaEvent.title}}<br />
-        {{agendaEvent.start_time_formatted}} -
-        {{agendaEvent.end_time_formatted}}
+        <div slot="start" style="font-size: 1.2rem">
+          {{agendaEvent.startISO | dayDateFormat}}
+        </div>
+        <div>
+          <div>{{agendaEvent.title}}</div>
+          <div style="font-size: 0.9rem; padding-left: 4px">
+            <ion-text color="medium"
+              >{{agendaEvent.start_time_formatted}} -
+              {{agendaEvent.end_time_formatted}}</ion-text
+            >
+          </div>
+        </div>
+
         <ion-buttons slot="end">
           <ion-button color="primary" (click)="goToChat(agendaEvent, $event)">
             <ion-icon name="chatbubble-ellipses-outline"></ion-icon>

@@ -1,16 +1,21 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Paramètres</ion-title>
-  </ion-toolbar>
+<ion-header>
+  <div class="header-ct">
+    <div class="header">
+      <ion-toolbar>
+        <ion-thumbnail slot="start">
+          <ion-img
+            src="assets/settings.png"
+            class="animate__animated animate__fadeInLeft"
+          ></ion-img>
+        </ion-thumbnail>
+        <ion-title> <h1>Paramètres</h1></ion-title>
+      </ion-toolbar>
+    </div>
+  </div>
 </ion-header>
+<div class="shape"></div>
 
 <ion-content class="bg_color" [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar style="--background: transparent">
-      <ion-title size="large">Paramètres</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
   <!-- <ion-list-header>
     <h2>Mon Status</h2>
   </ion-list-header>
@@ -94,7 +99,12 @@
             [(ngModel)]="appSettings!.receiveNotification"
             slot="end"
           ></ion-toggle>
-          <ion-label> Nouveau message reçu </ion-label>
+          <ion-label>
+            Nouveau message reçu
+            <p class="ion-text-wrap">
+              Lorsqu'un utilisateur envoie un message dans une discussion
+            </p></ion-label
+          >
         </ion-item>
       </div>
 
@@ -120,7 +130,18 @@
         </ion-item>
       </div>
 
-      <div *ngIf="appSettings">
+      <div>
+        <ion-item>
+          <ion-toggle
+            color="primary"
+            [(ngModel)]="appSettings!.eventInvitation"
+            slot="end"
+          ></ion-toggle>
+          <ion-label> Invitation à un événement </ion-label>
+        </ion-item>
+      </div>
+
+      <!-- <div *ngIf="appSettings">
         <ion-item>
           <ion-toggle
             color="primary"
@@ -135,11 +156,11 @@
             </p>
           </ion-label>
         </ion-item>
-      </div>
+      </div> -->
     </ion-list>
   </ion-card>
   <div *ngIf="appSettings">
-    <ion-list-header>Réglages</ion-list-header>
+    <ion-list-header><h2>Réglages</h2></ion-list-header>
     <ion-card>
       <ion-list>
         <div>

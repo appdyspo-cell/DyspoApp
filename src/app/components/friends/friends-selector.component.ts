@@ -167,4 +167,12 @@ export class FriendsSelectorComponent implements OnInit {
   close() {
     this.modalCtrl.dismiss({}, 'cancel');
   }
+
+  getDelayClass(index: number): string {
+    if (index <= 11) {
+      return 'animated delay_' + index;
+    } else {
+      return 'animated delay_12';
+    }
+  }
 }

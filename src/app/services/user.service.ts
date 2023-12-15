@@ -119,6 +119,7 @@ export class UserService {
         receiveEmail: false,
         receiveNotification: true,
         friendInvitation: true,
+        eventInvitation: true,
         actualiteDyspo: true,
         shareAgenda: true,
       },

@@ -1,16 +1,20 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Amis</ion-title>
-  </ion-toolbar>
+<ion-header>
+  <div class="header-ct">
+    <div class="header">
+      <ion-toolbar>
+        <ion-thumbnail slot="start">
+          <ion-img
+            src="assets/friends.png"
+            class="animate__animated animate__fadeInLeft"
+          ></ion-img>
+        </ion-thumbnail>
+        <ion-title> <h1>Amis</h1></ion-title>
+      </ion-toolbar>
+    </div>
+  </div>
 </ion-header>
-
+<div class="shape"></div>
 <ion-content [fullscreen]="true" class="bg_color">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Amis</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
   <ion-segment mode="md" [(ngModel)]="selectSegment" lines="none">
     <ion-segment-button mode="md" value="friends">
       <ion-icon name="person"></ion-icon>
@@ -58,7 +62,7 @@
       (ionClear)="clearAutocomplete()"
       showCancelButton="never"
     ></ion-searchbar>
-    <ion-list [hidden]="autocompleteItems.length === 0">
+    <ion-list [hidden]="autocompleteItems.length === 0" class="ion-no-padding">
       <ion-item *ngFor="let user of autocompleteItems">
         <ion-avatar slot="start">
           <img src="{{user.avatarPath}}" />
@@ -70,10 +74,18 @@
             </p>
           </ion-row>
         </ion-label>
-        <ion-button slot="end" (click)="inviteFriend(user)">
+        <ion-button
+          slot="end"
+          *ngIf="!user.is_my_friend"
+          (click)="inviteFriend(user)"
+        >
           <ion-icon name="person-add" slot="start"></ion-icon>
           Inviter
         </ion-button>
+        <!-- <ion-button slot="end" disabled="true" *ngIf="user.is_my_friend">
+          <ion-icon name="person-add" slot="start"></ion-icon>
+          Ami
+        </ion-button> -->
       </ion-item>
     </ion-list>
     <div id="container-friends" *ngIf="friends.length === 0">
@@ -88,7 +100,10 @@
         >
       </strong>
     </div>
-    <ion-list *ngIf="friends.length > 0">
+    <ion-list
+      *ngIf="friends.length > 0 && autocompleteItems.length === 0"
+      class="ion-no-padding"
+    >
       <ion-item-sliding
         [id]="'slidingItem' + i"
         *ngFor="let friendListDoc of friends ; let i = index;"
@@ -148,7 +163,7 @@
         >
       </strong>
     </div>
-    <ion-list *ngIf="friendGroups.length > 0">
+    <ion-list *ngIf="friendGroups.length > 0" class="ion-no-padding">
       <ion-item-sliding
         [id]="'slidingItemGroup' + i"
         *ngFor="let friendGroup of friendGroups ; let i = index;"
@@ -203,7 +218,7 @@
       </strong>
     </div>
 
-    <ion-list *ngIf="friendsSuggested.length > 0">
+    <ion-list *ngIf="friendsSuggested.length > 0" class="ion-no-padding">
       <ion-item-sliding
         [id]="'slidingItem' + i"
         *ngFor="let friendSuggested of friendsSuggested; let i = index;"

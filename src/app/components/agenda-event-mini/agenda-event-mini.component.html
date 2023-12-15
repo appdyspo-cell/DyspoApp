@@ -50,6 +50,7 @@
       class="ion-align-items-center ion-text-center"
     >
       <ion-button
+        *ngIf="agendaEvent.members_uid.length > 1"
         size="small"
         fill="clear"
         (click)="goToChat(agendaEvent, $event)"

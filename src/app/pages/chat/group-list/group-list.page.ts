@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
-import { format, parseISO } from 'date-fns';
+import { format, isAfter, isBefore, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Observable, Subscription } from 'rxjs';
-import { AgendaEvent, Chatroom } from 'src/app/models/models';
+import { AgendaEvent, Chatroom, DiscussionType } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
 import { ChatService } from 'src/app/services/chat.service';
 import { UserService } from 'src/app/services/user.service';
@@ -16,10 +16,14 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class GroupListPage implements OnInit {
   agendaSubscription: Subscription;
+  discussionType = DiscussionType;
   // chatrooms$: Observable<Chatroom[]>;
   agendaEvents: AgendaEvent[] = [];
+  agendaEventsArchived: AgendaEvent[] = [];
   my_uid: string;
   chatrooms: Record<string, Chatroom> = {};
+  selectDiscussionsType: DiscussionType;
+  isLoading = true;
 
   constructor(
     private route: Router,
@@ -28,29 +32,42 @@ export class GroupListPage implements OnInit {
     private userSvc: UserService,
     private navCtrl: NavController
   ) {
+    this.selectDiscussionsType = DiscussionType.ACTIVE;
     this.my_uid = this.userSvc.userInfo?.uid!;
 
+    console.log('Chatrooms ', this.chatrooms);
     this.agendaSubscription = this.agendaSvc.agendaEvents$.subscribe(
       (agendaEvents) => {
-        console.log('Chat group > agenda events', agendaEvents);
-        this.agendaEvents = agendaEvents;
+        this.isLoading = false;
+        this.agendaEvents = agendaEvents.filter((ev) => {
+          return (
+            ev.members_uid.length > 1 &&
+            isAfter(parseISO(ev.endISO), new Date().getTime())
+          );
+        });
+        this.agendaEventsArchived = agendaEvents.filter((ev) => {
+          return isBefore(parseISO(ev.endISO), new Date().getTime());
+        });
         agendaEvents.forEach((agEvent) => {
           this.chatrooms[agEvent.uid!] = agEvent[
             'user_' + this.my_uid
           ] as Chatroom;
         });
-
-        console.log('Chatrooms ', this.chatrooms);
       }
     );
   }
 
   ngOnInit() {}
 
-  goToChat(agendaEvent: AgendaEvent | undefined, ev: any) {
+  goToChat(
+    agendaEvent: AgendaEvent | undefined,
+    discussionType: DiscussionType,
+    ev: any
+  ) {
     const navigationExtras: NavigationExtras = {
       state: {
         agendaEvent,
+        discussionType,
       },
     };
     this.navCtrl.navigateForward('/group-chatting', navigationExtras);

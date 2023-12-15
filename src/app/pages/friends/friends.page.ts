@@ -262,6 +262,10 @@ export class FriendsPage implements OnInit {
           user.firstname!.toUpperCase().indexOf(pattern.toUpperCase()) >= 0 ||
           user.lastname!.toUpperCase().indexOf(pattern.toUpperCase()) >= 0
       );
+      this.autocompleteItems.forEach((user) => {
+        user.is_my_friend = this.friendService.isMyFriend(user.uid);
+        console.log(user);
+      });
       console.log('Results ', this.autocompleteItems);
     }
   }

@@ -60,6 +60,7 @@ export interface AppSettings {
   receiveEmail: boolean;
   receiveNotification: boolean;
   friendInvitation: boolean;
+  eventInvitation: boolean;
   actualiteDyspo: boolean;
   shareAgenda: boolean;
 }
@@ -211,6 +212,11 @@ export interface ChatMessage {
   read_by: string[];
   date_ISO: string;
   is_deleted?: boolean;
+}
+
+export enum DiscussionType {
+  ARCHIVE = 'ARCHIVE',
+  ACTIVE = 'ACTIVE',
 }
 
 export enum UserStatus {

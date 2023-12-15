@@ -17,21 +17,34 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-list>
-    <ion-list-header>Titre</ion-list-header>
-    <ion-item lines="none">
-      <ion-input
-        class="big-input"
-        [(ngModel)]="agendaEvent!.title"
-        placeholder="Saisissez un Titre"
-        required
-      ></ion-input>
-    </ion-item>
+<ion-content class="bg_color">
+  <div class="header-form-ct">
+    <div class="profile">
+      <div class="item_inner">
+        <div
+          *ngIf="agendaEvent?.avatar"
+          (click)="takePhotoPrompt()"
+          style="max-width: 80%; padding: 16px; margin: auto"
+        >
+          <ion-img src="{{agendaEvent?.avatar}}" />
+        </div>
+      </div>
 
-    <!-- <div style="height: 50px; width: 100%"></div> -->
-    <ion-list-header>Quand?</ion-list-header>
+      <div class="input-title">
+        <ion-input
+          class="ion-text-center"
+          maxlength="30"
+          autocapitalize="words"
+          [(ngModel)]="agendaEvent!.title"
+          placeholder="Saisissez un Titre"
+          required
+        ></ion-input>
+      </div>
+    </div>
+  </div>
 
+  <!-- <div style="height: 50px; width: 100%"></div> -->
+  <ion-card>
     <ion-item button="true" id="open-time-item" lines="none">
       <ion-text slot="start">{{agendaEvent?.start_date_formatted}}</ion-text>
       <ion-text slot="end">{{agendaEvent?.start_time_formatted}}</ion-text>
@@ -88,125 +101,86 @@
         </ng-template>
       </ion-popover>
     </ion-item>
+  </ion-card>
 
-    <ion-list>
-      <ion-radio-group [(ngModel)]="agendaEvent!.type">
-        <ion-item lines="none">
-          <ion-avatar slot="start">
-            <ion-img src="../../../../assets/dyspo-kid.png"></ion-img>
-          </ion-avatar>
-          <span style="color: var(--text-dyspo-with-kids)">Kids</span>
+  <ion-card>
+    <ion-radio-group [(ngModel)]="agendaEvent!.type">
+      <ion-item lines="none">
+        <ion-avatar slot="start">
+          <ion-img src="../../../../assets/dyspo-kid.png"></ion-img>
+        </ion-avatar>
+        <span style="color: var(--text-dyspo-with-kids)">Kids</span>
 
-          <ion-radio
-            slot="end"
-            class="ion-text-center"
-            [value]="agendaEventType.KIDS"
-          ></ion-radio>
-        </ion-item>
-        <ion-item lines="none">
-          <ion-avatar slot="start">
-            <ion-img src="../../../../assets/dyspo-nokid.png"></ion-img>
-          </ion-avatar>
-          <span style="color: var(--text-dyspo)">No Kids</span>
+        <ion-radio
+          slot="end"
+          class="ion-text-center"
+          [value]="agendaEventType.KIDS"
+        ></ion-radio>
+      </ion-item>
+      <ion-item lines="none">
+        <ion-avatar slot="start">
+          <ion-img src="../../../../assets/dyspo-nokid.png"></ion-img>
+        </ion-avatar>
+        <span style="color: var(--text-dyspo)">No Kids</span>
 
-          <ion-radio
-            slot="end"
-            class="ion-text-center"
-            [value]="agendaEventType.NOKIDS"
-          ></ion-radio>
-        </ion-item>
+        <ion-radio
+          slot="end"
+          class="ion-text-center"
+          [value]="agendaEventType.NOKIDS"
+        ></ion-radio>
+      </ion-item>
 
-        <ion-item lines="none">
-          <ion-avatar slot="start">
-            <ion-img src="../../../../assets/dyspo-free.png"></ion-img>
-          </ion-avatar>
-          <span style="color: var(--text-dyspo-free)">Au choix</span>
+      <ion-item lines="none">
+        <ion-avatar slot="start">
+          <ion-img src="../../../../assets/dyspo-free.png"></ion-img>
+        </ion-avatar>
+        <span style="color: var(--text-dyspo-free)">Au choix</span>
 
-          <ion-radio
-            slot="end"
-            class="ion-text-center"
-            [value]="agendaEventType.FREE"
-          ></ion-radio>
-        </ion-item>
-      </ion-radio-group>
-    </ion-list>
-    <ion-list-header>
-      <ion-label>Qui prévenir ?</ion-label>
+        <ion-radio
+          slot="end"
+          class="ion-text-center"
+          [value]="agendaEventType.FREE"
+        ></ion-radio>
+      </ion-item>
+    </ion-radio-group>
+  </ion-card>
 
-      <ion-button (click)="goToFriendSelection()">
+  <ion-card>
+    <ion-toolbar>
+      <ion-button slot="end" fill="clear" (click)="goToFriendSelection()">
         <ion-icon name="people" slot="start"></ion-icon>Amis, Groupe</ion-button
       >
-    </ion-list-header>
+    </ion-toolbar>
 
     <ion-row class="friends-wrapper ion-padding">
       <div>{{getNbMembers()}}</div>
     </ion-row>
+  </ion-card>
 
-    <ion-card>
-      <ion-list *ngIf="friends.length > 0">
-        <ion-item
-          *ngFor="let friend of friends ; let i = index;"
-          (click)="selectFriend(friend)"
-        >
-          <ion-avatar slot="start">
-            <!-- <img src="{{friend?.avatarPath}}" /> -->
-          </ion-avatar>
-
-          <div>
-            <ion-row class="ion-align-items-center">
-              <p class="ion-no-margin">NOM PRENOM</p>
-            </ion-row>
-            <ion-row class="ion-align-items-center">
-              <p class="ion-no-margin">5</p>
-            </ion-row>
-            <!-- <ion-row class="ion-align-items-center">
-              <rating [rating]="rate" (ratingChange)="onRateChanged($event)">
-              </rating>            
-            </ion-row> -->
-          </div>
-        </ion-item>
-      </ion-list>
-    </ion-card>
-
-    <ion-list-header>Lieu </ion-list-header>
-
-    <ion-searchbar
-      [(ngModel)]="autocompletePlaceInput.input"
-      (ngModelChange)="updateSearchResults()"
-      placeholder="Entrez une adresse"
-      (ionClear)="clearAutocomplete()"
-    >
-    </ion-searchbar>
-    <ion-list [hidden]="autocompletePlaces.length === 0">
-      <ion-item
-        *ngFor="let place of autocompletePlaces"
-        tappable
-        (click)="selectSearchResult(place)"
-      >
-        {{ place.description }}
-      </ion-item>
-    </ion-list>
-  </ion-list>
-
-  <ion-list-header>
-    <ion-label>Autorisations</ion-label>
-  </ion-list-header>
-  <div class="ion-padding">
-    <ion-checkbox [(ngModel)]="allCanEdit" labelPlacement="end"
-      >Autoriser l'édition pour tout le monde</ion-checkbox
-    >
-  </div>
-
-  <ion-list-header
-    ><ion-label>Photo</ion-label>
-    <ion-button (click)="takePhotoPrompt()"
-      ><ion-icon name="camera" slot="start"></ion-icon>Ajouter</ion-button
-    >
-  </ion-list-header>
-  <div
-    *ngIf="agendaEvent?.avatar"
-    style="max-width: 80%; padding: 16px; margin: auto"
+  <ion-searchbar
+    [(ngModel)]="autocompletePlaceInput.input"
+    (ngModelChange)="updateSearchResults()"
+    placeholder="Entrez une adresse"
+    (ionClear)="clearAutocomplete()"
   >
-    <ion-img src="{{agendaEvent?.avatar}}" />
-  </div>
+  </ion-searchbar>
+  <ion-list
+    class="ion-no-margin ion-no-padding"
+    [hidden]="autocompletePlaces.length === 0"
+  >
+    <ion-item
+      *ngFor="let place of autocompletePlaces"
+      tappable
+      (click)="selectSearchResult(place)"
+    >
+      {{ place.description }}
+    </ion-item>
+  </ion-list>
+  <ion-card>
+    <div class="ion-padding">
+      <ion-checkbox [(ngModel)]="allCanEdit" labelPlacement="end"
+        >Autoriser l'édition pour tout le monde</ion-checkbox
+      >
+    </div>
+  </ion-card>
 </ion-content>

@@ -212,10 +212,15 @@ export class AgendaService {
   }
 
   async saveOrUpdateEvent(agendaEvent: AgendaEvent) {
-    setDoc(
-      doc(this.firestore, `agenda_events/`, agendaEvent.uid!),
-      agendaEvent
-    );
+    setDoc(doc(this.firestore, `agenda_events/`, agendaEvent.uid!), agendaEvent)
+      .then(() => {
+        //this.utils.showToastSuccess("L'événement a été sauvegardé");
+        return true;
+      })
+      .catch((err) => {
+        //this.utils.showToastError("Une erreur s'est produite");
+        return false;
+      });
 
     // Send notif ?
     // this.notification-service.sendConfirmFriend()
