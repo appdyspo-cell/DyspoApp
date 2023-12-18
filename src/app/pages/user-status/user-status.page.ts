@@ -30,6 +30,7 @@ import {
 import { fr } from 'date-fns/locale';
 import { AgendaEventInfoComponent } from 'src/app/components/agenda-event-info/agenda-event-info.component';
 import { FriendsService } from 'src/app/services/friends.service';
+import { App } from '@capacitor/app';
 
 @Component({
   selector: 'app-user-status',
@@ -44,11 +45,11 @@ export class UserStatusPage implements OnInit {
   notifications: Notif[] = [];
   invitations: AgendaEvent[] = [];
   friendsSuggested: Friend[] = [];
-  friends$: Observable<Friend[]>;
-  agendaEventsSubscription: Subscription;
-  agendaDysposSubscription: Subscription;
-  invitationsSubscription: Subscription;
-  friendsSubscrition: Subscription;
+  friends$!: Observable<Friend[]>;
+  agendaEventsSubscription!: Subscription;
+  agendaDysposSubscription!: Subscription;
+  invitationsSubscription!: Subscription;
+  friendsSubscrition!: Subscription;
   todayFormatted = format(new Date(), 'iii dd MMM yyyy', { locale: fr });
   todayDyspo!: AgendaDyspoItem;
   agendaEventType = AgendaEventType;
@@ -60,6 +61,22 @@ export class UserStatusPage implements OnInit {
     private agendaSvc: AgendaService,
     private friendService: FriendsService
   ) {
+    this.fetchData();
+    // On Resume App
+    App.addListener('resume', () => {
+      if (this.agendaDysposSubscription)
+        this.agendaDysposSubscription.unsubscribe();
+      if (this.agendaDysposSubscription)
+        this.agendaDysposSubscription.unsubscribe();
+      this.todayFormatted = format(new Date(), 'iii dd MMM yyyy', {
+        locale: fr,
+      });
+
+      this.fetchData();
+    });
+  }
+
+  fetchData() {
     this.friends$ = this.friendService.friends$;
     this.agendaEventsSubscription = this.agendaSvc.agendaEvents$.subscribe(
       (agendaEvents) => {

@@ -11,6 +11,7 @@ import { AgendaService } from './services/agenda.service';
 import { NotificationService } from './services/notification.service';
 import { environment } from 'src/environments/environment';
 import { SplashScreen } from '@capacitor/splash-screen';
+import { App } from '@capacitor/app';
 
 @Component({
   selector: 'app-root',
@@ -47,13 +48,6 @@ export class AppComponent {
     this.user$ = user(this.auth);
     this.authState$ = authState(this.auth);
 
-    // this.userSubscription = this.user$.subscribe((aUser: User | null) => {
-    //   //handle user state changes here. Note, that user will be null if there is no currently logged in user.
-    //   console.log(aUser);
-    //   if (aUser) {
-    //     this.navController.navigateRoot('/tabs');
-    //   }
-    // });
     this.authStateSubscription = this.authState$.subscribe(
       (aUser: User | null) => {
         //handle auth state changes here. Note, that user will be null if there is no currently logged in user.
