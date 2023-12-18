@@ -23,6 +23,7 @@ import { EmailComposer } from 'capacitor-email-composer';
 import { LoggerService } from 'src/app/services/logger.service';
 import { UserStatusComponent } from 'src/app/components/user-status/user-status.component';
 import { UserCredential } from '@angular/fire/auth';
+import { NotificationService } from 'src/app/services/notification.service';
 
 @Component({
   selector: 'app-parametres',
@@ -101,6 +102,7 @@ export class ParametresPage implements OnInit {
     private authSvc: AuthService,
     private userSvc: UserService,
     private logger: LoggerService,
+    private notificationsSvc: NotificationService,
     private modalCtrl: ModalController,
     private utils: UtilsService
   ) {}
@@ -170,8 +172,7 @@ export class ParametresPage implements OnInit {
 
   logout() {
     this.saveFilters = false;
-    //Non car ça declenche updateMyFilters() et donc getMatchProfiles()
-
+    this.notificationsSvc.deleteToken(this.userSvc.userInfo!.uid);
     this.authSvc.logout();
   }
 

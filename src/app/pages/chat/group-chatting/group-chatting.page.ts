@@ -35,6 +35,7 @@ import { Keyboard } from '@capacitor/keyboard';
 import Swal from 'sweetalert2';
 import { Device, DeviceInfo } from '@capacitor/device';
 import { UtilsService } from 'src/app/services/utils.service';
+import { NotificationService } from 'src/app/services/notification.service';
 @Component({
   selector: 'app-group-chatting',
   templateUrl: './group-chatting.page.html',
@@ -79,7 +80,8 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     private friendsSvc: FriendsService,
     private mediaSvc: MediaService,
     private modalCtrl: ModalController,
-    private utils: UtilsService
+    private utils: UtilsService,
+    private notificationsSvc: NotificationService
   ) {
     this.agendaEvent =
       this.router.getCurrentNavigation()?.extras.state?.['agendaEvent'];
@@ -208,15 +210,12 @@ export class GroupChattingPage implements OnInit, OnDestroy {
 
       this.chatSvc.sendMsg(message, this.agendaEvent);
       this.pendingAttachment = undefined;
-      //this.msgList.push(message);
 
-      // this.afDB
-      //   .list('chatrooms_messages/' + this.chatroomKey + '/')
-      //   .push(message);
-
-      //this.updateChatrooms(timeMoment, message);
-
-      //this.sendNotificationToUser(this.userInput);
+      this.notificationsSvc.sendMessageInGroup(
+        this.agendaEvent.members_uid,
+        this.userInput,
+        this.agendaEvent
+      );
       this.userInput = '';
       if (this.deviceInfo.platform !== 'web') {
         Keyboard.hide();

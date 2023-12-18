@@ -28,6 +28,7 @@ import {
 import { LoggerService } from 'src/app/services/logger.service';
 import { Subscription } from 'rxjs';
 import { MediaService } from 'src/app/services/media.service';
+import { NotificationService } from 'src/app/services/notification.service';
 
 @Component({
   selector: 'app-profile',
@@ -49,7 +50,8 @@ export class ProfilePage implements OnInit {
     public userSvc: UserService,
     private utils: UtilsService,
     private logger: LoggerService,
-    private mediaSvc: MediaService
+    private mediaSvc: MediaService,
+    private notificationsSvc: NotificationService
   ) {}
 
   ngOnInit() {
@@ -175,6 +177,7 @@ export class ProfilePage implements OnInit {
   }
 
   logout() {
+    this.notificationsSvc.deleteToken(this.userSvc.userInfo!.uid);
     this.authSvc.logout();
   }
 }

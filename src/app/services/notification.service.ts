@@ -1,6 +1,6 @@
 import { Injectable, NgZone } from '@angular/core';
 
-import { AppUser, NotifSubjects } from '../models/models';
+import { AgendaEvent, AppUser, NotifSubjects } from '../models/models';
 import { NavigationExtras, Router } from '@angular/router';
 import { httpsCallable } from 'firebase/functions';
 import { Functions } from '@angular/fire/functions';
@@ -49,9 +49,10 @@ export class NotificationService {
 
     const { token } = await FirebaseMessaging.getToken();
 
-    if (token) {
+    if (!token) {
       console.log('ERR NotificationService ---> getToken() null');
     } else {
+      this.registerToken(this.uid, token);
       FirebaseMessaging.addListener(
         'notificationReceived',
         (event: NotificationReceivedEvent) => {
@@ -101,9 +102,6 @@ export class NotificationService {
 
   public async deleteToken(uid: string) {
     // Remove FCM instance
-    /*FCM.deleteInstance()
-    .then(() => console.log(`Token deleted`))
-    .catch((err) => console.log(err));*/
     FirebaseMessaging.removeAllListeners()
       .then((res) => {
         console.log('FirebaseMessaging.removeAllListeners()->', res);
@@ -145,6 +143,7 @@ export class NotificationService {
   }
 
   async sendInviteFriendNotif(friend_uid: string) {
+    if (!this.userSvc.userInfo) return;
     // Send notification
     console.log('Check to send notif or not');
 
@@ -158,81 +157,138 @@ export class NotificationService {
       const friendUser = querySnapshot.docs[0].data() as AppUser;
       if (
         friendUser.notificationToken &&
-        friendUser.appSettings?.receiveNotification
+        friendUser.appSettings?.friendInvitation
       ) {
-        if (this.userSvc.userInfo) {
-          const avatarPath = this.userSvc.userInfo.avatarPath;
+        const avatarPath = this.userSvc.userInfo!.avatarPath;
 
-          const message =
-            this.userSvc.userInfo.firstname +
+        const message =
+          this.userSvc.userInfo!.firstname +
+          ' ' +
+          this.userSvc.userInfo!.lastname +
+          ' vous a demandé en ami';
+        const f = httpsCallable(this.functions, 'sendNotification');
+        f({
+          message,
+          subject: NotifSubjects.INVITE,
+          tokens: [friendUser.notificationToken],
+          uids: [friend_uid],
+          username:
+            this.userSvc.userInfo!.firstname +
             ' ' +
-            this.userSvc.userInfo.lastname +
-            ' vous a demandé en ami';
-          const f = httpsCallable(this.functions, 'sendNotification');
-          f({
-            message,
-            subject: NotifSubjects.INVITE,
-            token: friendUser.notificationToken,
-            username:
-              this.userSvc.userInfo.firstname +
-              ' ' +
-              this.userSvc.userInfo.lastname,
-            avatarPath,
+            this.userSvc.userInfo!.lastname,
+          avatarPath,
+        })
+          .then((res) => {
+            console.log(res);
           })
-            .then((res) => {
-              console.log(res);
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        }
+          .catch((err) => {
+            console.log(err);
+          });
       }
     }
   }
 
   async sendInviteAgendaEvent(uids: string[]) {
+    if (!this.userSvc.userInfo) return;
+    // Send notification
+    console.log('Check to send notif or not');
+    uids = uids.filter((uid) => {
+      return uid !== this.userSvc.userInfo!.uid;
+    });
+    const q = query(
+      collection(this.firestore, 'users'),
+      where('uid', 'in', uids)
+    );
+    const querySnapshots = await getDocs(q);
+    if (!querySnapshots.empty) {
+      const tokens: string[] = [];
+      querySnapshots.forEach((snapshot) => {
+        const user = snapshot.data() as AppUser;
+        if (user.appSettings?.eventInvitation && user.notificationToken) {
+          tokens.push(user.notificationToken);
+        }
+      });
+
+      if (tokens.length === 0) return;
+
+      const avatarPath = this.userSvc.userInfo!.avatarPath;
+
+      const message =
+        this.userSvc.userInfo!.firstname +
+        ' ' +
+        this.userSvc.userInfo!.lastname +
+        ' propose un évenement';
+      const f = httpsCallable(this.functions, 'sendNotification');
+      f({
+        message,
+        subject: NotifSubjects.AGENDA_EVENT,
+        uids,
+        tokens,
+        username:
+          this.userSvc.userInfo!.firstname +
+          ' ' +
+          this.userSvc.userInfo!.lastname,
+        avatarPath,
+      })
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }
+
+  async sendMessageInGroup(
+    uids: string[],
+    message: string,
+    agendaEvent: AgendaEvent
+  ) {
+    if (!this.userSvc.userInfo) return;
     // Send notification
     console.log('Check to send notif or not');
 
     const q = query(
       collection(this.firestore, 'users'),
-      where('uid', 'array-contains', uids)
+      where('uid', 'in', uids)
     );
-    const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-      const ref = querySnapshot.docs[0].ref;
-      const friendUser = querySnapshot.docs[0].data() as AppUser;
-      if (
-        friendUser.notificationToken &&
-        friendUser.appSettings?.receiveNotification
-      ) {
-        if (this.userSvc.userInfo) {
-          const avatarPath = this.userSvc.userInfo.avatarPath;
 
-          const message =
-            this.userSvc.userInfo.firstname +
-            ' ' +
-            this.userSvc.userInfo.lastname +
-            ' propose un évenement';
-          const f = httpsCallable(this.functions, 'sendNotification');
-          f({
-            message,
-            subject: NotifSubjects.AGENDA_EVENT,
-            token: friendUser.notificationToken,
-            username:
-              this.userSvc.userInfo.firstname +
-              ' ' +
-              this.userSvc.userInfo.lastname,
-            avatarPath,
-          })
-            .then((res) => {
-              console.log(res);
-            })
-            .catch((err) => {
-              console.log(err);
-            });
+    uids = uids.filter((uid) => {
+      return uid !== this.userSvc.userInfo!.uid;
+    });
+    const querySnapshots = await getDocs(q);
+    if (!querySnapshots.empty) {
+      const tokens: string[] = [];
+      querySnapshots.forEach((snapshot) => {
+        const user = snapshot.data() as AppUser;
+        if (user.appSettings?.receiveNotification && user.notificationToken) {
+          tokens.push(user.notificationToken);
         }
-      }
+      });
+
+      if (tokens.length === 0) return;
+
+      const avatarPath = this.userSvc.userInfo!.avatarPath;
+
+      const f = httpsCallable(this.functions, 'test');
+      f({
+        message,
+        subject: NotifSubjects.MESSAGE,
+        uids,
+        tokens,
+        info: '{agendaEvent : }' + agendaEvent.uid,
+        username:
+          this.userSvc.userInfo!.firstname +
+          ' ' +
+          this.userSvc.userInfo!.lastname,
+        avatarPath,
+      })
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   }
 }

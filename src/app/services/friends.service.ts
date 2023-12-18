@@ -258,8 +258,8 @@ export class FriendsService {
 
       this.utils.hideLoader();
       if (showToast) this.utils.showToastSuccess('Invitation envoyée');
+      this.notificationSvc.sendInviteFriendNotif(membre.uid);
       return true;
-      //this.notificationSvc.sendInviteFriendNotif(membre.uid);
     } catch (err: any) {
       this.utils.hideLoader();
       this.utils.showToastError('Erreur');

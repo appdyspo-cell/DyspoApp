@@ -94,7 +94,6 @@ export class AppComponent {
     this.agendaSvc.initService(uid);
     this.chatSvc.initService(uid);
     this.notificationSvc.initService(uid);
-    // this.kdoSvc.initService(uid);
   }
 
   killAllServices() {
