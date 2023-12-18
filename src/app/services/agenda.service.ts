@@ -494,6 +494,66 @@ export class AgendaService {
     return result;
   }
 
+  async getUserAgendaEventsAndDyspos(
+    uid: string,
+    checkUserShare: boolean
+  ): Promise<{
+    agendaEvents: AgendaEvent[];
+    dyspos: AgendaDyspoItem[];
+    allowShare: boolean;
+  }> {
+    let allowShare = true;
+    if (checkUserShare) {
+      const docRef = doc(this.firestore, `users`, uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const result = docSnap.data() as AppUser;
+        allowShare = result.appSettings?.shareAgenda!;
+        if (!allowShare) {
+          return {
+            agendaEvents: [],
+            dyspos: [],
+            allowShare: false,
+          };
+        }
+      }
+    }
+    const agendaEventsCollectionRef = collection(
+      this.firestore,
+      `agenda_events/`
+    );
+
+    const queryAgendaEvents = query(
+      agendaEventsCollectionRef,
+      where('members_uid', 'array-contains', uid)
+    );
+
+    const agendaDysposCollectionRef = collection(
+      this.firestore,
+      `agenda_dyspos/${uid}/dyspo_list`
+    );
+
+    const querySnapshotsEvents = await getDocs(queryAgendaEvents);
+    const querySnapshotsDyspos = await getDocs(agendaDysposCollectionRef);
+
+    const events: AgendaEvent[] = [];
+    const dyspos: AgendaDyspoItem[] = [];
+
+    querySnapshotsEvents.forEach((snapshot) => {
+      events.push(snapshot.data() as AgendaEvent);
+    });
+
+    querySnapshotsDyspos.forEach((snapshot) => {
+      dyspos.push(snapshot.data() as AgendaDyspoItem);
+    });
+
+    return {
+      agendaEvents: events,
+      dyspos,
+      allowShare,
+    };
+  }
+
   unsubscribeAllAfterLogoutEvent() {
     if (this.dysposOnSpnashotCancel) this.dysposOnSpnashotCancel();
     if (this.eventsOnSnapshotCancel) this.eventsOnSnapshotCancel();

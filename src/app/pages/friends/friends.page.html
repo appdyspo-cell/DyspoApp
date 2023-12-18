@@ -116,11 +116,7 @@
             <ion-icon slot="icon-only" name="trash"></ion-icon>
           </ion-item-option>
         </ion-item-options>
-        <ion-item
-          (click)="showProfile(friendListDoc)"
-          lines="none"
-          class="friend-item"
-        >
+        <ion-item lines="none" class="friend-item">
           <ion-thumbnail slot="start">
             <img
               [defaultImage]="defaultImage"
@@ -137,14 +133,15 @@
             </ion-row>
           </ion-label>
 
-          <!-- <ion-buttons slot="end">
-            <ion-button
-              color="primary"
-              (click)="goToChat(friendListDoc.userData, $event)"
-            >
-              <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
-            </ion-button>
-          </ion-buttons> -->
+          <ion-button
+            fill="clear"
+            slot="end"
+            (click)="showAgenda(friendListDoc, $event)"
+            class="animate__animated animate__fadeInRight"
+          >
+            <!-- <ion-img src="assets/agenda.png"></ion-img> -->
+            <ion-icon name="calendar-outline" slot="icon-only"></ion-icon>
+          </ion-button>
         </ion-item>
       </ion-item-sliding>
     </ion-list>
@@ -231,7 +228,7 @@
             <ion-icon slot="icon-only" name="trash"></ion-icon>
           </ion-item-option>
         </ion-item-options>
-        <ion-item (click)="showProfile(friendSuggested)">
+        <ion-item (click)="showProfile(friendSuggested, $event)">
           <ion-avatar slot="start">
             <img src="{{friendSuggested.userData?.avatarPath}}" />
           </ion-avatar>

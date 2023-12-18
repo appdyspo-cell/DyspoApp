@@ -42,7 +42,7 @@ const routes: Routes = [
       ),
   },
   {
-    path: 'agenda',
+    path: 'agenda/:dataMode',
     loadChildren: () =>
       import('./pages/agenda/agenda.module').then((m) => m.AgendaPageModule),
   },

@@ -1,5 +1,41 @@
 <ion-content class="bg_color">
-  <div class="header-ct">
+  <div class="header-ct" *ngIf="isFriendMode">
+    <div class="header">
+      <ion-toolbar>
+        <div
+          slot="start"
+          style="display: flex"
+          class="ion-align-items-center thumbnail-friend"
+        >
+          <ion-button fill="clear" (click)="navCtrl.pop()">
+            <ion-icon
+              name="close-outline"
+              color="light"
+              slot="icon-only"
+            ></ion-icon>
+          </ion-button>
+          <ion-thumbnail
+            slot="start"
+            class="animate__animated animate__fadeInLeft"
+          >
+            <ion-img src="{{agendaFriend?.userData?.avatarPath}}"></ion-img>
+          </ion-thumbnail>
+        </div>
+
+        <ion-title> <h1>{{agendaFriend?.userData?.firstname}}</h1></ion-title>
+        <!-- <ion-buttons slot="end" >
+          <ion-toggle
+            color="secondary"
+            labelPlacement="start"
+            [enableOnOffLabels]="true"
+            (ionChange)="onChangeMode($event)"
+            >Edit</ion-toggle
+          >
+        </ion-buttons> -->
+      </ion-toolbar>
+    </div>
+  </div>
+  <div class="header-ct" *ngIf="!isFriendMode">
     <div class="header">
       <ion-toolbar>
         <ion-thumbnail
@@ -8,6 +44,7 @@
         >
           <ion-img src="assets/agenda.png"></ion-img>
         </ion-thumbnail>
+
         <ion-title> <h1>Calendrier</h1></ion-title>
         <ion-buttons slot="end">
           <ion-toggle
@@ -70,7 +107,7 @@
           </div>
         </div>
 
-        <ion-buttons slot="end">
+        <ion-buttons slot="end" *ngIf="isFriendMode === false">
           <ion-button color="primary" (click)="goToChat(agendaEvent, $event)">
             <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
           </ion-button>

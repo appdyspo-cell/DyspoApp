@@ -22,6 +22,9 @@ import { UtilsService } from 'src/app/services/utils.service';
   styleUrls: ['./friends.page.scss'],
 })
 export class FriendsPage implements OnInit {
+  showProfile(_t174: Friend, $event: MouseEvent) {
+    throw new Error('Method not implemented.');
+  }
   defaultImage = 'assets/logo.svg';
   selectSegment = 'friends';
   rate = 3;
@@ -192,8 +195,16 @@ export class FriendsPage implements OnInit {
     }
   }
 
-  showProfile(friend: AppUser) {
+  showAgenda(friend: AppUser, event: any) {
+    event.stopPropagation();
     //this.utils.showModalPage(AmiFicheComponent, {friendListDoc: friend, userData: friend.userData});
+    const navigationExtras: NavigationExtras = {
+      state: {
+        friend,
+      },
+    };
+
+    this.navCtrl.navigateForward('agenda/friend', navigationExtras);
   }
 
   showFriendGroup(friendGroup: FriendGroup, event: any) {

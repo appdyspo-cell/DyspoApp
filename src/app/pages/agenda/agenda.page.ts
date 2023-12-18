@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { NavigationExtras, Router } from '@angular/router';
+import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { ModalController, NavController } from '@ionic/angular';
 import {
   getDate,
@@ -21,6 +21,8 @@ import { CalendarMode } from 'src/app/components/calendar';
 import {
   AgendaDyspoItem,
   AgendaEvent,
+  AppUser,
+  Friend,
   UserDyspoStatus,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
@@ -33,6 +35,7 @@ export enum AgendaMode {
   SELECT,
   EDIT,
   READONLY,
+  FRIEND,
 }
 
 @Component({
@@ -42,6 +45,7 @@ export enum AgendaMode {
 })
 export class AgendaPage implements AfterViewInit {
   @ViewChild('mydiv') mydiv!: ElementRef;
+  agendaModeEnum = AgendaMode;
   calendar = {
     mode: 'month' as CalendarMode,
   };
@@ -56,62 +60,94 @@ export class AgendaPage implements AfterViewInit {
   eventsForDate: AgendaEvent[] = [];
   selectedDate: any;
 
-  agendaEvents$: Observable<AgendaEvent[]>;
+  agendaEvents$: Observable<AgendaEvent[]> | undefined;
   agendaEvents: AgendaEvent[] = [];
-  agendaEventsSubscription: Subscription;
+  agendaEventsSubscription: Subscription | undefined;
 
   // agendaDyspos$: Observable<{
   //   action: 'MODIFIED' | 'ADDED' | 'REMOVED';
   //   items: AgendaDyspoItem[];
   // }>;
   agendaDyspos: AgendaDyspoItem[] = [];
-  agendaDysposSubscription: Subscription;
+  agendaDysposSubscription: Subscription | undefined;
 
   agendaMode: AgendaMode = AgendaMode.READONLY;
+  isFriendMode = false;
   selectedDateFormatted: any;
-  selectedDateMs: number;
+  selectedDateMs: number | undefined;
 
   agendaModes = AgendaMode;
   calendarMonthData!: CalendarMonth;
   originalCalendarMonthData!: CalendarMonth;
   isModified = false;
+  dataMode = '';
+  agendaFriend: Friend | undefined;
 
   constructor(
     public agendaSvc: AgendaService,
-    private navCtrl: NavController,
+    public navCtrl: NavController,
     private utils: UtilsService,
     private modalCtrl: ModalController,
-    private route: Router
+    private activatedRoute: ActivatedRoute,
+    private router: Router
   ) {
-    this.agendaEvents$ = this.agendaSvc.agendaEvents$;
-    this.agendaEventsSubscription = this.agendaSvc.agendaEvents$.subscribe(
-      (agendaEvents: AgendaEvent[]) => {
-        console.log('Ag events');
-        this.agendaEvents = agendaEvents;
-        this.tagCalendarEventsData();
-      }
-    );
+    this.activatedRoute.params.subscribe(async (params) => {
+      this.dataMode = params['dataMode'];
+      if (this.dataMode === 'me') {
+        this.agendaEvents$ = this.agendaSvc.agendaEvents$;
+        this.agendaEventsSubscription = this.agendaSvc.agendaEvents$.subscribe(
+          (agendaEvents: AgendaEvent[]) => {
+            console.log('Ag events');
+            this.agendaEvents = agendaEvents;
+            this.tagCalendarEventsData();
+          }
+        );
 
-    //this.agendaDyspos$ = this.agendaSvc.agendaDyspos$;
-    this.agendaDysposSubscription = this.agendaSvc.agendaDyspos$.subscribe(
-      (agendaDyspos) => {
-        console.log(agendaDyspos.action);
-        if (
-          agendaDyspos.action === 'ADDED' ||
-          agendaDyspos.action === 'MODIFIED'
-        ) {
-          this.agendaDyspos = agendaDyspos.items;
+        //this.agendaDyspos$ = this.agendaSvc.agendaDyspos$;
+        this.agendaDysposSubscription = this.agendaSvc.agendaDyspos$.subscribe(
+          (agendaDyspos) => {
+            console.log(agendaDyspos.action);
+            if (
+              agendaDyspos.action === 'ADDED' ||
+              agendaDyspos.action === 'MODIFIED'
+            ) {
+              this.agendaDyspos = agendaDyspos.items;
+              this.tagCalendarUserDyspoData();
+            }
+          }
+        );
+
+        this.selectedDateMs = new Date().getTime();
+        this.selectedDateFormatted = this.utils.formatDate(
+          new Date().getTime()
+        );
+      } else if (this.dataMode === 'friend') {
+        // Check if shareAgenda is allowed
+
+        this.isFriendMode = true;
+        this.agendaFriend =
+          this.router.getCurrentNavigation()?.extras.state?.['friend'];
+        console.log('Friend Ag events');
+        const friendData = await this.agendaSvc.getUserAgendaEventsAndDyspos(
+          this.agendaFriend!.friend_uid!,
+          true
+        );
+        if (friendData.allowShare) {
+          this.agendaEvents = friendData.agendaEvents;
+          this.tagCalendarEventsData();
+          this.agendaDyspos = friendData.dyspos;
           this.tagCalendarUserDyspoData();
+        } else {
+          this.utils.showAlert('Ne souhaite pas partager son calendrier');
         }
       }
-    );
-
-    this.selectedDateMs = new Date().getTime();
-    this.selectedDateFormatted = this.utils.formatDate(new Date().getTime());
+    });
   }
 
   ngOnDestroy() {
-    this.agendaEventsSubscription.unsubscribe();
+    if (this.agendaEventsSubscription) {
+      this.agendaEventsSubscription.unsubscribe();
+    }
   }
 
   onChangeMode(ev: any) {
@@ -223,6 +259,9 @@ export class AgendaPage implements AfterViewInit {
   }
 
   onSelectReadOnly(ev: CalendarDay[]) {
+    if (this.isFriendMode) {
+      return;
+    }
     if (this.agendaMode === AgendaMode.READONLY) {
       console.log('Selected read only ', ev);
 
@@ -252,6 +291,9 @@ export class AgendaPage implements AfterViewInit {
   }
 
   async openEvent(agendaEvent: AgendaEvent) {
+    if (this.isFriendMode) {
+      return;
+    }
     const modal = await this.modalCtrl.create({
       component: AgendaEventInfoComponent,
       componentProps: {
