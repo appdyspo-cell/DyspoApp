@@ -170,7 +170,10 @@ export class AgendaEventInfoComponent implements OnInit {
         agendaEvent: this.agendaEvent,
       },
     };
-    this.navCtrl.navigateForward('/agenda/create-event/edit', navigationExtras);
+    this.navCtrl.navigateForward(
+      '/agenda/me/create-event/edit',
+      navigationExtras
+    );
   }
 
   async quitEvent() {

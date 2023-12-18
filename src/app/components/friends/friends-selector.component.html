@@ -1,21 +1,40 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-buttons slot="start">
-      <ion-button (click)="close()">
-        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-    <ion-buttons slot="end"> </ion-buttons>
-    <ion-title>Amis</ion-title>
-    <ion-buttons slot="end">
-      <ion-button fill="outline" shape="round" (click)="save()">
-        Enregistrer
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content>
+  <div class="header-ct">
+    <div class="header">
+      <ion-toolbar>
+        <div
+          slot="start"
+          style="display: flex"
+          class="ion-align-items-center thumbnail-friend"
+        >
+          <ion-button fill="clear" (click)="close()">
+            <ion-icon
+              name="close-outline"
+              color="light"
+              slot="icon-only"
+            ></ion-icon>
+          </ion-button>
+        </div>
+
+        <ion-title
+          >{{ agendaEvent.start_date_formatted }}<br />
+          {{ agendaEvent.start_time_formatted }}-{{
+            agendaEvent.end_time_formatted
+          }}</ion-title
+        >
+        <ion-buttons slot="end">
+          <ion-button fill="clear" (click)="save()">
+            <ion-icon
+              name="save-outline"
+              color="light"
+              slot="icon-only"
+            ></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </div>
+  </div>
+  <div class="shape"></div>
   <ion-segment
     mode="md"
     [(ngModel)]="selectSegment"
@@ -128,12 +147,12 @@
         >
       </strong>
     </div>
-    <ion-list *ngIf="friendGroups && friendGroups.length > 0">
-      <div class="groups-ct" *ngFor="let group of friendGroups">
-        <ion-card>
-          <ion-card-header class="ion-no-padding">
+    <div *ngIf="friendGroups && friendGroups.length > 0">
+      <ion-accordion-group>
+        <ion-accordion *ngFor="let group of friendGroups">
+          <ion-item slot="header" color="light">
             <div class="d-flex ion-justify-space-between" style="padding: 5px">
-              <div class="d-flex">
+              <div class="d-flex" style="margin-right: 5px">
                 <ion-thumbnail class="ion-thumbnail-group">
                   <img src="{{ group.avatarPath }}" />
                 </ion-thumbnail>
@@ -147,8 +166,8 @@
                 >Ajouter</ion-button
               >
             </div>
-          </ion-card-header>
-          <ion-card-content>
+          </ion-item>
+          <div class="ion-padding" slot="content">
             <ion-list lines="none">
               <ion-item
                 *ngFor="let checkedFriend of group.checked_friends"
@@ -195,9 +214,9 @@
                 ></ion-checkbox>
               </ion-item>
             </ion-list>
-          </ion-card-content>
-        </ion-card>
-      </div>
-    </ion-list>
+          </div>
+        </ion-accordion>
+      </ion-accordion-group>
+    </div>
   </div>
 </ion-content>

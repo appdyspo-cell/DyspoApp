@@ -278,7 +278,10 @@ export class AgendaPage implements AfterViewInit {
         tsDate: this.selectedDateMs,
       },
     };
-    this.navCtrl.navigateForward('/agenda/create-event/new', navigationExtras);
+    this.navCtrl.navigateForward(
+      '/agenda/me/create-event/new',
+      navigationExtras
+    );
   }
   updateEvent(agendaEvent: AgendaEvent, event: any) {
     event.stopPropagation();
@@ -287,7 +290,10 @@ export class AgendaPage implements AfterViewInit {
         agendaEvent,
       },
     };
-    this.navCtrl.navigateForward('/agenda/create-event/edit', navigationExtras);
+    this.navCtrl.navigateForward(
+      '/agenda/me/create-event/edit',
+      navigationExtras
+    );
   }
 
   async openEvent(agendaEvent: AgendaEvent) {
