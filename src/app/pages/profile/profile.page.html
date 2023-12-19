@@ -102,6 +102,24 @@
         ></ion-input>
       </ion-item>
 
+      <ion-item>
+        <ion-select
+          label="Zone Géographique"
+          [(ngModel)]="user.geo_zone"
+          placeholder="Sélectionnez une zone"
+        >
+          <ion-select-option value="zone_A">Zone A</ion-select-option>
+          <ion-select-option value="zone_B">Zone B</ion-select-option>
+          <ion-select-option value="zone_C">Zone C</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-text>J'ai des enfants </ion-text>
+        <ion-buttons slot="end">
+          <ion-checkbox [(ngModel)]="user.with_kids"> </ion-checkbox>
+        </ion-buttons>
+      </ion-item>
+
       <ion-item lines="none">
         <ion-label mode="md" position="stacked">Mot de passe</ion-label>
 

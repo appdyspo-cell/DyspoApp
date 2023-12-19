@@ -22,6 +22,7 @@ import * as Hammer from 'hammerjs';
 import $$ from 'dom7';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { UserDyspoStatus } from 'src/app/models/models';
+import { UserService } from 'src/app/services/user.service';
 
 export const MONTH_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -194,7 +195,8 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   constructor(
     public ref: ChangeDetectorRef,
     private gestureCtrl: GestureController,
-    private actionSheetCtrl: ActionSheetController
+    private actionSheetCtrl: ActionSheetController,
+    public userSvc: UserService
   ) {}
 
   onPanEnd(ev: any) {
@@ -278,32 +280,34 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   }
 
   async presentAction() {
+    const buttons = [];
+    buttons.push({
+      text: 'Dyspo',
+      cssClass: 'dyspo-sheet-dyspo',
+      data: {
+        action: UserDyspoStatus.DYSPO,
+      },
+    });
+    if (this.userSvc.userInfo?.with_kids) {
+      buttons.push({
+        text: 'Dyspo with Kid(s)',
+        cssClass: 'dyspo-sheet-dyspo-with-kids',
+        data: {
+          action: UserDyspoStatus.DYSPOWITHKIDS,
+        },
+      });
+    }
+    buttons.push({
+      text: 'No Dyspo',
+      cssClass: 'dyspo-sheet-no-dyspo',
+      data: {
+        action: UserDyspoStatus.NODYSPO,
+      },
+    });
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Saisissez vos disponibilités',
       cssClass: 'dyspo-sheet',
-      buttons: [
-        {
-          text: 'Dyspo',
-          cssClass: 'dyspo-sheet-dyspo',
-          data: {
-            action: UserDyspoStatus.DYSPO,
-          },
-        },
-        {
-          text: 'Dyspo with Kid(s)',
-          cssClass: 'dyspo-sheet-dyspo-with-kids',
-          data: {
-            action: UserDyspoStatus.DYSPOWITHKIDS,
-          },
-        },
-        {
-          text: 'No Dyspo',
-          cssClass: 'dyspo-sheet-no-dyspo',
-          data: {
-            action: UserDyspoStatus.NODYSPO,
-          },
-        },
-      ],
+      buttons,
     });
 
     await actionSheet.present();
@@ -545,13 +549,25 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     //   this.change.emit((this._date as CalendarDay[]).filter((e) => e !== null));
     // }
     if (this.pickMode === pickModes.MULTI) {
-      if (item.userDyspo === UserDyspoStatus.DYSPO) {
-        item.userDyspo = UserDyspoStatus.DYSPOWITHKIDS;
-      } else if (item.userDyspo === UserDyspoStatus.DYSPOWITHKIDS) {
-        item.userDyspo = UserDyspoStatus.NODYSPO;
+      if (this.userSvc.userInfo?.with_kids) {
+        if (item.userDyspo === UserDyspoStatus.DYSPO) {
+          item.userDyspo = UserDyspoStatus.DYSPOWITHKIDS;
+        } else if (item.userDyspo === UserDyspoStatus.DYSPOWITHKIDS) {
+          item.userDyspo = UserDyspoStatus.NODYSPO;
+        } else {
+          item.userDyspo = UserDyspoStatus.DYSPO;
+        }
       } else {
-        item.userDyspo = UserDyspoStatus.DYSPO;
+        if (
+          item.userDyspo === UserDyspoStatus.DYSPO ||
+          item.userDyspo === UserDyspoStatus.DYSPOWITHKIDS
+        ) {
+          item.userDyspo = UserDyspoStatus.NODYSPO;
+        } else {
+          item.userDyspo = UserDyspoStatus.DYSPO;
+        }
       }
+
       this.change.emit([item]);
     }
   }

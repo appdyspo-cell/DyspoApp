@@ -89,6 +89,24 @@
         >
       </ion-item>
 
+      <ion-item>
+        <ion-select
+          label="Zone Géographique"
+          [(ngModel)]="userInfo.geo_zone"
+          placeholder="Sélectionnez une zone"
+        >
+          <ion-select-option value="zone_A">Zone A</ion-select-option>
+          <ion-select-option value="zone_B">Zone B</ion-select-option>
+          <ion-select-option value="zone_C">Zone C</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-text>J'ai des enfants </ion-text>
+        <ion-buttons slot="end">
+          <ion-checkbox [(ngModel)]="userInfo.with_kids"> </ion-checkbox>
+        </ion-buttons>
+      </ion-item>
+
       <!-- <ion-item lines="none">
         <ion-input
           label="Téléphone"
@@ -125,19 +143,23 @@
         </ion-item>
       </ion-radio-group>
 
-      <ion-item class="ion-align-items-center">
-        <div slot="start">
-          <ion-checkbox [(ngModel)]="isTermsChecked" labelPlacement="end"
-            >J'ai lu et j'accepte les CGU de l'application</ion-checkbox
-          >
-        </div>
+      <ion-item lines="none">
+        <ion-checkbox
+          slot="start"
+          [(ngModel)]="isTermsChecked"
+          labelPlacement="end"
+        ></ion-checkbox>
+        <div class="d-flex">
+          <ion-text> J'ai lu et j'accepte les CGU de l'application </ion-text>
 
-        <ion-icon
-          slot="end"
-          color="medium"
-          name="chevron-forward"
-          (click)="gotoLegal()"
-        ></ion-icon>
+          <ion-button (click)="gotoLegal()" slot="end" fill="clear">
+            <ion-icon
+              color="medium"
+              name="chevron-forward"
+              slot="icon-only"
+            ></ion-icon>
+          </ion-button>
+        </div>
       </ion-item>
       <ion-note *ngIf="errors['cgu']" class="note-error"
         >Veuillez accepter les conditions générales d'utilisation</ion-note

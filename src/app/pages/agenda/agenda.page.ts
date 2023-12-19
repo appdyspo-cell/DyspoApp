@@ -30,6 +30,7 @@ import { UtilsService } from 'src/app/services/utils.service';
 
 import { cloneDeep } from 'lodash';
 import { AgendaEventInfoComponent } from 'src/app/components/agenda-event-info/agenda-event-info.component';
+import { UserService } from 'src/app/services/user.service';
 
 export enum AgendaMode {
   SELECT,
@@ -78,6 +79,8 @@ export class AgendaPage implements AfterViewInit {
   isModified = false;
   dataMode = '';
   agendaFriend: Friend | undefined;
+  userSubscription: Subscription;
+  my_info!: AppUser;
 
   constructor(
     public agendaSvc: AgendaService,
@@ -85,10 +88,14 @@ export class AgendaPage implements AfterViewInit {
     private utils: UtilsService,
     private modalCtrl: ModalController,
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    public userSvc: UserService
   ) {
-    // For friend agenda
+    this.userSubscription = this.userSvc.appUserInfoObs$.subscribe((user) => {
+      this.my_info = user;
 
+      console.log('user subscription profile page', user);
+    });
     this.activatedRoute.params.subscribe(async (params) => {
       this.dataMode = params['dataMode'];
       if (this.dataMode === 'me') {
@@ -145,6 +152,9 @@ export class AgendaPage implements AfterViewInit {
   ngOnDestroy() {
     if (this.agendaEventsSubscription) {
       this.agendaEventsSubscription.unsubscribe();
+    }
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
     }
   }
 

@@ -124,6 +124,8 @@ export class UserService {
         shareAgenda: true,
       },
       tagline: '',
+      geo_zone: 'zone_A',
+      with_kids: false,
     };
   }
 

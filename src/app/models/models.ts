@@ -22,6 +22,8 @@ export interface AppUser {
   created_at_ms?: number;
   is_phoneVerified?: boolean;
   is_my_friend?: boolean;
+  geo_zone?: string;
+  with_kids?: boolean;
 }
 
 export interface Friend extends AppUser {

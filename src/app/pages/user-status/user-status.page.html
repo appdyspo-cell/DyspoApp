@@ -17,6 +17,10 @@
       </ion-avatar> -->
         <div
           class="dyspo-button dyspo ion-activatable animate__animated animate__fadeIn"
+          style="
+            box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px,
+              rgba(0, 0, 0, 0.24) 0px 1px 2px;
+          "
           *ngIf="todayDyspo?.userDyspo === dyspoStatus.DYSPO"
         >
           Dyspo
@@ -26,6 +30,10 @@
         <div
           *ngIf="todayDyspo?.userDyspo === dyspoStatus.DYSPOWITHKIDS"
           class="dyspo-button dyspo-with-kids ion-activatable animate__animated animate__fadeIn"
+          style="
+            box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px,
+              rgba(0, 0, 0, 0.24) 0px 1px 2px;
+          "
         >
           Dyspo With Kids
           <ion-ripple-effect></ion-ripple-effect>
@@ -34,6 +42,10 @@
         <div
           *ngIf="todayDyspo?.userDyspo === dyspoStatus.NODYSPO"
           class="dyspo-button no-dyspo ion-activatable animate__animated animate__fadeIn"
+          style="
+            box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px,
+              rgba(0, 0, 0, 0.24) 0px 1px 2px;
+          "
         >
           No Dyspo
           <ion-ripple-effect></ion-ripple-effect>
@@ -139,8 +151,8 @@
     #statusmodal
     trigger="open-status-modal"
     (willDismiss)="onWillDismiss($event)"
-    [initialBreakpoint]="0.4"
-    [breakpoints]="[0, 0.4]"
+    [initialBreakpoint]="userSvc.userInfo?.with_kids? 0.4: 0.3"
+    [breakpoints]="userSvc.userInfo?.with_kids? [0, 0.4] : [0, 0.3]"
   >
     <ng-template>
       <ion-header>
@@ -159,6 +171,7 @@
             <ion-ripple-effect></ion-ripple-effect>
           </div>
           <div
+            *ngIf="userSvc.userInfo?.with_kids"
             button
             class="dyspo-button dyspo-with-kids ion-activatable margin-bottom"
             (click)="updateStatus(dyspoStatus.DYSPOWITHKIDS)"

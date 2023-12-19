@@ -14,6 +14,7 @@ declare interface RegisterErrors {
   email: boolean;
   password: boolean;
   phoneNumber: boolean;
+
   cgu: boolean;
 }
 
