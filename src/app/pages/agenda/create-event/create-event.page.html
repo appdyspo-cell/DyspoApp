@@ -104,6 +104,34 @@
   </ion-card>
 
   <ion-card>
+    <!-- <ion-toolbar>
+      <ion-button slot="end" fill="clear" (click)="goToFriendSelection()">
+        <ion-icon name="people" slot="start"></ion-icon>Amis, Groupe</ion-button
+      >
+    </ion-toolbar>
+
+     -->
+    <div style="height: 380px; width: 100%">
+      <app-friends-selector
+        [agendaEvent]="agendaEvent!"
+        [startTime]="startTime"
+        [endTime]="endTime"
+        (friendSelected)="onFriendSelected($event)"
+      ></app-friends-selector>
+      <ion-row class="friends-wrapper ion-padding">
+        <div>{{getNbMembers()}}</div>
+      </ion-row>
+    </div>
+  </ion-card>
+
+  <ion-searchbar
+    [(ngModel)]="autocompletePlaceInput.input"
+    (ngModelChange)="updateSearchResults()"
+    placeholder="Entrez une adresse"
+    (ionClear)="clearAutocomplete()"
+  >
+  </ion-searchbar>
+  <ion-card>
     <ion-radio-group [(ngModel)]="agendaEvent!.type">
       <ion-item lines="none">
         <ion-avatar slot="start">
@@ -145,25 +173,6 @@
     </ion-radio-group>
   </ion-card>
 
-  <ion-card>
-    <ion-toolbar>
-      <ion-button slot="end" fill="clear" (click)="goToFriendSelection()">
-        <ion-icon name="people" slot="start"></ion-icon>Amis, Groupe</ion-button
-      >
-    </ion-toolbar>
-
-    <ion-row class="friends-wrapper ion-padding">
-      <div>{{getNbMembers()}}</div>
-    </ion-row>
-  </ion-card>
-
-  <ion-searchbar
-    [(ngModel)]="autocompletePlaceInput.input"
-    (ngModelChange)="updateSearchResults()"
-    placeholder="Entrez une adresse"
-    (ionClear)="clearAutocomplete()"
-  >
-  </ion-searchbar>
   <ion-list
     class="ion-no-margin ion-no-padding"
     [hidden]="autocompletePlaces.length === 0"

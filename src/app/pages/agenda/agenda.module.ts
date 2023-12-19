@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, NavParams } from '@ionic/angular';
 
 import { AgendaPageRoutingModule } from './agenda-routing.module';
 
@@ -21,6 +21,7 @@ import { SharedPipesModule } from 'src/app/modules/shared-pipes/shared-pipes.mod
     AgendaPageRoutingModule,
     SharedPipesModule,
   ],
+
   declarations: [AgendaPage],
 })
 export class AgendaPageModule {}

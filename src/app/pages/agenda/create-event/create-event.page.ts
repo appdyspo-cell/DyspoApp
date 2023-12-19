@@ -25,6 +25,7 @@ import {
   AgendaEventStatus,
   AgendaEventType,
   Chatroom,
+  CheckedFriends,
   Friend,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
@@ -68,6 +69,8 @@ export class CreateEventPage implements OnInit {
   mode: any;
   uid = '';
   allCanEdit: boolean = false;
+  startTime: any;
+  endTime: any;
 
   constructor(
     private navCtrl: NavController,
@@ -200,19 +203,21 @@ export class CreateEventPage implements OnInit {
 
   onStartTimeChanged(ev: any) {
     console.log(ev);
+    this.startTime = ev.detail.value;
     this.agendaEvent!.start_date_formatted = this.formatDate(ev.detail.value);
     this.agendaEvent!.start_time_formatted = this.formatTime(ev.detail.value);
     this.agendaEvent!.startISO = ev.detail.value;
+    this.min_time_ISO_end = ev.detail.value;
     this.agendaEvent!.day = getDate(parseISO(this.agendaEvent!.startISO));
     this.agendaEvent!.month = getMonth(parseISO(this.agendaEvent!.startISO));
     this.agendaEvent!.year = getYear(parseISO(this.agendaEvent!.startISO));
-    (this.agendaEvent!.date_index =
-      getDate(new Date(this.tsInputDate)).toString() +
+    this.agendaEvent!.date_index =
+      this.agendaEvent!.day +
       '_' +
-      getMonth(new Date(this.tsInputDate)).toString() +
+      this.agendaEvent!.month +
       '_' +
-      getYear(new Date(this.tsInputDate)).toString()),
-      (this.min_time_ISO_end = ev.detail.value);
+      this.agendaEvent!.year;
+
     if (
       isAfter(
         parseISO(this.agendaEvent!.startISO),
@@ -233,6 +238,7 @@ export class CreateEventPage implements OnInit {
   }
 
   onEndTimeChanged(ev: any) {
+    this.endTime = ev.detail.value;
     this.agendaEvent!.end_date_formatted = this.formatDate(ev.detail.value);
     this.agendaEvent!.end_time_formatted = this.formatTime(ev.detail.value);
     this.agendaEvent!.endISO = ev.detail.value;
@@ -287,41 +293,41 @@ export class CreateEventPage implements OnInit {
     );
   }
 
-  async openFriendsModal() {
-    const modal = await this.modalCtrl.create({
-      component: FriendsSelectorComponent,
-      componentProps: {
-        agendaEvent: this.agendaEvent,
-        mode: this.mode,
-      },
-    });
-    modal.present();
+  // async openFriendsModal() {
+  //   const modal = await this.modalCtrl.create({
+  //     component: FriendsSelectorComponent,
+  //     componentProps: {
+  //       agendaEvent: this.agendaEvent,
+  //       mode: this.mode,
+  //     },
+  //   });
+  //   modal.present();
 
-    const { data, role } = await modal.onWillDismiss();
+  //   const { data, role } = await modal.onWillDismiss();
 
-    console.log(data);
-    if (role === 'confirm') {
-      this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!);
-      if (data.newInvits.length > 0) {
-        // const userChatroom: Chatroom = {
-        //   count: 0,
-        //   lastMessageRead: '',
-        //   startMessageId: 0,
-        //   nextMessageId: 0,
-        // };
-        // this.agendaEvent!['user_' + this.uid] = userChatroom;
-        // data.newInvits.forEach((newInvit: string) => {
-        //   const userChatroom: Chatroom = {
-        //     count: 0,
-        //     lastMessageRead: '',
-        //     startMessageId: 0,
-        //     nextMessageId: 0,
-        //   };
-        //   this.agendaEvent!['user_' + newInvit] = userChatroom;
-        // });
-      }
-    }
-  }
+  //   console.log(data);
+  //   if (role === 'confirm') {
+  //     this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!);
+  //     if (data.newInvits.length > 0) {
+  //       // const userChatroom: Chatroom = {
+  //       //   count: 0,
+  //       //   lastMessageRead: '',
+  //       //   startMessageId: 0,
+  //       //   nextMessageId: 0,
+  //       // };
+  //       // this.agendaEvent!['user_' + this.uid] = userChatroom;
+  //       // data.newInvits.forEach((newInvit: string) => {
+  //       //   const userChatroom: Chatroom = {
+  //       //     count: 0,
+  //       //     lastMessageRead: '',
+  //       //     startMessageId: 0,
+  //       //     nextMessageId: 0,
+  //       //   };
+  //       //   this.agendaEvent!['user_' + newInvit] = userChatroom;
+  //       // });
+  //     }
+  //   }
+  // }
 
   async takePhotoPrompt() {
     const { filepath } = await this.mediaSvc.takePhotoPrompt({
@@ -336,11 +342,6 @@ export class CreateEventPage implements OnInit {
         this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!);
       }
     }
-  }
-
-  goToFriendSelection() {
-    this.openFriendsModal();
-    return;
   }
 
   // getNbFriendsInvited() {
@@ -365,9 +366,63 @@ export class CreateEventPage implements OnInit {
     if (nbMembers === 0) {
       return '';
     } else if (nbMembers === 1) {
-      return '1 participant';
+      return '';
     } else {
-      return nbMembers + ' participants';
+      return nbMembers - 1 + ' participants';
     }
+  }
+
+  onFriendSelected(data: CheckedFriends[]) {
+    console.log('onFriendSelected', data);
+
+    console.log('save invits');
+    const friends_uid = this.getCheckedFriendsUid(data);
+    const newInvits: string[] = [];
+
+    for (let item of data) {
+      if (item.isChecked && !item.disable) {
+        if (
+          !this.agendaEvent!.members_invited_uid.includes(
+            item.friend.friend_uid!
+          )
+        ) {
+          this.agendaEvent!.members_invited_uid.push(item.friend.friend_uid!);
+        }
+      }
+      if (!item.isChecked && !item.disable) {
+        const foundIndex = this.agendaEvent!.members_invited_uid!.findIndex(
+          (e) => {
+            return e === item.friend.friend_uid!;
+          }
+        );
+        if (foundIndex >= 0) {
+          this.agendaEvent!.members_invited_uid.splice(foundIndex, 1);
+        }
+      }
+    }
+
+    // for (let uid of friends_uid) {
+    //   if (!this.agendaEvent!.members_invited_uid.includes(uid)) {
+    //     newInvits.push(uid);
+    //     this.agendaEvent!.members_invited_uid.push(uid);
+    //   }
+    // }
+  }
+
+  getCheckedFriendsUid(checkedFriends: CheckedFriends[]): {
+    uids_checked: string[];
+    uids_unchecked: string[];
+  } {
+    const uids_checked: string[] = [];
+    const uids_unchecked: string[] = [];
+    for (const item of checkedFriends) {
+      if (item.isChecked && !item.disable) {
+        uids_checked.push(item.friend.friend_uid!);
+      }
+      if (!item.isChecked && !item.disable) {
+        uids_unchecked.push(item.friend.friend_uid!);
+      }
+    }
+    return { uids_checked, uids_unchecked };
   }
 }

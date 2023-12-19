@@ -1,9 +1,20 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
+import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 import { ModalController, NavController } from '@ionic/angular';
+import { IonNav } from '@ionic/angular/common';
 import { cloneDeep } from 'lodash';
 import {
   AgendaEvent,
+  AppUser,
   CheckedFriends,
   Friend,
   FriendDyspo,
@@ -15,6 +26,8 @@ import { AgendaService } from 'src/app/services/agenda.service';
 import { FriendsService } from 'src/app/services/friends.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
+import { ChatMenuComponent } from '../chat-menu/chat-menu.component';
+import { AgendaPage } from 'src/app/pages/agenda/agenda.page';
 
 @Component({
   selector: 'app-friends-selector',
@@ -22,6 +35,10 @@ import { UtilsService } from 'src/app/services/utils.service';
   styleUrls: ['./friends-selector.component.scss'],
 })
 export class FriendsSelectorComponent implements OnInit {
+  @Input() agendaEvent!: AgendaEvent;
+  @Input() startTime!: any;
+  @Input() endTime!: any;
+  @Output() friendSelected = new EventEmitter<CheckedFriends[]>();
   UserDyspoStatus = UserDyspoStatus;
   friendSelectionType = FriendSelectionType;
   selectSegment = FriendSelectionType.FRIENDS;
@@ -29,20 +46,36 @@ export class FriendsSelectorComponent implements OnInit {
   inputSearch = '';
   checkedFriends: CheckedFriends[] = [];
   friendGroups: FriendGroup[] = [];
-  agendaEvent!: AgendaEvent;
+
   mode!: string;
   uid!: string;
   friendDyspos: FriendDyspo[] = [];
+  level = 0;
 
   constructor(
     private router: Router,
     private friendsSvc: FriendsService,
-    private activatedRoute: ActivatedRoute,
+    private navCtrl: NavController,
     private agendaSvc: AgendaService,
     private userSvc: UserService,
     public utils: UtilsService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
+
+  async ngOnChanges(changes: SimpleChanges) {
+    console.log('Changement détecté : ');
+    this.changeDetectorRef.markForCheck();
+    this.changeDetectorRef.detectChanges();
+    this.checkedFriends = [];
+    await this.fillCheckedFriends();
+    console.log('Set group friends');
+    this.friendGroups.forEach(async (group) => {
+      group.checked_friends = this.checkedFriends.filter((checkedFriend) => {
+        return group.members_uid.includes(checkedFriend.friend.friend_uid!);
+      });
+    });
+  }
 
   async ngOnInit() {
     console.log('init friendSelection');
@@ -103,6 +136,7 @@ export class FriendsSelectorComponent implements OnInit {
   }
 
   segmentChanged(ev: any) {
+    ev.stopPropagation();
     // if(ev.detail.value ==='club'){
     //   try{
     //     if(this.map){
@@ -117,55 +151,53 @@ export class FriendsSelectorComponent implements OnInit {
     // }
   }
 
-  onCheckedFriendChange($event: Event) {
-    console.log($event);
-    console.log(this.checkedFriends);
+  onCheckedFriendChange(checkedFriend: CheckedFriends, $event: Event) {
+    $event.stopPropagation();
+    this.friendSelected.emit(this.checkedFriends);
   }
 
-  getCheckedFriendsUid(): string[] {
-    const uids: string[] = [];
-    for (const item of this.checkedFriends) {
-      if (item.isChecked && !item.disable) {
-        uids.push(item.friend.friend_uid!);
-      }
-    }
-    return uids;
-  }
+  // getCheckedFriendsUid(): string[] {
+  //   const uids: string[] = [];
+  //   for (const item of this.checkedFriends) {
+  //     if (item.isChecked && !item.disable) {
+  //       uids.push(item.friend.friend_uid!);
+  //     }
+  //   }
+  //   return uids;
+  // }
 
-  save() {
-    console.log('save invits');
-    const friends_uid = this.getCheckedFriendsUid();
-    const newInvits: string[] = [];
+  // save() {
+  //   console.log('save invits');
+  //   const friends_uid = this.getCheckedFriendsUid();
+  //   const newInvits: string[] = [];
 
-    for (let uid of friends_uid) {
-      if (!this.agendaEvent.members_invited_uid.includes(uid)) {
-        newInvits.push(uid);
-        this.agendaEvent.members_invited_uid.push(uid);
+  //   for (let uid of friends_uid) {
+  //     if (!this.agendaEvent.members_invited_uid.includes(uid)) {
+  //       newInvits.push(uid);
+  //       this.agendaEvent.members_invited_uid.push(uid);
 
-        //
-      }
-    }
+  //       //
+  //     }
+  //   }
 
-    console.log('Agenda event ', this.agendaEvent);
-    this.modalCtrl.dismiss(
-      {
-        friendsUid: friends_uid,
-        newInvits,
-      },
-      'confirm'
-    );
-  }
+  //   console.log('Agenda event ', this.agendaEvent);
+  //   this.modalCtrl.dismiss(
+  //     {
+  //       friendsUid: friends_uid,
+  //       newInvits,
+  //     },
+  //     'confirm'
+  //   );
+  // }
 
-  addGroup(group: FriendGroup) {
+  addGroup(group: FriendGroup, $event: Event) {
+    $event.stopPropagation();
     this.checkedFriends.forEach((item) => {
       if (group.members_uid.includes(item.friend.friend_uid!)) {
         item.isChecked = true;
       }
     });
-  }
-
-  close() {
-    this.modalCtrl.dismiss({}, 'cancel');
+    this.friendSelected.emit(this.checkedFriends);
   }
 
   getDelayClass(index: number): string {
@@ -175,4 +207,18 @@ export class FriendsSelectorComponent implements OnInit {
       return 'animated delay_12';
     }
   }
+
+  // showAgenda(friend: AppUser, event: any) {
+  //   event.stopPropagation();
+  //   //this.utils.showModalPage(AmiFicheComponent, {friendListDoc: friend, userData: friend.userData});
+  //   const navigationExtras: NavigationExtras = {
+  //     state: {
+  //       friend,
+  //     },
+  //   };
+  //   this.level = 1;
+  //   this.myNav.push(AgendaPage, { friend });
+
+  //   //this.navCtrl.navigateForward('agenda/friend', navigationExtras);
+  // }
 }

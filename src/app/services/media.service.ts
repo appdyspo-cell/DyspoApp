@@ -63,10 +63,6 @@ export class MediaService {
               }
             },
           },
-          {
-            text: 'Annuler',
-            role: 'cancel',
-          },
         ],
       });
       await actionSheet.present();

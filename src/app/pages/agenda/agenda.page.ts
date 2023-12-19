@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
-import { ModalController, NavController } from '@ionic/angular';
+import { ModalController, NavController, NavParams } from '@ionic/angular';
 import {
   getDate,
   getMonth,
@@ -64,10 +64,6 @@ export class AgendaPage implements AfterViewInit {
   agendaEvents: AgendaEvent[] = [];
   agendaEventsSubscription: Subscription | undefined;
 
-  // agendaDyspos$: Observable<{
-  //   action: 'MODIFIED' | 'ADDED' | 'REMOVED';
-  //   items: AgendaDyspoItem[];
-  // }>;
   agendaDyspos: AgendaDyspoItem[] = [];
   agendaDysposSubscription: Subscription | undefined;
 
@@ -91,6 +87,8 @@ export class AgendaPage implements AfterViewInit {
     private activatedRoute: ActivatedRoute,
     private router: Router
   ) {
+    // For friend agenda
+
     this.activatedRoute.params.subscribe(async (params) => {
       this.dataMode = params['dataMode'];
       if (this.dataMode === 'me') {
@@ -379,5 +377,8 @@ export class AgendaPage implements AfterViewInit {
       this.navCtrl.navigateForward('/group-chatting', navigationExtras);
       //this.route.navigate(['chat-home'], navigationExtras);
     }
+  }
+  goBack() {
+    this.navCtrl.pop();
   }
 }
