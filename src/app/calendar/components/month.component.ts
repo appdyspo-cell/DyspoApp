@@ -50,11 +50,15 @@ export const MONTH_VALUE_ACCESSOR: any = {
       <ng-template [ngIf]="!_isRange" [ngIfElse]="rangeBox">
         <div class="days-box">
           <ng-template ngFor let-day [ngForOf]="month.days || []">
-            <div class="days" style="position: relative;">
+            <div
+              class="days p-day"
+              style="position: relative;"
+              [id]="'divday-' + day.time"
+            >
               <ng-container *ngIf="day">
                 <button
                   type="button"
-                  [id]="'btn-day-' + day.time"
+                  [id]="'btnday-' + day.time"
                   [class]="'days-btn ' + day.cssClass"
                   [class.p-day]="true"
                   [class.today]="day.isToday"
@@ -589,7 +593,7 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     console.log('longpress ', ev, day);
     this.longPressedDay = day;
 
-    await Haptics.vibrate();
+    //await Haptics.vibrate();
 
     // Slide mode
   }
@@ -600,11 +604,19 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   }
 
   getCalendarDayFromId(id: string): any {
+    console.log('get Calendar day from', id);
     if (Array.isArray(this.month.days)) {
-      const index = this.month.days.findIndex(
-        (el: CalendarDay) => 'day-' + el.time === id
-      );
+      let idCut = '';
+      if (id.startsWith('day-')) {
+        idCut = id.substring(id.lastIndexOf('-') + 1);
+      } else if (id.startsWith('btnday-') || id.startsWith('divday-')) {
+        idCut = id.substring(id.lastIndexOf('-') + 1);
+      }
+      const index = this.month.days.findIndex((el: CalendarDay) => {
+        return 'day-' + el.time === 'day-' + idCut;
+      });
       if (index >= 0) {
+        console.log();
         return {
           index,
           day: this.month.days[index],
