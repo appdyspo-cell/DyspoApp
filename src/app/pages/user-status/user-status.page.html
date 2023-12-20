@@ -65,7 +65,7 @@
 
   <!-- <h1>Bonjour {{userSvc.userInfo?.firstname}}</h1> -->
 
-  <div *ngIf="nextAgendaEvents.length > 0" style="padding-top: 24px">
+  <div style="padding-top: 24px">
     <ion-list-header>
       <!-- <div class="header-dot"></div> -->
       <span style="margin-right: 8px; font-size: 22px"
@@ -73,6 +73,7 @@
       >
     </ion-list-header>
     <ion-card-content>
+      <div *ngIf="nextAgendaEvents.length === 0">Aucun événement planifié</div>
       <div class="next-agenda-container">
         <div class="next-agenda-content">
           <app-agenda-event-mini

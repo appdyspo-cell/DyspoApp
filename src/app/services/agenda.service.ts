@@ -250,7 +250,7 @@ export class AgendaService {
 
   public saveDyspos(agendaDyspos: AgendaDyspoItem[]) {
     agendaDyspos.forEach((item) => {
-      console.log(item);
+      //console.log(item);
       setDoc(
         doc(
           this.firestore,
@@ -367,45 +367,6 @@ export class AgendaService {
     });
   }
 
-  async _getDyspos(
-    uids: string[],
-    agendaEvent: AgendaEvent
-  ): Promise<FriendDyspo[]> {
-    const dateToCheck = new Date(agendaEvent.startISO);
-    const agenda_dyspo_uid =
-      getYear(dateToCheck) +
-      '_' +
-      getMonth(dateToCheck) +
-      '_' +
-      getDate(dateToCheck);
-    const dyspos: FriendDyspo[] = [];
-    for (let uid of uids) {
-      const docRef = doc(
-        this.firestore,
-        `agenda_dyspos/${uid}/dyspo_list`,
-        agenda_dyspo_uid
-      );
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        console.log('Document data:', docSnap.data());
-        const agendaDyspo = docSnap.data() as AgendaDyspoItem;
-        dyspos.push({
-          friend_dyspo: agendaDyspo.userDyspo,
-          friend_uid: uid,
-          dyspo_date_ISO: agendaEvent.startISO,
-        });
-      } else {
-        dyspos.push({
-          friend_dyspo: UserDyspoStatus.UNDEFINED,
-          friend_uid: uid,
-          dyspo_date_ISO: agendaEvent.startISO,
-        });
-        console.log('No such document!');
-      }
-    }
-    return dyspos;
-  }
-
   async getDyspos(
     uids: string[],
     agendaEvent: AgendaEvent
@@ -419,6 +380,7 @@ export class AgendaService {
       getDate(dateToCheck);
     const dyspos: FriendDyspo[] = [];
     for (let uid of uids) {
+      console.log('get dyspos fro ', uid);
       const docRef = doc(
         this.firestore,
         `agenda_dyspos/${uid}/dyspo_list`,
@@ -426,7 +388,7 @@ export class AgendaService {
       );
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        console.log('Document data:', docSnap.data());
+        //console.log('Document data:', docSnap.data());
         const agendaDyspo = docSnap.data() as AgendaDyspoItem;
         dyspos.push({
           friend_dyspo: agendaDyspo.userDyspo,
@@ -478,19 +440,19 @@ export class AgendaService {
       year: agendaEventToCompare.year,
     };
 
-    console.log(
-      'Get ' +
-        events.length +
-        'user events for uid ' +
-        uid +
-        '=>' +
-        result.day +
-        '_' +
-        result.month +
-        '_' +
-        result.year,
-      result
-    );
+    // console.log(
+    //   'Get ' +
+    //     events.length +
+    //     'user events for uid ' +
+    //     uid +
+    //     '=>' +
+    //     result.day +
+    //     '_' +
+    //     result.month +
+    //     '_' +
+    //     result.year,
+    //   result
+    // );
     return result;
   }
 

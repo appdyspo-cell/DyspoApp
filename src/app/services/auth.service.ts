@@ -48,6 +48,7 @@ export class AuthService {
         password
       );
       const ref = doc(this.firestore, `users/${credentials.user.uid}`);
+      userInfo.uid = credentials.user.uid;
       setDoc(ref, userInfo);
       return credentials;
     } catch (e) {

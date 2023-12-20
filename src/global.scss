@@ -294,6 +294,16 @@ ion-item {
   border: 3px solid var(--text-no-dyspo);
 }
 
+.thumb-event-kids {
+  border: 3px solid var(--text-dyspo-with-kids);
+}
+.thumb-event-nokids {
+  border: 3px solid var(--text-dyspo);
+}
+.thumb-event-free {
+  border: 3px solid var(--text-dyspo-free);
+}
+
 .bg-kids {
   --background: #8c8c1f;
   color: var(--white);

@@ -15,6 +15,7 @@ import { cloneDeep } from 'lodash';
 import {
   AgendaEvent,
   AppUser,
+  AppUserWithEvents,
   CheckedFriends,
   Friend,
   FriendDyspo,
@@ -39,7 +40,14 @@ export class FriendsSelectorComponent implements OnInit {
   @Input() startTime!: any;
   @Input() endTime!: any;
   @Output() friendSelected = new EventEmitter<CheckedFriends[]>();
+  @Output() showEvents = new EventEmitter<{
+    agendaEvents: AgendaEvent[];
+    ev: Event;
+  }>();
+  @ViewChild('popoverUserEvents') popoverUserEvents: any;
   UserDyspoStatus = UserDyspoStatus;
+  isPopoverUserEventsOpen = false;
+  selectedUserEvents: AgendaEvent[] | undefined;
   friendSelectionType = FriendSelectionType;
   selectSegment = FriendSelectionType.FRIENDS;
   friends: Friend[] = [];
@@ -156,6 +164,13 @@ export class FriendsSelectorComponent implements OnInit {
     this.friendSelected.emit(this.checkedFriends);
   }
 
+  onClick(checkedFriend: CheckedFriends, $event: Event) {
+    $event.stopPropagation();
+    if (checkedFriend.disable) return;
+    checkedFriend.isChecked = !checkedFriend.isChecked;
+    this.friendSelected.emit(this.checkedFriends);
+  }
+
   // getCheckedFriendsUid(): string[] {
   //   const uids: string[] = [];
   //   for (const item of this.checkedFriends) {
@@ -206,6 +221,11 @@ export class FriendsSelectorComponent implements OnInit {
     } else {
       return 'animated delay_12';
     }
+  }
+
+  showUserEvents(agendaEvents: AgendaEvent[], e: Event) {
+    e.stopPropagation();
+    this.showEvents.emit({ agendaEvents, ev: e });
   }
 
   // showAgenda(friend: AppUser, event: any) {

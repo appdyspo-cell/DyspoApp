@@ -24,12 +24,15 @@ import {
   AgendaEvent,
   AgendaEventStatus,
   AgendaEventType,
+  AppUserWithEvents,
   Chatroom,
   CheckedFriends,
   Friend,
+  UserDyspoStatus,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
 import { ChatService } from 'src/app/services/chat.service';
+import { FriendsService } from 'src/app/services/friends.service';
 import { MediaService } from 'src/app/services/media.service';
 import { UserService } from 'src/app/services/user.service';
 import { environment } from 'src/environments/environment';
@@ -45,6 +48,10 @@ export enum FriendSelectionType {
   styleUrls: ['./create-event.page.scss'],
 })
 export class CreateEventPage implements OnInit {
+  @ViewChild('popoverUserEvents') popoverUserEvents: any;
+  UserDyspoStatus = UserDyspoStatus;
+  isPopoverUserEventsOpen = false;
+  selectedUserEvents: AgendaEvent[] | undefined;
   tsInputDate: any;
   start_date_formatted!: string;
   end_date_formatted!: string;
@@ -60,6 +67,7 @@ export class CreateEventPage implements OnInit {
   friendSelection: FriendSelectionType = FriendSelectionType.FRIENDS;
 
   friends = [];
+  members: AppUserWithEvents[] = [];
 
   autocompletePlaces: google.maps.places.AutocompletePrediction[] = [];
   inputSearch = '';
@@ -80,7 +88,8 @@ export class CreateEventPage implements OnInit {
     private modalCtrl: ModalController,
     private mediaSvc: MediaService,
     private userSvc: UserService,
-    private chatSvc: ChatService
+    private chatSvc: ChatService,
+    private friendsSvc: FriendsService
   ) {
     this.uid = this.userSvc.userInfo?.uid!;
     this.GoogleAutocompleteSvc = new google.maps.places.AutocompleteService();
@@ -171,7 +180,41 @@ export class CreateEventPage implements OnInit {
 
           break;
       }
+      this.getMembersInfo();
     });
+  }
+
+  async hydrateMemberDysposAndEvents(member: AppUserWithEvents) {
+    // Is he my friend ?
+    member.is_my_friend = this.friendsSvc.isMyFriend(member.uid);
+    console.log(member);
+    // Dyspos
+    const dyspo = (
+      await this.agendaSvc.getDyspos([member.uid], this.agendaEvent!)
+    )[0];
+    const dyspoStatus = dyspo.friend_dyspo;
+    // Hydrate AppUser with dyspo status
+    member.dyspoStatus = dyspoStatus;
+
+    // Fetch events of members
+    const events = await this.agendaSvc.getUserAgendaEvents(
+      member.uid,
+      this.agendaEvent!
+    );
+
+    member.agendaEvents = events.agendaEvents;
+  }
+
+  async getMembersInfo() {
+    this.members = await this.userSvc.getUserInfos(
+      this.agendaEvent!.members_uid.concat(
+        this.agendaEvent!.members_invited_uid
+      )
+    );
+
+    for (let member of this.members) {
+      await this.hydrateMemberDysposAndEvents(member);
+    }
   }
 
   ngOnInit() {}
@@ -235,6 +278,9 @@ export class CreateEventPage implements OnInit {
         this.agendaEvent!.endISO
       );
     }
+
+    //Reload members info
+    this.getMembersInfo();
   }
 
   onEndTimeChanged(ev: any) {
@@ -366,18 +412,18 @@ export class CreateEventPage implements OnInit {
     if (nbMembers === 0) {
       return '';
     } else if (nbMembers === 1) {
-      return '';
+      return '1 participant';
     } else {
-      return nbMembers - 1 + ' participants';
+      return nbMembers + ' participants';
     }
   }
 
-  onFriendSelected(data: CheckedFriends[]) {
+  async onFriendSelected(data: CheckedFriends[]) {
     console.log('onFriendSelected', data);
 
-    console.log('save invits');
-    const friends_uid = this.getCheckedFriendsUid(data);
-    const newInvits: string[] = [];
+    console.log('update members');
+    // const friends_uid = this.getCheckedFriendsUid(data);
+    // const newInvits: string[] = [];
 
     for (let item of data) {
       if (item.isChecked && !item.disable) {
@@ -387,6 +433,12 @@ export class CreateEventPage implements OnInit {
           )
         ) {
           this.agendaEvent!.members_invited_uid.push(item.friend.friend_uid!);
+          const newMember = (
+            await this.userSvc.getUserInfos([item.friend.friend_uid!])
+          )[0];
+          await this.hydrateMemberDysposAndEvents(newMember);
+          // Push in members info bar
+          this.members.push(newMember);
         }
       }
       if (!item.isChecked && !item.disable) {
@@ -397,6 +449,14 @@ export class CreateEventPage implements OnInit {
         );
         if (foundIndex >= 0) {
           this.agendaEvent!.members_invited_uid.splice(foundIndex, 1);
+        }
+
+        //Remove from members info bar
+        const foundIndexMembers = this.members.findIndex((e) => {
+          return e.uid === item.friend.friend_uid!;
+        });
+        if (foundIndexMembers >= 0) {
+          this.members.splice(foundIndexMembers, 1);
         }
       }
     }
@@ -424,5 +484,27 @@ export class CreateEventPage implements OnInit {
       }
     }
     return { uids_checked, uids_unchecked };
+  }
+
+  invite(user: AppUserWithEvents) {
+    this.friendsSvc.invite(user, true).then(() => {
+      user.is_my_friend = true;
+    });
+  }
+
+  showUserEvents(user: AppUserWithEvents, e: Event) {
+    this.selectedUserEvents = user.agendaEvents;
+    if (this.selectedUserEvents && this.selectedUserEvents?.length > 0) {
+      this.popoverUserEvents.event = e;
+      this.isPopoverUserEventsOpen = true;
+    }
+  }
+
+  onShowEvents(data: { agendaEvents: AgendaEvent[]; ev: Event }) {
+    this.selectedUserEvents = data.agendaEvents;
+    if (this.selectedUserEvents && this.selectedUserEvents?.length > 0) {
+      this.popoverUserEvents.event = data.ev;
+      this.isPopoverUserEventsOpen = true;
+    }
   }
 }

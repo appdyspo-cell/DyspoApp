@@ -46,6 +46,7 @@
   </div>
 </div>
 <div class="shape"></div> -->
+
 <ion-segment
   mode="md"
   [(ngModel)]="selectSegment"
@@ -66,7 +67,7 @@
   </ion-segment-button>
 </ion-segment>
 
-<div
+<!-- <div
   *ngIf="selectSegment === friendSelectionType.FRIENDS"
   class="ion-no-margin"
   style="width: 100%; max-height: 250px; overflow: scroll"
@@ -127,15 +128,6 @@
         </div>
       </div>
       <ion-buttons slot="end">
-        <!-- <ion-button
-              fill="clear"
-              slot="end"
-              (click)="showAgenda(checkedFriend.friend, $event)"
-              class="animate__animated animate__fadeInRight"
-            >
-          
-              <ion-icon name="calendar-outline" slot="icon-only"></ion-icon>
-            </ion-button> -->
         <ion-checkbox
           [disabled]="checkedFriend.disable"
           [(ngModel)]="checkedFriend.isChecked"
@@ -146,6 +138,59 @@
       </ion-buttons>
     </ion-item>
   </ion-list>
+</div> -->
+
+<div
+  *ngIf="selectSegment === friendSelectionType.FRIENDS"
+  class="ion-no-margin"
+  style="width: 100%; max-height: 300px; overflow: scroll"
+>
+  <ion-grid>
+    <ion-row class="ion-align-items-center">
+      <ng-container *ngFor="let checkedFriend of checkedFriends; let i = index">
+        <ion-col size="3" size-md="2" size-lg="1">
+          <div
+            style="width: 100%; display: flex; justify-content: center"
+            [ngClass]="{ 'friend-is-disabled': checkedFriend.disable }"
+          >
+            <!-- Contenu de chaque élément -->
+            <ion-thumbnail
+              (click)="onClick(checkedFriend, $event)"
+              [ngClass]="{
+                kid: checkedFriend.dyspo === UserDyspoStatus.DYSPOWITHKIDS,
+                nokids: checkedFriend.dyspo === UserDyspoStatus.DYSPO,
+                nodyspo: checkedFriend.dyspo === UserDyspoStatus.NODYSPO,
+                'ion-thumbnail-friend-grid': true
+              }"
+            >
+              <img src="{{ checkedFriend.friend.userData?.avatarPath }}" />
+              <ion-badge
+                (click)="showUserEvents(checkedFriend.agendaEvents, $event)"
+                *ngIf="checkedFriend.agendaEvents.length > 0"
+                name="warning-outline"
+                color="danger"
+                class="thumbnail-badge"
+                >{{ checkedFriend.agendaEvents.length }}</ion-badge
+              >
+              <div
+                *ngIf="checkedFriend.isChecked"
+                class="d-flex ion-align-items-center thumbnail-checked animate__animated animate__zoomIn"
+              >
+                <ion-icon name="checkmark-circle-outline"></ion-icon>
+              </div>
+            </ion-thumbnail>
+          </div>
+
+          <div style="text-align: center">
+            <div style="font-size: 10px">
+              <!-- {{ checkedFriend.friend.userData?.lastname }} -->
+              {{ checkedFriend.friend.userData?.firstname }}
+            </div>
+          </div>
+        </ion-col>
+      </ng-container>
+    </ion-row>
+  </ion-grid>
 </div>
 
 <div
@@ -180,7 +225,116 @@
                 <img src="{{ group.avatarPath }}" />
               </ion-thumbnail>
 
-              <div style="font-size: 1.5rem; font-weight: bold">
+              <div style="font-size: 1rem">
+                {{ group.label }}
+              </div>
+            </div>
+
+            <ion-button
+              size="small"
+              (click)="addGroup(group, $event)"
+              fill="outline"
+              >Ajouter</ion-button
+            >
+          </div>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          <ion-grid>
+            <ion-row class="ion-align-items-center">
+              <ng-container
+                *ngFor="
+                  let checkedFriend of group.checked_friends;
+                  let i = index
+                "
+              >
+                <ion-col size="3" size-md="2" size-lg="1">
+                  <div
+                    style="width: 100%; display: flex; justify-content: center"
+                    [ngClass]="{ 'friend-is-disabled': checkedFriend.disable }"
+                  >
+                    <!-- Contenu de chaque élément -->
+                    <ion-thumbnail
+                      (click)="onClick(checkedFriend, $event)"
+                      [ngClass]="{
+                        kid:
+                          checkedFriend.dyspo === UserDyspoStatus.DYSPOWITHKIDS,
+                        nokids: checkedFriend.dyspo === UserDyspoStatus.DYSPO,
+                        nodyspo:
+                          checkedFriend.dyspo === UserDyspoStatus.NODYSPO,
+                        'ion-thumbnail-friend-grid': true
+                      }"
+                    >
+                      <img
+                        src="{{ checkedFriend.friend.userData?.avatarPath }}"
+                      />
+                      <ion-badge
+                        (click)="
+                          showUserEvents(checkedFriend.agendaEvents, $event)
+                        "
+                        *ngIf="checkedFriend.agendaEvents.length > 0"
+                        name="warning-outline"
+                        color="danger"
+                        class="thumbnail-badge"
+                        >{{ checkedFriend.agendaEvents.length }}</ion-badge
+                      >
+                      <div
+                        *ngIf="checkedFriend.isChecked"
+                        class="d-flex ion-align-items-center thumbnail-checked animate__animated animate__zoomIn"
+                      >
+                        <ion-icon name="checkmark-circle-outline"></ion-icon>
+                      </div>
+                    </ion-thumbnail>
+                  </div>
+
+                  <div style="text-align: center">
+                    <div style="font-size: 10px">
+                      <!-- {{ checkedFriend.friend.userData?.lastname }} -->
+                      {{ checkedFriend.friend.userData?.firstname }}
+                    </div>
+                  </div>
+                </ion-col>
+              </ng-container>
+            </ion-row>
+          </ion-grid>
+        </div>
+      </ion-accordion>
+    </ion-accordion-group>
+  </div>
+</div>
+
+<!-- <div
+  *ngIf="selectSegment === friendSelectionType.GROUP"
+  class="ion-no-margin"
+  style="width: 100%; max-height: 250px; overflow: scroll"
+>
+  <div
+    id="contsainer-friends"
+    *ngIf="friendGroups && friendGroups.length === 0"
+    style="width: 100%; text-align: center"
+  >
+    <ion-icon
+      name="person-outline"
+      class="empty-icon-circle icon-large empty-icon-color"
+      style="margin-top: 30px"
+    ></ion-icon>
+    <br />
+    <strong class="capitalize">
+      <ion-text style="color: rgb(100, 100, 100)"
+        >Vous n'avez pas encore créé de groupe d'amis</ion-text
+      >
+    </strong>
+  </div>
+  <div *ngIf="friendGroups && friendGroups.length > 0">
+    <ion-accordion-group>
+      <ion-accordion *ngFor="let group of friendGroups">
+        <ion-item slot="header" color="light">
+          <div class="d-flex ion-justify-space-between" style="padding: 5px">
+            <div class="d-flex" style="margin-right: 5px">
+              <ion-thumbnail class="ion-thumbnail-group">
+                <img src="{{ group.avatarPath }}" />
+              </ion-thumbnail>
+
+              <div style="font-size: 1rem">
                 {{ group.label }}
               </div>
             </div>
@@ -244,4 +398,4 @@
       </ion-accordion>
     </ion-accordion-group>
   </div>
-</div>
+</div> -->

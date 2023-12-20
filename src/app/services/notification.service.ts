@@ -159,14 +159,20 @@ export class NotificationService {
         friendUser.notificationToken &&
         friendUser.appSettings?.friendInvitation
       ) {
-        const avatarPath = this.userSvc.userInfo!.avatarPath;
+        let avatarPath = this.userSvc.userInfo!.avatarPath;
+
+        if (!avatarPath?.startsWith('http')) {
+          avatarPath =
+            'https://firebasestorage.googleapis.com/v0/b/dyspo-stg.appspot.com/o/avatarsStorage%2Fuser.png?alt=media&token=048bd715-8f53-4fbf-866a-84335b158a89';
+        }
 
         const message =
           this.userSvc.userInfo!.firstname +
           ' ' +
           this.userSvc.userInfo!.lastname +
           ' vous a demandé en ami';
-        const f = httpsCallable(this.functions, 'sendNotification');
+        const f = httpsCallable(this.functions, 'test');
+
         f({
           message,
           subject: NotifSubjects.INVITE,
@@ -211,14 +217,17 @@ export class NotificationService {
 
       if (tokens.length === 0) return;
 
-      const avatarPath = this.userSvc.userInfo!.avatarPath;
-
+      let avatarPath = this.userSvc.userInfo!.avatarPath;
+      if (!avatarPath?.startsWith('http')) {
+        avatarPath =
+          'https://firebasestorage.googleapis.com/v0/b/dyspo-stg.appspot.com/o/avatarsStorage%2Fuser.png?alt=media&token=048bd715-8f53-4fbf-866a-84335b158a89';
+      }
       const message =
         this.userSvc.userInfo!.firstname +
         ' ' +
         this.userSvc.userInfo!.lastname +
         ' propose un évenement';
-      const f = httpsCallable(this.functions, 'sendNotification');
+      const f = httpsCallable(this.functions, 'test');
       f({
         message,
         subject: NotifSubjects.AGENDA_EVENT,
@@ -268,7 +277,11 @@ export class NotificationService {
 
       if (tokens.length === 0) return;
 
-      const avatarPath = this.userSvc.userInfo!.avatarPath;
+      let avatarPath = this.userSvc.userInfo!.avatarPath;
+      if (!avatarPath?.startsWith('http')) {
+        avatarPath =
+          'https://firebasestorage.googleapis.com/v0/b/dyspo-stg.appspot.com/o/avatarsStorage%2Fuser.png?alt=media&token=048bd715-8f53-4fbf-866a-84335b158a89';
+      }
 
       const f = httpsCallable(this.functions, 'test');
       f({

@@ -4,7 +4,12 @@ import { NavController } from '@ionic/angular';
 import { format, isAfter, isBefore, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Observable, Subscription } from 'rxjs';
-import { AgendaEvent, Chatroom, DiscussionType } from 'src/app/models/models';
+import {
+  AgendaEvent,
+  AgendaEventType,
+  Chatroom,
+  DiscussionType,
+} from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
 import { ChatService } from 'src/app/services/chat.service';
 import { UserService } from 'src/app/services/user.service';
@@ -15,6 +20,7 @@ import { UserService } from 'src/app/services/user.service';
   styleUrls: ['./group-list.page.scss'],
 })
 export class GroupListPage implements OnInit {
+  agendaEventType = AgendaEventType;
   agendaSubscription: Subscription;
   discussionType = DiscussionType;
   // chatrooms$: Observable<Chatroom[]>;

@@ -176,3 +176,72 @@ ion-list-header {
     }
   }
 }
+
+.category_div {
+  overflow: scroll;
+  display: flex;
+  flex-direction: row;
+  margin: 10px 0px 10px 0px;
+  .menu {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    .item {
+      border-radius: 50%;
+      background: transparent !important;
+      width: max-content;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      background: #f4f5f8;
+      ion-label {
+        font-size: 10px;
+        margin-top: 10px;
+      }
+      ion-thumbnail {
+        border-radius: 50%;
+        padding: 2px;
+        margin: 2px;
+        height: 60px;
+        width: 60px;
+        --background: transparent;
+        //border: 2px solid rgb(255, 95, 122);
+        position: relative;
+
+        ion-badge {
+          position: absolute;
+          top: -5px; /* Ajustez cette valeur pour positionner verticalement */
+          right: -5px; /* Ajustez cette valeur pour positionner horizontalement */
+          font-size: 12px; /* Taille du texte du badge */
+          width: 20px; /* Largeur du badge */
+          height: 20px; /* Hauteur du badge */
+          border-radius: 50%; /* Pour créer un badge circulaire */
+          background-color: red; /* Couleur de fond du badge */
+          color: white; /* Couleur du texte du badge */
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        ion-icon {
+          background: rgb(55, 108, 207);
+          border-radius: 20px;
+          position: absolute;
+          bottom: -22px;
+          color: white;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          font-size: 23px;
+        }
+        img {
+          border-radius: 50%;
+        }
+      }
+    }
+  }
+}
+
+.friends-wrapper {
+  height: 100px;
+  padding: 5px 5px 0px 5px;
+}

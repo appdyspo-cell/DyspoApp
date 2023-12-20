@@ -111,16 +111,49 @@
     </ion-toolbar>
 
      -->
-    <div style="height: 380px; width: 100%">
+    <div style="max-height: 650px; min-height: 300px; width: 100%">
+      <div style="padding: 4px 4px 0px 4px">{{getNbMembers()}}</div>
+      <ion-row class="friends-wrapper">
+        <div class="category_div">
+          <div class="menu">
+            <div
+              class="item animate__animated animate__fadeIn"
+              *ngFor="let member of members"
+            >
+              <ion-thumbnail
+                [ngClass]="{
+                'thumb-kid': member.dyspoStatus === UserDyspoStatus.DYSPOWITHKIDS,
+                'thumb-nokids': member.dyspoStatus === UserDyspoStatus.DYSPO,
+                'thumb-nodyspo': member.dyspoStatus === UserDyspoStatus.NODYSPO
+              }"
+              >
+                <img src="{{ member.avatarPath }}" />
+                <ion-badge
+                  (click)="showUserEvents(member, $event)"
+                  *ngIf="member.agendaEvents!.length > 0"
+                  name="warning-outline"
+                  color="danger"
+                  class="thumbnail-badge"
+                  >{{ member.agendaEvents!.length }}</ion-badge
+                >
+                <ion-icon
+                  (click)="invite(member)"
+                  *ngIf="member.is_my_friend === false"
+                  class="zmdi zmdi-plus end"
+                ></ion-icon>
+              </ion-thumbnail>
+              <ion-label>{{ member.firstname }}</ion-label>
+            </div>
+          </div>
+        </div>
+      </ion-row>
       <app-friends-selector
         [agendaEvent]="agendaEvent!"
         [startTime]="startTime"
         [endTime]="endTime"
         (friendSelected)="onFriendSelected($event)"
+        (showEvents)="onShowEvents($event)"
       ></app-friends-selector>
-      <ion-row class="friends-wrapper ion-padding">
-        <div>{{getNbMembers()}}</div>
-      </ion-row>
     </div>
   </ion-card>
 
@@ -192,4 +225,19 @@
       >
     </div>
   </ion-card>
+  <ion-popover
+    #popoverUserEvents
+    [isOpen]="isPopoverUserEventsOpen"
+    (didDismiss)="isPopoverUserEventsOpen = false"
+  >
+    <ng-template>
+      <ion-list>
+        <ion-item *ngFor="let agEv of selectedUserEvents">
+          <ion-text color="danger" style="font-size: 0.75rem"
+            >Autre evenement à {{ agEv.start_time_formatted }}</ion-text
+          >
+        </ion-item>
+      </ion-list>
+    </ng-template>
+  </ion-popover>
 </ion-content>

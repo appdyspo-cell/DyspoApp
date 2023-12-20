@@ -370,7 +370,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     console.log(this.viewType);
   }
   groupinfo() {
-    this.router.navigate(['./group-info']);
+    //this.router.navigate(['./group-info']);
   }
 
   async takePhoto() {
