@@ -93,6 +93,7 @@
             locale="fr-FR"
             [value]="agendaEvent?.endISO"
             [min]="min_time_ISO_end"
+            [max]="max_time_ISO_end"
             cancelText="Annuler"
             (ionChange)="onEndTimeChanged($event)"
           >
@@ -150,7 +151,6 @@
       <app-friends-selector
         [agendaEvent]="agendaEvent!"
         [startTime]="startTime"
-        [endTime]="endTime"
         (friendSelected)="onFriendSelected($event)"
         (showEvents)="onShowEvents($event)"
       ></app-friends-selector>
@@ -232,7 +232,7 @@
   >
     <ng-template>
       <ion-list>
-        <ion-item *ngFor="let agEv of selectedUserEvents">
+        <ion-item *ngFor="let agEv of selectedUserEvents" lines="none">
           <ion-text color="danger" style="font-size: 0.75rem"
             >Autre evenement à {{ agEv.start_time_formatted }}</ion-text
           >

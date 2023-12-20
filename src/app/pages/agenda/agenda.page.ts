@@ -2,14 +2,17 @@ import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { ModalController, NavController, NavParams } from '@ionic/angular';
 import {
+  addHours,
   getDate,
   getMonth,
   getYear,
   isAfter,
   isBefore,
+  isPast,
   isSameDay,
   isSameMonth,
   parseISO,
+  setHours,
 } from 'date-fns';
 import { Observable, Subscription } from 'rxjs';
 import {
@@ -281,6 +284,14 @@ export class AgendaPage implements AfterViewInit {
     }
   }
   addEvent() {
+    const todayMorning = setHours(new Date(), 0);
+    console.log();
+    if (isBefore(new Date(addHours(this.selectedDateMs!, 1)), todayMorning)) {
+      this.utils.showAlert(
+        'Vous ne pouvez pas creer un evenement dans le passé'
+      );
+      return;
+    }
     const navigationExtras: NavigationExtras = {
       state: {
         tsDate: this.selectedDateMs,

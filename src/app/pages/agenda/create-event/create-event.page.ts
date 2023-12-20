@@ -59,6 +59,7 @@ export class CreateEventPage implements OnInit {
   end_time_formatted!: string;
   min_time_ISO_start!: string;
   min_time_ISO_end!: string;
+  max_time_ISO_end!: string;
   agendaEvent: AgendaEvent | undefined;
   agendaEventType = AgendaEventType;
   pageTitle = '';
@@ -160,10 +161,15 @@ export class CreateEventPage implements OnInit {
           };
           this.agendaEvent!['user_' + this.uid] = userChatroom;
 
-          if (isSameDay(this.tsInputDate, new Date())) {
-            this.min_time_ISO_start = this.agendaEvent.startISO;
-            this.min_time_ISO_end = this.agendaEvent.startISO;
-          }
+          //if (isSameDay(this.tsInputDate, new Date())) {
+          this.min_time_ISO_start = this.agendaEvent.startISO;
+          this.min_time_ISO_end = this.agendaEvent.startISO;
+          //}
+          this.max_time_ISO_end = formatISO(
+            addHours(new Date(parseISO(this.min_time_ISO_end)), 12)
+          );
+          console.log('min time ', this.min_time_ISO_start);
+          console.log('max time ', this.max_time_ISO_end);
 
           break;
         case 'edit':
@@ -178,6 +184,12 @@ export class CreateEventPage implements OnInit {
 
           this.allCanEdit = this.agendaEvent!.all_can_edit;
 
+          this.min_time_ISO_start = formatISO(addHours(new Date(), 1));
+
+          this.min_time_ISO_end = this.min_time_ISO_start;
+          this.max_time_ISO_end = formatISO(
+            addHours(new Date(parseISO(this.min_time_ISO_start)), 12)
+          );
           break;
       }
       this.getMembersInfo();
@@ -251,6 +263,9 @@ export class CreateEventPage implements OnInit {
     this.agendaEvent!.start_time_formatted = this.formatTime(ev.detail.value);
     this.agendaEvent!.startISO = ev.detail.value;
     this.min_time_ISO_end = ev.detail.value;
+    this.max_time_ISO_end = formatISO(
+      addHours(new Date(parseISO(ev.detail.value)), 12)
+    );
     this.agendaEvent!.day = getDate(parseISO(this.agendaEvent!.startISO));
     this.agendaEvent!.month = getMonth(parseISO(this.agendaEvent!.startISO));
     this.agendaEvent!.year = getYear(parseISO(this.agendaEvent!.startISO));
@@ -261,23 +276,27 @@ export class CreateEventPage implements OnInit {
       '_' +
       this.agendaEvent!.year;
 
-    if (
-      isAfter(
-        parseISO(this.agendaEvent!.startISO),
-        parseISO(this.agendaEvent!.endISO)
-      )
-    ) {
-      this.agendaEvent!.endISO = formatISO(
-        addHours(new Date(parseISO(ev.detail.value)), 1)
-      );
+    // si on change la date de debut, il ne faut pas que la date de fin soit > 12h TODO
+    //const greaterThanTwelveHours =
 
-      this.agendaEvent!.end_date_formatted = this.formatDate(
-        this.agendaEvent!.endISO
-      );
-      this.agendaEvent!.end_time_formatted = this.formatTime(
-        this.agendaEvent!.endISO
-      );
-    }
+    // si la date de debut est apres l'ancienne date de fin, on remet la date de fin= date de debut + 1h
+    // if (
+    //   isAfter(
+    //     parseISO(this.agendaEvent!.startISO),
+    //     parseISO(this.agendaEvent!.endISO)
+    //   )
+    // ) {
+    this.agendaEvent!.endISO = formatISO(
+      addHours(new Date(parseISO(ev.detail.value)), 1)
+    );
+
+    this.agendaEvent!.end_date_formatted = this.formatDate(
+      this.agendaEvent!.endISO
+    );
+    this.agendaEvent!.end_time_formatted = this.formatTime(
+      this.agendaEvent!.endISO
+    );
+    //}
 
     //Reload members info
     this.getMembersInfo();

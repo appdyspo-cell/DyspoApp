@@ -38,7 +38,7 @@ import { AgendaPage } from 'src/app/pages/agenda/agenda.page';
 export class FriendsSelectorComponent implements OnInit {
   @Input() agendaEvent!: AgendaEvent;
   @Input() startTime!: any;
-  @Input() endTime!: any;
+  //@Input() endTime!: any;
   @Output() friendSelected = new EventEmitter<CheckedFriends[]>();
   @Output() showEvents = new EventEmitter<{
     agendaEvents: AgendaEvent[];
