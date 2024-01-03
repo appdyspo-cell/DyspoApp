@@ -126,6 +126,8 @@ interface CompatibleIcons {
         (selectStart)="selectStart.emit($event)"
         (selectEnd)="selectEnd.emit($event)"
         (selectReadOnly)="selectReadOnly.emit($event)"
+        (onSwipedLeft)="onSwipedLeft($event)"
+        (onSwipedRight)="onSwipedRight($event)"
         [pickMode]="_d.pickMode"
         [color]="_d.color"
       >
@@ -441,6 +443,36 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
       this.nextMonth();
     } else if (!isNext && this.canBack()) {
       this.backMonth();
+    }
+  }
+
+  async onSwipedLeft($event: any) {
+    if (this.agendaSvc.isModified) {
+      const canGo = await this.checkBeforeNavigate();
+      if (canGo) {
+        if (this.canNext()) {
+          this.nextMonth();
+        }
+      }
+    } else {
+      if (this.canNext()) {
+        this.nextMonth();
+      }
+    }
+  }
+
+  async onSwipedRight($event: any) {
+    if (this.agendaSvc.isModified) {
+      const canGo = await this.checkBeforeNavigate();
+      if (canGo) {
+        if (this.canBack()) {
+          this.backMonth();
+        }
+      }
+    } else {
+      if (this.canBack()) {
+        this.backMonth();
+      }
     }
   }
 

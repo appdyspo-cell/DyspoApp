@@ -46,6 +46,8 @@ export const MONTH_VALUE_ACCESSOR: any = {
       #calendarmonth
       (panend)="onPanEnd($event)"
       (panmove)="onPanMove($event)"
+      (swipeleft)="onSwipeLeft($event)"
+      (swiperight)="onSwipeRight($event)"
     >
       <ng-template [ngIf]="!_isRange" [ngIfElse]="rangeBox">
         <div class="days-box">
@@ -179,6 +181,11 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   @Output()
   public selectEnd: EventEmitter<CalendarDay> = new EventEmitter();
 
+  @Output()
+  public onSwipedLeft: EventEmitter<string> = new EventEmitter();
+  @Output()
+  public onSwipedRight: EventEmitter<string> = new EventEmitter();
+
   public _date: Array<CalendarDay | null> = [null, null];
   _isInit = false;
   public _onChanged!: Function;
@@ -218,6 +225,26 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
       this.startDayIndex = -1;
       this._selectedPanDays = [];
     }
+  }
+
+  onSwipeLeft(ev: any) {
+    console.log('swipe left');
+    if (!this.readonly) {
+      console.log('Edit Mode');
+
+      return;
+    }
+    this.onSwipedLeft.emit(ev);
+  }
+
+  onSwipeRight(ev: any) {
+    console.log('swipe right');
+    if (!this.readonly) {
+      console.log('Edit Mode');
+
+      return;
+    }
+    this.onSwipedRight.emit(ev);
   }
 
   onPanMove(ev: any) {
