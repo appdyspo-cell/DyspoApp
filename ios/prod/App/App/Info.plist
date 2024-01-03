@@ -30,6 +30,8 @@
 	<string>Acces aux photos</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Acces aux photos</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Acces aux contacts</string>
 	<array>
 		<string>remote-notification</string>
 	</array>

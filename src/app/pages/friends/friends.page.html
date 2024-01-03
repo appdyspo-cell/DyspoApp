@@ -24,6 +24,10 @@
       <ion-icon name="people"></ion-icon>
       <ion-label> Groupes</ion-label>
     </ion-segment-button>
+    <ion-segment-button mode="md" value="contacts">
+      <ion-icon name="people"></ion-icon>
+      <ion-label> Contacts</ion-label>
+    </ion-segment-button>
     <ion-segment-button mode="md" value="suggestions">
       <ion-icon name="person-add"></ion-icon>
       <ion-label> Invitations </ion-label>
@@ -199,6 +203,10 @@
         </ion-item>
       </ion-item-sliding>
     </ion-list>
+  </div>
+
+  <div *ngIf="selectSegment === 'contacts'" class="ion-no-margin">
+    <app-contacts></app-contacts>
   </div>
 
   <div *ngIf="selectSegment === 'suggestions'" class="ion-no-margin">

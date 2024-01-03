@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
+import { MaskitoElementPredicateAsync, MaskitoOptions } from '@maskito/core';
 import { TranslateService } from '@ngx-translate/core';
 import { AppUser, UserStatus } from 'src/app/models/models';
 import { AuthService } from 'src/app/services/auth.service';
@@ -25,6 +26,27 @@ declare interface RegisterErrors {
 })
 export class RegisterPage implements OnInit {
   isTermsChecked = false;
+  readonly maskPredicate: MaskitoElementPredicateAsync = async (el) =>
+    (el as HTMLIonInputElement).getInputElement();
+
+  readonly phoneMask: MaskitoOptions = {
+    mask: [
+      /\d/,
+      /\d/,
+      ' ',
+      /\d/,
+      /\d/,
+      ' ',
+      /\d/,
+      /\d/,
+      ' ',
+      /\d/,
+      /\d/,
+      ' ',
+      /\d/,
+      /\d/,
+    ],
+  };
 
   errors: { [key: string]: boolean } = {
     firstname: false,
@@ -80,8 +102,10 @@ export class RegisterPage implements OnInit {
 
   async register() {
     this.utils.showLoader();
-
+    this.userInfo.phoneNumber = this.userInfo.phoneNumber?.trim();
+    this.userInfo.phoneNumber = this.userInfo.phoneNumber?.replace(/\s/g, '');
     const user = await this.authSvc.register(this.userInfo, this.password);
+
     console.log('register user', user);
     //localStorage.setItem('isLoggedIn', 'true');
     this.utils.hideLoader();

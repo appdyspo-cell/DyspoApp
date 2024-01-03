@@ -107,8 +107,10 @@
         </ion-buttons>
       </ion-item>
 
-      <!-- <ion-item lines="none">
+      <ion-item lines="none">
         <ion-input
+          [maskito]="phoneMask"
+          [maskitoElement]="maskPredicate"
           label="Téléphone"
           labelPlacement="floating"
           type="tel"
@@ -120,7 +122,7 @@
         <ion-note *ngIf="errors['phoneNumber']" class="note-error"
           >Le téléphone n'est pas valide</ion-note
         >
-      </ion-item> -->
+      </ion-item>
 
       <!-- <ion-item class="desc-inner" lines="none">
         <ion-textarea

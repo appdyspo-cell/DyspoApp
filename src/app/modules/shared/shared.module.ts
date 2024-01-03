@@ -14,6 +14,7 @@ import { DyspoViewerComponent } from 'src/app/components/dyspo-viewer/dyspo-view
 import { NgxPanZoomModule } from 'ngx-panzoom';
 import { SwiperModule } from 'swiper/angular';
 import { ReportComponent } from 'src/app/components/report/report.component';
+import { ContactsComponent } from 'src/app/components/contacts/contacts.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { ReportComponent } from 'src/app/components/report/report.component';
     ChatMenuComponent,
     DyspoViewerComponent,
     ReportComponent,
+    ContactsComponent,
   ],
   imports: [
     CommonModule,
@@ -41,6 +43,7 @@ import { ReportComponent } from 'src/app/components/report/report.component';
     AgendaEventInfoComponent,
     DyspoViewerComponent,
     ReportComponent,
+    ContactsComponent,
   ],
 })
 export class SharedModule {}

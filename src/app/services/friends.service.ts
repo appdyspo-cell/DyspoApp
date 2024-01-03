@@ -356,7 +356,6 @@ export class FriendsService {
 
   unsubscribeAllAfterLogoutEvent() {
     this.onSnapshotFriendsCancel();
-
     this.onSnapshotFriendGroupsCancel();
     this.friends = [];
     this.friendGroups = [];

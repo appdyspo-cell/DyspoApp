@@ -26,6 +26,12 @@ export interface AppUser {
   with_kids?: boolean;
 }
 
+export interface AppContact {
+  display: string;
+  phone_number: string;
+  is_member: boolean;
+}
+
 export interface Friend extends AppUser {
   sinceDate?: number;
   requestDate?: number;

@@ -184,4 +184,16 @@ export class UserService {
     }
     return appUsers;
   }
+
+  async getUserInfosByPhone(number: string): Promise<AppUser | null> {
+    const collectionUserRef = collection(this.firestore, `users`);
+    const q = query(collectionUserRef, where('phoneNumber', '==', number));
+    const docFriendSnap = await getDocs(q);
+    if (!docFriendSnap.empty) {
+      const target = docFriendSnap.docs[0];
+      return target.data() as AppUser;
+    } else {
+      return null;
+    }
+  }
 }
