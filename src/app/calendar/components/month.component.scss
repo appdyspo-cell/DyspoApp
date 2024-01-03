@@ -68,13 +68,17 @@
   border: 2px solid var(--text-black);
 }
 
+.p-selected {
+  color: rgb(255, 255, 255) !important;
+}
+
 :host .on-selected-dyspo {
   background-color: var(--text-dyspo) !important;
   color: #fff !important;
 }
 
-.p-selected {
-  color: rgb(255, 255, 255) !important;
+:host .out-of-month {
+  opacity: 0.5;
 }
 
 :host .on-selected-dyspo-kids {

@@ -72,6 +72,7 @@ export const MONTH_VALUE_ACCESSOR: any = {
                   [class.next-month-day]="day.isNextMonth"
                   [class.on-selected]="isSelected(day.time)"
                   [class.on-selected-pan]="isSelectedPan(day.time)"
+                  [ngClass]="getDyspoClass(day)"
                   [class.on-selected-dyspo-kids]="
                     day.userDyspo === userDyspoStatus.DYSPOWITHKIDS
                   "
@@ -209,6 +210,29 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     private actionSheetCtrl: ActionSheetController,
     public userSvc: UserService
   ) {}
+
+  getDyspoClass(
+    day: CalendarDay
+  ):
+    | string
+    | string[]
+    | Set<string>
+    | { [klass: string]: any }
+    | null
+    | undefined {
+    const classes:
+      | string
+      | string[]
+      | Set<string>
+      | { [klass: string]: any }
+      | null
+      | undefined = [];
+    if (day.isLastMonth || day.isNextMonth) {
+      classes.push('out-of-month');
+    }
+
+    return classes;
+  }
 
   onPanEnd(ev: any) {
     console.log('pan end');
