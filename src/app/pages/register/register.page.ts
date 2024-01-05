@@ -26,6 +26,7 @@ declare interface RegisterErrors {
 })
 export class RegisterPage implements OnInit {
   isTermsChecked = false;
+  academies = '';
   readonly maskPredicate: MaskitoElementPredicateAsync = async (el) =>
     (el as HTMLIonInputElement).getInputElement();
 
@@ -68,9 +69,26 @@ export class RegisterPage implements OnInit {
     private router: Router
   ) {
     this.userInfo = this.userSvc.getEmptyUser();
+    this.getAcademies();
   }
 
   ngOnInit() {}
+
+  getAcademies() {
+    switch (this.userInfo.geo_zone) {
+      case 'zone_A':
+        this.academies =
+          'Besançon, Bordeaux, Clermont-Ferrand, Dijon, Grenoble, Limoges, Lyon et Poitiers.';
+        break;
+      case 'zone_B':
+        this.academies =
+          'Aix-Marseille, Amiens, Caen, Lille, Nancy-Metz, Nantes, Nice, Orléans-Tours, Reims, Rennes, Rouen et Strasbourg.';
+        break;
+      case 'zone_C':
+        this.academies = 'Créteil, Montpellier, Paris, Toulouse et Versailles.';
+        break;
+    }
+  }
 
   checkBeforeRegister() {
     if (this.userInfo?.lastname && this.userInfo?.lastname?.length < 3) {
@@ -84,18 +102,20 @@ export class RegisterPage implements OnInit {
     this.errors['email'] = !this.utils.validateEmail(this.userInfo.email!);
     this.errors['password'] = this.password === '' || this.password.length < 6;
     this.errors['cgu'] = !this.isTermsChecked;
-    if (this.userInfo.phoneNumber !== '') {
-      this.errors['phoneNumber'] = !this.utils.validatePhone(
-        this.userInfo!.phoneNumber
-      );
-    } else {
-      this.errors['phoneNumber'] = false;
-    }
+    //if (this.userInfo.phoneNumber !== '') {
+    this.errors['phoneNumber'] = !this.utils.validatePhone(
+      this.userInfo!.phoneNumber
+    );
+    // }
+    // else {
+    //   this.errors['phoneNumber'] = false;
+    // }
     let errorExists = false;
     for (const key in this.errors) {
       errorExists = errorExists || this.errors[key];
     }
     if (!errorExists) {
+      console.log('will register user');
       this.register();
     }
   }

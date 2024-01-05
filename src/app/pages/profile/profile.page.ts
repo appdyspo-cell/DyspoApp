@@ -36,6 +36,10 @@ import { NotificationService } from 'src/app/services/notification.service';
   styleUrls: ['./profile.page.scss'],
 })
 export class ProfilePage implements OnInit {
+  showZonesInfos() {
+    throw new Error('Method not implemented.');
+  }
+  academies = '';
   user!: AppUser;
   avatarPath = '';
   avatarChangedURL = '';
@@ -58,6 +62,7 @@ export class ProfilePage implements OnInit {
     this.user = this.userSvc.getEmptyUser();
     this.userSubscription = this.userSvc.appUserInfoObs$.subscribe((user) => {
       this.user = user;
+      this.getAcademies();
       console.log('user subscription profile page', user);
     });
     //this.user! = Object.assign({}, this.userSvc.userInfo);
@@ -179,5 +184,21 @@ export class ProfilePage implements OnInit {
   logout() {
     this.notificationsSvc.deleteToken(this.userSvc.userInfo!.uid);
     this.authSvc.logout();
+  }
+
+  getAcademies() {
+    switch (this.user?.geo_zone) {
+      case 'zone_A':
+        this.academies =
+          'Besançon, Bordeaux, Clermont-Ferrand, Dijon, Grenoble, Limoges, Lyon et Poitiers.';
+        break;
+      case 'zone_B':
+        this.academies =
+          'Aix-Marseille, Amiens, Caen, Lille, Nancy-Metz, Nantes, Nice, Orléans-Tours, Reims, Rennes, Rouen et Strasbourg.';
+        break;
+      case 'zone_C':
+        this.academies = 'Créteil, Montpellier, Paris, Toulouse et Versailles.';
+        break;
+    }
   }
 }
