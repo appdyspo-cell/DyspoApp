@@ -43,7 +43,7 @@ export class AgendaEventInfoComponent implements OnInit {
   members_presence_confirmed: AppUserWithEvents[] = [];
   members_presence_not_confirmed: AppUserWithEvents[] = [];
   new_admin_candidates: AppUser[] = [];
-  admin!: AppUser;
+  admin: AppUser | undefined;
   modalNewAdminOpened = false;
   isPopoverOpen = false;
   isPopoverUserEventsOpen = false;
@@ -51,6 +51,12 @@ export class AgendaEventInfoComponent implements OnInit {
   isSoloEvent!: boolean;
   selectedUserEvents: AgendaEvent[] | undefined;
   defaultImage = 'assets/logo.svg';
+  members_loaded: boolean;
+  eventTypeLabel = '';
+  my_dyspoStatus: UserDyspoStatus | undefined;
+  my_agendaEvents: AgendaEvent[] = [];
+  my_agendaEvents_label = '';
+  my_dyspoStatus_label = '';
 
   constructor(
     private modalCtrl: ModalController,
@@ -61,11 +67,24 @@ export class AgendaEventInfoComponent implements OnInit {
     private navCtrl: NavController,
     private friendsSvc: FriendsService,
     private ngZone: NgZone
-  ) {}
+  ) {
+    this.members_loaded = false;
+  }
 
   async ngOnInit() {
     console.log(this.agendaEvent);
-
+    switch (this.agendaEvent.type) {
+      case AgendaEventType.KIDS:
+        this.eventTypeLabel = 'avec kids';
+        break;
+      case AgendaEventType.NOKIDS:
+        this.eventTypeLabel = 'no kids';
+        break;
+      case AgendaEventType.FREE:
+        this.eventTypeLabel = 'avec ou sans kids';
+        break;
+    }
+    this.members_loaded = false;
     this.allowEdit =
       this.agendaEvent.admin_uid === this.userSvc.userInfo?.uid ||
       this.agendaEvent.all_can_edit;
@@ -83,6 +102,10 @@ export class AgendaEventInfoComponent implements OnInit {
     this.members_presence_confirmed = await this.userSvc.getUserInfos(
       this.agendaEvent!.members_uid
     );
+
+    //setTimeout(() => {
+    this.members_loaded = true;
+    //}, 500);
 
     // New Admin candidates
     if (this.agendaEvent.admin_uid === this.userSvc.userInfo?.uid) {
@@ -121,6 +144,48 @@ export class AgendaEventInfoComponent implements OnInit {
       );
 
       member.agendaEvents = events.agendaEvents;
+
+      // My Info
+      if (member.uid === this.userSvc.userInfo?.uid) {
+        this.my_dyspoStatus = dyspo.friend_dyspo;
+        this.my_dyspoStatus_label = '';
+        this.my_agendaEvents = events.agendaEvents;
+        this.my_agendaEvents_label = '';
+
+        if (this.my_agendaEvents.length === 1) {
+          this.my_agendaEvents_label =
+            'Vous avez un événement ce jour là de ' +
+            this.my_agendaEvents[0].start_time_formatted +
+            ' à ' +
+            this.my_agendaEvents[0].end_time_formatted;
+        }
+
+        if (this.my_agendaEvents.length > 1) {
+          this.my_agendaEvents_label =
+            'Vous avez plusieurs événements ce jour là';
+        }
+
+        if (this.my_agendaEvents.length === 0) {
+          this.my_agendaEvents_label = "Vous n'avez rien de prévu à cette date";
+        }
+
+        switch (this.my_dyspoStatus) {
+          case UserDyspoStatus.DYSPO:
+            this.my_dyspoStatus_label = 'Vous êtes disponible à cette date';
+            break;
+          case UserDyspoStatus.NODYSPO:
+            this.my_dyspoStatus_label =
+              "Vous n'êtes pas disponible à cette date";
+            break;
+          case UserDyspoStatus.DYSPOWITHKIDS:
+            this.my_dyspoStatus_label = 'Vous avez vos enfants à cette date';
+            break;
+          case UserDyspoStatus.UNDEFINED:
+            this.my_dyspoStatus_label =
+              'Vous n’avez pas indiqué si vous êtes disponible à cette date';
+            break;
+        }
+      }
     }
   }
 

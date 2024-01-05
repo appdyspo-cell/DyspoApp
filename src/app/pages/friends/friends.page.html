@@ -58,6 +58,23 @@
   </ion-segment> -->
 
   <div *ngIf="selectSegment === 'friends'" class="ion-no-margin">
+    <app-alphabet-scroll
+      (letterSelected)="scrollToLetter($event)"
+      (scrollingLetter)="letterScrollActive($event)"
+    ></app-alphabet-scroll>
+    <ion-item-group *ngFor="let friendAlpha of friendsAlpha">
+      <ion-item-divider sticky="true">
+        <ion-label>{{friendAlpha.letter}}</ion-label>
+      </ion-item-divider>
+
+      <ion-item *ngFor="let contact of friendAlpha.contacts">
+        <ion-label
+          >{{contact.userData!.firstname}}
+          {{contact.userData!.lastname}}</ion-label
+        >
+      </ion-item>
+    </ion-item-group>
+
     <ion-searchbar
       mode="ios"
       [(ngModel)]="inputSearch"
@@ -92,13 +109,8 @@
         </ion-button> -->
       </ion-item>
     </ion-list>
-    <div id="container-friends" *ngIf="friends.length === 0">
-      <ion-icon
-        name="person-outline"
-        class="empty-icon-circle icon-large empty-icon-color"
-      ></ion-icon>
-      <br />
-      <strong class="capitalize">
+    <div *ngIf="friends.length === 0" class="ion-padding">
+      <strong>
         <ion-text style="color: rgb(100, 100, 100)"
           >Vous n'avez pas encore d'amis</ion-text
         >
@@ -152,13 +164,8 @@
   </div>
 
   <div *ngIf="selectSegment === 'friendsgroup'" class="ion-no-margin">
-    <div id="container-friends-group" *ngIf="friendGroups.length === 0">
-      <ion-icon
-        name="people-outline"
-        class="empty-icon-circle icon-large empty-icon-color"
-      ></ion-icon>
-      <br />
-      <strong class="capitalize">
+    <div *ngIf="friendGroups.length === 0" class="ion-padding">
+      <strong>
         <ion-text style="color: rgb(100, 100, 100)"
           >Vous n'avez pas encore de groupe d'amis</ion-text
         >
@@ -210,13 +217,8 @@
   </div>
 
   <div *ngIf="selectSegment === 'suggestions'" class="ion-no-margin">
-    <div id="container-suggestions" *ngIf="friendsSuggested.length === 0">
-      <ion-icon
-        name="person-outline"
-        class="empty-icon-circle icon-large empty-icon-color"
-      ></ion-icon>
-      <br />
-      <strong class="capitalize">
+    <div *ngIf="friendsSuggested.length === 0" class="ion-padding">
+      <strong>
         <ion-text style="color: rgb(100, 100, 100)"
           >Vous n'avez pas d'invitations</ion-text
         >

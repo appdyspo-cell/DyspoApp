@@ -15,6 +15,7 @@ import { NgxPanZoomModule } from 'ngx-panzoom';
 import { SwiperModule } from 'swiper/angular';
 import { ReportComponent } from 'src/app/components/report/report.component';
 import { ContactsComponent } from 'src/app/components/contacts/contacts.component';
+import { AlphabetScrollComponent } from 'src/app/components/alphabet-scroll/alphabet-scroll.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { ContactsComponent } from 'src/app/components/contacts/contacts.componen
     DyspoViewerComponent,
     ReportComponent,
     ContactsComponent,
+    AlphabetScrollComponent,
   ],
   imports: [
     CommonModule,
@@ -44,6 +46,7 @@ import { ContactsComponent } from 'src/app/components/contacts/contacts.componen
     DyspoViewerComponent,
     ReportComponent,
     ContactsComponent,
+    AlphabetScrollComponent,
   ],
 })
 export class SharedModule {}

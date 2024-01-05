@@ -44,16 +44,27 @@ ion-header {
         }
       }
 
-      h2 {
-        margin: 0;
-        font-size: 1rem;
-        font-weight: 500;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
+      .title-container {
         margin: 0 10px;
         width: fit-content;
         max-width: calc(100% - 100px);
+        h2 {
+          margin: 0;
+          font-size: 1rem;
+          font-weight: 500;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+
+        h3 {
+          margin: 0;
+          font-size: 0.7rem;
+          font-weight: 500;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+        }
       }
 
       span {

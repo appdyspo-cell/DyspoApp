@@ -1,12 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import {
   AlertController,
   AnimationController,
+  IonItemGroup,
   NavController,
 } from '@ionic/angular';
 import { Observable, Subscription } from 'rxjs';
 import {
+  AppContact,
   AppUser,
   Friend,
   FriendGroup,
@@ -22,8 +30,28 @@ import { UtilsService } from 'src/app/services/utils.service';
   styleUrls: ['./friends.page.scss'],
 })
 export class FriendsPage implements OnInit {
+  @ViewChildren(IonItemGroup, { read: ElementRef }) itemGroups!: QueryList<any>;
+  scroll = false;
   showProfile(_t174: Friend, $event: MouseEvent) {
     throw new Error('Method not implemented.');
+  }
+
+  scrollToLetter(letter: string) {
+    for (let i = 0; i < this.friendsAlpha.length; i++) {
+      const group = this.friendsAlpha[i];
+      if (group.letter == letter) {
+        const group = this.itemGroups.filter((element, index) => index === i);
+        if (group) {
+          const el: any = group[0];
+          el.nativeElement.scrollIntoView();
+        }
+        return;
+      }
+    }
+  }
+
+  letterScrollActive(active: boolean) {
+    this.scroll = active;
   }
   defaultImage = 'assets/logo.svg';
   selectSegment = 'friends';
@@ -34,6 +62,7 @@ export class FriendsPage implements OnInit {
   friendGroups$: Observable<FriendGroup[]>;
 
   friends: Friend[] = [];
+  friendsAlpha: { letter: string; contacts: Friend[] }[] = [];
   friendGroups: FriendGroup[] = [];
   friendsSuggested: Friend[] = [];
 
@@ -60,6 +89,8 @@ export class FriendsPage implements OnInit {
       this.friends = friends.filter(
         (elt) => elt.friend_status === FriendStatus.FRIEND
       );
+      this.friendsAlpha = this.groupContactsByAlphabet(this.friends);
+      console.log(this.friendsAlpha);
       this.friendsSuggested = friends.filter(
         (elt) => elt.friend_status === FriendStatus.SUGGESTED
       );
@@ -285,5 +316,27 @@ export class FriendsPage implements OnInit {
     this.autocompleteItems = [];
     this.inputSearch = '';
     this.friendService.invite(user);
+  }
+
+  _groupContactsByAlphabet(contacts: Friend[]) {
+    return contacts.reduce((groups: any, contact) => {
+      const letter = contact.userData!.lastname!.charAt(0).toUpperCase();
+      groups[letter] = groups[letter] || [];
+      groups[letter].push(contact);
+      return groups;
+    }, {});
+  }
+
+  groupContactsByAlphabet(contacts: Friend[]) {
+    const groups: any = {};
+    contacts.forEach((contact) => {
+      const letter = contact.userData!.lastname!.charAt(0).toUpperCase();
+      groups[letter] = groups[letter] || [];
+      groups[letter].push(contact);
+    });
+    return Object.keys(groups).map((letter) => ({
+      letter,
+      contacts: groups[letter],
+    }));
   }
 }

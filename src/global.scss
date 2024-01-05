@@ -321,6 +321,23 @@ ion-item {
   color: var(--white);
 }
 
+.label-bg-kids {
+  background-color: #8c8c1f;
+  color: var(--white);
+  //border-color: var(--text-dyspo);
+}
+
+.label-bg-nokids {
+  background-color: #328bc6;
+  color: var(--white);
+  //color: var(--text-no-dyspo);
+}
+
+.label-bg-free {
+  background-color: #2fb62d;
+  color: var(--white);
+}
+
 .bg-kids-secondary {
   background-color: #e1e1b7;
   //color: var(--white);

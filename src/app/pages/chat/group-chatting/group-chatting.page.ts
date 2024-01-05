@@ -36,6 +36,7 @@ import Swal from 'sweetalert2';
 import { Device, DeviceInfo } from '@capacitor/device';
 import { UtilsService } from 'src/app/services/utils.service';
 import { NotificationService } from 'src/app/services/notification.service';
+import { AgendaEventInfoComponent } from 'src/app/components/agenda-event-info/agenda-event-info.component';
 @Component({
   selector: 'app-group-chatting',
   templateUrl: './group-chatting.page.html',
@@ -413,6 +414,23 @@ export class GroupChattingPage implements OnInit, OnDestroy {
       this.friendsSvc.invite(user, true).then(() => {
         user.is_my_friend = true;
       });
+    }
+  }
+
+  async openEvent() {
+    const modal = await this.modalCtrl.create({
+      component: AgendaEventInfoComponent,
+      componentProps: {
+        agendaEvent: this.agendaEvent,
+        isInvitation: false,
+      },
+    });
+    modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+
+    console.log(data);
+    if (role === 'confirm') {
     }
   }
 }

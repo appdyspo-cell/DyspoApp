@@ -70,4 +70,13 @@ export class ContactsComponent implements OnInit {
   showProfile(arg0: any, $event: MouseEvent) {
     throw new Error('Method not implemented.');
   }
+
+  groupContactsByAlphabet(contacts: AppContact[]) {
+    return contacts.reduce((groups: any, contact) => {
+      const letter = contact.display.charAt(0).toUpperCase();
+      groups[letter] = groups[letter] || [];
+      groups[letter].push(contact);
+      return groups;
+    }, {});
+  }
 }
