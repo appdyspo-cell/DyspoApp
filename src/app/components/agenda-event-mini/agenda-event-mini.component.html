@@ -1,6 +1,6 @@
 <div class="agenda-event-container box-1">
   <ion-row style="border-bottom: 1px solid" class="ion-align-items-center">
-    <ion-col size="2">
+    <ion-col size="2" *ngIf="agendaEvent.is_multi">
       <ion-avatar class="event-type-avatar">
         <ion-img
           *ngIf="agendaEvent.type === agendaEventType.KIDS"
@@ -16,7 +16,10 @@
         ></ion-img>
       </ion-avatar>
     </ion-col>
-    <ion-col size="10" style="margin-left: 0px !important">
+    <ion-col
+      [size]="agendaEvent.is_multi ? 10 : 12"
+      style="margin-left: 0px !important"
+    >
       <div
         style="white-space: no-wrap; text-overflow: ellipsis; overflow: hidden"
         class="ion-align-items-center title-notif"

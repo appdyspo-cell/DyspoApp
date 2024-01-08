@@ -38,7 +38,7 @@
     }"
   >
     <div class="header-inner ion-padding">
-      <div class="admin-ct d-flex" *ngIf="!isSoloEvent">
+      <div class="admin-ct d-flex" *ngIf="agendaEvent.is_multi">
         <ion-thumbnail
           slot="start"
           [ngClass]="{
@@ -78,7 +78,7 @@
             Le {{ agendaEvent.start_date_formatted }} à
             {{ agendaEvent.start_time_formatted }}
           </div>
-          <div class="ion-text-center">
+          <div *ngIf="agendaEvent.is_multi" class="ion-text-center">
             <span
               style="font-size: 1.3rem; font-weight: bold; margin-right: 5px"
               >{{
@@ -110,7 +110,7 @@
     </div>
     <!-- Participants section-->
 
-    <div class="category_div">
+    <div class="category_div" *ngIf="agendaEvent.is_multi">
       <div class="menu" *ngIf="!members_loaded">
         <div class="item" *ngFor="let i of [1, 2, 3, 4, 5]">
           <ion-thumbnail>
@@ -224,7 +224,7 @@
       <!-- My Status and Dyspo  -->
       <div
         *ngIf="isInvitation"
-        class="d-flex ion-text-center ion-justify-content-center"
+        class="d-flex ion-text-center ion-justify-content-center ion-padding-top"
       >
         {{ my_dyspoStatus_label }}<br />
         {{ my_agendaEvents_label }}

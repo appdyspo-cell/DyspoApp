@@ -107,6 +107,7 @@ export interface AgendaEvent {
   members_invited_uid: string[];
   admin_uid: string;
   all_can_edit: boolean;
+  all_can_see_title: boolean;
   // day: number;
   // month: number;
   // year: number;

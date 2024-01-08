@@ -85,6 +85,7 @@ export class CreateEventPage implements OnInit {
   mode: any;
   uid = '';
   allCanEdit: boolean = false;
+  allCanSeeTitle: boolean = true;
   startTime: any;
   endTime: any;
   is_multi = false;
@@ -149,10 +150,11 @@ export class CreateEventPage implements OnInit {
             type: AgendaEventType.FREE,
             status: AgendaEventStatus.ACTIVE,
             all_can_edit: false,
+            all_can_see_title: true,
             // day: getDate(new Date(this.tsInputDate)),
             // month: getMonth(new Date(this.tsInputDate)),
             // year: getYear(new Date(this.tsInputDate)),
-            avatar: 'assets/event.png',
+            avatar: 'assets/event.jpg',
             is_multi: this.is_multi,
             recurrence: AgendaEventRecurrence.ONE,
             recurrence_nb: '0',
@@ -224,6 +226,7 @@ export class CreateEventPage implements OnInit {
           }
 
           this.allCanEdit = this.agendaEvent!.all_can_edit;
+          this.allCanSeeTitle = this.agendaEvent!.all_can_see_title;
 
           this.min_time_ISO_start = formatISO(addHours(new Date(), 1));
 
@@ -279,7 +282,7 @@ export class CreateEventPage implements OnInit {
   saveOrUpdateEvent() {
     if (this.agendaEvent?.title) {
       this.agendaEvent.all_can_edit = this.allCanEdit;
-
+      this.agendaEvent.all_can_see_title = this.allCanSeeTitle;
       //Recurrence
       if (
         this.mode === 'new' &&
@@ -374,10 +377,10 @@ export class CreateEventPage implements OnInit {
     });
     this.agendaEvent!.end_date_ts = refEnd.getTime();
     this.agendaEvent!.end_date_day_of_year = getDayOfYear(
-      parseISO(this.agendaEvent!.startISO)
+      parseISO(this.agendaEvent!.endISO)
     );
     this.agendaEvent!.end_date_year = getYear(
-      parseISO(this.agendaEvent!.startISO)
+      parseISO(this.agendaEvent!.endISO)
     );
     //}
 
@@ -402,10 +405,10 @@ export class CreateEventPage implements OnInit {
     });
     this.agendaEvent!.end_date_ts = refEnd.getTime();
     this.agendaEvent!.end_date_day_of_year = getDayOfYear(
-      parseISO(this.agendaEvent!.startISO)
+      parseISO(this.agendaEvent!.endISO)
     );
     this.agendaEvent!.end_date_year = getYear(
-      parseISO(this.agendaEvent!.startISO)
+      parseISO(this.agendaEvent!.endISO)
     );
     console.log('Reload infos');
     //Reload members info

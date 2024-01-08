@@ -116,11 +116,26 @@
         (click)="openEvent(agendaEvent)"
       >
         <div slot="start" style="font-size: 1.2rem">
-          {{agendaEvent.startISO | dayDateFormat}}
+          <div
+            *ngIf="agendaEvent.start_date_day_of_year === agendaEvent.end_date_day_of_year"
+          >
+            {{agendaEvent.startISO | dayDateFormat}}
+          </div>
+          <div
+            *ngIf="agendaEvent.start_date_day_of_year !== agendaEvent.end_date_day_of_year"
+          >
+            {{agendaEvent.startISO | dayDateFormat}} <br />
+            {{agendaEvent.endISO | dayDateFormat}}
+          </div>
         </div>
         <div>
-          <div>{{agendaEvent.title}}</div>
-          <div style="font-size: 0.9rem; padding-left: 4px">
+          <div>
+            {{agendaEvent.all_can_see_title ? agendaEvent.title : '*****'}}
+          </div>
+          <div
+            *ngIf="agendaEvent.start_date_day_of_year === agendaEvent.end_date_day_of_year"
+            style="font-size: 0.9rem; padding-left: 4px"
+          >
             <ion-text color="medium"
               >{{agendaEvent.start_time_formatted}} -
               {{agendaEvent.end_time_formatted}}</ion-text
@@ -128,7 +143,10 @@
           </div>
         </div>
 
-        <ion-buttons slot="end" *ngIf="isFriendMode === false">
+        <ion-buttons
+          slot="end"
+          *ngIf="isFriendMode === false && agendaEvent.is_multi"
+        >
           <ion-button color="primary" (click)="goToChat(agendaEvent, $event)">
             <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
           </ion-button>

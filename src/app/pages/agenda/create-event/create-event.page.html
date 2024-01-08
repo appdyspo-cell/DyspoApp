@@ -262,6 +262,13 @@
       >
     </div>
   </ion-card>
+  <ion-card *ngIf="!is_multi">
+    <div class="ion-padding">
+      <ion-checkbox [(ngModel)]="allCanSeeTitle" labelPlacement="end"
+        >Afficher le titre de l'événement pour tout le monde</ion-checkbox
+      >
+    </div>
+  </ion-card>
 
   <div class="item_inner">
     <div
