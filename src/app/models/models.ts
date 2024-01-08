@@ -112,6 +112,10 @@ export interface AgendaEvent {
   year: number;
   date_index: string;
   last_message?: ChatMessage;
+  is_multi: boolean;
+  recurrence: AgendaEventRecurrence;
+  recurrence_end_ISO?: string;
+  parent_agenda_event_uid?: string;
   [member_uid: string]:
     | string
     | number
@@ -248,6 +252,12 @@ export enum AgendaEventType {
   KIDS = 'KIDS',
   NOKIDS = 'NOKIDS',
   FREE = 'FREE',
+}
+
+export enum AgendaEventRecurrence {
+  ONE = 'ONE',
+  DAILY = 'DAILY',
+  WEEKLY = 'WEEKLY',
 }
 
 export enum FriendStatus {

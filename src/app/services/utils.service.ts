@@ -190,4 +190,9 @@ export class UtilsService {
   formatDate(dateMs: number) {
     return format(new Date(dateMs), 'iii dd MMM yyyy', { locale: fr });
   }
+
+  formatTime(dateISO: string) {
+    console.log(dateISO);
+    return format(parseISO(dateISO), 'HH:mm');
+  }
 }

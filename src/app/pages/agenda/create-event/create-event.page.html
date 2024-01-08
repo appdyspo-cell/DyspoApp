@@ -20,16 +20,6 @@
 <ion-content class="bg_color">
   <div class="header-form-ct">
     <div class="profile">
-      <div class="item_inner">
-        <div
-          *ngIf="agendaEvent?.avatar"
-          (click)="takePhotoPrompt()"
-          style="max-width: 80%; padding: 16px; margin: auto"
-        >
-          <ion-img src="{{agendaEvent?.avatar}}" />
-        </div>
-      </div>
-
       <div class="input-title">
         <ion-input
           class="ion-text-center"
@@ -104,7 +94,7 @@
     </ion-item>
   </ion-card>
 
-  <ion-card>
+  <ion-card *ngIf="is_multi">
     <!-- <ion-toolbar>
       <ion-button slot="end" fill="clear" (click)="goToFriendSelection()">
         <ion-icon name="people" slot="start"></ion-icon>Amis, Groupe</ion-button
@@ -157,6 +147,52 @@
     </div>
   </ion-card>
 
+  <ion-card *ngIf="!is_multi">
+    <ion-item lines="none">
+      <ion-select
+        label="Recurrence"
+        [(ngModel)]="agendaEvent!.recurrence"
+        (ionChange)="onRecurrenceChanged($event)"
+        placeholder="Recurrence"
+      >
+        <ion-select-option [value]="AgendaEventRecurrence.ONE"
+          >1 fois</ion-select-option
+        >
+        <ion-select-option [value]="AgendaEventRecurrence.DAILY"
+          >Quotidienne</ion-select-option
+        >
+        <ion-select-option [value]="AgendaEventRecurrence.WEEKLY"
+          >Hebdomadaire</ion-select-option
+        >
+      </ion-select>
+    </ion-item>
+    <ion-item
+      lines="none"
+      *ngIf="agendaEvent?.recurrence !== AgendaEventRecurrence.ONE"
+    >
+      <ion-select
+        *ngIf="agendaEvent?.recurrence === AgendaEventRecurrence.WEEKLY"
+        label="Pendant"
+        [(ngModel)]="recurrence_period"
+        placeholder="Pendant"
+      >
+        <ion-select-option *ngFor="let m of [1,2,3,4,5,6]" value="{{m}}"
+          >{{m}} mois</ion-select-option
+        >
+      </ion-select>
+      <ion-select
+        *ngIf="agendaEvent?.recurrence === AgendaEventRecurrence.DAILY"
+        label="Pendant"
+        [(ngModel)]="recurrence_period"
+        placeholder="Pendant"
+      >
+        <ion-select-option *ngFor="let s of [1,2,3,4]" value="{{s}}"
+          >{{s}} semaines</ion-select-option
+        >
+      </ion-select>
+    </ion-item>
+  </ion-card>
+
   <ion-searchbar
     [(ngModel)]="autocompletePlaceInput.input"
     (ngModelChange)="updateSearchResults()"
@@ -164,7 +200,7 @@
     (ionClear)="clearAutocomplete()"
   >
   </ion-searchbar>
-  <ion-card>
+  <ion-card *ngIf="is_multi">
     <ion-radio-group [(ngModel)]="agendaEvent!.type">
       <ion-item lines="none">
         <ion-avatar slot="start">
@@ -218,13 +254,24 @@
       {{ place.description }}
     </ion-item>
   </ion-list>
-  <ion-card>
+  <ion-card *ngIf="is_multi">
     <div class="ion-padding">
       <ion-checkbox [(ngModel)]="allCanEdit" labelPlacement="end"
         >Autoriser l'édition pour tout le monde</ion-checkbox
       >
     </div>
   </ion-card>
+
+  <div class="item_inner">
+    <div
+      *ngIf="agendaEvent?.avatar"
+      (click)="takePhotoPrompt()"
+      style="max-width: 80%; padding: 16px; margin: auto"
+    >
+      <ion-img src="{{agendaEvent?.avatar}}" />
+    </div>
+  </div>
+
   <ion-popover
     #popoverUserEvents
     [isOpen]="isPopoverUserEventsOpen"

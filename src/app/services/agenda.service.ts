@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import {
   AgendaDyspoItem,
   AgendaEvent,
+  AgendaEventRecurrence,
   AgendaEventStatus,
+  AgendaEventType,
   AppUser,
   Chatroom,
   CrudFBAction,
@@ -23,9 +25,22 @@ import {
   setDoc,
   updateDoc,
   where,
+  writeBatch,
 } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { getDate, getMonth, getYear } from 'date-fns';
+import {
+  add,
+  addMonths,
+  formatISO,
+  getDate,
+  getHours,
+  getMonth,
+  getYear,
+  isBefore,
+  parseISO,
+  setDate,
+  setHours,
+} from 'date-fns';
 import { UtilsService } from './utils.service';
 import { cloneDeep } from 'lodash';
 
@@ -212,18 +227,99 @@ export class AgendaService {
   }
 
   async saveOrUpdateEvent(agendaEvent: AgendaEvent) {
-    setDoc(doc(this.firestore, `agenda_events/`, agendaEvent.uid!), agendaEvent)
-      .then(() => {
-        //this.utils.showToastSuccess("L'événement a été sauvegardé");
-        return true;
-      })
-      .catch((err) => {
-        //this.utils.showToastError("Une erreur s'est produite");
-        return false;
+    //Evt RECURRENT
+    if (agendaEvent.recurrence !== AgendaEventRecurrence.ONE) {
+      const batch = writeBatch(this.firestore);
+      const ref = doc(this.firestore, `agenda_events/`, agendaEvent.uid!);
+
+      // Add original event
+      batch.set(ref, agendaEvent);
+
+      let addPeriod;
+
+      if (agendaEvent.recurrence === AgendaEventRecurrence.DAILY) {
+        addPeriod = 1;
+      } else {
+        addPeriod = 7;
+      }
+
+      let nextCloneDateStart = add(parseISO(agendaEvent.startISO), {
+        days: addPeriod,
+      });
+      let nextCloneDateEnd = add(parseISO(agendaEvent.endISO), {
+        days: addPeriod,
       });
 
-    // Send notif ?
-    // this.notification-service.sendConfirmFriend()
+      let cloneIsBeforeRecEndDate = isBefore(
+        nextCloneDateStart,
+        parseISO(agendaEvent.recurrence_end_ISO!)
+      );
+
+      while (cloneIsBeforeRecEndDate) {
+        const agendaClone = cloneDeep(agendaEvent);
+        agendaClone.uid = 'agev_rec_' + new Date().getTime();
+        agendaClone.parent_agenda_event_uid = agendaEvent.uid;
+
+        agendaClone.startISO = formatISO(nextCloneDateStart);
+        agendaClone.endISO = formatISO(nextCloneDateEnd);
+
+        agendaClone.day = getDate(nextCloneDateStart);
+        agendaClone.month = getMonth(nextCloneDateStart);
+        agendaClone.year = getYear(nextCloneDateStart);
+
+        agendaClone.date_index =
+          agendaClone.day.toString() +
+          '_' +
+          agendaClone.month.toString() +
+          '_' +
+          agendaClone.year.toString();
+
+        // Hydrate agendaEvent
+        agendaClone.start_date_formatted = this.utils.formatISODate(
+          agendaClone.startISO
+        );
+        agendaClone.end_date_formatted = this.utils.formatISODate(
+          agendaClone.endISO
+        );
+        agendaClone.start_time_formatted = this.utils.formatTime(
+          agendaClone.startISO
+        );
+        agendaClone.end_time_formatted = this.utils.formatTime(
+          agendaClone.endISO
+        );
+        console.log('Save rec event ', agendaClone);
+        batch.set(ref, agendaClone);
+
+        nextCloneDateStart = add(parseISO(agendaClone.startISO), {
+          days: addPeriod,
+        });
+        nextCloneDateEnd = add(parseISO(agendaClone.endISO), {
+          days: addPeriod,
+        });
+        cloneIsBeforeRecEndDate = isBefore(
+          nextCloneDateStart,
+          parseISO(agendaEvent.recurrence_end_ISO!)
+        );
+      }
+    }
+    //NON RECURRENT
+    else {
+      setDoc(
+        doc(this.firestore, `agenda_events/`, agendaEvent.uid!),
+        agendaEvent
+      )
+        .then(() => {
+          //this.utils.showToastSuccess("L'événement a été sauvegardé");
+          return true;
+        })
+        .catch((err) => {
+          //this.utils.showToastError("Une erreur s'est produite");
+          return false;
+        });
+
+      // Send notif ?
+      // this.notification-service.sendConfirmFriend()
+    }
   }
 
   async removeEvent(agendaEvent: AgendaEvent) {

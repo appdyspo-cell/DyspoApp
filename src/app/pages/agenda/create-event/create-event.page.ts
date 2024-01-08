@@ -1,10 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
-import { IonDatetime, ModalController, NavController } from '@ionic/angular';
+import { NavController, SelectChangeEventDetail } from '@ionic/angular';
+import { IonSelectCustomEvent } from '@ionic/core';
 
 import {
   add,
   addHours,
+  addMonths,
+  addWeeks,
   format,
   formatISO,
   getDate,
@@ -18,10 +21,10 @@ import {
   setHours,
   setMinutes,
 } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { FriendsSelectorComponent } from 'src/app/components/friends/friends-selector.component';
+
 import {
   AgendaEvent,
+  AgendaEventRecurrence,
   AgendaEventStatus,
   AgendaEventType,
   AppUserWithEvents,
@@ -31,10 +34,10 @@ import {
   UserDyspoStatus,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
-import { ChatService } from 'src/app/services/chat.service';
 import { FriendsService } from 'src/app/services/friends.service';
 import { MediaService } from 'src/app/services/media.service';
 import { UserService } from 'src/app/services/user.service';
+import { UtilsService } from 'src/app/services/utils.service';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
 
@@ -50,6 +53,7 @@ export enum FriendSelectionType {
 export class CreateEventPage implements OnInit {
   @ViewChild('popoverUserEvents') popoverUserEvents: any;
   UserDyspoStatus = UserDyspoStatus;
+  AgendaEventRecurrence = AgendaEventRecurrence;
   isPopoverUserEventsOpen = false;
   selectedUserEvents: AgendaEvent[] | undefined;
   tsInputDate: any;
@@ -80,16 +84,17 @@ export class CreateEventPage implements OnInit {
   allCanEdit: boolean = false;
   startTime: any;
   endTime: any;
+  is_multi = false;
+  recurrence_period = '0';
 
   constructor(
     private navCtrl: NavController,
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private agendaSvc: AgendaService,
-    private modalCtrl: ModalController,
     private mediaSvc: MediaService,
     private userSvc: UserService,
-    private chatSvc: ChatService,
+    private utils: UtilsService,
     private friendsSvc: FriendsService
   ) {
     this.uid = this.userSvc.userInfo?.uid!;
@@ -98,13 +103,15 @@ export class CreateEventPage implements OnInit {
     this.autocompletePlaces = [];
     this.activatedRoute.params.subscribe((params) => {
       this.mode = params['mode'];
+
       switch (this.mode) {
         case 'new':
           this.pageTitle = 'Créer un evenement';
           this.saveLabel = 'Sauvegarder';
           this.tsInputDate =
             this.router.getCurrentNavigation()?.extras.state?.['tsDate'];
-
+          this.is_multi =
+            this.router.getCurrentNavigation()?.extras.state?.['is_multi'];
           this.agendaEvent = {
             admin_uid: this.uid,
             members_uid: [this.uid],
@@ -130,6 +137,8 @@ export class CreateEventPage implements OnInit {
             month: getMonth(new Date(this.tsInputDate)),
             year: getYear(new Date(this.tsInputDate)),
             avatar: 'assets/event.png',
+            is_multi: this.is_multi,
+            recurrence: AgendaEventRecurrence.ONE,
             date_index:
               getDate(new Date(this.tsInputDate)).toString() +
               '_' +
@@ -139,16 +148,16 @@ export class CreateEventPage implements OnInit {
           };
 
           // Hydrate agendaEvent
-          this.agendaEvent.start_date_formatted = this.formatDate(
+          this.agendaEvent.start_date_formatted = this.utils.formatISODate(
             this.agendaEvent.startISO
           );
-          this.agendaEvent.end_date_formatted = this.formatDate(
+          this.agendaEvent.end_date_formatted = this.utils.formatISODate(
             this.agendaEvent.endISO
           );
-          this.agendaEvent.start_time_formatted = this.formatTime(
+          this.agendaEvent.start_time_formatted = this.utils.formatTime(
             this.agendaEvent.startISO
           );
-          this.agendaEvent.end_time_formatted = this.formatTime(
+          this.agendaEvent.end_time_formatted = this.utils.formatTime(
             this.agendaEvent.endISO
           );
 
@@ -177,6 +186,7 @@ export class CreateEventPage implements OnInit {
           this.pageTitle = 'Editer un evenement';
           this.agendaEvent =
             this.router.getCurrentNavigation()?.extras.state?.['agendaEvent'];
+          this.is_multi = this.agendaEvent!.is_multi;
           if (this.agendaEvent?.place_description) {
             this.autocompletePlaceInput.input =
               this.agendaEvent?.place_description;
@@ -234,10 +244,26 @@ export class CreateEventPage implements OnInit {
   selectFriend(friend: Friend) {}
 
   saveOrUpdateEvent() {
-    console.log(this.agendaEvent);
     if (this.agendaEvent?.title) {
-      console.log('Événement créé :', this.agendaEvent);
       this.agendaEvent.all_can_edit = this.allCanEdit;
+
+      //Recurrence
+      if (this.agendaEvent.recurrence !== AgendaEventRecurrence.ONE) {
+        const recurrence_period_int = parseInt(this.recurrence_period);
+        if (this.agendaEvent.recurrence === AgendaEventRecurrence.WEEKLY) {
+          this.agendaEvent.recurrence_end_ISO = formatISO(
+            addMonths(
+              parseISO(this.agendaEvent.startISO),
+              recurrence_period_int
+            )
+          );
+        } else {
+          this.agendaEvent.recurrence_end_ISO = formatISO(
+            addWeeks(parseISO(this.agendaEvent.startISO), recurrence_period_int)
+          );
+        }
+      }
+
       this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!);
       this.navCtrl.pop();
     } else {
@@ -247,9 +273,6 @@ export class CreateEventPage implements OnInit {
       });
       return;
     }
-    // if (this.mode === 'new') {
-    // } else if (this.mode === 'edit') {
-    // }
   }
 
   removeEvent() {
@@ -259,8 +282,12 @@ export class CreateEventPage implements OnInit {
   onStartTimeChanged(ev: any) {
     console.log(ev);
     this.startTime = ev.detail.value;
-    this.agendaEvent!.start_date_formatted = this.formatDate(ev.detail.value);
-    this.agendaEvent!.start_time_formatted = this.formatTime(ev.detail.value);
+    this.agendaEvent!.start_date_formatted = this.utils.formatDate(
+      ev.detail.value
+    );
+    this.agendaEvent!.start_time_formatted = this.utils.formatTime(
+      ev.detail.value
+    );
     this.agendaEvent!.startISO = ev.detail.value;
     this.min_time_ISO_end = ev.detail.value;
     this.max_time_ISO_end = formatISO(
@@ -290,10 +317,10 @@ export class CreateEventPage implements OnInit {
       addHours(new Date(parseISO(ev.detail.value)), 1)
     );
 
-    this.agendaEvent!.end_date_formatted = this.formatDate(
+    this.agendaEvent!.end_date_formatted = this.utils.formatISODate(
       this.agendaEvent!.endISO
     );
-    this.agendaEvent!.end_time_formatted = this.formatTime(
+    this.agendaEvent!.end_time_formatted = this.utils.formatTime(
       this.agendaEvent!.endISO
     );
     //}
@@ -304,21 +331,13 @@ export class CreateEventPage implements OnInit {
 
   onEndTimeChanged(ev: any) {
     this.endTime = ev.detail.value;
-    this.agendaEvent!.end_date_formatted = this.formatDate(ev.detail.value);
-    this.agendaEvent!.end_time_formatted = this.formatTime(ev.detail.value);
+    this.agendaEvent!.end_date_formatted = this.utils.formatDate(
+      ev.detail.value
+    );
+    this.agendaEvent!.end_time_formatted = this.utils.formatTime(
+      ev.detail.value
+    );
     this.agendaEvent!.endISO = ev.detail.value;
-  }
-
-  formatDate(value: string) {
-    console.log(parseISO(value));
-    const dateTime = parseISO(value).getTime();
-    console.log(dateTime);
-    return format(parseISO(value), 'iii dd MMM yyyy', { locale: fr });
-  }
-
-  formatTime(dateISO: string) {
-    console.log(dateISO);
-    return format(parseISO(dateISO), 'HH:mm');
   }
 
   selectSearchResult(prediction: google.maps.places.AutocompletePrediction) {
@@ -524,6 +543,15 @@ export class CreateEventPage implements OnInit {
     if (this.selectedUserEvents && this.selectedUserEvents?.length > 0) {
       this.popoverUserEvents.event = data.ev;
       this.isPopoverUserEventsOpen = true;
+    }
+  }
+
+  onRecurrenceChanged(ev: IonSelectCustomEvent<SelectChangeEventDetail<any>>) {
+    console.log('Recuurence cahnged');
+    if (ev.detail.value === AgendaEventRecurrence.ONE) {
+      this.recurrence_period = '0';
+    } else {
+      this.recurrence_period = '1';
     }
   }
 }

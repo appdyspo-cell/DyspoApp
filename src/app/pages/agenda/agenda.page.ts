@@ -1,6 +1,11 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
-import { ModalController, NavController, NavParams } from '@ionic/angular';
+import {
+  ActionSheetController,
+  ModalController,
+  NavController,
+  NavParams,
+} from '@ionic/angular';
 import {
   addHours,
   getDate,
@@ -90,6 +95,7 @@ export class AgendaPage implements AfterViewInit {
     public navCtrl: NavController,
     private utils: UtilsService,
     private modalCtrl: ModalController,
+    private actionSheetCtrl: ActionSheetController,
     private activatedRoute: ActivatedRoute,
     private router: Router,
     public userSvc: UserService
@@ -183,9 +189,7 @@ export class AgendaPage implements AfterViewInit {
     console.log('onChange', ev);
     this.agendaSvc.isModified = true;
   }
-  onItemSwipe(ev: any) {
-    console.log('Sxipe');
-  }
+
   onSelect(ev: any) {
     if (this.agendaMode === AgendaMode.READONLY) {
       console.log('Get events for Selected ', ev);
@@ -255,6 +259,24 @@ export class AgendaPage implements AfterViewInit {
     });
   }
 
+  getAgendaEventsForDate(ev: CalendarDay) {
+    this.eventsForDate = [];
+    this.eventsForDate = this.agendaEvents.filter((elt: AgendaEvent) =>
+      isSameDay(ev.time, parseISO(elt.startISO))
+    );
+    this.eventsForDate.sort((item1, item2) => {
+      const date1 = parseISO(item1.startISO);
+      const date2 = parseISO(item2.startISO);
+      if (isBefore(date1, date2)) {
+        return -1; // item1 doit être trié avant item2
+      } else if (isAfter(date1, date2)) {
+        return 1; // item1 doit être trié après item2
+      } else {
+        return 0; // les dates sont égales
+      }
+    });
+  }
+
   tagCalendarUserDyspoData() {
     if (!this.calendarMonthData) {
       console.log('Can not tag calendar data');
@@ -276,14 +298,15 @@ export class AgendaPage implements AfterViewInit {
     if (this.agendaMode === AgendaMode.READONLY) {
       console.log('Selected read only ', ev);
 
-      this.selectedDate = ev;
+      this.selectedDate = ev[0];
       this.selectedDateFormatted = this.utils.formatDate(ev[0].time);
       this.selectedDateMs = ev[0].time;
 
-      this.addEvent();
+      //this.openCreateEvent();
+      this.getAgendaEventsForDate(ev[0]);
     }
   }
-  addEvent() {
+  async openCreateEvent() {
     const todayMorning = setHours(new Date(), 0);
     console.log();
     if (isBefore(new Date(addHours(this.selectedDateMs!, 1)), todayMorning)) {
@@ -292,16 +315,47 @@ export class AgendaPage implements AfterViewInit {
       );
       return;
     }
-    const navigationExtras: NavigationExtras = {
-      state: {
-        tsDate: this.selectedDateMs,
+
+    const buttons = [];
+    buttons.push({
+      text: 'Personnel',
+      cssClass: 'dyspo-sheet-dyspo',
+      data: {
+        is_multi: false,
       },
-    };
-    this.navCtrl.navigateForward(
-      '/agenda/me/create-event/new',
-      navigationExtras
-    );
+    });
+
+    buttons.push({
+      text: 'Groupe',
+      cssClass: 'dyspo-sheet-dyspo-with-kids',
+      data: {
+        is_multi: true,
+      },
+    });
+
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: "Saisissez le type de l' événement",
+      cssClass: 'dyspo-sheet',
+      buttons,
+    });
+
+    await actionSheet.present();
+
+    let result = await actionSheet.onDidDismiss();
+    if (result.data) {
+      const navigationExtras: NavigationExtras = {
+        state: {
+          tsDate: this.selectedDateMs,
+          is_multi: result.data.is_multi,
+        },
+      };
+      this.navCtrl.navigateForward(
+        '/agenda/me/create-event/new',
+        navigationExtras
+      );
+    }
   }
+
   updateEvent(agendaEvent: AgendaEvent, event: any) {
     event.stopPropagation();
     const navigationExtras: NavigationExtras = {

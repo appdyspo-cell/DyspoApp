@@ -87,11 +87,32 @@
     [readonly]="agendaMode === agendaModes.READONLY"
   ></ion-calendar>
   <div *ngIf="agendaMode === agendaModes.READONLY" style="padding-top: 5px">
-    <!-- <ion-list-header> {{selectedDateFormatted}} </ion-list-header> -->
+    <ion-toolbar style="padding: 0px 6px">
+      <div
+        slot="start"
+        style="display: flex; align-items: center; font-size: 1.2rem"
+      >
+        <ion-icon
+          name="calendar-outline"
+          slot="start"
+          style="margin-right: 5px"
+        ></ion-icon>
+        <ion-text>{{selectedDateFormatted}}</ion-text>
+      </div>
+      <ion-button slot="end" fill="clear" (click)="openCreateEvent()">
+        <ion-icon name="add-circle-outline" slot="start"></ion-icon
+        >Nouveau</ion-button
+      >
+    </ion-toolbar>
 
-    <ion-list *ngIf="eventsForDate.length > 0">
+    <ion-list>
+      <ion-item *ngIf="!eventsForDate || eventsForDate?.length === 0">
+        <ion-icon name="time-outline" slot="start"></ion-icon>
+        Pas d'evenement prévu
+      </ion-item>
       <ion-item
         *ngFor="let agendaEvent of eventsForDate; let i=index "
+        [button]="true"
         (click)="openEvent(agendaEvent)"
       >
         <div slot="start" style="font-size: 1.2rem">
@@ -114,12 +135,7 @@
         </ion-buttons>
       </ion-item>
     </ion-list>
-    <ion-list *ngIf="!eventsForDate || eventsForDate?.length === 0">
-      <ion-item>
-        <ion-icon name="time-outline" slot="start"></ion-icon>
-        Pas d'evenement prévu
-      </ion-item>
-    </ion-list>
+    <ion-list> </ion-list>
   </div>
 
   <div *ngIf="agendaMode === agendaModes.EDIT" class="ion-padding">
