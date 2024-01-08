@@ -5,12 +5,14 @@ import { IonSelectCustomEvent } from '@ionic/core';
 
 import {
   add,
+  addDays,
   addHours,
   addMonths,
   addWeeks,
   format,
   formatISO,
   getDate,
+  getDayOfYear,
   getHours,
   getMonth,
   getYear,
@@ -18,6 +20,7 @@ import {
   isEqual,
   isSameDay,
   parseISO,
+  set,
   setHours,
   setMinutes,
 } from 'date-fns';
@@ -85,7 +88,6 @@ export class CreateEventPage implements OnInit {
   startTime: any;
   endTime: any;
   is_multi = false;
-  recurrence_period = '0';
 
   constructor(
     private navCtrl: NavController,
@@ -103,49 +105,78 @@ export class CreateEventPage implements OnInit {
     this.autocompletePlaces = [];
     this.activatedRoute.params.subscribe((params) => {
       this.mode = params['mode'];
-
+      console.log('Create ev');
       switch (this.mode) {
         case 'new':
-          this.pageTitle = 'Créer un evenement';
-          this.saveLabel = 'Sauvegarder';
           this.tsInputDate =
             this.router.getCurrentNavigation()?.extras.state?.['tsDate'];
           this.is_multi =
             this.router.getCurrentNavigation()?.extras.state?.['is_multi'];
+          const dateHPlus1 = setHours(
+            new Date(this.tsInputDate),
+            getHours(add(new Date(), { hours: 1 }))
+          );
+          const dateHPlus2 = setHours(
+            new Date(this.tsInputDate),
+            getHours(add(new Date(), { hours: 2 }))
+          );
+          const start_date_day_of_year = getDayOfYear(dateHPlus1);
+          const end_date_day_of_year = getDayOfYear(dateHPlus2);
+          const refStart = set(dateHPlus1, {
+            hours: 0,
+            minutes: 0,
+            seconds: 0,
+            milliseconds: 0,
+          });
+          const refEnd = set(dateHPlus2, {
+            hours: 23,
+            minutes: 59,
+            seconds: 59,
+            milliseconds: 999,
+          });
+
+          this.pageTitle = 'Créer un evenement';
+          this.saveLabel = 'Sauvegarder';
+
           this.agendaEvent = {
             admin_uid: this.uid,
             members_uid: [this.uid],
             members_invited_uid: [],
             uid: 'agev_' + new Date().getTime(),
-            startISO: formatISO(
-              setHours(
-                new Date(this.tsInputDate),
-                getHours(add(new Date(), { hours: 1 }))
-              )
-            ),
-            endISO: formatISO(
-              setHours(
-                new Date(this.tsInputDate),
-                getHours(add(new Date(), { hours: 2 }))
-              )
-            ),
+            startISO: formatISO(dateHPlus1),
+            endISO: formatISO(dateHPlus2),
             title: '',
             type: AgendaEventType.FREE,
             status: AgendaEventStatus.ACTIVE,
             all_can_edit: false,
-            day: getDate(new Date(this.tsInputDate)),
-            month: getMonth(new Date(this.tsInputDate)),
-            year: getYear(new Date(this.tsInputDate)),
+            // day: getDate(new Date(this.tsInputDate)),
+            // month: getMonth(new Date(this.tsInputDate)),
+            // year: getYear(new Date(this.tsInputDate)),
             avatar: 'assets/event.png',
             is_multi: this.is_multi,
             recurrence: AgendaEventRecurrence.ONE,
-            date_index:
-              getDate(new Date(this.tsInputDate)).toString() +
-              '_' +
-              getMonth(new Date(this.tsInputDate)).toString() +
-              '_' +
-              getYear(new Date(this.tsInputDate)).toString(),
+            recurrence_nb: '0',
+            start_date_day_of_year,
+            end_date_day_of_year,
+            start_date_year: getYear(dateHPlus1),
+            end_date_year: getYear(dateHPlus2),
+            start_date_ts: refStart.getTime(),
+            end_date_ts: refEnd.getTime(),
           };
+          //   start_date_index:
+          //     getDate(new Date(this.tsInputDate)).toString() +
+          //     '_' +
+          //     getMonth(new Date(this.tsInputDate)).toString() +
+          //     '_' +
+          //     getYear(new Date(this.tsInputDate)).toString(),
+
+          //   end_date_index:
+          //     getDate(new Date(this.tsInputDate)).toString() +
+          //     '_' +
+          //     getMonth(new Date(this.tsInputDate)).toString() +
+          //     '_' +
+          //     getYear(new Date(this.tsInputDate)).toString(),
+          // };
 
           // Hydrate agendaEvent
           this.agendaEvent.start_date_formatted = this.utils.formatISODate(
@@ -175,10 +206,10 @@ export class CreateEventPage implements OnInit {
           this.min_time_ISO_end = this.agendaEvent.startISO;
           //}
           this.max_time_ISO_end = formatISO(
-            addHours(new Date(parseISO(this.min_time_ISO_end)), 12)
+            addDays(new Date(parseISO(this.min_time_ISO_end)), 30)
           );
-          console.log('min time ', this.min_time_ISO_start);
-          console.log('max time ', this.max_time_ISO_end);
+          // console.log('min time ', this.min_time_ISO_start);
+          // console.log('max time ', this.max_time_ISO_end);
 
           break;
         case 'edit':
@@ -198,18 +229,20 @@ export class CreateEventPage implements OnInit {
 
           this.min_time_ISO_end = this.min_time_ISO_start;
           this.max_time_ISO_end = formatISO(
-            addHours(new Date(parseISO(this.min_time_ISO_start)), 12)
+            addDays(new Date(parseISO(this.min_time_ISO_start)), 30)
           );
           break;
       }
-      this.getMembersInfo();
+      if (this.is_multi) {
+        this.getMembersInfo();
+      }
     });
   }
 
   async hydrateMemberDysposAndEvents(member: AppUserWithEvents) {
     // Is he my friend ?
     member.is_my_friend = this.friendsSvc.isMyFriend(member.uid);
-    console.log(member);
+
     // Dyspos
     const dyspo = (
       await this.agendaSvc.getDyspos([member.uid], this.agendaEvent!)
@@ -248,8 +281,11 @@ export class CreateEventPage implements OnInit {
       this.agendaEvent.all_can_edit = this.allCanEdit;
 
       //Recurrence
-      if (this.agendaEvent.recurrence !== AgendaEventRecurrence.ONE) {
-        const recurrence_period_int = parseInt(this.recurrence_period);
+      if (
+        this.mode === 'new' &&
+        this.agendaEvent.recurrence !== AgendaEventRecurrence.ONE
+      ) {
+        const recurrence_period_int = parseInt(this.agendaEvent.recurrence_nb);
         if (this.agendaEvent.recurrence === AgendaEventRecurrence.WEEKLY) {
           this.agendaEvent.recurrence_end_ISO = formatISO(
             addMonths(
@@ -262,9 +298,11 @@ export class CreateEventPage implements OnInit {
             addWeeks(parseISO(this.agendaEvent.startISO), recurrence_period_int)
           );
         }
+        this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!, true);
+      } else {
+        this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!, false);
       }
 
-      this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!);
       this.navCtrl.pop();
     } else {
       Swal.fire({
@@ -291,28 +329,33 @@ export class CreateEventPage implements OnInit {
     this.agendaEvent!.startISO = ev.detail.value;
     this.min_time_ISO_end = ev.detail.value;
     this.max_time_ISO_end = formatISO(
-      addHours(new Date(parseISO(ev.detail.value)), 12)
+      addDays(new Date(parseISO(ev.detail.value)), 30)
     );
-    this.agendaEvent!.day = getDate(parseISO(this.agendaEvent!.startISO));
-    this.agendaEvent!.month = getMonth(parseISO(this.agendaEvent!.startISO));
-    this.agendaEvent!.year = getYear(parseISO(this.agendaEvent!.startISO));
-    this.agendaEvent!.date_index =
-      this.agendaEvent!.day +
-      '_' +
-      this.agendaEvent!.month +
-      '_' +
-      this.agendaEvent!.year;
+    // this.agendaEvent!.day = getDate(parseISO(this.agendaEvent!.startISO));
+    // this.agendaEvent!.month = getMonth(parseISO(this.agendaEvent!.startISO));
+    // this.agendaEvent!.year = getYear(parseISO(this.agendaEvent!.startISO));
+    // this.agendaEvent!.start_date_index =
+    //   this.agendaEvent!.day +
+    //   '_' +
+    //   this.agendaEvent!.month +
+    //   '_' +
+    //   this.agendaEvent!.year;
+    this.agendaEvent!.start_date_day_of_year = getDayOfYear(
+      parseISO(this.agendaEvent!.startISO)
+    );
+    this.agendaEvent!.start_date_year = getYear(
+      parseISO(this.agendaEvent!.startISO)
+    );
 
-    // si on change la date de debut, il ne faut pas que la date de fin soit > 12h TODO
-    //const greaterThanTwelveHours =
+    const refStart = set(parseISO(this.agendaEvent!.startISO), {
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      milliseconds: 0,
+    });
 
-    // si la date de debut est apres l'ancienne date de fin, on remet la date de fin= date de debut + 1h
-    // if (
-    //   isAfter(
-    //     parseISO(this.agendaEvent!.startISO),
-    //     parseISO(this.agendaEvent!.endISO)
-    //   )
-    // ) {
+    this.agendaEvent!.start_date_ts = refStart.getTime();
+
     this.agendaEvent!.endISO = formatISO(
       addHours(new Date(parseISO(ev.detail.value)), 1)
     );
@@ -322,6 +365,19 @@ export class CreateEventPage implements OnInit {
     );
     this.agendaEvent!.end_time_formatted = this.utils.formatTime(
       this.agendaEvent!.endISO
+    );
+    const refEnd = set(parseISO(this.agendaEvent!.endISO), {
+      hours: 23,
+      minutes: 59,
+      seconds: 59,
+      milliseconds: 999,
+    });
+    this.agendaEvent!.end_date_ts = refEnd.getTime();
+    this.agendaEvent!.end_date_day_of_year = getDayOfYear(
+      parseISO(this.agendaEvent!.startISO)
+    );
+    this.agendaEvent!.end_date_year = getYear(
+      parseISO(this.agendaEvent!.startISO)
     );
     //}
 
@@ -338,6 +394,22 @@ export class CreateEventPage implements OnInit {
       ev.detail.value
     );
     this.agendaEvent!.endISO = ev.detail.value;
+    const refEnd = set(parseISO(this.agendaEvent!.endISO), {
+      hours: 23,
+      minutes: 59,
+      seconds: 59,
+      milliseconds: 999,
+    });
+    this.agendaEvent!.end_date_ts = refEnd.getTime();
+    this.agendaEvent!.end_date_day_of_year = getDayOfYear(
+      parseISO(this.agendaEvent!.startISO)
+    );
+    this.agendaEvent!.end_date_year = getYear(
+      parseISO(this.agendaEvent!.startISO)
+    );
+    console.log('Reload infos');
+    //Reload members info
+    this.getMembersInfo();
   }
 
   selectSearchResult(prediction: google.maps.places.AutocompletePrediction) {
@@ -549,9 +621,9 @@ export class CreateEventPage implements OnInit {
   onRecurrenceChanged(ev: IonSelectCustomEvent<SelectChangeEventDetail<any>>) {
     console.log('Recuurence cahnged');
     if (ev.detail.value === AgendaEventRecurrence.ONE) {
-      this.recurrence_period = '0';
+      this.agendaEvent!.recurrence_nb = '0';
     } else {
-      this.recurrence_period = '1';
+      this.agendaEvent!.recurrence_nb = '1';
     }
   }
 }

@@ -33,11 +33,13 @@ import {
   addMonths,
   formatISO,
   getDate,
+  getDayOfYear,
   getHours,
   getMonth,
   getYear,
   isBefore,
   parseISO,
+  set,
   setDate,
   setHours,
 } from 'date-fns';
@@ -226,14 +228,17 @@ export class AgendaService {
     );
   }
 
-  async saveOrUpdateEvent(agendaEvent: AgendaEvent) {
+  async saveOrUpdateEvent(agendaEvent: AgendaEvent, saveRecurrences = false) {
     //Evt RECURRENT
-    if (agendaEvent.recurrence !== AgendaEventRecurrence.ONE) {
+    if (
+      saveRecurrences &&
+      agendaEvent.recurrence !== AgendaEventRecurrence.ONE
+    ) {
       const batch = writeBatch(this.firestore);
-      const ref = doc(this.firestore, `agenda_events/`, agendaEvent.uid!);
+      let docRef = doc(this.firestore, `agenda_events/`, agendaEvent.uid!);
 
       // Add original event
-      batch.set(ref, agendaEvent);
+      batch.set(docRef, agendaEvent);
 
       let addPeriod;
 
@@ -258,21 +263,45 @@ export class AgendaService {
       while (cloneIsBeforeRecEndDate) {
         const agendaClone = cloneDeep(agendaEvent);
         agendaClone.uid = 'agev_rec_' + new Date().getTime();
+        docRef = doc(this.firestore, `agenda_events/`, agendaClone.uid!);
         agendaClone.parent_agenda_event_uid = agendaEvent.uid;
 
         agendaClone.startISO = formatISO(nextCloneDateStart);
         agendaClone.endISO = formatISO(nextCloneDateEnd);
 
-        agendaClone.day = getDate(nextCloneDateStart);
-        agendaClone.month = getMonth(nextCloneDateStart);
-        agendaClone.year = getYear(nextCloneDateStart);
+        agendaClone.start_date_day_of_year = getDayOfYear(nextCloneDateStart);
+        agendaClone.start_date_year = getYear(nextCloneDateStart);
+        agendaClone.end_date_day_of_year = getDayOfYear(nextCloneDateEnd);
+        agendaClone.end_date_year = getYear(nextCloneDateEnd);
 
-        agendaClone.date_index =
-          agendaClone.day.toString() +
-          '_' +
-          agendaClone.month.toString() +
-          '_' +
-          agendaClone.year.toString();
+        const refStart = set(nextCloneDateStart, {
+          hours: 0,
+          minutes: 0,
+          seconds: 0,
+          milliseconds: 0,
+        });
+        const refEnd = set(nextCloneDateEnd, {
+          hours: 23,
+          minutes: 59,
+          seconds: 59,
+          milliseconds: 999,
+        });
+
+        console.log(refStart, refEnd);
+        agendaClone.start_date_ts = refStart.getTime();
+        agendaClone.end_date_ts = refEnd.getTime();
+
+        // agendaClone.day = getDate(nextCloneDateStart);
+        // agendaClone.month = getMonth(nextCloneDateStart);
+        // agendaClone.year = getYear(nextCloneDateStart);
+
+        // agendaClone.date_index = [
+        //   agendaClone.day.toString() +
+        //     '_' +
+        //     agendaClone.month.toString() +
+        //     '_' +
+        //     agendaClone.year.toString(),
+        // ];
 
         // Hydrate agendaEvent
         agendaClone.start_date_formatted = this.utils.formatISODate(
@@ -288,7 +317,7 @@ export class AgendaService {
           agendaClone.endISO
         );
         console.log('Save rec event ', agendaClone);
-        batch.set(ref, agendaClone);
+        batch.set(docRef, agendaClone);
 
         nextCloneDateStart = add(parseISO(agendaClone.startISO), {
           days: addPeriod,
@@ -301,6 +330,8 @@ export class AgendaService {
           parseISO(agendaEvent.recurrence_end_ISO!)
         );
       }
+
+      await batch.commit();
     }
     //NON RECURRENT
     else {
@@ -476,7 +507,6 @@ export class AgendaService {
       getDate(dateToCheck);
     const dyspos: FriendDyspo[] = [];
     for (let uid of uids) {
-      console.log('get dyspos fro ', uid);
       const docRef = doc(
         this.firestore,
         `agenda_dyspos/${uid}/dyspo_list`,
@@ -497,7 +527,6 @@ export class AgendaService {
           friend_uid: uid,
           dyspo_date_ISO: agendaEvent.startISO,
         });
-        console.log('No such document!');
       }
     }
     return dyspos;
@@ -507,15 +536,19 @@ export class AgendaService {
     uid: string,
     agendaEventToCompare: AgendaEvent
   ): Promise<UserAgendaEventsByDay> {
+    console.log('Get user events ', uid);
     const agendaEventsCollectionRef = collection(
       this.firestore,
       `agenda_events/`
     );
 
+    console.log('Get user events ', uid);
+    console.log('startDateRef', formatISO(agendaEventToCompare.start_date_ts));
+    console.log('endDateRef', formatISO(agendaEventToCompare.end_date_ts));
     const queryAgendaEvents = query(
       agendaEventsCollectionRef,
       where('members_uid', 'array-contains', uid),
-      where('date_index', '==', agendaEventToCompare.date_index)
+      where('start_date_ts', '>=', agendaEventToCompare.start_date_ts)
     );
 
     const querySnapshots = await getDocs(queryAgendaEvents);
@@ -523,17 +556,20 @@ export class AgendaService {
     const events: AgendaEvent[] = [];
     querySnapshots.forEach((snapshot) => {
       const eventResult = snapshot.data() as AgendaEvent;
+
       if (eventResult.uid !== agendaEventToCompare.uid) {
-        events.push(eventResult);
+        if (eventResult.end_date_ts <= agendaEventToCompare.end_date_ts) {
+          events.push(eventResult);
+        }
       }
     });
 
     const result: UserAgendaEventsByDay = {
       uid,
       agendaEvents: events,
-      day: agendaEventToCompare.day,
-      month: agendaEventToCompare.month,
-      year: agendaEventToCompare.year,
+      // day: agendaEventToCompare.day,
+      // month: agendaEventToCompare.month,
+      // year: agendaEventToCompare.year,
     };
 
     // console.log(

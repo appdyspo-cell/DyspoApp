@@ -107,13 +107,19 @@ export interface AgendaEvent {
   members_invited_uid: string[];
   admin_uid: string;
   all_can_edit: boolean;
-  day: number;
-  month: number;
-  year: number;
-  date_index: string;
+  // day: number;
+  // month: number;
+  // year: number;
+  start_date_ts: number;
+  end_date_ts: number;
+  start_date_day_of_year: number;
+  end_date_day_of_year: number;
+  start_date_year: number;
+  end_date_year: number;
   last_message?: ChatMessage;
   is_multi: boolean;
   recurrence: AgendaEventRecurrence;
+  recurrence_nb: string;
   recurrence_end_ISO?: string;
   parent_agenda_event_uid?: string;
   [member_uid: string]:
@@ -129,9 +135,9 @@ export interface AgendaEvent {
 export interface UserAgendaEventsByDay {
   uid: string;
   agendaEvents: AgendaEvent[];
-  day: number;
-  month: number;
-  year: number;
+  // day: number;
+  // month: number;
+  // year: number;
 }
 
 export interface FriendDyspo {

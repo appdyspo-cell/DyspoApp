@@ -192,7 +192,6 @@ export class UtilsService {
   }
 
   formatTime(dateISO: string) {
-    console.log(dateISO);
     return format(parseISO(dateISO), 'HH:mm');
   }
 }

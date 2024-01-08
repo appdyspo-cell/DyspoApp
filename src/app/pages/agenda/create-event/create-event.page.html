@@ -141,13 +141,14 @@
       <app-friends-selector
         [agendaEvent]="agendaEvent!"
         [startTime]="startTime"
+        [endTime]="endTime"
         (friendSelected)="onFriendSelected($event)"
         (showEvents)="onShowEvents($event)"
       ></app-friends-selector>
     </div>
   </ion-card>
 
-  <ion-card *ngIf="!is_multi">
+  <ion-card *ngIf="!is_multi && mode==='new'">
     <ion-item lines="none">
       <ion-select
         label="Recurrence"
@@ -173,7 +174,7 @@
       <ion-select
         *ngIf="agendaEvent?.recurrence === AgendaEventRecurrence.WEEKLY"
         label="Pendant"
-        [(ngModel)]="recurrence_period"
+        [(ngModel)]="agendaEvent!.recurrence_nb"
         placeholder="Pendant"
       >
         <ion-select-option *ngFor="let m of [1,2,3,4,5,6]" value="{{m}}"
@@ -183,7 +184,7 @@
       <ion-select
         *ngIf="agendaEvent?.recurrence === AgendaEventRecurrence.DAILY"
         label="Pendant"
-        [(ngModel)]="recurrence_period"
+        [(ngModel)]="agendaEvent!.recurrence_nb"
         placeholder="Pendant"
       >
         <ion-select-option *ngFor="let s of [1,2,3,4]" value="{{s}}"
@@ -281,7 +282,8 @@
       <ion-list>
         <ion-item *ngFor="let agEv of selectedUserEvents" lines="none">
           <ion-text color="danger" style="font-size: 0.75rem"
-            >Autre evenement à {{ agEv.start_time_formatted }}</ion-text
+            >Autre evenement {{ agEv.start_date_formatted }} à {{
+            agEv.start_time_formatted }}</ion-text
           >
         </ion-item>
       </ion-list>
