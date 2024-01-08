@@ -216,12 +216,20 @@ export class AgendaPage implements AfterViewInit {
       this.eventsForDate = [];
       this.calendarMonthData.days.forEach((day) => {
         day.isEvent = false;
+
         this.agendaEvents.forEach((agendaEvent) => {
-          if (isSameDay(day.time, parseISO(agendaEvent.startISO))) {
+          if (
+            agendaEvent.start_date_ts <= day.time &&
+            agendaEvent.end_date_ts >= day.time
+          ) {
             day.isEvent = true;
             this.eventsForDate.push(agendaEvent);
-            //day.subTitle = agendaEvent.title?.substring(0, 5);
           }
+          // if (isSameDay(day.time, parseISO(agendaEvent.startISO))) {
+          //   day.isEvent = true;
+          //   this.eventsForDate.push(agendaEvent);
+          //   //day.subTitle = agendaEvent.title?.substring(0, 5);
+          // }
         });
       });
       this.eventsForDate.sort((item1, item2) => {
@@ -261,8 +269,11 @@ export class AgendaPage implements AfterViewInit {
 
   getAgendaEventsForDate(ev: CalendarDay) {
     this.eventsForDate = [];
-    this.eventsForDate = this.agendaEvents.filter((elt: AgendaEvent) =>
-      isSameDay(ev.time, parseISO(elt.startISO))
+    this.eventsForDate = this.agendaEvents.filter(
+      (elt: AgendaEvent) => {
+        return elt.start_date_ts <= ev.time && elt.end_date_ts >= ev.time;
+      }
+      //isSameDay(ev.time, parseISO(elt.startISO))
     );
     this.eventsForDate.sort((item1, item2) => {
       const date1 = parseISO(item1.startISO);
