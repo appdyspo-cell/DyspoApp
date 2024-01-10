@@ -125,7 +125,7 @@ export class DeviceContactsPage implements OnInit {
     $event: MouseEvent
   ) {
     if (contact.is_my_friend) {
-      this.utils.showToastError('Deja ami');
+      this.utils.showToastError('Vous êtes déjà ami avec ' + contact.display);
       return;
     }
     if (contact.is_member) {
