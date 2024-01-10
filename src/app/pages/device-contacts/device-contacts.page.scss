@@ -2,13 +2,20 @@ $colors: #a2b9bc, #6b5b95, #feb236, #d64161, #ff7b25, #b2ad7f, #878f99;
 
 .avatar {
   color: #fff;
-  padding: 2px;
+  margin: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 100%;
-  width: 48px;
-  height: 48px;
+  width: 50px;
+  height: 50px;
   font-weight: 600;
   filter: brightness(120%);
+}
+
+.thumb {
+  height: 60px;
+  width: 60px;
+  --border-radius: 50%;
+  padding: 5px;
 }

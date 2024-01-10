@@ -35,9 +35,9 @@
         (click)="confirmFriendInvitation(contact, i, $event)"
       >
         <div slot="start" class="avatar-container">
-          <ion-avatar *ngIf="contact.avatar">
+          <ion-thumbnail class="thumb" *ngIf="contact.avatar">
             <img src="{{contact.avatar}}" />
-          </ion-avatar>
+          </ion-thumbnail>
           <div
             *ngIf="!contact.avatar"
             [style.background-color]="colors[i % colors.length]"
@@ -65,7 +65,7 @@
         ></ion-icon>
         <ion-icon
           slot="end"
-          name="link-outline"
+          name="share-social-outline"
           style="padding-right: 30px"
           *ngIf="contact.is_member===false && !contact.is_my_friend"
         ></ion-icon>
