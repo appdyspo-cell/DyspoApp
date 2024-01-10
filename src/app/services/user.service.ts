@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import {
+  AppDeviceContact,
   AppUser,
   AppUserWithEvents,
   UserDyspoStatus,
@@ -195,5 +196,40 @@ export class UserService {
     } else {
       return null;
     }
+  }
+
+  async hydrateAppContacts(appContacts: AppDeviceContact[]) {
+    const collectionUserRef = collection(this.firestore, `users`);
+    //const q = query(collectionUserRef, where('phoneNumber', '==', number));
+    const docFriendSnaps = await getDocs(collectionUserRef);
+    const allPhones: string[] = [];
+    const allUsers: AppUser[] = [];
+    docFriendSnaps.forEach((snap) => {
+      const user = snap.data() as AppUser;
+      if (user.phoneNumber) {
+        allUsers.push(user);
+      }
+    });
+    docFriendSnaps.forEach((snap) => {
+      const user = snap.data() as AppUser;
+      if (user.phoneNumber) {
+        allPhones.push(user.phoneNumber);
+      }
+    });
+    //  appContacts.map(appContact => {
+    //   return appContact.is_member = true
+    // })
+    appContacts.forEach((appContact) => {
+      const foundIndex = allUsers.findIndex((user) => {
+        return user.phoneNumber === '0' + appContact.phone_number;
+      });
+      if (foundIndex >= 0) {
+        appContact.uid = allUsers[foundIndex].uid;
+        appContact.avatar = allUsers[foundIndex].avatarPath;
+        appContact.is_member = true;
+      } else {
+        appContact.is_member = false;
+      }
+    });
   }
 }

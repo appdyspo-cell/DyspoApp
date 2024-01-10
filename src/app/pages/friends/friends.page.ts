@@ -14,7 +14,7 @@ import {
 } from '@ionic/angular';
 import { Observable, Subscription } from 'rxjs';
 import {
-  AppContact,
+  AppDeviceContact,
   AppUser,
   Friend,
   FriendGroup,
@@ -53,6 +53,11 @@ export class FriendsPage implements OnInit {
   letterScrollActive(active: boolean) {
     this.scroll = active;
   }
+
+  openContacts() {
+    this.navCtrl.navigateForward('device-contacts');
+  }
+
   defaultImage = 'assets/logo.svg';
   selectSegment = 'friends';
   rate = 3;

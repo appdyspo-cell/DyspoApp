@@ -1,0 +1,79 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Contacts</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div
+    id="container-suggestions"
+    *ngIf="appContacts.length === 0 && !isLoading"
+  >
+    <ion-icon
+      name="person-outline"
+      class="empty-icon-circle icon-large empty-icon-color"
+    ></ion-icon>
+    <br />
+    <strong class="capitalize">
+      <ion-text style="color: rgb(100, 100, 100)"
+        >Vous n'avez pas de contacts</ion-text
+      >
+    </strong>
+  </div>
+
+  <ng-container *ngIf="!isLoading">
+    <ion-item-group *ngFor="let appContactGrouped of appContactsGrouped">
+      <ion-item-divider sticky="true">
+        <ion-label>{{ appContactGrouped.letter }}</ion-label>
+      </ion-item-divider>
+
+      <ion-item
+        *ngFor="let contact of appContactGrouped.contacts; let i = index"
+        (click)="confirmFriendInvitation(contact, i, $event)"
+      >
+        <div slot="start" class="avatar-container">
+          <ion-avatar *ngIf="contact.avatar">
+            <img src="{{contact.avatar}}" />
+          </ion-avatar>
+          <div
+            *ngIf="!contact.avatar"
+            [style.background-color]="colors[i % colors.length]"
+            class="avatar"
+          >
+            {{contact.initials}}
+          </div>
+        </div>
+        <div>
+          <div class="d-flex">
+            <ion-text>{{ contact.display }} </ion-text>
+            <ion-thumbnail *ngIf="contact.is_member===true">
+              <img src="assets/logo.svg" />
+            </ion-thumbnail>
+          </div>
+
+          <!-- <ion-note *ngIf="contact.is_my_friend"> Vous êtes ami </ion-note> -->
+        </div>
+
+        <ion-icon
+          slot="end"
+          name="add-circle-outline"
+          style="padding-right: 30px"
+          *ngIf="contact.is_member===true && !contact.is_my_friend"
+        ></ion-icon>
+        <ion-icon
+          slot="end"
+          name="link-outline"
+          style="padding-right: 30px"
+          *ngIf="contact.is_member===false && !contact.is_my_friend"
+        ></ion-icon>
+      </ion-item>
+    </ion-item-group>
+  </ng-container>
+</ion-content>
+<app-alphabet-scroll
+  (letterSelected)="scrollToLetter($event)"
+  (scrollingLetter)="letterScrollActive($event)"
+></app-alphabet-scroll>

@@ -26,10 +26,14 @@ export interface AppUser {
   with_kids?: boolean;
 }
 
-export interface AppContact {
+export interface AppDeviceContact {
+  uid: string | undefined;
   display: string;
   phone_number: string;
-  is_member: boolean;
+  is_member: boolean | undefined;
+  is_my_friend: boolean | undefined;
+  initials: string | undefined;
+  avatar: string | undefined;
 }
 
 export interface Friend extends AppUser {

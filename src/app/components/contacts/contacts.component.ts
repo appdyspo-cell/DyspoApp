@@ -1,6 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
 import { ContactPayload, Contacts } from '@capacitor-community/contacts';
-import { AppContact } from 'src/app/models/models';
+import { IonItemGroup } from '@ionic/angular';
+import { AppDeviceContact, Friend } from 'src/app/models/models';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
@@ -9,8 +16,11 @@ import { UserService } from 'src/app/services/user.service';
   styleUrls: ['./contacts.component.scss'],
 })
 export class ContactsComponent implements OnInit {
+  @ViewChildren(IonItemGroup, { read: ElementRef }) itemGroups!: QueryList<any>;
   contacts: ContactPayload[] = [];
-  appContacts: AppContact[] = [];
+  appContacts: AppDeviceContact[] = [];
+  appContactsGrouped: { letter: string; contacts: AppDeviceContact[] }[] = [];
+  scroll = false;
   isLoading: boolean;
   constructor(private userSvc: UserService) {
     this.isLoading = false;
@@ -19,6 +29,24 @@ export class ContactsComponent implements OnInit {
   ngOnInit() {
     this.isLoading = true;
     this.printContactsData();
+  }
+
+  scrollToLetter(letter: string) {
+    for (let i = 0; i < this.appContactsGrouped.length; i++) {
+      const group = this.appContactsGrouped[i];
+      if (group.letter == letter) {
+        const group = this.itemGroups.filter((element, index) => index === i);
+        if (group) {
+          const el: any = group[0];
+          el.nativeElement.scrollIntoView();
+        }
+        return;
+      }
+    }
+  }
+
+  letterScrollActive(active: boolean) {
+    this.scroll = active;
   }
 
   printContactsData = async () => {
@@ -32,10 +60,14 @@ export class ContactsComponent implements OnInit {
     });
 
     for (const contact of result.contacts) {
-      let appContact: AppContact = {
+      let appContact: AppDeviceContact = {
         phone_number: '',
         is_member: false,
         display: '',
+        uid: undefined,
+        is_my_friend: undefined,
+        initials: undefined,
+        avatar: undefined,
       };
       if (contact.name?.display) {
         appContact.display = contact.name?.display;
@@ -46,8 +78,8 @@ export class ContactsComponent implements OnInit {
         if (number.trim().length >= 9) {
           number = number.trim().slice(-9);
           appContact.phone_number = number;
-          const isMember = await this.userSvc.getUserInfosByPhone('0' + number);
-
+          //const isMember = await this.userSvc.getUserInfosByPhone('0' + number);
+          const isMember = false;
           if (isMember) {
             console.log('is Memeber ?', isMember);
             appContact.is_member = true;
@@ -56,12 +88,13 @@ export class ContactsComponent implements OnInit {
         }
       }
     }
-
+    this.appContactsGrouped = this.groupContactsByAlphabet(this.appContacts);
+    console.log(this.appContactsGrouped);
     this.isLoading = false;
   };
 
   confirmFriendInvitation(
-    contact: AppContact,
+    contact: AppDeviceContact,
     _t17: number,
     $event: MouseEvent
   ) {
@@ -71,12 +104,18 @@ export class ContactsComponent implements OnInit {
     throw new Error('Method not implemented.');
   }
 
-  groupContactsByAlphabet(contacts: AppContact[]) {
-    return contacts.reduce((groups: any, contact) => {
+  groupContactsByAlphabet(contacts: AppDeviceContact[]) {
+    const groups: any = {};
+    contacts.forEach((contact) => {
       const letter = contact.display.charAt(0).toUpperCase();
       groups[letter] = groups[letter] || [];
       groups[letter].push(contact);
-      return groups;
-    }, {});
+    });
+    return Object.keys(groups)
+      .sort()
+      .map((letter) => ({
+        letter,
+        contacts: groups[letter],
+      }));
   }
 }

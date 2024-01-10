@@ -107,6 +107,10 @@ const routes: Routes = [
         (m) => m.ProCalendarPageModule
       ),
   },
+  {
+    path: 'device-contacts',
+    loadChildren: () => import('./pages/device-contacts/device-contacts.module').then( m => m.DeviceContactsPageModule)
+  },
 ];
 @NgModule({
   imports: [

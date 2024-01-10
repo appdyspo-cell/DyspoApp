@@ -240,3 +240,7 @@ ion-toolbar {
     }
   }
 }
+
+app-alphabet-scroll {
+  z-index: 1000000000;
+}

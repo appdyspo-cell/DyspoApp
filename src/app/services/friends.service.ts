@@ -13,7 +13,13 @@ import {
   updateDoc,
   where,
 } from '@angular/fire/firestore';
-import { AppUser, Friend, FriendGroup, FriendStatus } from '../models/models';
+import {
+  AppDeviceContact,
+  AppUser,
+  Friend,
+  FriendGroup,
+  FriendStatus,
+} from '../models/models';
 import { UtilsService } from './utils.service';
 import { NotificationService } from './notification.service';
 import { UserService } from './user.service';
@@ -259,6 +265,51 @@ export class FriendsService {
       this.utils.hideLoader();
       if (showToast) this.utils.showToastSuccess('Invitation envoyée');
       this.notificationSvc.sendInviteFriendNotif(membre.uid);
+      return true;
+    } catch (err: any) {
+      this.utils.hideLoader();
+      this.utils.showToastError('Erreur');
+      return false;
+    }
+  }
+
+  async inviteFromDeviceContact(contact: AppDeviceContact, showToast = false) {
+    try {
+      const uid = this.userSvc.userInfo?.uid || 'unknown';
+      console.log(contact);
+      //Check if membre has been blocked
+      //this.friendService
+      this.utils.showLoader();
+
+      const myInviteData = {
+        friend_uid: contact.uid,
+        friendLastname: contact.display,
+        friendFirstname: contact.initials,
+        friend_status: FriendStatus.INVITED,
+        requestDate: new Date().getTime(),
+      };
+      await setDoc(
+        doc(this.firestore, `friends/${uid}/friend_list`, contact.uid!),
+        myInviteData,
+        { merge: true }
+      );
+
+      const hisSuggestionData = {
+        friend_uid: uid,
+        friendLastname: this.userSvc.userInfo?.lastname,
+        friendFirstname: this.userSvc.userInfo?.firstname,
+        friend_status: FriendStatus.SUGGESTED,
+        requestDate: new Date().getTime(),
+      };
+      await setDoc(
+        doc(this.firestore, `friends/${contact.uid}/friend_list`, uid),
+        hisSuggestionData,
+        { merge: true }
+      );
+
+      this.utils.hideLoader();
+      if (showToast) this.utils.showToastSuccess('Invitation envoyée');
+      this.notificationSvc.sendInviteFriendNotif(contact.uid!);
       return true;
     } catch (err: any) {
       this.utils.hideLoader();

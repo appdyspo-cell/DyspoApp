@@ -1,46 +1,61 @@
-<div id="container-suggestions" *ngIf="appContacts.length === 0 && !isLoading">
-  <ion-icon
-    name="person-outline"
-    class="empty-icon-circle icon-large empty-icon-color"
-  ></ion-icon>
-  <br />
-  <strong class="capitalize">
-    <ion-text style="color: rgb(100, 100, 100)"
-      >Vous n'avez pas de contacts</ion-text
-    >
-  </strong>
-</div>
-
-<ion-list *ngIf="appContacts.length > 0" class="ion-no-padding">
-  <ion-item
-    *ngFor="let contact of appContacts; let i = index"
-    (click)="showProfile(contact, $event)"
+<ion-content>
+  <div
+    id="container-suggestions"
+    *ngIf="appContacts.length === 0 && !isLoading"
   >
-    <!-- <ion-avatar slot="start">
-      <img src="{{ contact.userData?.avatarPath }}" />
-    </ion-avatar>
-    -->
-    <ion-label>
-      <ion-row class="ion-align-items-center">
-        <p class="ion-no-margin">
-          {{ contact.display | uppercase }}
-        </p>
-      </ion-row>
-      <ion-row class="ion-align-items-center">
-        <p class="ion-no-margin">
-          {{ contact.phone_number }}
-        </p>
-      </ion-row>
-    </ion-label>
-    <ion-buttons slot="end">
-      <ion-button *ngIf="contact.is_member"> is member </ion-button>
-      <ion-button
-        color="primary"
-        size="small"
-        (click)="confirmFriendInvitation(contact, i, $event)"
+    <ion-icon
+      name="person-outline"
+      class="empty-icon-circle icon-large empty-icon-color"
+    ></ion-icon>
+    <br />
+    <strong class="capitalize">
+      <ion-text style="color: rgb(100, 100, 100)"
+        >Vous n'avez pas de contacts</ion-text
       >
-        <ion-icon [id]="'add' + i" name="person-add"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-item>
-</ion-list>
+    </strong>
+  </div>
+
+  <ion-grid *ngIf="appContactsGrouped.length > 0 && !isLoading">
+    <ion-col size="10">
+      <ion-item-group *ngFor="let appContactGrouped of appContactsGrouped">
+        <ion-item-divider sticky="true">
+          <ion-label>{{ appContactGrouped.letter }}</ion-label>
+        </ion-item-divider>
+
+        <ion-item
+          (click)="showProfile(contact, $event)"
+          *ngFor="let contact of appContactGrouped.contacts; let i = index"
+        >
+          <ion-label>
+            <ion-row class="ion-align-items-center">
+              <p class="ion-no-margin">
+                {{ contact.display | uppercase }}
+              </p>
+            </ion-row>
+            <ion-row class="ion-align-items-center">
+              <p class="ion-no-margin">
+                {{ contact.phone_number }}
+              </p>
+            </ion-row>
+          </ion-label>
+          <ion-buttons slot="end">
+            <ion-button *ngIf="contact.is_member"> is member </ion-button>
+            <ion-button
+              color="primary"
+              size="small"
+              (click)="confirmFriendInvitation(contact, i, $event)"
+            >
+              <ion-icon [id]="'add' + i" name="person-add"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-item>
+      </ion-item-group>
+    </ion-col>
+    <ion-col size="2">
+      <app-alphabet-scroll
+        (letterSelected)="scrollToLetter($event)"
+        (scrollingLetter)="letterScrollActive($event)"
+      ></app-alphabet-scroll>
+    </ion-col>
+  </ion-grid>
+</ion-content>
