@@ -355,12 +355,16 @@ export class FriendsService {
   }
 
   unsubscribeAllAfterLogoutEvent() {
-    this.onSnapshotFriendsCancel();
-    this.onSnapshotFriendGroupsCancel();
-    this.friends = [];
-    this.friendGroups = [];
-    this.friendGroupsSubject.next(this.friendGroups);
-    this.friendsSubject.next(this.friends);
+    try {
+      this.onSnapshotFriendsCancel();
+      this.onSnapshotFriendGroupsCancel();
+      this.friends = [];
+      this.friendGroups = [];
+      this.friendGroupsSubject.next(this.friendGroups);
+      this.friendsSubject.next(this.friends);
+    } catch (err) {
+      console.log('Can not unsubscribe ', err);
+    }
   }
 
   // getFriendStatus(friend_uid: string) {
