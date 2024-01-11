@@ -66,12 +66,15 @@
   <!-- <h1>Bonjour {{userSvc.userInfo?.firstname}}</h1> -->
 
   <div style="padding-top: 24px">
-    <ion-list-header>
-      <!-- <div class="header-dot"></div> -->
+    <div
+      class="d-flex ion-justify-content-between ion-align-items-center ion-padding"
+      style="padding-bottom: 0px; padding-top: 0px"
+    >
       <span style="margin-right: 8px; font-size: 22px"
         ><h2>Evenements a venir</h2></span
       >
-    </ion-list-header>
+      <ion-button (click)="openCreateEvent()">Créer</ion-button>
+    </div>
     <ion-card-content>
       <div *ngIf="nextAgendaEvents.length === 0">Aucun événement planifié</div>
       <div class="next-agenda-container">

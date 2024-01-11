@@ -113,7 +113,7 @@ export class AgendaPage implements AfterViewInit {
           (agendaEvents: AgendaEvent[]) => {
             console.log('Ag events');
             this.agendaEvents = agendaEvents;
-            this.tagCalendarEventsData();
+            this.tagCalendarEventsDataForMonth();
           }
         );
 
@@ -149,7 +149,7 @@ export class AgendaPage implements AfterViewInit {
         );
         if (friendData.allowShare) {
           this.agendaEvents = friendData.agendaEvents;
-          this.tagCalendarEventsData();
+          this.tagCalendarEventsDataForMonth();
           this.agendaDyspos = friendData.dyspos;
           this.tagCalendarUserDyspoData();
         } else {
@@ -203,23 +203,24 @@ export class AgendaPage implements AfterViewInit {
 
   onCreateMonthEvent(calendarMonthData: CalendarMonth) {
     console.log('Month created !!!!', calendarMonthData);
-    this.selectedDate = undefined;
-    this.selectedDateMs = undefined;
-    this.selectedDateFormatted = this.utils.formatMonth(
-      calendarMonthData.original.time
-    );
+
     this.calendarMonthData = calendarMonthData;
     this.originalCalendarMonthData = cloneDeep(this.calendarMonthData);
     this.agendaSvc.isModified = false;
-    this.tagCalendarEventsData();
+    this.tagCalendarEventsDataForMonth();
     this.tagCalendarUserDyspoData();
   }
 
-  tagCalendarEventsData() {
+  tagCalendarEventsDataForMonth() {
     if (!this.calendarMonthData) {
       console.log('Can not tag calendar data');
     } else {
       this.eventsForDate = [];
+      this.selectedDate = undefined;
+      this.selectedDateMs = undefined;
+      this.selectedDateFormatted = this.utils.formatMonth(
+        this.calendarMonthData.original.time
+      );
       this.calendarMonthData.days.forEach((day) => {
         day.isEvent = false;
 

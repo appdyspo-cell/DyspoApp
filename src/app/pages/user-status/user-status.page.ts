@@ -1,5 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { IonModal, ModalController } from '@ionic/angular';
+import {
+  ActionSheetController,
+  IonModal,
+  ModalController,
+  NavController,
+} from '@ionic/angular';
 import { UserStatusComponent } from 'src/app/components/user-status/user-status.component';
 import {
   AgendaDyspoItem,
@@ -17,6 +22,7 @@ import { UtilsService } from 'src/app/services/utils.service';
 import { AgendaService } from 'src/app/services/agenda.service';
 import { Observable, Subscription } from 'rxjs';
 import {
+  addHours,
   format,
   getDate,
   getMonth,
@@ -26,11 +32,13 @@ import {
   isSameDay,
   isSameMonth,
   parseISO,
+  setHours,
 } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { AgendaEventInfoComponent } from 'src/app/components/agenda-event-info/agenda-event-info.component';
 import { FriendsService } from 'src/app/services/friends.service';
 import { App } from '@capacitor/app';
+import { NavigationExtras } from '@angular/router';
 
 @Component({
   selector: 'app-user-status',
@@ -59,7 +67,9 @@ export class UserStatusPage implements OnInit {
     private modalCtrl: ModalController,
     private utils: UtilsService,
     private agendaSvc: AgendaService,
-    private friendService: FriendsService
+    private friendService: FriendsService,
+    public navCtrl: NavController,
+    private actionSheetCtrl: ActionSheetController
   ) {
     this.fetchData();
     // On Resume App
@@ -86,7 +96,17 @@ export class UserStatusPage implements OnInit {
           return isAfter(parseISO(agEvent.startISO), new Date());
         });
 
-        //this.tagCalendarUserDyspoData();
+        this.nextAgendaEvents.sort((item1, item2) => {
+          const date1 = parseISO(item1.startISO);
+          const date2 = parseISO(item2.startISO);
+          if (isBefore(date1, date2)) {
+            return -1; // item1 doit être trié avant item2
+          } else if (isAfter(date1, date2)) {
+            return 1; // item1 doit être trié après item2
+          } else {
+            return 0; // les dates sont égales
+          }
+        });
       }
     );
 
@@ -99,6 +119,17 @@ export class UserStatusPage implements OnInit {
     this.invitationsSubscription =
       this.agendaSvc.agendaEventInvitations$.subscribe((invitations) => {
         this.invitations = invitations;
+        this.invitations.sort((item1, item2) => {
+          const date1 = parseISO(item1.startISO);
+          const date2 = parseISO(item2.startISO);
+          if (isBefore(date1, date2)) {
+            return -1; // item1 doit être trié avant item2
+          } else if (isAfter(date1, date2)) {
+            return 1; // item1 doit être trié après item2
+          } else {
+            return 0; // les dates sont égales
+          }
+        });
       });
 
     this.agendaDysposSubscription = this.agendaSvc.agendaDyspos$.subscribe(
@@ -238,6 +269,56 @@ export class UserStatusPage implements OnInit {
     console.log(data);
     if (role === 'confirm') {
       //this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!);
+    }
+  }
+
+  async openCreateEvent() {
+    const todayMorning = setHours(new Date(), 0);
+    console.log();
+    // if (isBefore(new Date(addHours(new Date().getTime(), 1)), todayMorning)) {
+    //   this.utils.showAlert(
+    //     'Vous ne pouvez pas creer un evenement dans le passé'
+    //   );
+    //   return;
+    // }
+
+    const buttons = [];
+    buttons.push({
+      text: 'Personnel',
+      cssClass: 'dyspo-sheet-dyspo',
+      data: {
+        is_multi: false,
+      },
+    });
+
+    buttons.push({
+      text: 'Groupe',
+      cssClass: 'dyspo-sheet-dyspo-with-kids',
+      data: {
+        is_multi: true,
+      },
+    });
+
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: "Saisissez le type de l' événement",
+      cssClass: 'dyspo-sheet',
+      buttons,
+    });
+
+    await actionSheet.present();
+
+    let result = await actionSheet.onDidDismiss();
+    if (result.data) {
+      const navigationExtras: NavigationExtras = {
+        state: {
+          tsDate: new Date().getTime(),
+          is_multi: result.data.is_multi,
+        },
+      };
+      this.navCtrl.navigateForward(
+        '/agenda/me/create-event/new',
+        navigationExtras
+      );
     }
   }
 }

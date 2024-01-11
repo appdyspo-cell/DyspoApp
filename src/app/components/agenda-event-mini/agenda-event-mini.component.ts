@@ -3,6 +3,8 @@ import { AgendaEvent, AgendaEventType } from 'src/app/models/models';
 import { Output, EventEmitter } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
 import { NavController } from '@ionic/angular';
+import { format, isSameDay, parseISO } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 @Component({
   selector: 'app-agenda-event-mini',
@@ -14,10 +16,47 @@ export class AgendaEventMiniComponent implements OnInit {
   @Input() agendaEvent!: AgendaEvent;
   @Input() isInvitation!: boolean;
   agendaEventType = AgendaEventType;
+  display_date_1: string | undefined;
+  display_date_2: string | undefined;
 
   constructor(private navCtrl: NavController) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    if (
+      isSameDay(this.agendaEvent.start_date_ts, this.agendaEvent.end_date_ts)
+    ) {
+      this.display_date_1 = format(
+        parseISO(this.agendaEvent.startISO),
+        'iii dd MMM',
+        {
+          locale: fr,
+        }
+      );
+      this.display_date_2 =
+        format(parseISO(this.agendaEvent.startISO), 'HH:mm', {
+          locale: fr,
+        }) +
+        '-' +
+        format(parseISO(this.agendaEvent.endISO), 'HH:mm', {
+          locale: fr,
+        });
+    } else {
+      this.display_date_1 = format(
+        parseISO(this.agendaEvent.startISO),
+        'iii dd MMM HH:mm',
+        {
+          locale: fr,
+        }
+      );
+      this.display_date_2 = format(
+        parseISO(this.agendaEvent.endISO),
+        'iii dd MMM HH:mm',
+        {
+          locale: fr,
+        }
+      );
+    }
+  }
 
   addNewItem(value: string) {
     this.outevt.emit(value);

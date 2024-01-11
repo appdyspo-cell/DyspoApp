@@ -279,7 +279,7 @@ export class FriendsService {
       console.log(contact);
       //Check if membre has been blocked
       //this.friendService
-      this.utils.showLoader();
+      //this.utils.showLoader();
 
       const myInviteData = {
         friend_uid: contact.uid,
@@ -307,12 +307,12 @@ export class FriendsService {
         { merge: true }
       );
 
-      this.utils.hideLoader();
+      //this.utils.hideLoader();
       if (showToast) this.utils.showToastSuccess('Invitation envoyée');
       this.notificationSvc.sendInviteFriendNotif(contact.uid!);
       return true;
     } catch (err: any) {
-      this.utils.hideLoader();
+      //this.utils.hideLoader();
       this.utils.showToastError('Erreur');
       return false;
     }

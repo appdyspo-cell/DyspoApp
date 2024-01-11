@@ -41,11 +41,8 @@
       [size]="isInvitation ? 9 : 7"
       class="ion-align-items-center ion-text-center"
     >
-      {{ agendaEvent.start_date_formatted }}<br />
-      <ion-text style="font-size: 0.85rem"
-        >{{ agendaEvent.start_time_formatted }} -
-        {{ agendaEvent.end_time_formatted }}</ion-text
-      >
+      {{ display_date_1 }}<br />
+      <ion-text style="font-size: 0.85rem">{{ display_date_2 }} </ion-text>
     </ion-col>
     <ion-col
       *ngIf="!isInvitation"

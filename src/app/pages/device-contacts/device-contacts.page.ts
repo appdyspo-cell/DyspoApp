@@ -132,13 +132,17 @@ export class DeviceContactsPage implements OnInit {
       contact.is_my_friend = true;
       this.friendsSvc.inviteFromDeviceContact(contact, true);
     } else {
-      await Share.share({
-        text: "Rejoins moi sur Dyspo. Installe l'application Dyspo et rejoins moi ! N'oublie pas de me demander en ami",
-      });
+      this.shareApp();
       // this.utils.showToastSuccess(
       //   "Non membre. Inviter à installer l'application"
       // );
     }
+  }
+
+  async shareApp() {
+    await Share.share({
+      text: "Rejoins moi sur Dyspo. Installe l'application Dyspo et rejoins moi ! N'oublie pas de me demander en ami",
+    });
   }
 
   groupContactsByAlphabet(contacts: AppDeviceContact[]) {

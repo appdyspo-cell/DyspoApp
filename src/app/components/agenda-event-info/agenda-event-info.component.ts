@@ -13,6 +13,8 @@ import {
   ModalController,
   NavController,
 } from '@ionic/angular';
+import { format, isSameDay, parseISO } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import {
   AgendaEvent,
   AgendaEventType,
@@ -57,6 +59,8 @@ export class AgendaEventInfoComponent implements OnInit {
   my_agendaEvents: AgendaEvent[] = [];
   my_agendaEvents_label = '';
   my_dyspoStatus_label = '';
+  display_date_1: string | undefined;
+  display_date_2: string | undefined;
 
   constructor(
     private modalCtrl: ModalController,
@@ -93,8 +97,33 @@ export class AgendaEventInfoComponent implements OnInit {
       this.agendaEvent.admin_uid === this.userSvc.userInfo?.uid &&
       this.agendaEvent.members_invited_uid.length === 0 &&
       this.agendaEvent.members_uid.length === 1;
-    // Get members info
 
+    //Display dates
+    if (
+      isSameDay(this.agendaEvent.start_date_ts, this.agendaEvent.end_date_ts)
+    ) {
+      this.display_date_1 =
+        'Le ' +
+        format(parseISO(this.agendaEvent.startISO), 'iii dd MMM', {
+          locale: fr,
+        }) +
+        ' à ' +
+        format(parseISO(this.agendaEvent.startISO), 'HH:mm', {
+          locale: fr,
+        });
+    } else {
+      this.display_date_1 =
+        'Du ' +
+        format(parseISO(this.agendaEvent.startISO), 'iii dd MMM HH:mm', {
+          locale: fr,
+        });
+      this.display_date_2 =
+        'Au ' +
+        format(parseISO(this.agendaEvent.endISO), 'iii dd MMM HH:mm', {
+          locale: fr,
+        });
+    }
+    // Get members info
     this.members_presence_not_confirmed = await this.userSvc.getUserInfos(
       this.agendaEvent!.members_invited_uid
     );

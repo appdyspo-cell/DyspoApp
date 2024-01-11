@@ -201,6 +201,18 @@
     (ionClear)="clearAutocomplete()"
   >
   </ion-searchbar>
+  <ion-list
+    class="ion-no-margin ion-no-padding"
+    [hidden]="autocompletePlaces.length === 0"
+  >
+    <ion-item
+      *ngFor="let place of autocompletePlaces"
+      tappable
+      (click)="selectSearchResult(place)"
+    >
+      {{ place.description }}
+    </ion-item>
+  </ion-list>
   <ion-card *ngIf="is_multi">
     <ion-radio-group [(ngModel)]="agendaEvent!.type">
       <ion-item lines="none">
@@ -243,18 +255,6 @@
     </ion-radio-group>
   </ion-card>
 
-  <ion-list
-    class="ion-no-margin ion-no-padding"
-    [hidden]="autocompletePlaces.length === 0"
-  >
-    <ion-item
-      *ngFor="let place of autocompletePlaces"
-      tappable
-      (click)="selectSearchResult(place)"
-    >
-      {{ place.description }}
-    </ion-item>
-  </ion-list>
   <ion-card *ngIf="is_multi">
     <div class="ion-padding">
       <ion-checkbox [(ngModel)]="allCanEdit" labelPlacement="end"

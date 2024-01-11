@@ -75,9 +75,9 @@
       >
         <div>
           <div>
-            Le {{ agendaEvent.start_date_formatted }} à
-            {{ agendaEvent.start_time_formatted }}
+            {{ display_date_1 }}
           </div>
+          <div *ngIf="display_date_2">{{ display_date_2 }}</div>
           <div *ngIf="agendaEvent.is_multi" class="ion-text-center">
             <span
               style="font-size: 1.3rem; font-weight: bold; margin-right: 5px"
