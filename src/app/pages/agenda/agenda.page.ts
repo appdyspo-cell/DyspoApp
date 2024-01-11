@@ -135,6 +135,7 @@ export class AgendaPage implements AfterViewInit {
         this.selectedDateFormatted = this.utils.formatDate(
           new Date().getTime()
         );
+        this.getAgendaEventsForDate(this.selectedDateMs);
       } else if (this.dataMode === 'friend') {
         // Check if shareAgenda is allowed
 
@@ -202,6 +203,11 @@ export class AgendaPage implements AfterViewInit {
 
   onCreateMonthEvent(calendarMonthData: CalendarMonth) {
     console.log('Month created !!!!', calendarMonthData);
+    this.selectedDate = undefined;
+    this.selectedDateMs = undefined;
+    this.selectedDateFormatted = this.utils.formatMonth(
+      calendarMonthData.original.time
+    );
     this.calendarMonthData = calendarMonthData;
     this.originalCalendarMonthData = cloneDeep(this.calendarMonthData);
     this.agendaSvc.isModified = false;
@@ -223,13 +229,14 @@ export class AgendaPage implements AfterViewInit {
             agendaEvent.end_date_ts >= day.time
           ) {
             day.isEvent = true;
-            this.eventsForDate.push(agendaEvent);
+            //Prevent doublons for long events
+            const foundIndex = this.eventsForDate.findIndex((evForDate) => {
+              return evForDate.uid === agendaEvent.uid;
+            });
+            if (foundIndex < 0) {
+              this.eventsForDate.push(agendaEvent);
+            }
           }
-          // if (isSameDay(day.time, parseISO(agendaEvent.startISO))) {
-          //   day.isEvent = true;
-          //   this.eventsForDate.push(agendaEvent);
-          //   //day.subTitle = agendaEvent.title?.substring(0, 5);
-          // }
         });
       });
       this.eventsForDate.sort((item1, item2) => {
@@ -246,32 +253,32 @@ export class AgendaPage implements AfterViewInit {
     }
   }
 
-  getAgendaEventsForCurrentMonth() {
-    this.eventsForDate = [];
-    this.eventsForDate = this.agendaEvents.filter((elt: AgendaEvent) =>
-      isSameMonth(
-        this.calendarMonthData?.original.month,
-        parseISO(elt.startISO)
-      )
-    );
-    this.eventsForDate.sort((item1, item2) => {
-      const date1 = parseISO(item1.startISO);
-      const date2 = parseISO(item2.startISO);
-      if (isBefore(date1, date2)) {
-        return -1; // item1 doit être trié avant item2
-      } else if (isAfter(date1, date2)) {
-        return 1; // item1 doit être trié après item2
-      } else {
-        return 0; // les dates sont égales
-      }
-    });
-  }
+  // getAgendaEventsForCurrentMonth() {
+  //   this.eventsForDate = [];
+  //   this.eventsForDate = this.agendaEvents.filter((elt: AgendaEvent) =>
+  //     isSameMonth(
+  //       this.calendarMonthData?.original.month,
+  //       parseISO(elt.startISO)
+  //     )
+  //   );
+  //   this.eventsForDate.sort((item1, item2) => {
+  //     const date1 = parseISO(item1.startISO);
+  //     const date2 = parseISO(item2.startISO);
+  //     if (isBefore(date1, date2)) {
+  //       return -1; // item1 doit être trié avant item2
+  //     } else if (isAfter(date1, date2)) {
+  //       return 1; // item1 doit être trié après item2
+  //     } else {
+  //       return 0; // les dates sont égales
+  //     }
+  //   });
+  // }
 
-  getAgendaEventsForDate(ev: CalendarDay) {
+  getAgendaEventsForDate(ts: number) {
     this.eventsForDate = [];
     this.eventsForDate = this.agendaEvents.filter(
       (elt: AgendaEvent) => {
-        return elt.start_date_ts <= ev.time && elt.end_date_ts >= ev.time;
+        return elt.start_date_ts <= ts && elt.end_date_ts >= ts;
       }
       //isSameDay(ev.time, parseISO(elt.startISO))
     );
@@ -303,9 +310,9 @@ export class AgendaPage implements AfterViewInit {
   }
 
   onSelectReadOnly(ev: CalendarDay[]) {
-    if (this.isFriendMode) {
-      return;
-    }
+    // if (this.isFriendMode) {
+    //   return;
+    // }
     if (this.agendaMode === AgendaMode.READONLY) {
       console.log('Selected read only ', ev);
 
@@ -314,7 +321,7 @@ export class AgendaPage implements AfterViewInit {
       this.selectedDateMs = ev[0].time;
 
       //this.openCreateEvent();
-      this.getAgendaEventsForDate(ev[0]);
+      this.getAgendaEventsForDate(ev[0].time);
     }
   }
   async openCreateEvent() {

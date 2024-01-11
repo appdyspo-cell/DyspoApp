@@ -194,4 +194,9 @@ export class UtilsService {
   formatTime(dateISO: string) {
     return format(parseISO(dateISO), 'HH:mm');
   }
+
+  formatMonth(dateMs: number) {
+    const month = format(new Date(dateMs), 'MMMM', { locale: fr });
+    return month.charAt(0).toUpperCase() + month.slice(1);
+  }
 }

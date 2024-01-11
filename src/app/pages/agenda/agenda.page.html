@@ -99,7 +99,12 @@
         ></ion-icon>
         <ion-text>{{selectedDateFormatted}}</ion-text>
       </div>
-      <ion-button slot="end" fill="clear" (click)="openCreateEvent()">
+      <ion-button
+        *ngIf="!isFriendMode && selectedDateMs"
+        slot="end"
+        fill="clear"
+        (click)="openCreateEvent()"
+      >
         <ion-icon name="add-circle-outline" slot="start"></ion-icon
         >Nouveau</ion-button
       >
