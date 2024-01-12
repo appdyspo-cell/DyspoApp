@@ -101,7 +101,7 @@
 }
 .header-ct {
   background: var(--ion-color-primary);
-  padding: 16px;
+  padding: var(--ion-safe-area-top) 16px var(--ion-safe-area-bottom) 16px;
   .header {
     display: flex;
     flex-direction: row;

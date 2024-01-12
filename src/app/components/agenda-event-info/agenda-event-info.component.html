@@ -7,24 +7,17 @@
   }"
 >
   <ion-toolbar>
-    <ion-button slot="start" (click)="close()" fill="clear">
-      <ion-icon
-        slot="icon-only"
-        name="close-circle-outline"
-        size="large"
-      ></ion-icon>
+    <ion-button slot="start" (click)="close()" fill="clear" size="large">
+      <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
     </ion-button>
     <ion-button
       *ngIf="!isInvitation"
       slot="end"
       (click)="openPopoverMenu($event)"
       fill="clear"
+      size="large"
     >
-      <ion-icon
-        slot="icon-only"
-        name="ellipsis-vertical-outline"
-        size="large"
-      ></ion-icon>
+      <ion-icon slot="icon-only" name="ellipsis-vertical-outline"></ion-icon>
     </ion-button>
   </ion-toolbar>
 
@@ -234,7 +227,7 @@
   <div
     *ngIf="isInvitation"
     class="d-flex ion-justify-content-center ion-margin-top"
-    style="color: #eee"
+    style="color: #eee; padding-bottom: var(--ion-safe-area-bottom)"
   >
     <ion-button (click)="acceptInvitation()" class="form-btn" fill="clear"
       >Dyspo! <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon

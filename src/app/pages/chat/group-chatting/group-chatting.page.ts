@@ -13,7 +13,7 @@ import {
   NavController,
   PopoverController,
 } from '@ionic/angular';
-import { format } from 'date-fns';
+import { format, isSameDay, parseISO } from 'date-fns';
 import { cloneDeep, reduce } from 'lodash';
 import { Subscription } from 'rxjs';
 import { ChatMenuComponent } from 'src/app/components/chat-menu/chat-menu.component';
@@ -37,6 +37,7 @@ import { Device, DeviceInfo } from '@capacitor/device';
 import { UtilsService } from 'src/app/services/utils.service';
 import { NotificationService } from 'src/app/services/notification.service';
 import { AgendaEventInfoComponent } from 'src/app/components/agenda-event-info/agenda-event-info.component';
+import { fr } from 'date-fns/locale';
 @Component({
   selector: 'app-group-chatting',
   templateUrl: './group-chatting.page.html',
@@ -69,6 +70,8 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   defaultAvatar = 'assets/img/user.png';
   pendingAttachment: string | undefined;
   deviceInfo!: DeviceInfo;
+  display_date_1: string | undefined;
+  display_date_2: string | undefined;
 
   constructor(
     private navCtrl: NavController,
@@ -89,6 +92,31 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     console.log('Event uid', this.agendaEvent);
     this.my_uid = this.userSvc.userInfo?.uid!;
     this.my_avatar = this.userSvc.userInfo?.avatarPath!;
+    //Display dates
+    if (
+      isSameDay(this.agendaEvent.start_date_ts, this.agendaEvent.end_date_ts)
+    ) {
+      this.display_date_1 =
+        'Le ' +
+        format(parseISO(this.agendaEvent.startISO), 'iii dd MMM', {
+          locale: fr,
+        }) +
+        ' à ' +
+        format(parseISO(this.agendaEvent.startISO), 'HH:mm', {
+          locale: fr,
+        });
+    } else {
+      this.display_date_1 =
+        'Du ' +
+        format(parseISO(this.agendaEvent.startISO), 'iii dd MMM HH:mm', {
+          locale: fr,
+        });
+      this.display_date_2 =
+        'Au ' +
+        format(parseISO(this.agendaEvent.endISO), 'iii dd MMM HH:mm', {
+          locale: fr,
+        });
+    }
   }
 
   ngOnDestroy(): void {

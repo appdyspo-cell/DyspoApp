@@ -5,7 +5,7 @@ import {
   ModalController,
   NavController,
 } from '@ionic/angular';
-import { UserStatusComponent } from 'src/app/components/user-status/user-status.component';
+
 import {
   AgendaDyspoItem,
   AgendaEvent,
@@ -188,17 +188,6 @@ export class UserStatusPage implements OnInit {
   //     },
   //   ];
   // }
-
-  openStatus() {
-    this.modalCtrl
-      .create({
-        component: UserStatusComponent,
-        cssClass: 'transparent-modal',
-      })
-      .then((modal) => {
-        modal.present();
-      });
-  }
 
   cancel() {
     this.modal.dismiss(null, 'cancel');

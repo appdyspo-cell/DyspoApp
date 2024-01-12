@@ -124,6 +124,7 @@ export class AgendaEventInfoComponent implements OnInit {
         });
     }
     // Get members info
+    console.log('agenda ev', this.agendaEvent);
     this.members_presence_not_confirmed = await this.userSvc.getUserInfos(
       this.agendaEvent!.members_invited_uid
     );

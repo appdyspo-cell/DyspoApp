@@ -3,8 +3,8 @@
     <ion-buttons slot="start">
       <ion-back-button text="" icon="chevron-back-outline"></ion-back-button>
     </ion-buttons>
-    <ion-title (click)="openEvent()">
-      <div class="profile d-flex active">
+    <ion-title (click)="openEvent()" mode="md">
+      <div class="profile d-flex">
         <div *ngIf="agendaEvent.avatar" class="profile_img_box">
           <div class="profile_img">
             <img src="{{agendaEvent.avatar}}" />
@@ -12,11 +12,10 @@
         </div>
         <div class="title-container">
           <h2>{{agendaEvent.title}}</h2>
-          <h3>{{agendaEvent.start_date_formatted}}</h3>
-          <h3>
-            {{agendaEvent.start_time_formatted}} -
-            {{agendaEvent.end_time_formatted}}
-          </h3>
+          <div>
+            <h3>{{ display_date_1 }}</h3>
+          </div>
+          <div *ngIf="display_date_2"><h3>{{ display_date_2 }}</h3></div>
         </div>
 
         <!-- <span class="end">

@@ -21,7 +21,7 @@ import { UtilsService } from 'src/app/services/utils.service';
 import { environment } from 'src/environments/environment';
 import { EmailComposer } from 'capacitor-email-composer';
 import { LoggerService } from 'src/app/services/logger.service';
-import { UserStatusComponent } from 'src/app/components/user-status/user-status.component';
+
 import { UserCredential } from '@angular/fire/auth';
 import { NotificationService } from 'src/app/services/notification.service';
 

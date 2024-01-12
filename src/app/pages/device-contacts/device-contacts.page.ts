@@ -34,6 +34,8 @@ export class DeviceContactsPage implements OnInit {
   appContactsGrouped: { letter: string; contacts: AppDeviceContact[] }[] = [];
   scroll = false;
   isLoading = false;
+  inputSearch = '';
+  autocompleteItems: AppDeviceContact[] = [];
   constructor(
     private userSvc: UserService,
     private utils: UtilsService,
@@ -161,5 +163,28 @@ export class DeviceContactsPage implements OnInit {
             a.display.localeCompare(b.display)
         ),
       }));
+  }
+
+  clearAutocomplete() {
+    this.autocompleteItems = [];
+    this.inputSearch = '';
+  }
+
+  updateSearchResults() {
+    const pattern = this.inputSearch;
+    if (pattern === '') {
+      this.autocompleteItems = [];
+      return;
+    } else if (pattern && pattern.length > 2) {
+      this.autocompleteItems = this.appContacts.filter(
+        (user) =>
+          user.display!.toUpperCase().indexOf(pattern.toUpperCase()) >= 0
+      );
+      // this.autocompleteItems.forEach((user) => {
+      //   user.is_my_friend = this.friendService.isMyFriend(user.uid);
+      //   console.log(user);
+      // });
+      console.log('Results ', this.autocompleteItems);
+    }
   }
 }

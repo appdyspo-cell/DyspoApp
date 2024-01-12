@@ -37,7 +37,7 @@ ion-calendar {
 }
 .header-ct {
   background: var(--ion-color-primary);
-  padding: 10px;
+  padding: var(--ion-safe-area-top) 16px var(--ion-safe-area-bottom) 16px;
   color: white;
   .header {
     display: flex;

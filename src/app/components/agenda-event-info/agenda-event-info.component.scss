@@ -4,6 +4,7 @@ ion-button {
 
 ion-toolbar {
   --background: transparent;
+  padding-top: var(--ion-safe-area-top);
 }
 
 .form-btn {

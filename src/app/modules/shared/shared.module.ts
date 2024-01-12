@@ -14,7 +14,7 @@ import { DyspoViewerComponent } from 'src/app/components/dyspo-viewer/dyspo-view
 import { NgxPanZoomModule } from 'ngx-panzoom';
 import { SwiperModule } from 'swiper/angular';
 import { ReportComponent } from 'src/app/components/report/report.component';
-import { ContactsComponent } from 'src/app/components/contacts/contacts.component';
+
 import { AlphabetScrollComponent } from 'src/app/components/alphabet-scroll/alphabet-scroll.component';
 
 @NgModule({
@@ -26,7 +26,6 @@ import { AlphabetScrollComponent } from 'src/app/components/alphabet-scroll/alph
     ChatMenuComponent,
     DyspoViewerComponent,
     ReportComponent,
-    ContactsComponent,
     AlphabetScrollComponent,
   ],
   imports: [
@@ -45,7 +44,6 @@ import { AlphabetScrollComponent } from 'src/app/components/alphabet-scroll/alph
     AgendaEventInfoComponent,
     DyspoViewerComponent,
     ReportComponent,
-    ContactsComponent,
     AlphabetScrollComponent,
   ],
 })
