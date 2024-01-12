@@ -23,6 +23,7 @@ import {
   AppUser,
   AppUserWithEvents,
   ChatMessage,
+  Chatroom,
   UserDyspoStatus,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
@@ -89,7 +90,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   ) {
     this.agendaEvent =
       this.router.getCurrentNavigation()?.extras.state?.['agendaEvent'];
-    console.log('Event uid', this.agendaEvent);
+    console.log('Agenda Event', this.agendaEvent);
     this.my_uid = this.userSvc.userInfo?.uid!;
     this.my_avatar = this.userSvc.userInfo?.avatarPath!;
     //Display dates
@@ -130,6 +131,8 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     // Messages
     this.chatSvc.removeListenMessages();
     this.msgList = await this.chatSvc.getMessages(this.agendaEvent);
+    await this.chatSvc.resetCount(this.agendaEvent);
+    // On pourrait ici tester si les messages ont été lus et les marquer comme lus si ce n'est pas le cas
     this.scrollDown();
     this.chatSvc.listenMessages(this.agendaEvent);
 
@@ -182,6 +185,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
       componentProps: {
         friend_id: null,
         username: null,
+        my_chatroom: this.agendaEvent['user_' + this.my_uid] as Chatroom,
       },
       translucent: true,
       event: ev,
@@ -209,6 +213,15 @@ export class GroupChattingPage implements OnInit, OnDestroy {
         .catch((err) => {
           this.utils.showToastError(err);
         });
+    } else if (role === 'togglenotifications') {
+      const my_chatroom = data['my_chatroom'] as Chatroom;
+      my_chatroom.isNotifications = !my_chatroom.isNotifications;
+      console.log('My new chatroom', my_chatroom);
+      console.log('My new chatroom', this.agendaEvent);
+      this.chatSvc.toggleUserNotification(
+        this.agendaEvent,
+        my_chatroom.isNotifications
+      );
     }
   }
 
@@ -241,9 +254,8 @@ export class GroupChattingPage implements OnInit, OnDestroy {
       this.pendingAttachment = undefined;
 
       this.notificationsSvc.sendMessageInGroup(
-        this.agendaEvent.members_uid,
-        this.userInput,
-        this.agendaEvent
+        this.agendaEvent.uid!,
+        this.userInput
       );
       this.userInput = '';
       if (this.deviceInfo.platform !== 'web') {

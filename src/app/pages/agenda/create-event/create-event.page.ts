@@ -200,6 +200,7 @@ export class CreateEventPage implements OnInit {
             lastMessageRead: '',
             startMessageId: 0,
             nextMessageId: 0,
+            isNotifications: true,
           };
           this.agendaEvent!['user_' + this.uid] = userChatroom;
 

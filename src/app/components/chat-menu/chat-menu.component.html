@@ -20,5 +20,24 @@
       ></ion-icon>
       <ion-text>Quitter le groupe</ion-text>
     </ion-item>
+    <ion-item (click)="toggleNotifications()" lines="none">
+      <ion-icon
+        *ngIf="my_chatroom.isNotifications"
+        name="notifications-off-outline"
+        color="danger"
+        style="margin-right: 15px"
+      ></ion-icon>
+      <ion-icon
+        *ngIf="!my_chatroom.isNotifications"
+        name="notifications-outline"
+        color="danger"
+        style="margin-right: 15px"
+      ></ion-icon>
+      <ion-text>{{
+        my_chatroom.isNotifications
+          ? "Désactiver les notifications"
+          : "Activer les notifications"
+      }}</ion-text>
+    </ion-item>
   </ion-list>
 </ion-content>

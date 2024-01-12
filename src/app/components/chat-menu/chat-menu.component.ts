@@ -7,6 +7,7 @@ import {
 import { ChatService } from 'src/app/services/chat.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { ReportComponent } from '../report/report.component';
+import { Chatroom } from 'src/app/models/models';
 
 @Component({
   selector: 'app-chat-menu',
@@ -16,6 +17,9 @@ import { ReportComponent } from '../report/report.component';
 export class ChatMenuComponent implements OnInit {
   @Input() friend_id!: string;
   @Input() username!: string;
+  @Input() my_chatroom!: Chatroom;
+  notificationsIcon: any;
+  notifLabel: any;
 
   constructor(
     private popCtrl: PopoverController,
@@ -25,7 +29,9 @@ export class ChatMenuComponent implements OnInit {
     private chatSvc: ChatService
   ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log('my chatroom ', this.my_chatroom);
+  }
 
   async requestBlock() {
     this.popCtrl.dismiss();
@@ -115,5 +121,12 @@ export class ChatMenuComponent implements OnInit {
     //   console.log(data.data.friendListDocReturned);
     //   friendListDoc = data.data.friendListDocReturned;
     //  });
+  }
+
+  toggleNotifications() {
+    this.popCtrl.dismiss(
+      { my_chatroom: this.my_chatroom },
+      'togglenotifications'
+    );
   }
 }

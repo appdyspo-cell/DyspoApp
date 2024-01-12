@@ -412,6 +412,7 @@ export class AgendaService {
         lastMessageRead: '',
         startMessageId: 0,
         nextMessageId: 0,
+        isNotifications: true,
       };
       invitation!['user_' + this.uid] = userChatroom;
 

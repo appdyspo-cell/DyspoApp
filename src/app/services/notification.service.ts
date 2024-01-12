@@ -1,6 +1,11 @@
 import { Injectable, NgZone } from '@angular/core';
 
-import { AgendaEvent, AppUser, NotifSubjects } from '../models/models';
+import {
+  AgendaEvent,
+  AppUser,
+  Chatroom,
+  NotifSubjects,
+} from '../models/models';
 import { NavigationExtras, Router } from '@angular/router';
 import { httpsCallable } from 'firebase/functions';
 import { Functions } from '@angular/fire/functions';
@@ -248,29 +253,52 @@ export class NotificationService {
     }
   }
 
-  async sendMessageInGroup(
-    uids: string[],
-    message: string,
-    agendaEvent: AgendaEvent
-  ) {
+  async sendMessageInGroup(event_uid: string, message: string) {
     if (!this.userSvc.userInfo) return;
     // Send notification
     console.log('Check to send notif or not');
 
+    //Get event for real time infos
+    const q1 = query(
+      collection(this.firestore, 'agenda_events'),
+      where('uid', '==', event_uid)
+    );
+    const snaps = await getDocs(q1);
+    if (snaps.empty) {
+      return;
+    }
+    const agendaEvent: AgendaEvent = snaps.docs[0].data() as AgendaEvent;
+    let uids = agendaEvent.members_uid;
+
+    uids = uids.filter((member_uid) => {
+      const isOtherId = member_uid !== this.userSvc.userInfo!.uid;
+      let isActiveNotifications = false;
+
+      if (member_uid !== this.uid) {
+        if (agendaEvent['user_' + member_uid]) {
+          const chatroom = agendaEvent['user_' + member_uid] as Chatroom;
+          isActiveNotifications = chatroom.isNotifications;
+        }
+      }
+
+      return isOtherId && isActiveNotifications;
+    });
+
+    if (uids.length === 0) {
+      console.log('No notif to send');
+      return;
+    }
     const q = query(
       collection(this.firestore, 'users'),
       where('uid', 'in', uids)
     );
-
-    uids = uids.filter((uid) => {
-      return uid !== this.userSvc.userInfo!.uid;
-    });
     const querySnapshots = await getDocs(q);
     if (!querySnapshots.empty) {
       const tokens: string[] = [];
       querySnapshots.forEach((snapshot) => {
         const user = snapshot.data() as AppUser;
         if (user.appSettings?.receiveNotification && user.notificationToken) {
+          console.log('Send notif to', user.firstname);
           tokens.push(user.notificationToken);
         }
       });

@@ -37,6 +37,7 @@ import {
   where,
 } from '@angular/fire/firestore';
 import { environment } from 'src/environments/environment';
+import { LoggerService } from './logger.service';
 //import { Firestore, doc, getDoc } from '@firebase/firestore';
 
 @Injectable({
@@ -63,6 +64,7 @@ export class ChatService {
 
   constructor(
     public utils: UtilsService,
+    private loggerSvc: LoggerService,
     private firestore: Firestore,
     private db: Database
   ) {
@@ -118,8 +120,8 @@ export class ChatService {
         transaction.set(messageCollectionRef, message);
       });
       console.log('Transaction successfully committed!');
-    } catch (e) {
-      console.log('Transaction failed: ', e);
+    } catch (e: any) {
+      this.loggerSvc.sendLog(e, 'sendMsg');
     }
   }
 
@@ -154,14 +156,82 @@ export class ChatService {
           }
 
           transaction.update(agendaDocRef, updateObject);
+        } else {
+          this.loggerSvc.sendLog('Can not find uid', 'markLastMessageRead');
         }
-        // const lastMessage = agendaFetched.last_message;
-        // if (lastMessage) {
-        //   lastMessage.read_by.push(this.uid);
-        //   updateObject.last_message.read_by = lastMessage.read_by;
-        // }
+      });
+    } else {
+      this.loggerSvc.sendLog(
+        'Can not find user_' + this.uid,
+        'markLastMessageRead'
+      );
+    }
+  }
 
-        transaction.update(agendaDocRef, updateObject);
+  async toggleUserNotification(
+    agendaEvent: AgendaEvent,
+    activeNotifications: boolean
+  ) {
+    if (this.uid) {
+      const agendaDocRef = doc(
+        this.firestore,
+        `agenda_events`,
+        agendaEvent.uid!
+      );
+
+      await runTransaction(this.firestore, async (transaction) => {
+        const agendaDoc = await transaction.get(agendaDocRef);
+        if (!agendaDoc.exists()) {
+          throw 'Document does not exist!';
+        }
+
+        //agenda fetched-> Write values
+        const agendaFetched = agendaDoc.data() as AgendaEvent;
+        const updateObject: any = {};
+
+        if (agendaFetched['user_' + this.uid]) {
+          updateObject['user_' + this.uid + '.isNotifications'] =
+            activeNotifications;
+
+          transaction.update(agendaDocRef, updateObject);
+        } else {
+          this.loggerSvc.sendLog(
+            'Can not find user_' + this.uid,
+            'toggleUserNotification'
+          );
+        }
+      });
+    }
+  }
+
+  async resetCount(agendaEvent: AgendaEvent) {
+    if (this.uid) {
+      const agendaDocRef = doc(
+        this.firestore,
+        `agenda_events`,
+        agendaEvent.uid!
+      );
+
+      await runTransaction(this.firestore, async (transaction) => {
+        const agendaDoc = await transaction.get(agendaDocRef);
+        if (!agendaDoc.exists()) {
+          throw 'Document does not exist!';
+        }
+
+        //agenda fetched-> Write values
+        const agendaFetched = agendaDoc.data() as AgendaEvent;
+        const updateObject: any = {};
+
+        if (agendaFetched['user_' + this.uid]) {
+          updateObject['user_' + this.uid + '.count'] = 0;
+
+          transaction.update(agendaDocRef, updateObject);
+        } else {
+          this.loggerSvc.sendLog(
+            'Can not find user_' + this.uid,
+            'toggleUserNotification'
+          );
+        }
       });
     }
   }

@@ -15,4 +15,9 @@ export class LoggerService {
       // if (optionalParams) console.log(optionalParams[0]);
     }
   }
+
+  sendLog(message: string, func: string) {
+    console.error(func, message);
+    // FirebaseCrashlytics.send
+  }
 }

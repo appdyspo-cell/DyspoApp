@@ -91,6 +91,7 @@ export interface Chatroom {
   blockedTimeMs?: number;
   quit_chatroom_at?: number;
   isArchived?: boolean;
+  isNotifications: boolean;
 }
 
 export interface AgendaEvent {
