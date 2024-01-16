@@ -15,7 +15,7 @@ import {
 } from '@ionic/angular';
 import { format, isSameDay, parseISO } from 'date-fns';
 import { cloneDeep, reduce } from 'lodash';
-import { Subscription } from 'rxjs';
+import { Subscription, take } from 'rxjs';
 import { ChatMenuComponent } from 'src/app/components/chat-menu/chat-menu.component';
 import { DyspoViewerComponent } from 'src/app/components/dyspo-viewer/dyspo-viewer.component';
 import {
@@ -27,7 +27,7 @@ import {
   UserDyspoStatus,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
-import { ChatService } from 'src/app/services/chat.service';
+import { ChatService, GetMessagesResult } from 'src/app/services/chat.service';
 import { FriendsService } from 'src/app/services/friends.service';
 import { MediaService } from 'src/app/services/media.service';
 import { UserService } from 'src/app/services/user.service';
@@ -39,6 +39,7 @@ import { UtilsService } from 'src/app/services/utils.service';
 import { NotificationService } from 'src/app/services/notification.service';
 import { AgendaEventInfoComponent } from 'src/app/components/agenda-event-info/agenda-event-info.component';
 import { fr } from 'date-fns/locale';
+import { QueryDocumentSnapshot, DocumentData } from '@angular/fire/firestore';
 @Component({
   selector: 'app-group-chatting',
   templateUrl: './group-chatting.page.html',
@@ -73,6 +74,9 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   deviceInfo!: DeviceInfo;
   display_date_1: string | undefined;
   display_date_2: string | undefined;
+  firstVisibleMessageDoc:
+    | QueryDocumentSnapshot<DocumentData, DocumentData>
+    | undefined;
 
   constructor(
     private navCtrl: NavController,
@@ -130,7 +134,13 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     this.deviceInfo = await Device.getInfo();
     // Messages
     this.chatSvc.removeListenMessages();
-    this.msgList = await this.chatSvc.getMessages(this.agendaEvent);
+    const fetchedMessages: GetMessagesResult = await this.chatSvc.getMessages(
+      this.agendaEvent
+    );
+    this.msgList = fetchedMessages.messages;
+
+    this.firstVisibleMessageDoc = fetchedMessages.firstVisibleMessageDoc;
+    console.log('First visible msg ', this.firstVisibleMessageDoc?.data());
     await this.chatSvc.resetCount(this.agendaEvent);
     // On pourrait ici tester si les messages ont été lus et les marquer comme lus si ce n'est pas le cas
     this.scrollDown();
@@ -270,70 +280,65 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     //this.show = false;
   }
 
-  getMore() {
-    // this.loading = true;
-    // const previousMsgList = [];
-    // const firstId = this.msgList[0].id;
-    // let startAt = firstId - this.limit;
-    // if (startAt < this.myChatroom.startMessageId) {
-    //   startAt = this.myChatroom.startMessageId;
-    // }
-    // const firstMessage = this.msgList[0];
-    // this.afDB
-    //   .list('chatrooms_messages/' + this.chatroomKey + '/', (ref) =>
-    //     ref.orderByChild('id').limitToFirst(this.limit).startAt(startAt)
-    //   )
-    //   .snapshotChanges(['child_added', 'child_changed'])
-    //   .pipe(take(1))
-    //   .subscribe((actions) => {
-    //     actions.forEach((action) => {
-    //       const incomingMessage = action.payload.val() as Message;
-    //       if (firstMessage && firstMessage.id <= incomingMessage.id) {
-    //       } else {
-    //         previousMsgList.push(incomingMessage);
-    //       }
-    //     });
-    //     if (previousMsgList.length === 0) {
-    //       this.allIsLoaded = true;
-    //     } else {
-    //       this.msgList = previousMsgList.concat(this.msgList);
-    //       //Set the scroll at the same y coord of the first Message before loading more
-    //       setTimeout(() => {
-    //         const yPosition = document
-    //           .getElementById('msg_' + firstId)
-    //           .getBoundingClientRect().y;
-    //         console.log(yPosition);
-    //         this.msgScrollableContainer.nativeElement.scrollTo({
-    //           top: yPosition - 150,
-    //           left: 0,
-    //           behavior: 'auto',
-    //         });
-    //       }, 20);
-    //     }
-    //     console.log(previousMsgList);
-    //     console.log(this.msgList);
-    //     this.loading = false;
-    //   });
+  async getMore() {
+    this.loading = true;
+
+    console.log('Get More');
+
+    if (!this.firstVisibleMessageDoc || this.allIsLoaded) return;
+
+    const firstMessageOfListUid = this.msgList[0].uid;
+
+    const fetchedPreviousMessages: GetMessagesResult =
+      await this.chatSvc.getPreviousMessages(
+        this.agendaEvent,
+        this.firstVisibleMessageDoc
+      );
+
+    this.loading = false;
+
+    if (fetchedPreviousMessages.messages.length === 0) {
+      this.allIsLoaded = true;
+      this.firstVisibleMessageDoc = undefined;
+      return;
+    } else {
+      const firstMessageOfListUid = this.msgList[0].uid;
+      this.msgList = fetchedPreviousMessages.messages.concat(this.msgList);
+      this.firstVisibleMessageDoc =
+        fetchedPreviousMessages.firstVisibleMessageDoc;
+
+      // console.log('firstvisible ', this.firstVisibleMessageDoc?.data());
+      setTimeout(() => {
+        const elt = window.document.getElementById(firstMessageOfListUid);
+        if (elt) {
+          const yPosition = elt.getBoundingClientRect().y;
+          // console.log(
+          //   'yPosition of ' + firstMessageOfListUid + ' = ' + yPosition
+          // );
+          this.content.scrollToPoint(0, yPosition - 150, 250);
+        }
+      }, 20);
+    }
   }
 
   onScroll(event: any): void {
-    console.log('onScroll', event);
+    //console.log('onScroll', event);
     if (
       this.loading ||
       this.msgList.length >= this.maxMsg ||
       this.allIsLoaded
     ) {
-      console.log(
-        'loading:' +
-          this.loading +
-          ' Msg:' +
-          this.msgList.length +
-          ' allIsLoaded:' +
-          this.allIsLoaded
-      );
+      // console.log(
+      //   'loading:' +
+      //     this.loading +
+      //     ' Msg:' +
+      //     this.msgList.length +
+      //     ' allIsLoaded:' +
+      //     this.allIsLoaded
+      // );
       return;
     } else {
-      if (event === 'top') {
+      if (event.detail.scrollTop === 0) {
         this.loading = true;
         setTimeout(() => {
           this.getMore();

@@ -20,4 +20,5 @@ export const environment = {
   firebase_avatar_group_storage_path: 'avatarGroupsStorage/',
   firebase_avatar_event_storage_path: 'avatarEventsStorage/',
   firebase_event_root: 'eventsMediaStorage/',
+  messages_fetch_limit: 50,
 };

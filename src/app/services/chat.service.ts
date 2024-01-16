@@ -22,23 +22,35 @@ import {
   ref,
 } from '@angular/fire/database';
 import {
+  DocumentData,
   Firestore,
+  QueryDocumentSnapshot,
   addDoc,
   collection,
   deleteDoc,
   doc,
   getDoc,
   getDocs,
+  limit,
   onSnapshot,
+  orderBy,
   query,
   runTransaction,
   setDoc,
+  startAfter,
   updateDoc,
   where,
 } from '@angular/fire/firestore';
 import { environment } from 'src/environments/environment';
 import { LoggerService } from './logger.service';
 //import { Firestore, doc, getDoc } from '@firebase/firestore';
+
+export interface GetMessagesResult {
+  messages: ChatMessage[];
+  firstVisibleMessageDoc:
+    | QueryDocumentSnapshot<DocumentData, DocumentData>
+    | undefined;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -246,17 +258,57 @@ export class ChatService {
 
   createChatroom() {}
 
-  async getMessages(agendaEvent: AgendaEvent): Promise<ChatMessage[]> {
+  async getMessages(agendaEvent: AgendaEvent): Promise<GetMessagesResult> {
     const messagesCollectionRef = collection(
       this.firestore,
       `agenda_events/${agendaEvent.uid}/messages_list`
     );
+    const q = query(
+      messagesCollectionRef,
+      orderBy('time_ms', 'desc'),
+      limit(environment.messages_fetch_limit)
+    );
 
-    const docs = await getDocs(messagesCollectionRef);
-    docs.forEach((doc) => {
-      this.messages.push(doc.data() as ChatMessage);
+    const documentSnapshots = await getDocs(q);
+    const firstVisibleMessageDoc =
+      documentSnapshots.docs[documentSnapshots.docs.length - 1];
+    documentSnapshots.forEach((documentSnapshot) => {
+      this.messages.push(documentSnapshot.data() as ChatMessage);
     });
-    return this.messages;
+    return { messages: this.messages.reverse(), firstVisibleMessageDoc };
+  }
+
+  async getPreviousMessages(
+    agendaEvent: AgendaEvent,
+    firstMessage: QueryDocumentSnapshot<DocumentData, DocumentData>
+  ): Promise<GetMessagesResult> {
+    const messagesCollectionRef = collection(
+      this.firestore,
+      `agenda_events/${agendaEvent.uid}/messages_list`
+    );
+    const q = query(
+      messagesCollectionRef,
+      orderBy('time_ms', 'desc'),
+      startAfter(firstMessage),
+      limit(environment.messages_fetch_limit)
+    );
+    const documentSnapshots = await getDocs(q);
+    if (documentSnapshots.docs.length === 0) {
+      return { messages: [], firstVisibleMessageDoc: undefined };
+    } else {
+    }
+    const firstVisibleMessageDoc =
+      documentSnapshots.docs[documentSnapshots.docs.length - 1];
+    const tempArray: ChatMessage[] = [];
+    documentSnapshots.forEach((documentSnapshot) => {
+      tempArray.push(documentSnapshot.data() as ChatMessage);
+    });
+    tempArray.reverse();
+
+    return {
+      messages: tempArray,
+      firstVisibleMessageDoc: firstVisibleMessageDoc,
+    };
   }
 
   listenMessages(agendaEvent: AgendaEvent) {
@@ -268,47 +320,50 @@ export class ChatService {
       `agenda_events/${agendaEvent.uid}/messages_list`
     );
 
-    this.messagesOnSnapshotCancel = onSnapshot(
+    const q = query(
       messagesCollectionRef,
-      (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-          const msgFetched = change.doc.data() as ChatMessage;
-          console.log('msg fetched', msgFetched);
-          let foundItem = this.messages.find((elt) => {
-            return elt.uid === msgFetched.uid;
-          });
-          if (change.type === 'modified' && foundItem) {
-            foundItem = msgFetched;
-            this.messagesSubject.next({
-              action: 'MODIFIED',
-              messages: this.messages,
-            });
-          }
-          if (change.type === 'added' && !foundItem) {
-            this.messages.push(msgFetched);
-            console.log('Chat Svc messageSubject ADDED', msgFetched.message);
-            this.messagesSubject.next({
-              action: 'ADDED',
-              messages: this.messages,
-            });
-          }
-          if (change.type === 'removed') {
-            const msgRemoved = change.doc.data() as ChatMessage;
-            msgRemoved.uid = change.doc.id;
-            const foundIndex = this.messages.findIndex(
-              (elt) => elt.uid === msgRemoved.uid
-            );
-            if (foundIndex >= 0) {
-              this.messages.splice(foundIndex, 1);
-              this.messagesSubject.next({
-                action: 'REMOVED',
-                messages: this.messages,
-              });
-            }
-          }
-        });
-      }
+      orderBy('time_ms', 'desc'),
+      limit(environment.messages_fetch_limit)
     );
+
+    this.messagesOnSnapshotCancel = onSnapshot(q, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        const msgFetched = change.doc.data() as ChatMessage;
+
+        let foundItem = this.messages.find((elt) => {
+          return elt.uid === msgFetched.uid;
+        });
+        if (change.type === 'modified' && foundItem) {
+          foundItem = msgFetched;
+          this.messagesSubject.next({
+            action: 'MODIFIED',
+            messages: this.messages,
+          });
+        }
+        if (change.type === 'added' && !foundItem) {
+          this.messages.push(msgFetched);
+          console.log('Chat Svc messageSubject ADDED', msgFetched.message);
+          this.messagesSubject.next({
+            action: 'ADDED',
+            messages: this.messages,
+          });
+        }
+        if (change.type === 'removed') {
+          const msgRemoved = change.doc.data() as ChatMessage;
+          msgRemoved.uid = change.doc.id;
+          const foundIndex = this.messages.findIndex(
+            (elt) => elt.uid === msgRemoved.uid
+          );
+          if (foundIndex >= 0) {
+            this.messages.splice(foundIndex, 1);
+            this.messagesSubject.next({
+              action: 'REMOVED',
+              messages: this.messages,
+            });
+          }
+        }
+      });
+    });
   }
 
   removeListenMessages() {

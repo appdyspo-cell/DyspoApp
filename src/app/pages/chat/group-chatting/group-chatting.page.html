@@ -84,9 +84,20 @@
   </div>
 </ion-header>
 
-<ion-content>
-  <div class="chat_container d-flex" (scrollPosition)="onScroll($event)">
-    <ng-container *ngFor="let msg of msgList">
+<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
+  <div class="chat_container d-flex" #msgScrollableContainer>
+    <div *ngIf="loading" class="d-flex ion-justify-content-center">
+      <ion-spinner
+        color="light"
+        style="width: 40px; height: 40px"
+      ></ion-spinner>
+    </div>
+
+    <div
+      class="d-flex"
+      *ngFor="let msg of msgList; let i = index; "
+      id="{{msg.uid}}"
+    >
       <div *ngIf="msg.sender !== my_uid" class="chat-box d-flex received">
         <div class="chat">
           <div class="chat_detail">
@@ -134,7 +145,7 @@
           </div>
         </div>
       </div>
-    </ng-container>
+    </div>
     <div *ngIf="pendingAttachment" class="chat-box d-flex send">
       <p>Now</p>
       <div class="chat">
