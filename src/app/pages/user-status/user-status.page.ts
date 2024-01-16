@@ -39,6 +39,7 @@ import { AgendaEventInfoComponent } from 'src/app/components/agenda-event-info/a
 import { FriendsService } from 'src/app/services/friends.service';
 import { App } from '@capacitor/app';
 import { NavigationExtras } from '@angular/router';
+import { NotificationService } from 'src/app/services/notification.service';
 
 @Component({
   selector: 'app-user-status',
@@ -65,13 +66,14 @@ export class UserStatusPage implements OnInit {
   constructor(
     public userSvc: UserService,
     private modalCtrl: ModalController,
-    private utils: UtilsService,
+    private notificationsSvc: NotificationService,
     private agendaSvc: AgendaService,
     private friendService: FriendsService,
     public navCtrl: NavController,
     private actionSheetCtrl: ActionSheetController
   ) {
     this.fetchData();
+    this.notificationsSvc.resetBadgeCount();
     // On Resume App
     App.addListener('resume', () => {
       if (this.agendaDysposSubscription)
@@ -82,6 +84,7 @@ export class UserStatusPage implements OnInit {
         locale: fr,
       });
 
+      this.notificationsSvc.resetBadgeCount();
       this.fetchData();
     });
   }

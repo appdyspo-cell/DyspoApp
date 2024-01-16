@@ -27,6 +27,7 @@ import {
   NotificationReceivedEvent,
   Notification,
 } from '@capacitor-firebase/messaging';
+import { Device } from '@capacitor/device';
 
 @Injectable({
   providedIn: 'root',
@@ -134,7 +135,11 @@ export class NotificationService {
   }
 
   resetBadgeCount() {
-    FirebaseMessaging.removeAllDeliveredNotifications();
+    Device.getInfo().then((res) => {
+      if (res.platform !== 'web') {
+        FirebaseMessaging.removeAllDeliveredNotifications();
+      }
+    });
   }
 
   goToChat(friend_uid: string) {
