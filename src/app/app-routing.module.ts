@@ -35,13 +35,6 @@ const routes: Routes = [
       import('./pages/friends/friends.module').then((m) => m.FriendsPageModule),
   },
   {
-    path: 'chat-home',
-    loadChildren: () =>
-      import('./pages/chat-home/chat-home.module').then(
-        (m) => m.ChatHomePageModule
-      ),
-  },
-  {
     path: 'agenda/:dataMode',
     loadChildren: () =>
       import('./pages/agenda/agenda.module').then((m) => m.AgendaPageModule),
@@ -109,7 +102,10 @@ const routes: Routes = [
   },
   {
     path: 'device-contacts',
-    loadChildren: () => import('./pages/device-contacts/device-contacts.module').then( m => m.DeviceContactsPageModule)
+    loadChildren: () =>
+      import('./pages/device-contacts/device-contacts.module').then(
+        (m) => m.DeviceContactsPageModule
+      ),
   },
 ];
 @NgModule({

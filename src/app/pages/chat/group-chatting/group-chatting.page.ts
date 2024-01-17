@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   ElementRef,
   OnDestroy,
@@ -62,7 +63,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   msgList: ChatMessage[] = [];
   viewType: string = '';
   agendaEvent: AgendaEvent;
-  msgSelected: any;
+  msgSelected: ChatMessage | undefined;
   userInput = '';
   my_uid!: string;
   my_avatar!: string;
@@ -90,7 +91,8 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     private mediaSvc: MediaService,
     private modalCtrl: ModalController,
     private utils: UtilsService,
-    private notificationsSvc: NotificationService
+    private notificationsSvc: NotificationService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     this.agendaEvent =
       this.router.getCurrentNavigation()?.extras.state?.['agendaEvent'];
@@ -157,6 +159,10 @@ export class GroupChattingPage implements OnInit, OnDestroy {
         }
         this.chatSvc.markLastMessageRead(this.agendaEvent, lastMessage);
         this.scrollDown();
+      } else if (data.action === 'MODIFIED') {
+        console.log('Modified');
+        console.log('New list ', this.msgList);
+        // this.changeDetectorRef.detectChanges();
       }
     });
 
@@ -254,6 +260,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
         uid: 'msg_' + d.getTime(),
         date_ISO: d.toISOString(),
         read_by: [],
+        deleted_by: [],
       };
 
       if (this.pendingAttachment) {
@@ -287,8 +294,6 @@ export class GroupChattingPage implements OnInit, OnDestroy {
 
     if (!this.firstVisibleMessageDoc || this.allIsLoaded) return;
 
-    const firstMessageOfListUid = this.msgList[0].uid;
-
     const fetchedPreviousMessages: GetMessagesResult =
       await this.chatSvc.getPreviousMessages(
         this.agendaEvent,
@@ -302,6 +307,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
       this.firstVisibleMessageDoc = undefined;
       return;
     } else {
+      if (this.msgList.length === 0) return;
       const firstMessageOfListUid = this.msgList[0].uid;
       this.msgList = fetchedPreviousMessages.messages.concat(this.msgList);
       this.firstVisibleMessageDoc =
@@ -354,26 +360,21 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   }
 
   deleteMsg(ev: any) {
-    // Swal.fire({
-    //   title: 'Voulez-vous supprimer ce message ?',
-    //   showDenyButton: true,
-    //   heightAuto: false,
-    //   confirmButtonText: 'Oui',
-    //   denyButtonText: `Non`,
-    // }).then((result) => {
-    //   if (result.isConfirmed) {
-    //     this.afDB
-    //     .object(
-    //       'chatrooms_messages/' + this.chatroomKey + '/' + this.msgSelected.message_key
-    //     )
-    //     .update({ is_deleted: true }).then(res=>{
-    //       console.log('Msg deleted');
-    //     })
-    //     .catch(err=>{
-    //       console.log(err);
-    //     });
-    //   }
-    // });
+    Swal.fire({
+      title: 'Voulez-vous supprimer ce message ?',
+      showDenyButton: true,
+      heightAuto: false,
+      confirmButtonText: 'Oui',
+      denyButtonText: `Non`,
+    }).then((result) => {
+      if (result.isConfirmed && this.msgSelected) {
+        this.chatSvc.deleteMessage(this.msgSelected, this.agendaEvent);
+      }
+    });
+  }
+
+  onMsgSelected(msg: ChatMessage) {
+    this.msgSelected = msg;
   }
 
   reportMsg(ev: any) {
@@ -477,5 +478,14 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     console.log(data);
     if (role === 'confirm') {
     }
+  }
+
+  isMsgHiddenForMe(msg: ChatMessage): any {
+    if (msg.deleted_by && msg.deleted_by.includes(this.my_uid)) {
+      msg.message = 'Effacé';
+      // return true;
+    }
+
+    //return true;
   }
 }

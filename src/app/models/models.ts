@@ -235,6 +235,7 @@ export interface ChatMessage {
   map?: string;
   read_by: string[];
   date_ISO: string;
+  deleted_by: string[];
   is_deleted?: boolean;
 }
 

@@ -39,5 +39,13 @@
           : "Activer les notifications"
       }}</ion-text>
     </ion-item>
+    <ion-item (click)="requestReport()" lines="none">
+      <ion-icon
+        name="stop-outline"
+        color="danger"
+        style="margin-right: 15px"
+      ></ion-icon>
+      <ion-text>Signaler le groupe</ion-text>
+    </ion-item>
   </ion-list>
 </ion-content>

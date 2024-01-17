@@ -43,6 +43,7 @@ import {
 } from '@angular/fire/firestore';
 import { environment } from 'src/environments/environment';
 import { LoggerService } from './logger.service';
+import { findIndex } from 'lodash';
 //import { Firestore, doc, getDoc } from '@firebase/firestore';
 
 export interface GetMessagesResult {
@@ -85,6 +86,70 @@ export class ChatService {
     //});
     this.chatrooms$ = this.chatroomsSubject.asObservable();
     this.messages$ = this.messagesSubject.asObservable();
+  }
+
+  listenMessages(agendaEvent: AgendaEvent) {
+    if (this.messagesOnSnapshotCancel) {
+      this.messagesOnSnapshotCancel();
+    }
+    const messagesCollectionRef = collection(
+      this.firestore,
+      `agenda_events/${agendaEvent.uid}/messages_list`
+    );
+
+    const q = query(
+      messagesCollectionRef,
+      orderBy('time_ms', 'desc'),
+      limit(environment.messages_fetch_limit)
+    );
+
+    this.messagesOnSnapshotCancel = onSnapshot(q, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        const msgFetched = change.doc.data() as ChatMessage;
+
+        const foundIndex = this.messages.findIndex(
+          (elt) => elt.uid === msgFetched.uid
+        );
+
+        if (change.type === 'modified' && foundIndex > -1) {
+          this.messages[foundIndex] = msgFetched;
+          console.log('Chat Svc messageSubject MODIFIED', msgFetched.message);
+          this.messagesSubject.next({
+            action: 'MODIFIED',
+            messages: this.messages,
+          });
+        }
+        if (change.type === 'added' && foundIndex < 0) {
+          this.messages.push(msgFetched);
+          console.log('Chat Svc messageSubject ADDED', msgFetched.message);
+          this.messagesSubject.next({
+            action: 'ADDED',
+            messages: this.messages,
+          });
+        }
+        if (change.type === 'removed') {
+          const msgRemoved = change.doc.data() as ChatMessage;
+          msgRemoved.uid = change.doc.id;
+          const foundIndex = this.messages.findIndex(
+            (elt) => elt.uid === msgRemoved.uid
+          );
+          if (foundIndex >= 0) {
+            this.messages.splice(foundIndex, 1);
+            this.messagesSubject.next({
+              action: 'REMOVED',
+              messages: this.messages,
+            });
+          }
+        }
+      });
+    });
+  }
+
+  removeListenMessages() {
+    this.messages = [];
+    if (this.messagesOnSnapshotCancel) {
+      this.messagesOnSnapshotCancel();
+    }
   }
 
   /**************************************************
@@ -248,16 +313,6 @@ export class ChatService {
     }
   }
 
-  createUsersChatroom(newInvits: string[], agendaEvent: AgendaEvent) {
-    newInvits.forEach((newInvitUid) => {
-      //addDoc()
-    });
-  }
-
-  getUnreadMessagesCount() {}
-
-  createChatroom() {}
-
   async getMessages(agendaEvent: AgendaEvent): Promise<GetMessagesResult> {
     const messagesCollectionRef = collection(
       this.firestore,
@@ -311,68 +366,6 @@ export class ChatService {
     };
   }
 
-  listenMessages(agendaEvent: AgendaEvent) {
-    if (this.messagesOnSnapshotCancel) {
-      this.messagesOnSnapshotCancel();
-    }
-    const messagesCollectionRef = collection(
-      this.firestore,
-      `agenda_events/${agendaEvent.uid}/messages_list`
-    );
-
-    const q = query(
-      messagesCollectionRef,
-      orderBy('time_ms', 'desc'),
-      limit(environment.messages_fetch_limit)
-    );
-
-    this.messagesOnSnapshotCancel = onSnapshot(q, (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        const msgFetched = change.doc.data() as ChatMessage;
-
-        let foundItem = this.messages.find((elt) => {
-          return elt.uid === msgFetched.uid;
-        });
-        if (change.type === 'modified' && foundItem) {
-          foundItem = msgFetched;
-          this.messagesSubject.next({
-            action: 'MODIFIED',
-            messages: this.messages,
-          });
-        }
-        if (change.type === 'added' && !foundItem) {
-          this.messages.push(msgFetched);
-          console.log('Chat Svc messageSubject ADDED', msgFetched.message);
-          this.messagesSubject.next({
-            action: 'ADDED',
-            messages: this.messages,
-          });
-        }
-        if (change.type === 'removed') {
-          const msgRemoved = change.doc.data() as ChatMessage;
-          msgRemoved.uid = change.doc.id;
-          const foundIndex = this.messages.findIndex(
-            (elt) => elt.uid === msgRemoved.uid
-          );
-          if (foundIndex >= 0) {
-            this.messages.splice(foundIndex, 1);
-            this.messagesSubject.next({
-              action: 'REMOVED',
-              messages: this.messages,
-            });
-          }
-        }
-      });
-    });
-  }
-
-  removeListenMessages() {
-    this.messages = [];
-    if (this.messagesOnSnapshotCancel) {
-      this.messagesOnSnapshotCancel();
-    }
-  }
-
   async initService(uid: string) {
     this.uid = uid;
     this.chatrooms = [];
@@ -385,13 +378,13 @@ export class ChatService {
     this.chatroomsOnSnapshotCancel = onSnapshot(queryChats, (snapshot) => {
       snapshot.docChanges().forEach((change) => {
         const chatroomFetched = change.doc.data() as Chatroom;
-        let foundItem = this.chatrooms.find((elt) => {
+        let foundIndex = this.chatrooms.findIndex((elt) => {
           return elt.uid === chatroomFetched.uid;
         });
-        if (change.type === 'modified' && foundItem) {
-          foundItem = chatroomFetched;
+        if (change.type === 'modified' && foundIndex > -1) {
+          this.chatrooms[foundIndex] = chatroomFetched;
         }
-        if (change.type === 'added' && !foundItem) {
+        if (change.type === 'added' && foundIndex < 0) {
           this.chatrooms.push(chatroomFetched);
         }
         if (change.type === 'removed') {
@@ -413,22 +406,6 @@ export class ChatService {
     await deleteDoc(
       doc(this.firestore, this.chatroomsCollectionRef + chatroom.uid)
     );
-
-    //On cache uniquement le salon de celui qui veut supprimer le chatroom
-    // this.afDB
-    //   .object(
-    //     'users_chatrooms/' +
-    //       this.userSvc.userInfo!.uid +
-    //       '/' +
-    //       chatroom.chatroomKey
-    //   )
-    //   .update({
-    //     isArchived: true,
-    //     description: '',
-    //     startMessageId: chatroom.nextMessageId,
-    //   });
-    //On le laisse visible le chatroom chez l'ami
-    //this.afDB.object('users_chatrooms/' + chatroom.friend_uid + '/' + chatroom.chatroomKey).remove();
   }
 
   public getUserByUID(uid: string): Promise<AppUser> {
@@ -583,6 +560,47 @@ export class ChatService {
     //         });
     //     });
     // });
+  }
+
+  async deleteMessage(message: ChatMessage, agendaEvent: AgendaEvent) {
+    try {
+      const messageCollectionRef = doc(
+        this.firestore,
+        `agenda_events/${agendaEvent.uid}/messages_list`,
+        message.uid
+      );
+
+      await runTransaction(this.firestore, async (transaction) => {
+        const messageDoc = await transaction.get(messageCollectionRef);
+        if (!messageDoc.exists()) {
+          throw 'Document does not exist!';
+        }
+
+        //messageFetched -> Write values
+        const messageFetched = messageDoc.data() as ChatMessage;
+
+        //delete for me or for all
+        if (message.sender === this.uid) {
+          const deleted_by = messageFetched.deleted_by || [];
+          if (!deleted_by.includes(this.uid)) {
+            deleted_by.push(this.uid);
+          }
+          transaction.update(messageCollectionRef, {
+            deleted_by,
+            is_deleted: true,
+          });
+        } else {
+          const deleted_by = messageFetched.deleted_by || [];
+          if (!deleted_by.includes(this.uid)) {
+            deleted_by.push(this.uid);
+          }
+          transaction.update(messageCollectionRef, { deleted_by });
+        }
+      });
+      console.log('Transaction successfully committed!');
+    } catch (e: any) {
+      this.loggerSvc.sendLog(e, 'deleteMsg');
+    }
   }
 
   unsubscribeAllAfterLogoutEvent() {

@@ -40,7 +40,9 @@ export class MediaService {
             handler: async () => {
               try {
                 options.source = CameraSource.Photos;
+                actionSheet.dismiss();
                 const result = await this.takePhoto(options);
+
                 resolve(result);
               } catch (e) {
                 this.utils.showAlert(e);
@@ -54,6 +56,7 @@ export class MediaService {
             handler: async () => {
               try {
                 options.source = CameraSource.Camera;
+                actionSheet.dismiss();
                 const result = await this.takePhoto(options);
                 resolve(result);
               } catch (e: any) {
@@ -104,9 +107,8 @@ export class MediaService {
       }
     } catch (error) {
       // Gérer les erreurs ici, vous pouvez soit les logger ou les gérer en conséquence
-      console.error('Erreur lors de la capture de la photo :', error);
-      this.utils.showToastError("Une erreur s'est produite");
-      throw error; // Vous pouvez choisir de relancer l'erreur ou de la gérer différemment selon votre logique
+      console.error('Pas de photo :', error);
+      return { filepath: undefined };
     }
   }
 }

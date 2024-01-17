@@ -163,13 +163,13 @@ export class AgendaService {
       (snapshot) => {
         snapshot.docChanges().forEach((change) => {
           const invitFetched = change.doc.data() as AgendaEvent;
-          let foundItem = this.agendaEventInvitations.find((elt) => {
+          let foundIndex = this.agendaEventInvitations.findIndex((elt) => {
             return elt.uid === invitFetched.uid;
           });
-          if (change.type === 'modified' && foundItem) {
-            foundItem = invitFetched;
+          if (change.type === 'modified' && foundIndex > -1) {
+            this.agendaEventInvitations[foundIndex] = invitFetched;
           }
-          if (change.type === 'added' && !foundItem) {
+          if (change.type === 'added' && foundIndex < 0) {
             this.agendaEventInvitations.push(invitFetched);
           }
           if (change.type === 'removed') {

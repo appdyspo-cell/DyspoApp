@@ -37,7 +37,7 @@
         tappable
         slot="end"
         name="trash-outline"
-        color="light"
+        color="primary"
         (click)="deleteMsg($event)"
       >
       </ion-icon>
@@ -46,7 +46,7 @@
         tappable
         slot="end"
         name="warning-outline"
-        color="light"
+        color="primary"
         (click)="reportMsg($event)"
       >
       </ion-icon>
@@ -97,8 +97,12 @@
       class="d-flex"
       *ngFor="let msg of msgList; let i = index; "
       id="{{msg.uid}}"
+      (click)="onMsgSelected(msg)"
     >
-      <div *ngIf="msg.sender !== my_uid" class="chat-box d-flex received">
+      <div
+        *ngIf="msg.sender !== my_uid && !msg.is_deleted && !msg.deleted_by?.includes(my_uid)"
+        class="chat-box d-flex received"
+      >
         <div class="chat">
           <div class="chat_detail">
             <div class="profile_img center_img">
@@ -128,7 +132,10 @@
         <p>{{msg.date_ISO | dateChatFormat}}</p>
       </div>
 
-      <div *ngIf="msg.sender === my_uid" class="chat-box d-flex send">
+      <div
+        *ngIf="msg.sender === my_uid && !msg.is_deleted && !msg.deleted_by?.includes(my_uid)"
+        class="chat-box d-flex send"
+      >
         <p>{{msg.date_ISO | dateChatFormat}}</p>
         <div class="chat">
           <div class="chat_detail ion-justify-content-end">

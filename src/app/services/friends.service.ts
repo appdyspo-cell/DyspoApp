@@ -193,14 +193,14 @@ export class FriendsService {
       (snapshot) => {
         snapshot.docChanges().forEach((change) => {
           const friendGroupFetched = change.doc.data() as FriendGroup;
-          let foundItem = this.friendGroups.find((elt) => {
+          let foundIndex = this.friendGroups.findIndex((elt) => {
             return elt.uid === friendGroupFetched.uid;
           });
-          if (change.type === 'modified' && foundItem) {
-            foundItem = friendGroupFetched;
+          if (change.type === 'modified' && foundIndex > -1) {
+            this.friendGroups[foundIndex] = friendGroupFetched;
             this.friendGroupsSubject.next(this.friendGroups);
           }
-          if (change.type === 'added' && !foundItem) {
+          if (change.type === 'added' && foundIndex < 0) {
             this.friendGroups.push(friendGroupFetched);
             this.friendGroupsSubject.next(this.friendGroups);
           }
