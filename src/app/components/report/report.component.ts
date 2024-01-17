@@ -22,9 +22,9 @@ export class ReportComponent implements OnInit {
   ) {
     this.reportData = [
       {
-        image: '../../assets/images/warning.png',
-        head: "Signaler l'utilisateur",
-        desc: 'Cette personne vous dérange? Dites nous pourquoi.',
+        image: 'assets/warning.png',
+        head: 'Signaler le groupe',
+        desc: 'Ce groupe vous dérange? Dites nous pourquoi.',
         items: [
           {
             icon: 'camera',
@@ -57,14 +57,14 @@ export class ReportComponent implements OnInit {
 
   ngOnInit() {}
 
-  sendReport() {
-    console.log('Close modal');
+  sendWarningReport() {
+    console.log('sendWarningReport Group');
     this.chatSvc
-      .reportUser(this.user_id, this.report_text)
+      .warnReportUser(this.user_id, this.report_text)
       .then((res) => {
         this.utils.swalSuccess(
           'OK',
-          "L'utilisateur a été signalé. Votre requête sera examinée sous 48 heures."
+          'Le groupe a été signalé. Votre requête va être examinée.'
         );
         this.modalCtrl.dismiss();
       })

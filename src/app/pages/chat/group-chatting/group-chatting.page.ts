@@ -25,7 +25,11 @@ import {
   AppUserWithEvents,
   ChatMessage,
   Chatroom,
+  WarnReportMsg,
+  WarnReportMsgStatus,
   UserDyspoStatus,
+  WarnReportGroup,
+  WarnReportGroupStatus,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
 import { ChatService, GetMessagesResult } from 'src/app/services/chat.service';
@@ -196,11 +200,14 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   }
 
   async openMenu(ev: any) {
+    const can_quit = this.agendaEvent.admin_uid !== this.userSvc.userInfo?.uid;
+
     const modal = await this.popCtrl.create({
       component: ChatMenuComponent,
       componentProps: {
         friend_id: null,
         username: null,
+        can_quit,
         my_chatroom: this.agendaEvent['user_' + this.my_uid] as Chatroom,
       },
       translucent: true,
@@ -238,6 +245,8 @@ export class GroupChattingPage implements OnInit, OnDestroy {
         this.agendaEvent,
         my_chatroom.isNotifications
       );
+    } else if (role === 'warnreportgroup') {
+      this.reportGroup();
     }
   }
 
@@ -369,6 +378,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     }).then((result) => {
       if (result.isConfirmed && this.msgSelected) {
         this.chatSvc.deleteMessage(this.msgSelected, this.agendaEvent);
+        this.msgSelected = undefined;
       }
     });
   }
@@ -378,38 +388,89 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   }
 
   reportMsg(ev: any) {
-    // Swal.fire({
-    //   title: 'Voulez-vous signaler ce message ?',
-    //   showDenyButton: true,
-    //   heightAuto: false,
-    //   confirmButtonText: 'Oui',
-    //   denyButtonText: `Non`,
-    // }).then(async (result) => {
-    //   if (result.isConfirmed) {
-    //     console.log('Close modal');
-    //     const my_id = this.utils.userInfo.id;
-    //     const now = new Date();
-    //     const now_ISO = now.toISOString();
-    //     const report_data: ReportMsg = {
-    //       report_chat_key: this.msgSelected.message_key,
-    //       report_chatroom_key: this.chatroomKey,
-    //       report_date_ms: now.getTime(),
-    //       report_date_ISO: now_ISO,
-    //       from_user_id: my_id,
-    //       report_user_id: this.friend_id,
-    //       report_text: this.msgSelected.message,
-    //       status: environment.report_msg_status.CREATED,
-    //       from_user_data: this.utils.userInfo,
-    //       report_user_data: await this.firestoreService.getUserByID(this.friend_id)
-    //     };
-    //         this.firestoreService.reportMsg(report_data).then(res => {
-    //           this.utils.swalSuccess('OK', 'Le message a été signalé. Votre requête sera examinée sous 48 heures.');
-    //           this.modalCtrl.dismiss();
-    //       }).catch( err => {
-    //         this.utils.swalError(err);
-    //       });
-    //   }
-    // });
+    Swal.fire({
+      title: 'Voulez-vous signaler ce message ?',
+      showDenyButton: true,
+      heightAuto: false,
+      confirmButtonText: 'Oui',
+      denyButtonText: `Non`,
+    }).then(async (result) => {
+      if (result.isConfirmed && this.msgSelected !== undefined) {
+        const my_id = this.my_uid;
+        const now = new Date();
+        const now_ISO = now.toISOString();
+        const senderInfo = (
+          await this.userSvc.getUserInfos([this.msgSelected.sender])
+        )[0];
+        const report_data: WarnReportMsg = {
+          uid: 'report_msg_' + new Date().getTime(),
+          msg_uid: this.msgSelected.uid,
+          msg_sender_uid: this.msgSelected.sender,
+          agenda_event_uid: this.agendaEvent.uid!,
+          date_ms: now.getTime(),
+          date_ISO: now_ISO,
+          from_user_id: my_id,
+          report_text: this.msgSelected.message,
+          status: WarnReportMsgStatus.CREATED,
+          from_user_data: this.userSvc.userInfo,
+          msg_sender_data: senderInfo,
+        };
+        this.msgSelected = undefined;
+
+        this.chatSvc
+          .warnReportMsg(report_data)
+          .then((res) => {
+            this.utils.swalSuccess(
+              'OK',
+              'Le message a été signalé. Votre requête va être examinée.'
+            );
+          })
+          .catch((err) => {
+            this.utils.swalError(err);
+          });
+      }
+    });
+  }
+
+  async reportGroup() {
+    const { value: text } = await Swal.fire({
+      input: 'textarea',
+      heightAuto: false,
+      inputLabel: 'Signaler le groupe',
+      inputPlaceholder: 'Decrivez ce qui vous dérange',
+      inputAttributes: {
+        'aria-label': 'Type your message here',
+      },
+      showCancelButton: true,
+    });
+    if (text) {
+      //const last_five_messages = this.m
+      const now = new Date();
+      const now_ISO = now.toISOString();
+      const report_data: WarnReportGroup = {
+        uid: 'report_group_' + new Date().getTime(),
+        agenda_event_uid: this.agendaEvent.uid!,
+        date_ms: now.getTime(),
+        date_ISO: now_ISO,
+        from_user_id: this.my_uid,
+        report_text: text,
+        status: WarnReportGroupStatus.CREATED,
+        from_user_data: this.userSvc.userInfo,
+        last_five_messages: [],
+        members_uid: this.agendaEvent.members_uid,
+      };
+      this.chatSvc
+        .warnReportGroup(report_data)
+        .then((res) => {
+          this.utils.swalSuccess(
+            'OK',
+            'Le groupe a été signalé. Votre requête va être examinée.'
+          );
+        })
+        .catch((err) => {
+          this.utils.swalError(err);
+        });
+    }
   }
 
   setViewType(vt: string) {

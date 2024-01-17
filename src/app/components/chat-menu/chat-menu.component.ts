@@ -7,7 +7,8 @@ import {
 import { ChatService } from 'src/app/services/chat.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { ReportComponent } from '../report/report.component';
-import { Chatroom } from 'src/app/models/models';
+import { Chatroom, WarnReportGroup } from 'src/app/models/models';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-chat-menu',
@@ -18,6 +19,7 @@ export class ChatMenuComponent implements OnInit {
   @Input() friend_id!: string;
   @Input() username!: string;
   @Input() my_chatroom!: Chatroom;
+  @Input() can_quit!: boolean;
   notificationsIcon: any;
   notifLabel: any;
 
@@ -77,6 +79,23 @@ export class ChatMenuComponent implements OnInit {
   }
 
   async quitEvent() {
+    Swal.fire({
+      title:
+        "Voulez-vous vraiment quitter ce groupe ? Ceci effacera l'evenement de votre agenda",
+      showDenyButton: true,
+      heightAuto: false,
+      confirmButtonText: 'Oui',
+      denyButtonText: 'Non',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.confirmQuitEvent();
+      } else {
+        this.popCtrl.dismiss({ friend: undefined }, 'cancel');
+      }
+    });
+  }
+
+  async _quitEvent() {
     const alert = await this.alertCtrl.create({
       //cssClass: 'my-custom-class',
       header: 'Confirmation',
@@ -107,16 +126,21 @@ export class ChatMenuComponent implements OnInit {
   }
 
   async requestReport() {
-    this.popCtrl.dismiss();
-    const modal = await this.modalCtrl.create({
-      component: ReportComponent,
-      cssClass: 'transparent-modal',
-      componentProps: {
-        user_id: this.friend_id,
-      },
-    });
-    modal.present();
+    this.popCtrl.dismiss({ friend: undefined }, 'warnreportgroup');
 
+    // const modal = await this.modalCtrl.create({
+    //   component: ReportComponent,
+    //   cssClass: 'transparent-modal',
+    //   componentProps: {
+    //     user_id: this.friend_id,
+    //   },
+    // });
+    // modal.present();
+    // const { data, role } = await modal.onWillDismiss();
+
+    // console.log(data);
+    // if (role === 'confirm') {
+    // }
     //  modal.onDidDismiss().then(data=>{
     //   console.log(data.data.friendListDocReturned);
     //   friendListDoc = data.data.friendListDocReturned;

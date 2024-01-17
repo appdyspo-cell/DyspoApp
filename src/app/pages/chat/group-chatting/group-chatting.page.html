@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar *ngIf="!msgSelected">
     <ion-buttons slot="start">
       <ion-back-button text="" icon="chevron-back-outline"></ion-back-button>
     </ion-buttons>
@@ -32,8 +32,22 @@
         (click)="openMenu($event)"
       >
       </ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar *ngIf="msgSelected">
+    <ion-buttons slot="start">
       <ion-icon
-        *ngIf="msgSelected"
+        tappable
+        slot="end"
+        name="close-outline"
+        color="primary"
+        (click)="msgSelected = undefined"
+      >
+      </ion-icon>
+    </ion-buttons>
+
+    <ion-buttons slot="end">
+      <ion-icon
         tappable
         slot="end"
         name="trash-outline"
@@ -42,7 +56,7 @@
       >
       </ion-icon>
       <ion-icon
-        *ngIf="msgSelected"
+        *ngIf="msgSelected.sender !== my_uid"
         tappable
         slot="end"
         name="warning-outline"
@@ -104,7 +118,9 @@
         class="chat-box d-flex received"
       >
         <div class="chat">
-          <div class="chat_detail">
+          <div
+            [ngClass]="{'chat_detail': true, 'msg-selected':msgSelected === msg}"
+          >
             <div class="profile_img center_img">
               <img
                 class="animate__animated animated__fadeIn"
@@ -138,7 +154,9 @@
       >
         <p>{{msg.date_ISO | dateChatFormat}}</p>
         <div class="chat">
-          <div class="chat_detail ion-justify-content-end">
+          <div
+            [ngClass]="{'chat_detail': true, 'ion-justify-content-end': true, 'msg-selected':msgSelected === msg}"
+          >
             <div class="text">
               <h6>Vous</h6>
               <h2>{{msg.message}}</h2>

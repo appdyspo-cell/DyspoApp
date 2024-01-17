@@ -9,8 +9,9 @@ import {
   ChatMessage,
   Chatroom,
   DBUser,
-  ReportMsg,
-  ReportUser,
+  WarnReportGroup,
+  WarnReportMsg,
+  WarnReportUser,
 } from '../models/models';
 import {
   Database,
@@ -425,60 +426,7 @@ export class ChatService {
     });
   }
 
-  async blockUser(uid: string) {
-    return true;
-    // return new Promise(async (resolve, reject) => {
-    //   const user_id = this.utils.userInfo.id;
-    //   const my_id = this.utils.userInfo.id;
-
-    //   this.afs
-    //     .collection<Friend>(`friends`)
-    //     .doc(this.user_id)
-    //     .collection('friend_list', (ref) =>
-    //       ref.where('friend_id', '==', friend_id)
-    //     )
-    //     .get()
-    //     .subscribe((snaps) => {
-    //       const snap = snaps.docs[0];
-    //       //On met le status de l'ami à 'BLOCKED' chez nous et 'BEENBLOCKED' chez lui
-    //       this.afs
-    //         .collection<Friend>(`friends`)
-    //         .doc(this.user_id)
-    //         .collection('friend_list')
-    //         .doc(snap.id)
-    //         .update({ status: 'BLOCKED', since: new Date().getTime() })
-    //         .then(() => {
-    //           console.log('Finish update my friend list');
-
-    //           this.afs
-    //             .collection<Friend>(`friends`)
-    //             .doc(friend_id)
-    //             .collection('friend_list', (ref) =>
-    //               ref.where('friend_id', '==', this.user_id)
-    //             )
-    //             .get()
-    //             .subscribe((snapsB) => {
-    //               const snapB = snapsB.docs[0];
-    //               this.afs
-    //                 .collection<Friend>(`friends`)
-    //                 .doc(friend_id)
-    //                 .collection('friend_list')
-    //                 .doc(snapB.id)
-    //                 .update({
-    //                   status: 'BEENBLOCKED',
-    //                   since: new Date().getTime(),
-    //                 })
-    //                 .then(() => {
-    //                   console.log('Finish update his friend list');
-    //                   //this.eventService.publishReloadFriends(this.user_id);
-    //                 });
-    //             });
-    //         });
-    //     });
-    // });
-  }
-
-  async reportUser(report_user_id: string, report_text: string) {
+  async warnReportUser(report_user_id: string, report_text: string) {
     return true;
     // return new Promise(async (resolve, reject) => {
     //   const my_id = this.utils.userInfo.id;
@@ -534,7 +482,45 @@ export class ChatService {
     // });
   }
 
-  async reportMsg(report: ReportMsg) {
+  async warnReportMsg(report: WarnReportMsg) {
+    console.log('Report Msg', report);
+    const reportMsgClone: WarnReportMsg = { ...report };
+    const ref = doc(this.firestore, 'mail', report.uid);
+    setDoc(ref, reportMsgClone);
+
+    return true;
+    // return new Promise(async (resolve, reject) => {
+    //   this.afs
+    //     .collection<ReportMsg>(`report_msg`)
+    //     .add(report)
+    //     .then((res) => {
+    //       this.afs
+    //         .collection('mail')
+    //         .add({
+    //           to: environment.email,
+    //           message: {
+    //             subject: 'Signalement message',
+    //             html:
+    //               'Un message a été signalé. Contenu du message:<br><br>' +
+    //               report.report_text,
+    //           },
+    //         })
+    //         .then(() => {
+    //           resolve(true);
+    //         })
+    //         .catch((error) => {
+    //           reject(error);
+    //         });
+    //     });
+    // });
+  }
+
+  async warnReportGroup(report: WarnReportGroup) {
+    console.log('Report Msg', report);
+    const reportGroupClone: WarnReportGroup = { ...report };
+    const ref = doc(this.firestore, 'mail', report.uid);
+    setDoc(ref, reportGroupClone);
+
     return true;
     // return new Promise(async (resolve, reject) => {
     //   this.afs
@@ -601,6 +587,59 @@ export class ChatService {
     } catch (e: any) {
       this.loggerSvc.sendLog(e, 'deleteMsg');
     }
+  }
+
+  async blockUser(uid: string) {
+    return true;
+    // return new Promise(async (resolve, reject) => {
+    //   const user_id = this.utils.userInfo.id;
+    //   const my_id = this.utils.userInfo.id;
+
+    //   this.afs
+    //     .collection<Friend>(`friends`)
+    //     .doc(this.user_id)
+    //     .collection('friend_list', (ref) =>
+    //       ref.where('friend_id', '==', friend_id)
+    //     )
+    //     .get()
+    //     .subscribe((snaps) => {
+    //       const snap = snaps.docs[0];
+    //       //On met le status de l'ami à 'BLOCKED' chez nous et 'BEENBLOCKED' chez lui
+    //       this.afs
+    //         .collection<Friend>(`friends`)
+    //         .doc(this.user_id)
+    //         .collection('friend_list')
+    //         .doc(snap.id)
+    //         .update({ status: 'BLOCKED', since: new Date().getTime() })
+    //         .then(() => {
+    //           console.log('Finish update my friend list');
+
+    //           this.afs
+    //             .collection<Friend>(`friends`)
+    //             .doc(friend_id)
+    //             .collection('friend_list', (ref) =>
+    //               ref.where('friend_id', '==', this.user_id)
+    //             )
+    //             .get()
+    //             .subscribe((snapsB) => {
+    //               const snapB = snapsB.docs[0];
+    //               this.afs
+    //                 .collection<Friend>(`friends`)
+    //                 .doc(friend_id)
+    //                 .collection('friend_list')
+    //                 .doc(snapB.id)
+    //                 .update({
+    //                   status: 'BEENBLOCKED',
+    //                   since: new Date().getTime(),
+    //                 })
+    //                 .then(() => {
+    //                   console.log('Finish update his friend list');
+    //                   //this.eventService.publishReloadFriends(this.user_id);
+    //                 });
+    //             });
+    //         });
+    //     });
+    // });
   }
 
   unsubscribeAllAfterLogoutEvent() {

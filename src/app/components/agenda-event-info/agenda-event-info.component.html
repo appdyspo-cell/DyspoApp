@@ -248,15 +248,15 @@
     <ng-template>
       <ion-list>
         <ion-item *ngIf="allowEdit" tappable (click)="editEvent()">
-          <ion-icon name="create-outline" style="margin-right: 15px"></ion-icon>
+          <!-- <ion-icon name="create-outline" style="margin-right: 15px"></ion-icon> -->
           <ion-text>Editer l'évenement</ion-text>
         </ion-item>
         <ion-item tappable (click)="quitEvent()" lines="none">
-          <ion-icon
+          <!-- <ion-icon
             name="ban"
             color="danger"
             style="margin-right: 15px"
-          ></ion-icon>
+          ></ion-icon> -->
           <ion-text>Supprimer l'évenement</ion-text>
         </ion-item>
       </ion-list>

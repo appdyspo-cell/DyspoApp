@@ -19,20 +19,24 @@
         </ion-label>
       </ion-item>
       <ion-list>
-        <ion-item counter="true" class="desc-inner" lines="none">
-          <ion-label position="floating">Description</ion-label>
+        <ion-item class="desc-inner" lines="none">
           <ion-textarea
+            counter="true"
+            label="Description"
+            labelPlacement="floating"
             [(ngModel)]="report_text"
             rows="5"
             maxlength="300"
             placeholder="Décrivez le motif de votre signalement..."
           ></ion-textarea>
         </ion-item>
+        <ion-button expand="full" fill="clear" (click)="sendWarningReport()">
+          Envoyer
+        </ion-button>
+        <ion-button expand="full" fill="clear" (click)="modalCtrl.dismiss()">
+          Annuler
+        </ion-button>
       </ion-list>
-      <ion-button expand="full" (click)="sendReport()"> Envoyer </ion-button>
-      <ion-button expand="full" (click)="modalCtrl.dismiss()">
-        Annuler
-      </ion-button>
     </ion-card>
   </div>
 </ion-content>

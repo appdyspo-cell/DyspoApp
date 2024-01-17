@@ -196,34 +196,6 @@ export interface Notif {
   status: string;
 }
 
-export interface ReportMsg {
-  id?: string;
-  report_chat_key: string;
-  report_chatroom_key: string;
-  report_date_ms: number;
-  report_date_ISO?: string;
-  from_user_id: string;
-  from_user_data?: AppUser;
-  report_user_data?: AppUser;
-  report_user_id: string;
-  report_text?: string;
-  status: string;
-  result_user_status?: string;
-  result_msg_status?: string;
-}
-
-export interface ReportUser {
-  id?: string;
-  report_date_ms: number;
-  report_date_ISO?: string;
-  from_user_id: string;
-  from_user_data?: AppUser;
-  report_user_data?: AppUser;
-  report_user_id: string;
-  report_text: string;
-  result_user_status?: string;
-}
-
 export interface ChatMessage {
   uid: string;
   sender: string;
@@ -237,6 +209,49 @@ export interface ChatMessage {
   date_ISO: string;
   deleted_by: string[];
   is_deleted?: boolean;
+}
+
+export interface WarnReportUser {
+  id?: string;
+  report_date_ms: number;
+  report_date_ISO?: string;
+  from_user_id: string;
+  from_user_data?: AppUser;
+  report_user_data?: AppUser;
+  report_user_id: string;
+  report_text: string;
+  result_user_status?: string;
+}
+
+export interface WarnReportMsg {
+  uid: string;
+  msg_uid: string;
+  msg_sender_uid: string;
+  msg_sender_data?: AppUser;
+  agenda_event_uid: string;
+  date_ms: number;
+  date_ISO?: string;
+  from_user_id: string;
+  from_user_data?: AppUser;
+  report_text?: string;
+  status: WarnReportMsgStatus;
+  result_user_status?: string;
+  result_msg_status?: string;
+}
+
+export interface WarnReportGroup {
+  uid: string;
+  agenda_event_uid: string;
+  last_five_messages: string[];
+  members_uid: string[];
+  date_ms: number;
+  date_ISO?: string;
+  from_user_id: string;
+  from_user_data?: AppUser;
+  report_text: string;
+  status: WarnReportGroupStatus;
+  result_user_status?: string;
+  result_group_status?: string;
 }
 
 export enum DiscussionType {
@@ -289,4 +304,18 @@ export enum NotifSubjects {
   MESSAGE = 'MESSAGE',
   INVITE = 'INVITE',
   AGENDA_EVENT = 'AGENDA_EVENT',
+}
+
+export enum WarnReportMsgStatus {
+  CREATED = 'CREATED',
+  ARCHIVED = 'ARCHIVED',
+  USER_BANNED = 'USER_BANNED',
+  MSG_REMOVED = 'MSG_REMOVED',
+}
+
+export enum WarnReportGroupStatus {
+  CREATED = 'CREATED',
+  ARCHIVED = 'ARCHIVED',
+  USERS_BANNED = 'USERS_BANNED',
+  GROUP_REMOVED = 'GROUP_REMOVED',
 }
