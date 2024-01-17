@@ -39,6 +39,7 @@ import {
 import { AgendaService } from 'src/app/services/agenda.service';
 import { FriendsService } from 'src/app/services/friends.service';
 import { MediaService } from 'src/app/services/media.service';
+import { NotificationService } from 'src/app/services/notification.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { environment } from 'src/environments/environment';
@@ -89,6 +90,7 @@ export class CreateEventPage implements OnInit {
   startTime: any;
   endTime: any;
   is_multi = false;
+  new_members: string[] = [];
 
   constructor(
     private navCtrl: NavController,
@@ -98,7 +100,8 @@ export class CreateEventPage implements OnInit {
     private mediaSvc: MediaService,
     private userSvc: UserService,
     private utils: UtilsService,
-    private friendsSvc: FriendsService
+    private friendsSvc: FriendsService,
+    private notificationsSvc: NotificationService
   ) {
     this.uid = this.userSvc.userInfo?.uid!;
     this.GoogleAutocompleteSvc = new google.maps.places.AutocompleteService();
@@ -278,8 +281,6 @@ export class CreateEventPage implements OnInit {
 
   ngOnInit() {}
 
-  selectFriend(friend: Friend) {}
-
   saveOrUpdateEvent() {
     if (this.agendaEvent?.title) {
       this.agendaEvent.all_can_edit = this.allCanEdit;
@@ -303,8 +304,17 @@ export class CreateEventPage implements OnInit {
           );
         }
         this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!, true);
-      } else {
+      }
+      // Non recurrent
+      else {
         this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!, false);
+        // If New members -> send Notif
+        if (this.new_members.length > 0) {
+          this.notificationsSvc.sendInviteAgendaEvent(
+            this.new_members,
+            this.agendaEvent
+          );
+        }
       }
 
       this.navCtrl.pop();
@@ -316,6 +326,8 @@ export class CreateEventPage implements OnInit {
       return;
     }
   }
+
+  selectFriend(friend: Friend) {}
 
   removeEvent() {
     this.agendaSvc.removeEvent(this.agendaEvent!);
@@ -453,42 +465,6 @@ export class CreateEventPage implements OnInit {
     );
   }
 
-  // async openFriendsModal() {
-  //   const modal = await this.modalCtrl.create({
-  //     component: FriendsSelectorComponent,
-  //     componentProps: {
-  //       agendaEvent: this.agendaEvent,
-  //       mode: this.mode,
-  //     },
-  //   });
-  //   modal.present();
-
-  //   const { data, role } = await modal.onWillDismiss();
-
-  //   console.log(data);
-  //   if (role === 'confirm') {
-  //     this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!);
-  //     if (data.newInvits.length > 0) {
-  //       // const userChatroom: Chatroom = {
-  //       //   count: 0,
-  //       //   lastMessageRead: '',
-  //       //   startMessageId: 0,
-  //       //   nextMessageId: 0,
-  //       // };
-  //       // this.agendaEvent!['user_' + this.uid] = userChatroom;
-  //       // data.newInvits.forEach((newInvit: string) => {
-  //       //   const userChatroom: Chatroom = {
-  //       //     count: 0,
-  //       //     lastMessageRead: '',
-  //       //     startMessageId: 0,
-  //       //     nextMessageId: 0,
-  //       //   };
-  //       //   this.agendaEvent!['user_' + newInvit] = userChatroom;
-  //       // });
-  //     }
-  //   }
-  // }
-
   async takePhotoPrompt() {
     const { filepath } = await this.mediaSvc.takePhotoPrompt({
       firebasePath: environment.firebase_avatar_event_storage_path,
@@ -503,20 +479,6 @@ export class CreateEventPage implements OnInit {
       }
     }
   }
-
-  // getNbFriendsInvited() {
-  //   const nbFriends = this.agendaEvent?.members_uid.filter(
-  //     (member_uid) => member_uid != this.uid
-  //   ).length;
-
-  //   if (nbFriends === 0) {
-  //     return '';
-  //   } else if (nbFriends === 1) {
-  //     return '1 ami invité';
-  //   } else {
-  //     return nbFriends + ' amis invités';
-  //   }
-  // }
 
   getNbMembers() {
     const nbMembers =
@@ -535,10 +497,6 @@ export class CreateEventPage implements OnInit {
   async onFriendSelected(data: CheckedFriends[]) {
     console.log('onFriendSelected', data);
 
-    console.log('update members');
-    // const friends_uid = this.getCheckedFriendsUid(data);
-    // const newInvits: string[] = [];
-
     for (let item of data) {
       if (item.isChecked && !item.disable) {
         if (
@@ -547,6 +505,7 @@ export class CreateEventPage implements OnInit {
           )
         ) {
           this.agendaEvent!.members_invited_uid.push(item.friend.friend_uid!);
+          this.new_members.push(item.friend.friend_uid!);
           const newMember = (
             await this.userSvc.getUserInfos([item.friend.friend_uid!])
           )[0];
@@ -572,15 +531,16 @@ export class CreateEventPage implements OnInit {
         if (foundIndexMembers >= 0) {
           this.members.splice(foundIndexMembers, 1);
         }
+
+        //Remove from new members
+        const foundIndexNewMembers = this.new_members.findIndex((uid) => {
+          return uid === item.friend.friend_uid!;
+        });
+        if (foundIndexNewMembers >= 0) {
+          this.new_members.splice(foundIndexNewMembers, 1);
+        }
       }
     }
-
-    // for (let uid of friends_uid) {
-    //   if (!this.agendaEvent!.members_invited_uid.includes(uid)) {
-    //     newInvits.push(uid);
-    //     this.agendaEvent!.members_invited_uid.push(uid);
-    //   }
-    // }
   }
 
   getCheckedFriendsUid(checkedFriends: CheckedFriends[]): {

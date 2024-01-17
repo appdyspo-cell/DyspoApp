@@ -1,11 +1,6 @@
 import { Injectable, NgZone } from '@angular/core';
 
-import {
-  AgendaEvent,
-  AppUser,
-  Chatroom,
-  NotifSubjects,
-} from '../models/models';
+import { AgendaEvent, AppUser, Chatroom, NotifSubject } from '../models/models';
 import { NavigationExtras, Router } from '@angular/router';
 import { httpsCallable } from 'firebase/functions';
 import { Functions } from '@angular/fire/functions';
@@ -13,6 +8,8 @@ import { Functions } from '@angular/fire/functions';
 import {
   Firestore,
   collection,
+  doc,
+  getDoc,
   getDocs,
   query,
   updateDoc,
@@ -28,6 +25,10 @@ import {
   Notification,
 } from '@capacitor-firebase/messaging';
 import { Device } from '@capacitor/device';
+import { format, isSameDay, parseISO } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { AgendaEventInfoComponent } from '../components/agenda-event-info/agenda-event-info.component';
+import { ModalController } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root',
@@ -40,8 +41,8 @@ export class NotificationService {
     private router: Router,
     private zone: NgZone,
     private functions: Functions,
-    private utils: UtilsService,
-    private userSvc: UserService
+    private userSvc: UserService,
+    private modalCtrl: ModalController
   ) {}
 
   async initListeners() {
@@ -74,7 +75,15 @@ export class NotificationService {
           console.log(
             'data ' + JSON.stringify(actionPerformed.notification.data)
           );
-          //this.goToChat(actionPerformed.notification.data.friend_uid);
+          try {
+            const data = actionPerformed.notification.data as any;
+            const subject: NotifSubject = data['subject'];
+            switch (subject) {
+              case NotifSubject.AGENDA_EVENT:
+                this.openEvent(data['info']['agendaEvent']);
+                break;
+            }
+          } catch (err) {}
         }
       );
     }
@@ -142,16 +151,6 @@ export class NotificationService {
     });
   }
 
-  goToChat(friend_uid: string) {
-    console.log('goToChat', friend_uid);
-    const navigationExtras: NavigationExtras = {
-      state: {
-        friend_uid,
-      },
-    };
-    this.router.navigate(['chatroom'], navigationExtras);
-  }
-
   async sendInviteFriendNotif(friend_uid: string) {
     if (!this.userSvc.userInfo) return;
     // Send notification
@@ -185,7 +184,7 @@ export class NotificationService {
 
         f({
           message,
-          subject: NotifSubjects.INVITE,
+          subject: NotifSubject.INVITE,
           tokens: [friendUser.notificationToken],
           uids: [friend_uid],
           username:
@@ -204,7 +203,7 @@ export class NotificationService {
     }
   }
 
-  async sendInviteAgendaEvent(uids: string[]) {
+  async sendInviteAgendaEvent(uids: string[], agendaEvent: AgendaEvent) {
     if (!this.userSvc.userInfo) return;
     // Send notification
     console.log('Check to send notif or not');
@@ -232,17 +231,21 @@ export class NotificationService {
         avatarPath =
           'https://firebasestorage.googleapis.com/v0/b/dyspo-stg.appspot.com/o/avatarsStorage%2Fuser.png?alt=media&token=048bd715-8f53-4fbf-866a-84335b158a89';
       }
+
       const message =
         this.userSvc.userInfo!.firstname +
         ' ' +
         this.userSvc.userInfo!.lastname +
-        ' propose un évenement';
+        ' propose un évenement ' +
+        this.formatInvitMsg(agendaEvent);
       const f = httpsCallable(this.functions, 'test');
+
       f({
         message,
-        subject: NotifSubjects.AGENDA_EVENT,
+        subject: NotifSubject.AGENDA_EVENT,
         uids,
         tokens,
+        info: '{agendaEvent : ' + agendaEvent.uid + '}',
         username:
           this.userSvc.userInfo!.firstname +
           ' ' +
@@ -319,14 +322,11 @@ export class NotificationService {
       const f = httpsCallable(this.functions, 'test');
       f({
         message,
-        subject: NotifSubjects.MESSAGE,
+        subject: NotifSubject.MESSAGE,
         uids,
         tokens,
-        info: '{agendaEvent : }' + agendaEvent.uid,
-        username:
-          this.userSvc.userInfo!.firstname +
-          ' ' +
-          this.userSvc.userInfo!.lastname,
+        info: '{agendaEvent : ' + agendaEvent.uid + '}',
+        username: agendaEvent.title!,
         avatarPath,
       })
         .then((res) => {
@@ -335,6 +335,66 @@ export class NotificationService {
         .catch((err) => {
           console.log(err);
         });
+    }
+  }
+
+  formatInvitMsg(agendaEvent: AgendaEvent): string {
+    if (isSameDay(agendaEvent.start_date_ts, agendaEvent.end_date_ts)) {
+      const display_date_1 =
+        'le ' +
+        format(parseISO(agendaEvent.startISO), 'iii dd MMM', {
+          locale: fr,
+        }) +
+        ' à ' +
+        format(parseISO(agendaEvent.startISO), 'HH:mm', {
+          locale: fr,
+        });
+      return display_date_1;
+    } else {
+      const display_date_1 =
+        'du ' +
+        format(parseISO(agendaEvent.startISO), 'iii dd MMM HH:mm', {
+          locale: fr,
+        });
+      const display_date_2 =
+        'au ' +
+        format(parseISO(agendaEvent.endISO), 'iii dd MMM HH:mm', {
+          locale: fr,
+        });
+      return display_date_1 + ' ' + display_date_2;
+    }
+  }
+
+  goToChat(friend_uid: string) {
+    console.log('goToChat', friend_uid);
+    const navigationExtras: NavigationExtras = {
+      state: {
+        friend_uid,
+      },
+    };
+    this.router.navigate(['chatroom'], navigationExtras);
+  }
+
+  async openEvent(agendaEventUid: any) {
+    const docSnap = await getDoc(
+      doc(this.firestore, `agenda_events/`, agendaEventUid)
+    );
+    if (docSnap.exists()) {
+      const eventFetched = docSnap.data() as AgendaEvent;
+      const modal = await this.modalCtrl.create({
+        component: AgendaEventInfoComponent,
+        componentProps: {
+          agendaEvent: eventFetched,
+          isInvitation: true,
+        },
+      });
+      modal.present();
+
+      const { data, role } = await modal.onWillDismiss();
+
+      console.log(data);
+      if (role === 'confirm') {
+      }
     }
   }
 }

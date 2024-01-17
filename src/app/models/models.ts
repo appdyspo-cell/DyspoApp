@@ -300,7 +300,7 @@ export enum FriendGroupStatus {
   DELETED = 'DELETED',
 }
 
-export enum NotifSubjects {
+export enum NotifSubject {
   MESSAGE = 'MESSAGE',
   INVITE = 'INVITE',
   AGENDA_EVENT = 'AGENDA_EVENT',

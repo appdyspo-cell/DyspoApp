@@ -347,9 +347,6 @@ export class AgendaService {
           //this.utils.showToastError("Une erreur s'est produite");
           return false;
         });
-
-      // Send notif ?
-      // this.notification-service.sendConfirmFriend()
     }
   }
 

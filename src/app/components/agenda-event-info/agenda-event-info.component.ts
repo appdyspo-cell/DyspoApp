@@ -272,36 +272,46 @@ export class AgendaEventInfoComponent implements OnInit {
   }
 
   async quitEvent() {
-    this.isPopoverOpen = false;
-    // I am the admin
-    if (this.agendaEvent.admin_uid === this.userSvc.userInfo?.uid) {
-      if (this.new_admin_candidates.length > 0) {
-        this.modalNewAdminOpened = true;
-        return;
+    Swal.fire({
+      title: 'Voulez-vous vraiment supprimer cet evenement de votre agenda?',
+      showDenyButton: true,
+      heightAuto: false,
+      confirmButtonText: 'Oui',
+      denyButtonText: 'Non',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.isPopoverOpen = false;
+        // I am the admin
+        if (this.agendaEvent.admin_uid === this.userSvc.userInfo?.uid) {
+          if (this.new_admin_candidates.length > 0) {
+            this.modalNewAdminOpened = true;
+            return;
+          }
+          // No candidates => Delete event
+          else {
+            this.agendaSvc
+              .quitEvent(this.agendaEvent)
+              .then((res) => {
+                this.close();
+              })
+              .catch((err) => {
+                this.utils.showToastError(err);
+                this.close();
+              });
+          }
+        } else {
+          this.agendaSvc
+            .quitEvent(this.agendaEvent)
+            .then((res) => {
+              this.close();
+            })
+            .catch((err) => {
+              this.utils.showToastError(err);
+              this.close();
+            });
+        }
       }
-      // No candidates => Delete event
-      else {
-        this.agendaSvc
-          .quitEvent(this.agendaEvent)
-          .then((res) => {
-            this.close();
-          })
-          .catch((err) => {
-            this.utils.showToastError(err);
-            this.close();
-          });
-      }
-    } else {
-      this.agendaSvc
-        .quitEvent(this.agendaEvent)
-        .then((res) => {
-          this.close();
-        })
-        .catch((err) => {
-          this.utils.showToastError(err);
-          this.close();
-        });
-    }
+    });
   }
 
   onProfile() {
