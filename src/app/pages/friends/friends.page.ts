@@ -6,19 +6,23 @@ import {
   ViewChildren,
 } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
+import { Preferences } from '@capacitor/preferences';
 import {
   AlertController,
   AnimationController,
   IonItemGroup,
+  ModalController,
   NavController,
 } from '@ionic/angular';
 import { Observable, Subscription } from 'rxjs';
+import { HelperComponent } from 'src/app/components/helper/helper.component';
 import {
   AppDeviceContact,
   AppUser,
   Friend,
   FriendGroup,
   FriendStatus,
+  ShowHelper,
 } from 'src/app/models/models';
 import { FriendsService } from 'src/app/services/friends.service';
 import { UserService } from 'src/app/services/user.service';
@@ -32,6 +36,7 @@ import { UtilsService } from 'src/app/services/utils.service';
 export class FriendsPage implements OnInit {
   @ViewChildren(IonItemGroup, { read: ElementRef }) itemGroups!: QueryList<any>;
   scroll = false;
+  showHelper = false;
   showProfile(_t174: Friend, $event: MouseEvent) {
     throw new Error('Method not implemented.');
   }
@@ -84,7 +89,8 @@ export class FriendsPage implements OnInit {
     private userSvc: UserService,
     public friendService: FriendsService,
     public animationCtrl: AnimationController,
-    private navCtrl: NavController
+    private navCtrl: NavController,
+    private modalCtrl: ModalController
   ) {
     this.friends$ = this.friendService.friends$;
     this.friendGroups$ = this.friendService.friendGroups$;
@@ -114,7 +120,27 @@ export class FriendsPage implements OnInit {
     }
   }
 
-  async ngOnInit() {}
+  async ngOnInit() {
+    // await Preferences.remove({
+    //   key: ShowHelper.FRIENDS,
+    // });
+    const { value } = await Preferences.get({ key: ShowHelper.FRIENDS });
+    if (!value) {
+      this.showHelper = true;
+      const modal = await this.modalCtrl.create({
+        component: HelperComponent,
+        componentProps: {
+          showHelper: ShowHelper.FRIENDS,
+        },
+      });
+      modal.present();
+
+      await Preferences.set({
+        key: ShowHelper.FRIENDS,
+        value: 'SHOWN',
+      });
+    }
+  }
 
   ngOnDestroy() {
     this.friendsSubscrition.unsubscribe();

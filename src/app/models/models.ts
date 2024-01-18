@@ -319,3 +319,9 @@ export enum WarnReportGroupStatus {
   USERS_BANNED = 'USERS_BANNED',
   GROUP_REMOVED = 'GROUP_REMOVED',
 }
+
+export enum ShowHelper {
+  DASHBOARD = 'DASHBOARD',
+  FRIENDS = 'FRIENDS',
+  AGENDA = 'AGENDA',
+}

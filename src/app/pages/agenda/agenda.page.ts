@@ -31,6 +31,7 @@ import {
   AgendaEvent,
   AppUser,
   Friend,
+  ShowHelper,
   UserDyspoStatus,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
@@ -39,6 +40,8 @@ import { UtilsService } from 'src/app/services/utils.service';
 import { cloneDeep } from 'lodash';
 import { AgendaEventInfoComponent } from 'src/app/components/agenda-event-info/agenda-event-info.component';
 import { UserService } from 'src/app/services/user.service';
+import { Preferences } from '@capacitor/preferences';
+import { HelperComponent } from 'src/app/components/helper/helper.component';
 
 export enum AgendaMode {
   SELECT,
@@ -89,6 +92,7 @@ export class AgendaPage implements AfterViewInit {
   agendaFriend: Friend | undefined;
   userSubscription: Subscription;
   my_info!: AppUser;
+  showHelper = false;
 
   constructor(
     public agendaSvc: AgendaService,
@@ -176,7 +180,26 @@ export class AgendaPage implements AfterViewInit {
     }
   }
 
-  ngAfterViewInit() {
+  async ngAfterViewInit() {
+    // await Preferences.remove({
+    //   key: ShowHelper.AGENDA,
+    // });
+    const { value } = await Preferences.get({ key: ShowHelper.AGENDA });
+    if (!value) {
+      this.showHelper = true;
+      const modal = await this.modalCtrl.create({
+        component: HelperComponent,
+        componentProps: {
+          showHelper: ShowHelper.AGENDA,
+        },
+      });
+      modal.present();
+
+      await Preferences.set({
+        key: ShowHelper.AGENDA,
+        value: 'SHOWN',
+      });
+    }
     this.optionsMulti = {
       pickMode: 'multi',
       showMonthPicker: true,

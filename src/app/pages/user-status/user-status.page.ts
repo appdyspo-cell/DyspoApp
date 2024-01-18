@@ -14,6 +14,7 @@ import {
   Friend,
   FriendStatus,
   Notif,
+  ShowHelper,
   UserDyspoStatus,
 } from 'src/app/models/models';
 import { UserService } from 'src/app/services/user.service';
@@ -40,6 +41,9 @@ import { FriendsService } from 'src/app/services/friends.service';
 import { App } from '@capacitor/app';
 import { NavigationExtras } from '@angular/router';
 import { NotificationService } from 'src/app/services/notification.service';
+import { Preferences } from '@capacitor/preferences';
+import { PictureComponent } from 'src/app/components/picture/picture.component';
+import { HelperComponent } from 'src/app/components/helper/helper.component';
 
 @Component({
   selector: 'app-user-status',
@@ -62,6 +66,7 @@ export class UserStatusPage implements OnInit {
   todayFormatted = format(new Date(), 'iii dd MMM yyyy', { locale: fr });
   todayDyspo!: AgendaDyspoItem;
   agendaEventType = AgendaEventType;
+  showHelper = true;
 
   constructor(
     public userSvc: UserService,
@@ -160,7 +165,27 @@ export class UserStatusPage implements OnInit {
     );
   }
 
-  ngOnInit() {}
+  async ngOnInit() {
+    // await Preferences.remove({
+    //   key: ShowHelper.DASHBOARD,
+    // });
+    const { value } = await Preferences.get({ key: ShowHelper.DASHBOARD });
+    if (!value) {
+      this.showHelper = true;
+      const modal = await this.modalCtrl.create({
+        component: HelperComponent,
+        componentProps: {
+          showHelper: ShowHelper.DASHBOARD,
+        },
+      });
+      modal.present();
+
+      await Preferences.set({
+        key: ShowHelper.DASHBOARD,
+        value: 'SHOWN',
+      });
+    }
+  }
 
   cancel() {
     this.modal.dismiss(null, 'cancel');

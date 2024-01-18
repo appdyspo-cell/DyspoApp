@@ -1,0 +1,20 @@
+ion-content {
+  --background: rgba(0, 0, 1, 0.1) !important;
+  backdrop-filter: blur(3px);
+}
+
+.img_box {
+  width: calc(100% - 49px);
+  background-color: #ffe14a;
+  overflow: scroll;
+  opacity: 0.6;
+  padding: 10px;
+  margin: auto;
+  height: 306px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: -106px;
+  border-radius: 10px;
+}

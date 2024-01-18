@@ -16,6 +16,7 @@ import { SwiperModule } from 'swiper/angular';
 import { ReportComponent } from 'src/app/components/report/report.component';
 
 import { AlphabetScrollComponent } from 'src/app/components/alphabet-scroll/alphabet-scroll.component';
+import { HelperComponent } from 'src/app/components/helper/helper.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { AlphabetScrollComponent } from 'src/app/components/alphabet-scroll/alph
     DyspoViewerComponent,
     ReportComponent,
     AlphabetScrollComponent,
+    HelperComponent,
   ],
   imports: [
     CommonModule,
@@ -45,6 +47,7 @@ import { AlphabetScrollComponent } from 'src/app/components/alphabet-scroll/alph
     DyspoViewerComponent,
     ReportComponent,
     AlphabetScrollComponent,
+    HelperComponent,
   ],
 })
 export class SharedModule {}
