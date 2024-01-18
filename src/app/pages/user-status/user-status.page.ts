@@ -93,8 +93,6 @@ export class UserStatusPage implements OnInit {
     this.friends$ = this.friendService.friends$;
     this.agendaEventsSubscription = this.agendaSvc.agendaEvents$.subscribe(
       (agendaEvents) => {
-        console.log('User Status -> get Agenda Events', agendaEvents);
-
         this.nextAgendaEvents = agendaEvents.filter((agEvent) => {
           return isAfter(parseISO(agEvent.startISO), new Date());
         });
@@ -162,35 +160,7 @@ export class UserStatusPage implements OnInit {
     );
   }
 
-  ngOnInit() {
-    //this.loadInfos();
-  }
-
-  // loadInfos() {
-  //   console.log('loadINFOS');
-
-  //   this.userInfo = this.userSvc.userInfo;
-  //   this.notifications = [
-  //     {
-  //       message: 'Demande en Ami',
-  //       title: 'Ami',
-  //       user_id: '',
-  //       create_at_ISO: '',
-  //       create_at_ms: 343434,
-  //       status: 'dsf',
-  //       subject: 'dfsdf',
-  //     },
-  //     {
-  //       message: 'Paul vous invite à un évènement',
-  //       title: 'Evt',
-  //       user_id: '',
-  //       create_at_ISO: '',
-  //       create_at_ms: 343434,
-  //       status: 'dsf',
-  //       subject: 'dfsdf',
-  //     },
-  //   ];
-  // }
+  ngOnInit() {}
 
   cancel() {
     this.modal.dismiss(null, 'cancel');
@@ -204,28 +174,12 @@ export class UserStatusPage implements OnInit {
     this.modal.dismiss(dyspoStatus, 'confirm');
   }
 
-  // TODO check why Agenda not updatae when changing Dyspo
   onWillDismiss(event: Event) {
     const ev = event as CustomEvent<OverlayEventDetail<string>>;
     if (ev.detail.role === 'confirm') {
       console.log('Update dyspo');
       this.todayDyspo.userDyspo = ev.detail.data as UserDyspoStatus;
       this.agendaSvc.updateOrCreateDyspo(this.todayDyspo);
-
-      // if (ev.detail.data !== this.userInfo!.dyspoStatus) {
-      //   //this.message = `Hello, ${ev.detail.data}!`;
-      //   console.log(`Update status, ${ev.detail.data}!`);
-      //   this.userInfo!.dyspoStatus = ev.detail.data as UserDyspoStatus;
-      //   const userInfoClone = Object.assign({}, this.userInfo) as AppUser;
-      //   this.userSvc
-      //     .updateUser(userInfoClone)
-      //     .then(() => {
-      //       this.utils.showToastSuccess('Le status a été mis à jour');
-      //     })
-      //     .catch((err) => {
-      //       this.utils.showToastError(err);
-      //     });
-      // }
     }
   }
 
@@ -265,15 +219,6 @@ export class UserStatusPage implements OnInit {
   }
 
   async openCreateEvent() {
-    const todayMorning = setHours(new Date(), 0);
-    console.log();
-    // if (isBefore(new Date(addHours(new Date().getTime(), 1)), todayMorning)) {
-    //   this.utils.showAlert(
-    //     'Vous ne pouvez pas creer un evenement dans le passé'
-    //   );
-    //   return;
-    // }
-
     const buttons = [];
     buttons.push({
       text: 'Personnel',

@@ -9,9 +9,11 @@ import {
   getDocs,
   onSnapshot,
   query,
+  runTransaction,
   setDoc,
   updateDoc,
   where,
+  writeBatch,
 } from '@angular/fire/firestore';
 import {
   AppDeviceContact,
@@ -25,6 +27,7 @@ import { NotificationService } from './notification.service';
 import { UserService } from './user.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Database } from '@angular/fire/database';
+import { LoggerService } from './logger.service';
 
 @Injectable({
   providedIn: 'root',
@@ -46,7 +49,7 @@ export class FriendsService {
     private firestore: Firestore,
     private utils: UtilsService,
     private userSvc: UserService,
-    private db: Database,
+    private logger: LoggerService,
     private notificationSvc: NotificationService
   ) {
     this.friends$ = this.friendsSubject.asObservable();
@@ -342,19 +345,39 @@ export class FriendsService {
     // this.notification-service.sendConfirmFriend()
   }
 
-  async addFriendGroup(friendGroup: FriendGroup) {
+  async saveFriendGroup(friendGroup: FriendGroup) {
     const uid = this.userSvc.userInfo?.uid || 'unknown';
-    setDoc(
-      doc(
-        this.firestore,
-        `friend_groups/${uid}/friend_group_list`,
-        friendGroup.uid!
-      ),
-      friendGroup
-    );
+    // Check each member is my friend
+    const members: string[] = [];
+    friendGroup.members_uid.forEach((member) => {
+      if (this.isMyFriend(member)) {
+        members.push(member);
+      } else {
+        this.utils.showToastError("Une erreur s'est produite");
+        this.logger.sendLog(
+          member +
+            ' is not a friend of mine. Can not attach to group ' +
+            friendGroup.label,
+          'saveFriendGroup'
+        );
+      }
+    });
 
-    // Send notif ?
-    // this.notification-service.sendConfirmFriend()
+    if (members.length === 0) {
+      this.utils.showToastError(
+        "Une erreur s'est produite. Votre liste ne peut pas être vide"
+      );
+    } else {
+      friendGroup.members_uid = members;
+      setDoc(
+        doc(
+          this.firestore,
+          `friend_groups/${uid}/friend_group_list`,
+          friendGroup.uid!
+        ),
+        friendGroup
+      );
+    }
   }
 
   async updateFriendGroup(friendGroup: FriendGroup) {
@@ -369,20 +392,59 @@ export class FriendsService {
   }
 
   async deleteFriend(friend: Friend, listElement: any) {
+    console.log('delete friend');
     const uid = this.userSvc.userInfo?.uid;
-    await deleteDoc(
+    const batch = writeBatch(this.firestore);
+    // Remove invitation in my collection
+    batch.delete(
       doc(this.firestore, `friends/${uid}/friend_list/${friend.friend_uid}`)
     );
-    const friendCollectionRef = collection(
-      this.firestore,
-      `friends/${uid}/friend_list`
+    // Remove invitation in his collection
+    batch.delete(
+      doc(this.firestore, `friends/${friend.friend_uid}/friend_list/${uid}`)
     );
-    const querySnapshot = await getDocs(
-      query(friendCollectionRef, where('friend_uid', '==', uid))
-    );
-    if (!querySnapshot.empty) {
-      deleteDoc(querySnapshot.docs[0].ref);
-    }
+
+    batch.commit();
+
+    await runTransaction(this.firestore, async (transaction) => {
+      const mygroups_snapshots = await getDocs(
+        query(
+          collection(this.firestore, `friend_groups/${uid}/friend_group_list`),
+          where('members_uid', 'array-contains', friend.friend_uid)
+        )
+      );
+      const hisgroups_snapshots = await getDocs(
+        query(
+          collection(
+            this.firestore,
+            `friend_groups/${friend.friend_uid}/friend_group_list`
+          ),
+          where('members_uid', 'array-contains', uid)
+        )
+      );
+
+      // Remove friend from my groups
+      mygroups_snapshots.forEach((snap) => {
+        const group = snap.data() as FriendGroup;
+        const updateMembers = group.members_uid.splice(
+          group.members_uid.indexOf(friend.friend_uid!),
+          1
+        );
+
+        transaction.update(snap.ref, { members_uid: group.members_uid });
+      });
+
+      // Remove friend from his groups
+      hisgroups_snapshots.forEach((snap) => {
+        const group = snap.data() as FriendGroup;
+        const updateMembers = group.members_uid.splice(
+          group.members_uid.indexOf(uid!),
+          1
+        );
+
+        transaction.update(snap.ref, { members_uid: group.members_uid });
+      });
+    });
   }
 
   async deleteFriendGroup(friendGroup: FriendGroup, listElement: any) {
@@ -390,19 +452,9 @@ export class FriendsService {
     await deleteDoc(
       doc(
         this.firestore,
-        `friendGroups/${uid}/friendGroup_list/${friendGroup.uid}`
+        `friend_groups/${uid}/friend_group_list/${friendGroup.uid}`
       )
     );
-    const friendCollectionRef = collection(
-      this.firestore,
-      `friendGroups/${uid}/friendGroup_list`
-    );
-    const querySnapshot = await getDocs(
-      query(friendCollectionRef, where('uid', '==', uid))
-    );
-    if (!querySnapshot.empty) {
-      deleteDoc(querySnapshot.docs[0].ref);
-    }
   }
 
   unsubscribeAllAfterLogoutEvent() {

@@ -192,7 +192,6 @@ export class AgendaService {
       agendaDysposCollectionRef,
       (snapshot) => {
         snapshot.docChanges().forEach((change) => {
-          console.log('Dyspo changed');
           const agendaDyspoFetched = change.doc.data() as AgendaDyspoItem;
           let foundItem = this.agendaDyspos.find((elt) => {
             return elt.time === agendaDyspoFetched.time;

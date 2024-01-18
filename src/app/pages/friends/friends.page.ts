@@ -107,6 +107,11 @@ export class FriendsPage implements OnInit {
         console.log('Friend Groups  ', friendGroups);
       }
     );
+    const isFromNotif =
+      this.route.getCurrentNavigation()?.extras.state?.['isFromNotif'];
+    if (isFromNotif) {
+      this.selectSegment = 'suggestions';
+    }
   }
 
   async ngOnInit() {}
@@ -152,6 +157,13 @@ export class FriendsPage implements OnInit {
       });
   }
 
+  declineFriendInvit(friend: Friend, i: number) {
+    const slidingItem = document.getElementById(
+      'slidingItemSuggested' + i
+    ) as any;
+    this.deleteFriend(friend, slidingItem);
+  }
+
   promptDeleteFriendGroup(friendGroup: FriendGroup, i: number) {
     this.alertCtrl
       .create({
@@ -173,7 +185,7 @@ export class FriendsPage implements OnInit {
             text: 'Oui',
             handler: (data: any) => {
               const slidingItem = document.getElementById(
-                'slidingItem' + i
+                'slidingItemGroup' + i
               ) as any;
               this.deleteFriendGroup(friendGroup, slidingItem);
             },
@@ -201,6 +213,7 @@ export class FriendsPage implements OnInit {
   }
 
   async deleteFriendGroup(friendGroup: FriendGroup, listElement: any) {
+    console.log('Delete group');
     const animationDeleteItem = this.animationCtrl
       .create()
       .addElement(listElement)

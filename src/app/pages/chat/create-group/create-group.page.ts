@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Friend, FriendGroup, FriendGroupStatus } from 'src/app/models/models';
+import {
+  Friend,
+  FriendGroup,
+  FriendGroupStatus,
+  FriendStatus,
+} from 'src/app/models/models';
 import { FriendsService } from 'src/app/services/friends.service';
 import { cloneDeep } from 'lodash';
 import { UserService } from 'src/app/services/user.service';
@@ -39,6 +44,8 @@ export class CreateGroupPage implements OnInit {
     const uid = this.userSvc.userInfo?.uid!;
     this.friends = cloneDeep(this.friendsSvc.friends);
 
+    console.log('my friends ', this.friends);
+
     this.activatedRoute.params.subscribe((params) => {
       this.mode = params['mode'];
       switch (this.mode) {
@@ -58,7 +65,9 @@ export class CreateGroupPage implements OnInit {
           };
 
           this.friends.forEach((friend) => {
-            this.checkedFriends.push({ friend, isChecked: false });
+            if (friend.friend_status === FriendStatus.FRIEND) {
+              this.checkedFriends.push({ friend, isChecked: false });
+            }
           });
 
           break;
@@ -108,18 +117,22 @@ export class CreateGroupPage implements OnInit {
     return namesOfCheckedItems;
   }
 
-  addFriendGroup() {
+  saveFriendGroup() {
     const checkedItems = this.getCheckedItems();
     if (checkedItems.length <= 0) {
       this.utils.showToastError('Vous devez sélectionner au moins 1 ami');
       return;
     }
-    const uid = this.userSvc.userInfo?.uid!;
+    if (this.friendGroup.label === '') {
+      this.utils.showToastError('Veuillez donner un nom au groupe');
+      return;
+    }
+    //const uid = this.userSvc.userInfo?.uid!;
 
     this.friendGroup.members_uid = checkedItems;
-    this.friendGroup.members_uid.push(uid);
+    //this.friendGroup.members_uid.push(uid);
     console.log('Add friend group ', this.friendGroup);
-    this.friendsSvc.addFriendGroup(this.friendGroup);
+    this.friendsSvc.saveFriendGroup(this.friendGroup);
     this.navCtrl.pop();
   }
 

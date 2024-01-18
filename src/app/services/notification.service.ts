@@ -1,6 +1,12 @@
 import { Injectable, NgZone } from '@angular/core';
 
-import { AgendaEvent, AppUser, Chatroom, NotifSubject } from '../models/models';
+import {
+  AgendaEvent,
+  AppUser,
+  Chatroom,
+  DiscussionType,
+  NotifSubject,
+} from '../models/models';
 import { NavigationExtras, Router } from '@angular/router';
 import { httpsCallable } from 'firebase/functions';
 import { Functions } from '@angular/fire/functions';
@@ -28,7 +34,7 @@ import { Device } from '@capacitor/device';
 import { format, isSameDay, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { AgendaEventInfoComponent } from '../components/agenda-event-info/agenda-event-info.component';
-import { ModalController } from '@ionic/angular';
+import { ModalController, NavController } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root',
@@ -42,17 +48,12 @@ export class NotificationService {
     private zone: NgZone,
     private functions: Functions,
     private userSvc: UserService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private navCtrl: NavController
   ) {}
 
   async initListeners() {
     console.log('NotificationService ---> initListeners');
-    // FirebaseMessaging.addListener('registration', (data) => {
-    //   // alert(JSON.stringify(data));
-    //   console.log('Registration OK : Good token');
-    //   console.log(data.value);
-    //   this.registerToken(this.uid, data.value);
-    // });
 
     const { token } = await FirebaseMessaging.getToken();
 
@@ -72,15 +73,20 @@ export class NotificationService {
       FirebaseMessaging.addListener(
         'notificationActionPerformed',
         (actionPerformed: NotificationActionPerformedEvent) => {
-          console.log(
-            'data ' + JSON.stringify(actionPerformed.notification.data)
-          );
           try {
             const data = actionPerformed.notification.data as any;
+            console.log('data ' + JSON.stringify(data));
+
             const subject: NotifSubject = data['subject'];
             switch (subject) {
               case NotifSubject.AGENDA_EVENT:
-                this.openEvent(data['info']['agendaEvent']);
+                this.openEvent(data['info']);
+                break;
+              case NotifSubject.MESSAGE:
+                this.goToChat(data['info']);
+                break;
+              case NotifSubject.INVITE:
+                this.goToFriends();
                 break;
             }
           } catch (err) {}
@@ -245,7 +251,7 @@ export class NotificationService {
         subject: NotifSubject.AGENDA_EVENT,
         uids,
         tokens,
-        info: '{agendaEvent : ' + agendaEvent.uid + '}',
+        info: agendaEvent.uid,
         username:
           this.userSvc.userInfo!.firstname +
           ' ' +
@@ -325,7 +331,7 @@ export class NotificationService {
         subject: NotifSubject.MESSAGE,
         uids,
         tokens,
-        info: '{agendaEvent : ' + agendaEvent.uid + '}',
+        info: agendaEvent.uid,
         username: agendaEvent.title!,
         avatarPath,
       })
@@ -365,14 +371,29 @@ export class NotificationService {
     }
   }
 
-  goToChat(friend_uid: string) {
-    console.log('goToChat', friend_uid);
+  goToFriends() {
     const navigationExtras: NavigationExtras = {
       state: {
-        friend_uid,
+        isFromNotif: true,
       },
     };
-    this.router.navigate(['chatroom'], navigationExtras);
+    this.navCtrl.navigateForward('/friends', navigationExtras);
+  }
+
+  async goToChat(agendaEventUid: string) {
+    const docSnap = await getDoc(
+      doc(this.firestore, `agenda_events/`, agendaEventUid)
+    );
+    if (docSnap.exists()) {
+      const eventFetched = docSnap.data() as AgendaEvent;
+      const navigationExtras: NavigationExtras = {
+        state: {
+          agendaEvent: eventFetched,
+          discussionType: DiscussionType.ACTIVE,
+        },
+      };
+      this.navCtrl.navigateForward('/group-chatting', navigationExtras);
+    }
   }
 
   async openEvent(agendaEventUid: any) {

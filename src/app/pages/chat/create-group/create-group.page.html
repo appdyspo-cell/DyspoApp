@@ -1,21 +1,18 @@
-<ion-header [translucent]="true">
+<ion-header [translucent]="true" class="ion-no-border">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button text="" icon="chevron-back-outline"></ion-back-button>
     </ion-buttons>
-    <ion-title
+    <!-- <ion-title
       >{{pageTitle}}
-      <!-- <span class="ion-float-end">
- 				<ion-icon class="zmdi zmdi-search ion-text-start"></ion-icon>
- 			</span> -->
-    </ion-title>
+    
+    </ion-title> -->
     <ion-buttons slot="end">
       <ion-button
         slot="end"
-        size="large"
+        fill="outline"
         shape="round"
-        class="btn end"
-        (click)="addFriendGroup()"
+        (click)="saveFriendGroup()"
         >{{saveLabel}}</ion-button
       >
       <!-- <ion-button>

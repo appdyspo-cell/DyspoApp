@@ -215,12 +215,12 @@
 
     <ion-list *ngIf="friendsSuggested.length > 0" class="ion-no-padding">
       <ion-item-sliding
-        [id]="'slidingItem' + i"
+        [id]="'slidingItemSuggested' + i"
         *ngFor="let friendSuggested of friendsSuggested; let i = index;"
       >
         <ion-item-options>
           <ion-item-option
-            (click)="promptDeleteFriend(friendSuggested,i)"
+            (click)="declineFriendInvit(friendSuggested,i)"
             color="danger"
           >
             <ion-icon slot="icon-only" name="trash"></ion-icon>
