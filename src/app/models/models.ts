@@ -39,7 +39,7 @@ export interface AppDeviceContact {
 export interface Friend extends AppUser {
   sinceDate?: number;
   requestDate?: number;
-  friend_status?: string;
+  friend_status?: FriendStatus;
   friend_uid?: string;
 
   userData?: AppUser;
@@ -63,6 +63,7 @@ export interface FriendGroup {
 export interface CheckedFriends {
   friend: Friend;
   isChecked: boolean;
+  isCheckedPending: boolean;
   disable: boolean;
   dyspo?: UserDyspoStatus;
   agendaEvents: AgendaEvent[];
@@ -293,6 +294,7 @@ export enum FriendStatus {
   PENDING = 'PENDING',
   INVITED = 'INVITED',
   SUGGESTED = 'SUGGESTED',
+  NOFRIEND = 'NOFRIEND',
 }
 
 export enum FriendGroupStatus {

@@ -75,7 +75,6 @@
       </div>
       <ion-checkbox
         [(ngModel)]="checkedFriend.isChecked"
-        (ionChange)="onCheckedFriendChange($event)"
         slot="end"
       ></ion-checkbox>
     </ion-item>
@@ -100,7 +99,7 @@
   </ion-list>
 </ion-content>
 
-<ion-footer class="ion-no-border animated slideInUp delay_4">
+<ion-footer class="ion-no-border animate__animated animate__slideInUp delay_4">
   <h2 class="d-flex">
     <span> {{countCheckedItems()}} {{'members_selected' | translate}}</span>
   </h2>

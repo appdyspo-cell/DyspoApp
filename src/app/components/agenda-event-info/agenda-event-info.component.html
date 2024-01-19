@@ -1,12 +1,12 @@
-<ion-content
-  [fullscreen]="true"
-  [ngClass]="{
-    'bg-kids': agendaEvent.type === agendaEventType.KIDS,
-    'bg-nokids': agendaEvent.type === agendaEventType.NOKIDS,
-    'bg-free': agendaEvent.type === agendaEventType.FREE,
-  }"
->
-  <ion-toolbar>
+<ion-header class="ion-no-border">
+  <ion-toolbar
+    [ngClass]="{
+      'bg-kids': agendaEvent.type === agendaEventType.KIDS,
+      'bg-nokids': agendaEvent.type === agendaEventType.NOKIDS,
+      'bg-free': agendaEvent.type === agendaEventType.FREE,
+      
+    }"
+  >
     <ion-button slot="start" (click)="close()" fill="clear" size="large">
       <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
     </ion-button>
@@ -20,7 +20,14 @@
       <ion-icon slot="icon-only" name="ellipsis-vertical-outline"></ion-icon>
     </ion-button>
   </ion-toolbar>
-
+</ion-header>
+<ion-content
+  [ngClass]="{
+    'bg-kids': agendaEvent.type === agendaEventType.KIDS,
+    'bg-nokids': agendaEvent.type === agendaEventType.NOKIDS,
+    'bg-free': agendaEvent.type === agendaEventType.FREE,
+  }"
+>
   <div
     [ngClass]="{
       'bg-kids-secondary': agendaEvent.type === agendaEventType.KIDS,
@@ -30,7 +37,7 @@
       
     }"
   >
-    <div class="header-inner ion-padding">
+    <div style="padding: 5px">
       <div class="admin-ct d-flex" *ngIf="agendaEvent.is_multi">
         <ion-thumbnail
           slot="start"
@@ -45,10 +52,15 @@
         </ion-thumbnail>
         <div>
           <span style="font-weight: bold; font-size: 1.15rem">{{
-            admin?.firstname
+            admin?.uid !== userSvc.userInfo?.uid ? admin?.firstname : "Vous"
           }}</span
           ><br />
-          <span>propose un évenement</span>
+          <span *ngIf="admin?.uid === userSvc.userInfo?.uid"
+            >proposez un évenement</span
+          >
+          <span *ngIf="admin?.uid !== userSvc.userInfo?.uid"
+            >propose un évenement</span
+          >
           <br />
           <div
             [ngClass]="{
@@ -141,7 +153,6 @@
               >{{ member.agendaEvents!.length }}</ion-badge
             >
             <ion-icon
-              (click)="invite(member)"
               *ngIf="member.is_my_friend === false"
               class="zmdi zmdi-plus end invite-icon"
             ></ion-icon>
@@ -195,16 +206,12 @@
     class="body-inner d-flex ion-margin-top ion-margin-bottom ion-justify-content-center"
   >
     <div class="ion-margin-top ion-text-center" style="width: 100%">
-      <!-- <div class="container">
-        <div class="skewed-div">
-          <img src="{{ agendaEvent.avatar }}" />
-        </div>
-      </div> -->
       <div *ngIf="agendaEvent.avatar" class="d-flex ion-justify-content-center">
         <div
-          class="bg-avatar d-flex ion-justify-content-center ion-margin-bottom"
+          style="background-image: url('{{ agendaEvent.avatar }}');"
+          class="bg-event-avatar d-flex ion-justify-content-center ion-margin-bottom"
         >
-          <ion-img src="{{ agendaEvent.avatar }}"></ion-img>
+          <!-- <ion-img src="{{ agendaEvent.avatar }}"></ion-img> -->
         </div>
       </div>
 
@@ -224,21 +231,6 @@
       </div>
     </div>
   </div>
-  <div
-    *ngIf="isInvitation"
-    class="d-flex ion-justify-content-center ion-margin-top"
-    style="color: #eee; padding-bottom: var(--ion-safe-area-bottom)"
-  >
-    <ion-button (click)="acceptInvitation()" class="form-btn" fill="clear"
-      >Dyspo! <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon
-    ></ion-button>
-    <ion-button (click)="declineInvitation()" class="form-btn" fill="clear"
-      >No Dyspo <ion-icon slot="start" name="close-circle-outline"></ion-icon
-    ></ion-button>
-    <ion-button (click)="close()" class="form-btn" fill="clear"
-      >A Voir <ion-icon slot="start" name="help-circle-outline"></ion-icon
-    ></ion-button>
-  </div>
 
   <ion-popover
     #popovermenu
@@ -252,11 +244,6 @@
           <ion-text>Editer l'évenement</ion-text>
         </ion-item>
         <ion-item tappable (click)="quitEvent()" lines="none">
-          <!-- <ion-icon
-            name="ban"
-            color="danger"
-            style="margin-right: 15px"
-          ></ion-icon> -->
           <ion-text>Supprimer l'évenement</ion-text>
         </ion-item>
       </ion-list>
@@ -269,11 +256,24 @@
     (didDismiss)="isPopoverUserEventsOpen = false"
   >
     <ng-template>
-      <ion-list>
+      <ion-item
+        (click)="invite(selectedUser!)"
+        *ngIf="
+          selectedUser!.uid !== userSvc.userInfo?.uid &&
+          selectedUserFriendStatus === FriendStatus.NOFRIEND
+        "
+      >
+        Demander en Ami
+      </ion-item>
+      <ion-item *ngIf="selectedUserFriendStatus !== FriendStatus.NOFRIEND">
+        {{ selectedUserFriendStatusLabel }}
+      </ion-item>
+      <ion-list *ngIf="selectedUserEvents && selectedUserEvents.length > 0">
+        <ion-note style="padding-left: 10px">Indisponible</ion-note>
         <ion-item *ngFor="let agEv of selectedUserEvents">
-          <ion-text color="danger" style="font-size: 0.75rem"
-            >Autre evenement à {{ agEv.start_time_formatted }}</ion-text
-          >
+          <ion-text color="danger" style="font-size: 0.75rem">{{
+            getOtherEventLabel(agEv)
+          }}</ion-text>
         </ion-item>
       </ion-list>
     </ng-template>
@@ -312,3 +312,30 @@
     </ng-template>
   </ion-modal>
 </ion-content>
+<ion-footer class="ion-no-border">
+  <ion-toolbar
+    [ngClass]="{
+      'bg-kids': agendaEvent.type === agendaEventType.KIDS,
+      'bg-nokids': agendaEvent.type === agendaEventType.NOKIDS,
+      'bg-free': agendaEvent.type === agendaEventType.FREE,
+     
+    }"
+  >
+    <div
+      *ngIf="isInvitation"
+      class="d-flex ion-justify-content-center"
+      style="color: #eee; padding-bottom: var(--ion-safe-area-bottom)"
+    >
+      <ion-button (click)="acceptInvitation()" class="form-btn" fill="clear"
+        >Dyspo!
+        <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon
+      ></ion-button>
+      <ion-button (click)="declineInvitation()" class="form-btn" fill="clear"
+        >No Dyspo <ion-icon slot="start" name="close-circle-outline"></ion-icon
+      ></ion-button>
+      <ion-button (click)="close()" class="form-btn" fill="clear"
+        >A Voir <ion-icon slot="start" name="help-circle-outline"></ion-icon
+      ></ion-button>
+    </div>
+  </ion-toolbar>
+</ion-footer>

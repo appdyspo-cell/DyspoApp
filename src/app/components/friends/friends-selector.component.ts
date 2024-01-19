@@ -29,6 +29,8 @@ import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { ChatMenuComponent } from '../chat-menu/chat-menu.component';
 import { AgendaPage } from 'src/app/pages/agenda/agenda.page';
+import { format, parseISO } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 @Component({
   selector: 'app-friends-selector',
@@ -36,17 +38,24 @@ import { AgendaPage } from 'src/app/pages/agenda/agenda.page';
   styleUrls: ['./friends-selector.component.scss'],
 })
 export class FriendsSelectorComponent implements OnInit {
+  selectedFriend: CheckedFriends | undefined;
+
   @Input() agendaEvent!: AgendaEvent;
   @Input() startTime!: any;
   @Input() endTime!: any;
-  @Output() friendSelected = new EventEmitter<CheckedFriends[]>();
-  @Output() showEvents = new EventEmitter<{
-    agendaEvents: AgendaEvent[];
-    ev: Event;
+  @Output() friendSelected = new EventEmitter<{
+    friendSelected: CheckedFriends;
+    checkedFriends: CheckedFriends[];
   }>();
-  @ViewChild('popoverUserEvents') popoverUserEvents: any;
+  @Output() groupSelected = new EventEmitter<CheckedFriends[]>();
+  // @Output() showEvents = new EventEmitter<{
+  //   agendaEvents: AgendaEvent[];
+  //   ev: Event;
+  // }>();
+  @ViewChild('popoverConfirmInvitEvent') popoverConfirmInvitEvent: any;
+
   UserDyspoStatus = UserDyspoStatus;
-  isPopoverUserEventsOpen = false;
+  isPopoverConfirmInvitEventOpen = false;
   selectedUserEvents: AgendaEvent[] | undefined;
   friendSelectionType = FriendSelectionType;
   selectSegment = FriendSelectionType.FRIENDS;
@@ -125,6 +134,7 @@ export class FriendsSelectorComponent implements OnInit {
           this.checkedFriends.push({
             friend,
             isChecked: true,
+            isCheckedPending: false,
             disable: true,
             dyspo: dyspoStatus,
             agendaEvents: events.agendaEvents,
@@ -133,6 +143,7 @@ export class FriendsSelectorComponent implements OnInit {
           this.checkedFriends.push({
             friend,
             isChecked: false,
+            isCheckedPending: false,
             disable: false,
             dyspo: dyspoStatus,
             agendaEvents: events.agendaEvents,
@@ -159,16 +170,39 @@ export class FriendsSelectorComponent implements OnInit {
     // }
   }
 
-  onCheckedFriendChange(checkedFriend: CheckedFriends, $event: Event) {
-    $event.stopPropagation();
-    this.friendSelected.emit(this.checkedFriends);
-  }
-
   onClick(checkedFriend: CheckedFriends, $event: Event) {
     $event.stopPropagation();
     if (checkedFriend.disable) return;
-    checkedFriend.isChecked = !checkedFriend.isChecked;
-    this.friendSelected.emit(this.checkedFriends);
+    this.selectedFriend = checkedFriend;
+    if (checkedFriend.isChecked) {
+      this.selectedFriend.isChecked = false;
+      this.friendSelected.emit({
+        friendSelected: this.selectedFriend!,
+        checkedFriends: this.checkedFriends,
+      });
+    } else {
+      // Check if some events
+      if (this.selectedFriend.agendaEvents.length > 0) {
+        this.popoverConfirmInvitEvent.event = $event;
+        this.isPopoverConfirmInvitEventOpen = true;
+      } else {
+        this.selectedFriend.isChecked = true;
+        this.friendSelected.emit({
+          friendSelected: this.selectedFriend!,
+          checkedFriends: this.checkedFriends,
+        });
+      }
+    }
+  }
+
+  confirmInviteToEvent() {
+    if (!this.selectedFriend) return;
+    this.isPopoverConfirmInvitEventOpen = false;
+    this.selectedFriend.isChecked = true;
+    this.friendSelected.emit({
+      friendSelected: this.selectedFriend!,
+      checkedFriends: this.checkedFriends,
+    });
   }
 
   // getCheckedFriendsUid(): string[] {
@@ -212,7 +246,7 @@ export class FriendsSelectorComponent implements OnInit {
         item.isChecked = true;
       }
     });
-    this.friendSelected.emit(this.checkedFriends);
+    this.groupSelected.emit(this.checkedFriends);
   }
 
   getDelayClass(index: number): string {
@@ -223,10 +257,10 @@ export class FriendsSelectorComponent implements OnInit {
     }
   }
 
-  showUserEvents(agendaEvents: AgendaEvent[], e: Event) {
-    e.stopPropagation();
-    this.showEvents.emit({ agendaEvents, ev: e });
-  }
+  // showUserEvents(agendaEvents: AgendaEvent[], e: Event) {
+  //   e.stopPropagation();
+  //   this.showEvents.emit({ agendaEvents, ev: e });
+  // }
 
   // showAgenda(friend: AppUser, event: any) {
   //   event.stopPropagation();
@@ -241,4 +275,25 @@ export class FriendsSelectorComponent implements OnInit {
 
   //   //this.navCtrl.navigateForward('agenda/friend', navigationExtras);
   // }
+
+  getOtherEventLabel(ev: AgendaEvent) {
+    // Event long
+    if (ev.start_date_day_of_year !== ev.end_date_day_of_year) {
+      return (
+        format(parseISO(ev.startISO), 'dd MMM HH:mm', { locale: fr }) +
+        ' - ' +
+        format(parseISO(ev.endISO), 'dd MMM HH:mm', { locale: fr })
+      );
+    }
+    // Event sur une journee
+    else {
+      return (
+        format(parseISO(ev.endISO), 'dd MMM', { locale: fr }) +
+        ' ' +
+        ev.start_time_formatted +
+        ' - ' +
+        ev.end_time_formatted
+      );
+    }
+  }
 }

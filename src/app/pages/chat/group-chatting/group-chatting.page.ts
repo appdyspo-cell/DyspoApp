@@ -45,6 +45,7 @@ import { NotificationService } from 'src/app/services/notification.service';
 import { AgendaEventInfoComponent } from 'src/app/components/agenda-event-info/agenda-event-info.component';
 import { fr } from 'date-fns/locale';
 import { QueryDocumentSnapshot, DocumentData } from '@angular/fire/firestore';
+import { UserInfoMenuComponent } from 'src/app/components/user-info-menu/user-info-menu.component';
 @Component({
   selector: 'app-group-chatting',
   templateUrl: './group-chatting.page.html',
@@ -55,6 +56,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
 
   @ViewChild(IonContent) content!: IonContent;
   @ViewChild('txtInput') txtInput!: ElementRef;
+  @ViewChild('popoverUserEvents') popoverUserEvents: any;
   loading = false;
 
   allIsLoaded = false;
@@ -516,12 +518,28 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     modal.present();
   }
 
-  onSelectUser(user: AppUserWithEvents, $event: MouseEvent) {
+  async onSelectUser(user: AppUserWithEvents, $event: MouseEvent) {
     if (!user.is_my_friend) {
       this.friendsSvc.invite(user, true).then(() => {
         user.is_my_friend = true;
       });
     }
+
+    // const modal = await this.popCtrl.create({
+    //   component: UserInfoMenuComponent,
+    //   componentProps: {
+    //     friend_id: null,
+    //     username: null,
+    //     my_chatroom: this.agendaEvent['user_' + this.my_uid] as Chatroom,
+    //   },
+    //   translucent: true,
+    //   event: $event,
+    //   mode: 'md',
+    // });
+
+    // modal.present();
+
+    // const { data, role } = await modal.onWillDismiss();
   }
 
   async openEvent() {
@@ -548,5 +566,10 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     }
 
     //return true;
+  }
+
+  presentPopover(e: Event) {
+    // this.popover.event = e;
+    // this.isOpen = true;
   }
 }

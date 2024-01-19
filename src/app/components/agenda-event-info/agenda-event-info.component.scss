@@ -2,11 +2,6 @@ ion-button {
   --color: #eee;
 }
 
-ion-toolbar {
-  --background: transparent;
-  padding-top: var(--ion-safe-area-top);
-}
-
 .form-btn {
   --background: #363636;
 }
@@ -50,7 +45,7 @@ ion-toolbar {
   display: flex;
   flex-direction: row;
   min-height: 82px;
-  margin: 10px 0px 10px 0px;
+  padding: 5px 5px 5px 0px;
   .menu {
     width: 100%;
     display: flex;
@@ -144,15 +139,19 @@ ion-row {
   }
 }
 
-.bg-avatar {
+.bg-event-avatar {
   overflow: hidden;
   border-radius: 3px;
-
-  width: 50%;
-  height: 250px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  min-width: 50%;
+  max-width: 80%;
+  min-height: 248px;
   position: relative;
   border: 2px solid rgb(181, 181, 181);
   transform-origin: top left;
+
   transform: rotate(-2deg); /* Ajustez l'angle de rotation selon vos besoins */
 
   ion-img {
@@ -193,4 +192,8 @@ ion-row {
   width: fit-content;
   border-radius: 3px;
   padding: 3px 5px;
+}
+
+ion-item:last-child {
+  --inner-border-width: 0;
 }

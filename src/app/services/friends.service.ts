@@ -231,13 +231,24 @@ export class FriendsService {
     }
   }
 
+  getFriendStatus(uid: string): FriendStatus {
+    const foundIndex = this.friends.findIndex((f) => {
+      return f.friend_uid === uid;
+    });
+    if (foundIndex > -1) {
+      return this.friends[foundIndex].friend_status!;
+    } else {
+      return FriendStatus.NOFRIEND;
+    }
+  }
+
   async invite(membre: AppUser, showToast = false): Promise<boolean> {
     try {
       const uid = this.userSvc.userInfo?.uid || 'unknown';
       console.log(membre);
       //Check if membre has been blocked
       //this.friendService
-      this.utils.showLoader();
+      //this.utils.showLoader();
 
       const myInviteData = {
         friend_uid: membre.uid,
@@ -265,12 +276,12 @@ export class FriendsService {
         { merge: true }
       );
 
-      this.utils.hideLoader();
+      //this.utils.hideLoader();
       if (showToast) this.utils.showToastSuccess('Invitation envoyée');
       this.notificationSvc.sendInviteFriendNotif(membre.uid);
       return true;
     } catch (err: any) {
-      this.utils.hideLoader();
+      //this.utils.hideLoader();
       this.utils.showToastError('Erreur');
       return false;
     }

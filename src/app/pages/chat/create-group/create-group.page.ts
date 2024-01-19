@@ -96,11 +96,6 @@ export class CreateGroupPage implements OnInit {
   //   this.route.navigate(['./create-group-info']);
   // }
 
-  onCheckedFriendChange($event: Event) {
-    console.log($event);
-    console.log(this.checkedFriends);
-  }
-
   countCheckedItems(): number {
     return this.checkedFriends.filter((item) => item.isChecked).length;
   }

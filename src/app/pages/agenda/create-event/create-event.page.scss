@@ -181,7 +181,7 @@ ion-list-header {
   overflow: scroll;
   display: flex;
   flex-direction: row;
-  margin: 10px 0px 10px 0px;
+  padding: 5px 5px 5px 0px;
   .menu {
     width: 100%;
     display: flex;
@@ -244,4 +244,8 @@ ion-list-header {
 .friends-wrapper {
   height: 100px;
   padding: 5px 5px 0px 5px;
+}
+
+ion-item:last-child {
+  --inner-border-width: 0;
 }

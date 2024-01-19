@@ -24,6 +24,7 @@ import {
   setHours,
   setMinutes,
 } from 'date-fns';
+import fr from 'date-fns/locale/fr';
 
 import {
   AgendaEvent,
@@ -34,6 +35,7 @@ import {
   Chatroom,
   CheckedFriends,
   Friend,
+  FriendStatus,
   UserDyspoStatus,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
@@ -57,6 +59,7 @@ export enum FriendSelectionType {
 export class CreateEventPage implements OnInit {
   @ViewChild('popoverUserEvents') popoverUserEvents: any;
   UserDyspoStatus = UserDyspoStatus;
+  FriendStatus = FriendStatus;
   AgendaEventRecurrence = AgendaEventRecurrence;
   isPopoverUserEventsOpen = false;
   selectedUserEvents: AgendaEvent[] | undefined;
@@ -74,6 +77,9 @@ export class CreateEventPage implements OnInit {
   saveLabel = '';
   friendSelectionType = FriendSelectionType;
   friendSelection: FriendSelectionType = FriendSelectionType.FRIENDS;
+  selectedUser: AppUserWithEvents | undefined;
+  selectedUserFriendStatus: FriendStatus | undefined;
+  selectedUserFriendStatusLabel = '';
 
   friends = [];
   members: AppUserWithEvents[] = [];
@@ -494,10 +500,75 @@ export class CreateEventPage implements OnInit {
     }
   }
 
-  async onFriendSelected(data: CheckedFriends[]) {
-    console.log('onFriendSelected', data);
+  getCheckedFriendsUid(checkedFriends: CheckedFriends[]): {
+    uids_checked: string[];
+    uids_unchecked: string[];
+  } {
+    const uids_checked: string[] = [];
+    const uids_unchecked: string[] = [];
+    for (const item of checkedFriends) {
+      if (item.isChecked && !item.disable) {
+        uids_checked.push(item.friend.friend_uid!);
+      }
+      if (!item.isChecked && !item.disable) {
+        uids_unchecked.push(item.friend.friend_uid!);
+      }
+    }
+    return { uids_checked, uids_unchecked };
+  }
 
-    for (let item of data) {
+  invite(user: AppUserWithEvents) {
+    this.isPopoverUserEventsOpen = false;
+    if (!user) return;
+    this.friendsSvc.invite(user, true).then(() => {
+      user.is_my_friend = true;
+    });
+  }
+
+  // showUserEvents(user: AppUserWithEvents, e: Event) {
+  //   this.selectedUserEvents = user.agendaEvents;
+  //   if (this.selectedUserEvents && this.selectedUserEvents?.length > 0) {
+  //     this.popoverUserEvents.event = e;
+  //     this.isPopoverUserEventsOpen = true;
+  //   }
+  // }
+
+  // onShowEvents(data: { agendaEvents: AgendaEvent[]; ev: Event }) {
+  //   this.selectedUserEvents = data.agendaEvents;
+  //   if (this.selectedUserEvents && this.selectedUserEvents?.length > 0) {
+  //     this.popoverUserEvents.event = data.ev;
+  //     this.isPopoverUserEventsOpen = true;
+  //   }
+  // }
+
+  onSelectUser(user: AppUserWithEvents, e?: Event) {
+    if (user.uid === this.userSvc.userInfo?.uid) return;
+    this.selectedUserEvents = user.agendaEvents;
+    this.selectedUser = user;
+    console.log('get friend status');
+    this.selectedUserFriendStatus = this.friendsSvc.getFriendStatus(user.uid);
+    this.selectedUserFriendStatusLabel = this.getSelectedFriendStatusLabel(
+      this.selectedUserFriendStatus!
+    );
+    //if (this.selectedUserEvents && this.selectedUserEvents?.length > 0) {
+    if (e) this.popoverUserEvents.event = e;
+    this.isPopoverUserEventsOpen = true;
+    //}
+  }
+
+  async onFriendSelected(data: {
+    friendSelected: CheckedFriends;
+    checkedFriends: CheckedFriends[];
+  }) {
+    this.tagCheckedFriends(data.checkedFriends);
+  }
+
+  async onGroupSelected(checkedFriends: CheckedFriends[]) {
+    this.tagCheckedFriends(checkedFriends);
+  }
+
+  async tagCheckedFriends(checkedFriends: CheckedFriends[]) {
+    for (let item of checkedFriends) {
       if (item.isChecked && !item.disable) {
         if (
           !this.agendaEvent!.members_invited_uid.includes(
@@ -543,45 +614,6 @@ export class CreateEventPage implements OnInit {
     }
   }
 
-  getCheckedFriendsUid(checkedFriends: CheckedFriends[]): {
-    uids_checked: string[];
-    uids_unchecked: string[];
-  } {
-    const uids_checked: string[] = [];
-    const uids_unchecked: string[] = [];
-    for (const item of checkedFriends) {
-      if (item.isChecked && !item.disable) {
-        uids_checked.push(item.friend.friend_uid!);
-      }
-      if (!item.isChecked && !item.disable) {
-        uids_unchecked.push(item.friend.friend_uid!);
-      }
-    }
-    return { uids_checked, uids_unchecked };
-  }
-
-  invite(user: AppUserWithEvents) {
-    this.friendsSvc.invite(user, true).then(() => {
-      user.is_my_friend = true;
-    });
-  }
-
-  showUserEvents(user: AppUserWithEvents, e: Event) {
-    this.selectedUserEvents = user.agendaEvents;
-    if (this.selectedUserEvents && this.selectedUserEvents?.length > 0) {
-      this.popoverUserEvents.event = e;
-      this.isPopoverUserEventsOpen = true;
-    }
-  }
-
-  onShowEvents(data: { agendaEvents: AgendaEvent[]; ev: Event }) {
-    this.selectedUserEvents = data.agendaEvents;
-    if (this.selectedUserEvents && this.selectedUserEvents?.length > 0) {
-      this.popoverUserEvents.event = data.ev;
-      this.isPopoverUserEventsOpen = true;
-    }
-  }
-
   onRecurrenceChanged(ev: IonSelectCustomEvent<SelectChangeEventDetail<any>>) {
     console.log('Recuurence cahnged');
     if (ev.detail.value === AgendaEventRecurrence.ONE) {
@@ -589,5 +621,57 @@ export class CreateEventPage implements OnInit {
     } else {
       this.agendaEvent!.recurrence_nb = '1';
     }
+  }
+
+  getSelectedFriendStatusLabel(status: FriendStatus): string {
+    let label = '';
+    switch (status) {
+      case FriendStatus.FRIEND:
+        label = 'Vous êtes amis';
+        break;
+      case FriendStatus.NOFRIEND:
+        label = "Vous n'êtes pas amis";
+        break;
+      case FriendStatus.INVITED:
+        label = 'Invitation envoyée';
+        break;
+      case FriendStatus.SUGGESTED:
+        label = 'Invitation reçue';
+        break;
+    }
+    return label;
+  }
+
+  getOtherEventLabel(ev: AgendaEvent) {
+    // Event long
+    if (ev.start_date_day_of_year !== ev.end_date_day_of_year) {
+      return (
+        format(parseISO(ev.startISO), 'dd MMM HH:mm', { locale: fr }) +
+        ' - ' +
+        format(parseISO(ev.endISO), 'dd MMM HH:mm', { locale: fr })
+      );
+    }
+    // Event sur une journee
+    else {
+      return (
+        format(parseISO(ev.endISO), 'dd MMM', { locale: fr }) +
+        ' ' +
+        ev.start_time_formatted +
+        ' - ' +
+        ev.end_time_formatted
+      );
+    }
+  }
+
+  getIconTypeEvent(): string {
+    let path = '';
+    if (this.agendaEvent?.type === AgendaEventType.KIDS) {
+      path = 'assets/dyspo-kid.png';
+    } else if (this.agendaEvent?.type === AgendaEventType.NOKIDS) {
+      path = 'assets/dyspo-nokid.png';
+    } else if (this.agendaEvent?.type === AgendaEventType.FREE) {
+      path = 'assets/dyspo-free.png';
+    }
+    return path;
   }
 }

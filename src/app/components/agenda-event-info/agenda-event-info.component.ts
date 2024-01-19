@@ -20,6 +20,7 @@ import {
   AgendaEventType,
   AppUser,
   AppUserWithEvents,
+  FriendStatus,
   UserDyspoStatus,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
@@ -41,6 +42,7 @@ export class AgendaEventInfoComponent implements OnInit {
   @ViewChild('popoverUserEvents') popoverUserEvents: any;
 
   UserDyspoStatus = UserDyspoStatus;
+  FriendStatus = FriendStatus;
   agendaEventType = AgendaEventType;
   members_presence_confirmed: AppUserWithEvents[] = [];
   members_presence_not_confirmed: AppUserWithEvents[] = [];
@@ -61,6 +63,9 @@ export class AgendaEventInfoComponent implements OnInit {
   my_dyspoStatus_label = '';
   display_date_1: string | undefined;
   display_date_2: string | undefined;
+  selectedUser: AppUserWithEvents | undefined;
+  selectedUserFriendStatus: FriendStatus | undefined;
+  selectedUserFriendStatusLabel = '';
 
   constructor(
     private modalCtrl: ModalController,
@@ -177,17 +182,14 @@ export class AgendaEventInfoComponent implements OnInit {
 
       // My Info
       if (member.uid === this.userSvc.userInfo?.uid) {
+        member.firstname = 'Vous';
         this.my_dyspoStatus = dyspo.friend_dyspo;
         this.my_dyspoStatus_label = '';
         this.my_agendaEvents = events.agendaEvents;
         this.my_agendaEvents_label = '';
 
         if (this.my_agendaEvents.length === 1) {
-          this.my_agendaEvents_label =
-            'Vous avez un événement ce jour là de ' +
-            this.my_agendaEvents[0].start_time_formatted +
-            ' à ' +
-            this.my_agendaEvents[0].end_time_formatted;
+          this.my_agendaEvents_label = 'Vous avez un événement ce jour là';
         }
 
         if (this.my_agendaEvents.length > 1) {
@@ -225,11 +227,22 @@ export class AgendaEventInfoComponent implements OnInit {
   }
 
   onSelectUser(user: AppUserWithEvents, e: Event) {
+    if (
+      user.uid === this.userSvc.userInfo?.uid &&
+      user.agendaEvents?.length === 0
+    )
+      return;
     this.selectedUserEvents = user.agendaEvents;
-    if (this.selectedUserEvents && this.selectedUserEvents?.length > 0) {
-      this.popoverUserEvents.event = e;
-      this.isPopoverUserEventsOpen = true;
-    }
+    this.selectedUser = user;
+    console.log('get friend status');
+    this.selectedUserFriendStatus = this.friendsSvc.getFriendStatus(user.uid);
+    this.selectedUserFriendStatusLabel = this.getSelectedFriendStatusLabel(
+      this.selectedUserFriendStatus!
+    );
+    //if (this.selectedUserEvents && this.selectedUserEvents?.length > 0) {
+    this.popoverUserEvents.event = e;
+    this.isPopoverUserEventsOpen = true;
+    //}
   }
 
   // async confirmQuitEvent(newAdminUid?: string) {
@@ -356,8 +369,50 @@ export class AgendaEventInfoComponent implements OnInit {
   }
 
   invite(user: AppUserWithEvents) {
+    this.isPopoverUserEventsOpen = false;
+    if (!user) return;
     this.friendsSvc.invite(user, true).then(() => {
       user.is_my_friend = true;
     });
+  }
+
+  getSelectedFriendStatusLabel(status: FriendStatus): string {
+    let label = '';
+    switch (status) {
+      case FriendStatus.FRIEND:
+        label = 'Vous êtes amis';
+        break;
+      case FriendStatus.NOFRIEND:
+        label = "Vous n'êtes pas amis";
+        break;
+      case FriendStatus.INVITED:
+        label = 'Invitation ami envoyée';
+        break;
+      case FriendStatus.SUGGESTED:
+        label = 'Invitation ami reçue';
+        break;
+    }
+    return label;
+  }
+
+  getOtherEventLabel(ev: AgendaEvent) {
+    // Event long
+    if (ev.start_date_day_of_year !== ev.end_date_day_of_year) {
+      return (
+        format(parseISO(ev.startISO), 'dd MMM HH:mm', { locale: fr }) +
+        ' - ' +
+        format(parseISO(ev.endISO), 'dd MMM HH:mm', { locale: fr })
+      );
+    }
+    // Event sur une journee
+    else {
+      return (
+        format(parseISO(ev.endISO), 'dd MMM', { locale: fr }) +
+        ' ' +
+        ev.start_time_formatted +
+        ' - ' +
+        ev.end_time_formatted
+      );
+    }
   }
 }

@@ -103,7 +103,7 @@
 
      -->
     <div style="max-height: 650px; min-height: 300px; width: 100%">
-      <div style="padding: 4px 4px 0px 4px">{{getNbMembers()}}</div>
+      <!-- <div style="padding: 4px 4px 0px 4px">{{getNbMembers()}}</div> -->
       <ion-row class="friends-wrapper">
         <div class="category_div">
           <div class="menu">
@@ -112,6 +112,7 @@
               *ngFor="let member of members"
             >
               <ion-thumbnail
+                (click)="onSelectUser(member, $event)"
                 [ngClass]="{
                 'thumb-kid': member.dyspoStatus === UserDyspoStatus.DYSPOWITHKIDS,
                 'thumb-nokids': member.dyspoStatus === UserDyspoStatus.DYSPO,
@@ -120,7 +121,6 @@
               >
                 <img src="{{ member.avatarPath }}" />
                 <ion-badge
-                  (click)="showUserEvents(member, $event)"
                   *ngIf="member.agendaEvents!.length > 0"
                   name="warning-outline"
                   color="danger"
@@ -128,12 +128,13 @@
                   >{{ member.agendaEvents!.length }}</ion-badge
                 >
                 <ion-icon
-                  (click)="invite(member)"
                   *ngIf="member.is_my_friend === false"
                   class="zmdi zmdi-plus end"
                 ></ion-icon>
               </ion-thumbnail>
-              <ion-label>{{ member.firstname }}</ion-label>
+              <ion-label
+                >{{ member.uid === uid ? 'Vous' : member.firstname }}</ion-label
+              >
             </div>
           </div>
         </div>
@@ -143,7 +144,7 @@
         [startTime]="startTime"
         [endTime]="endTime"
         (friendSelected)="onFriendSelected($event)"
-        (showEvents)="onShowEvents($event)"
+        (groupSelected)="onGroupSelected($event)"
       ></app-friends-selector>
     </div>
   </ion-card>
@@ -194,27 +195,27 @@
     </ion-item>
   </ion-card>
 
-  <ion-searchbar
-    [(ngModel)]="autocompletePlaceInput.input"
-    (ngModelChange)="updateSearchResults()"
-    placeholder="Entrez une adresse"
-    (ionClear)="clearAutocomplete()"
-  >
-  </ion-searchbar>
-  <ion-list
-    class="ion-no-margin ion-no-padding"
-    [hidden]="autocompletePlaces.length === 0"
-  >
-    <ion-item
-      *ngFor="let place of autocompletePlaces"
-      tappable
-      (click)="selectSearchResult(place)"
-    >
-      {{ place.description }}
-    </ion-item>
-  </ion-list>
   <ion-card *ngIf="is_multi">
-    <ion-radio-group [(ngModel)]="agendaEvent!.type">
+    <ion-item>
+      <ion-select aria-label="Type evenement" [(ngModel)]="agendaEvent!.type">
+        <ion-avatar slot="start" style="width: 40px; height: 40px">
+          <ion-img [src]="getIconTypeEvent()"></ion-img>
+        </ion-avatar>
+        <ion-select-option [value]="agendaEventType.KIDS"
+          >Kids</ion-select-option
+        >
+        <ion-select-option [value]="agendaEventType.NOKIDS"
+          >No Kids</ion-select-option
+        >
+        <ion-select-option [value]="agendaEventType.FREE">
+          <span style="color: var(--text-dyspo-free)"
+            >Avec ou sans Kids</span
+          ></ion-select-option
+        >
+      </ion-select>
+    </ion-item>
+
+    <!-- <ion-radio-group [(ngModel)]="agendaEvent!.type">
       <ion-item lines="none">
         <ion-avatar slot="start">
           <ion-img src="../../../../assets/dyspo-kid.png"></ion-img>
@@ -252,8 +253,27 @@
           [value]="agendaEventType.FREE"
         ></ion-radio>
       </ion-item>
-    </ion-radio-group>
+    </ion-radio-group> -->
   </ion-card>
+  <ion-searchbar
+    [(ngModel)]="autocompletePlaceInput.input"
+    (ngModelChange)="updateSearchResults()"
+    placeholder="Entrez une adresse"
+    (ionClear)="clearAutocomplete()"
+  >
+  </ion-searchbar>
+  <ion-list
+    class="ion-no-margin ion-no-padding"
+    [hidden]="autocompletePlaces.length === 0"
+  >
+    <ion-item
+      *ngFor="let place of autocompletePlaces"
+      tappable
+      (click)="selectSearchResult(place)"
+    >
+      {{ place.description }}
+    </ion-item>
+  </ion-list>
 
   <ion-card *ngIf="is_multi">
     <div class="ion-padding">
@@ -274,9 +294,16 @@
     <div
       *ngIf="agendaEvent?.avatar"
       (click)="takePhotoPrompt()"
-      style="max-width: 80%; padding: 16px; margin: auto"
+      style="background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
+      min-width: 50%;
+      max-width: 80%;
+      min-height: 250px;
+      margin: auto;
+      background-image: url('{{agendaEvent?.avatar}}');"
     >
-      <ion-img src="{{agendaEvent?.avatar}}" />
+      <!-- <ion-img src="{{agendaEvent?.avatar}}" /> -->
     </div>
   </div>
 
@@ -286,11 +313,20 @@
     (didDismiss)="isPopoverUserEventsOpen = false"
   >
     <ng-template>
-      <ion-list>
-        <ion-item *ngFor="let agEv of selectedUserEvents" lines="none">
+      <ion-item
+        (click)="invite(selectedUser!)"
+        *ngIf="selectedUserFriendStatus === FriendStatus.NOFRIEND"
+      >
+        Demander en Ami
+      </ion-item>
+      <ion-item *ngIf="selectedUserFriendStatus !== FriendStatus.NOFRIEND">
+        {{ selectedUserFriendStatusLabel }}
+      </ion-item>
+      <ion-list *ngIf="selectedUserEvents && selectedUserEvents.length > 0">
+        <ion-note style="padding-left: 10px">Indisponible</ion-note>
+        <ion-item *ngFor="let agEv of selectedUserEvents">
           <ion-text color="danger" style="font-size: 0.75rem"
-            >Autre evenement {{ agEv.start_date_formatted }} à {{
-            agEv.start_time_formatted }}</ion-text
+            >{{ getOtherEventLabel(agEv) }}</ion-text
           >
         </ion-item>
       </ion-list>
