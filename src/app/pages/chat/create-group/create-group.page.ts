@@ -43,7 +43,9 @@ export class CreateGroupPage implements OnInit {
   ) {
     const uid = this.userSvc.userInfo?.uid!;
     this.friends = cloneDeep(this.friendsSvc.friends);
-
+    this.friends = this.friends.filter((friend) => {
+      return friend.friend_status === FriendStatus.FRIEND;
+    });
     console.log('my friends ', this.friends);
 
     this.activatedRoute.params.subscribe((params) => {

@@ -126,3 +126,7 @@ ion-toolbar {
   display: flex;
   justify-content: center;
 }
+
+ion-item:last-child {
+  --inner-border-width: 0;
+}

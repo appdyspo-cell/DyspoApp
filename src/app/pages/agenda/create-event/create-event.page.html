@@ -95,58 +95,61 @@
   </ion-card>
 
   <ion-card *ngIf="is_multi">
-    <!-- <ion-toolbar>
-      <ion-button slot="end" fill="clear" (click)="goToFriendSelection()">
-        <ion-icon name="people" slot="start"></ion-icon>Amis, Groupe</ion-button
-      >
-    </ion-toolbar>
-
-     -->
-    <div style="max-height: 650px; min-height: 300px; width: 100%">
-      <!-- <div style="padding: 4px 4px 0px 4px">{{getNbMembers()}}</div> -->
-      <ion-row class="friends-wrapper">
-        <div class="category_div">
-          <div class="menu">
-            <div
-              class="item animate__animated animate__fadeIn"
-              *ngFor="let member of members"
-            >
-              <ion-thumbnail
-                (click)="onSelectUser(member, $event)"
-                [ngClass]="{
-                'thumb-kid': member.dyspoStatus === UserDyspoStatus.DYSPOWITHKIDS,
-                'thumb-nokids': member.dyspoStatus === UserDyspoStatus.DYSPO,
-                'thumb-nodyspo': member.dyspoStatus === UserDyspoStatus.NODYSPO
-              }"
-              >
-                <img src="{{ member.avatarPath }}" />
-                <ion-badge
-                  *ngIf="member.agendaEvents!.length > 0"
-                  name="warning-outline"
-                  color="danger"
-                  class="thumbnail-badge"
-                  >{{ member.agendaEvents!.length }}</ion-badge
-                >
-                <ion-icon
-                  *ngIf="member.is_my_friend === false"
-                  class="zmdi zmdi-plus end"
-                ></ion-icon>
-              </ion-thumbnail>
-              <ion-label
-                >{{ member.uid === uid ? 'Vous' : member.firstname }}</ion-label
-              >
-            </div>
+    <ion-accordion-group>
+      <ion-accordion value="first">
+        <ion-item slot="header" color="light">
+          <ion-label> {{getNbMembers()}}</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          <div style="max-height: 650px; min-height: 300px; width: 100%">
+            <!-- <div style="padding: 4px 4px 0px 4px">{{getNbMembers()}}</div> -->
+            <ion-row class="friends-wrapper">
+              <div class="category_div">
+                <div class="menu">
+                  <div
+                    class="item animate__animated animate__fadeIn"
+                    *ngFor="let member of members"
+                  >
+                    <ion-thumbnail
+                      (click)="onSelectUser(member, $event)"
+                      [ngClass]="{
+                      'thumb-kid': member.dyspoStatus === UserDyspoStatus.DYSPOWITHKIDS,
+                      'thumb-nokids': member.dyspoStatus === UserDyspoStatus.DYSPO,
+                      'thumb-nodyspo': member.dyspoStatus === UserDyspoStatus.NODYSPO
+                    }"
+                    >
+                      <img src="{{ member.avatarPath }}" />
+                      <ion-badge
+                        *ngIf="member.agendaEvents!.length > 0"
+                        name="warning-outline"
+                        color="danger"
+                        class="thumbnail-badge"
+                        >{{ member.agendaEvents!.length }}</ion-badge
+                      >
+                      <ion-icon
+                        *ngIf="member.is_my_friend === false"
+                        class="zmdi zmdi-plus end"
+                      ></ion-icon>
+                    </ion-thumbnail>
+                    <ion-label
+                      >{{ member.uid === uid ? 'Vous' : member.firstname
+                      }}</ion-label
+                    >
+                  </div>
+                </div>
+              </div>
+            </ion-row>
+            <app-friends-selector
+              [agendaEvent]="agendaEvent!"
+              [startTime]="startTime"
+              [endTime]="endTime"
+              (friendSelected)="onFriendSelected($event)"
+              (groupSelected)="onGroupSelected($event)"
+            ></app-friends-selector>
           </div>
         </div>
-      </ion-row>
-      <app-friends-selector
-        [agendaEvent]="agendaEvent!"
-        [startTime]="startTime"
-        [endTime]="endTime"
-        (friendSelected)="onFriendSelected($event)"
-        (groupSelected)="onGroupSelected($event)"
-      ></app-friends-selector>
-    </div>
+      </ion-accordion>
+    </ion-accordion-group>
   </ion-card>
 
   <ion-card *ngIf="!is_multi && mode==='new'">

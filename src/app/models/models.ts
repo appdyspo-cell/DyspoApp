@@ -14,7 +14,6 @@ export interface AppUser {
   firstConnexion?: boolean;
   notificationToken?: string;
   isConnected?: boolean;
-  friendStatus?: string;
   friendListUid?: string;
   tagline?: string;
   avg_rates?: number;
