@@ -163,7 +163,7 @@ export class CreateEventPage implements OnInit {
             // day: getDate(new Date(this.tsInputDate)),
             // month: getMonth(new Date(this.tsInputDate)),
             // year: getYear(new Date(this.tsInputDate)),
-            avatar: 'assets/event.jpg',
+            avatar: 'assets/date-du-calendrier.png',
             is_multi: this.is_multi,
             recurrence: AgendaEventRecurrence.ONE,
             recurrence_nb: '0',

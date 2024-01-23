@@ -247,7 +247,7 @@ export class UserStatusPage implements OnInit {
     const buttons = [];
     buttons.push({
       text: 'Personnel',
-      cssClass: 'dyspo-sheet-dyspo',
+      // cssClass: 'dyspo-sheet-dyspo',
       data: {
         is_multi: false,
       },
@@ -255,7 +255,7 @@ export class UserStatusPage implements OnInit {
 
     buttons.push({
       text: 'Groupe',
-      cssClass: 'dyspo-sheet-dyspo-with-kids',
+      //  cssClass: 'dyspo-sheet-dyspo-with-kids',
       data: {
         is_multi: true,
       },

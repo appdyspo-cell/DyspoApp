@@ -269,7 +269,7 @@
         {{ selectedUserFriendStatusLabel }}
       </ion-item>
       <ion-list *ngIf="selectedUserEvents && selectedUserEvents.length > 0">
-        <ion-note style="padding-left: 10px">Indisponible</ion-note>
+        <ion-note style="padding-left: 10px">Indisponibilités</ion-note>
         <ion-item *ngFor="let agEv of selectedUserEvents">
           <ion-text color="danger" style="font-size: 0.75rem">{{
             getOtherEventLabel(agEv)
