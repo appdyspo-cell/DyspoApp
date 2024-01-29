@@ -9,6 +9,7 @@ import {
   Chatroom,
   CrudFBAction,
   FriendDyspo,
+  HolidaysEvent,
   UserAgendaEventsByDay,
   UserDyspoStatus,
 } from '../models/models';
@@ -53,12 +54,17 @@ export class AgendaService {
   private uid!: string;
   public agendaEvents: AgendaEvent[] = [];
   public agendaEventInvitations: AgendaEvent[] = [];
+  public holidays: HolidaysEvent[] = [];
   public agendaEventsSubject = new BehaviorSubject<AgendaEvent[]>([]);
   public agendaEventInvitationsSubject = new BehaviorSubject<AgendaEvent[]>([]);
   public agendaDyspos: AgendaDyspoItem[] = [];
   public agendaDysposSubject = new BehaviorSubject<{
     action: 'MODIFIED' | 'ADDED' | 'REMOVED';
     items: AgendaDyspoItem[];
+  }>({ action: 'ADDED', items: [] });
+  public holidaysSubject = new BehaviorSubject<{
+    action: 'MODIFIED' | 'ADDED' | 'REMOVED';
+    items: HolidaysEvent[];
   }>({ action: 'ADDED', items: [] });
 
   public agendaEvents$!: Observable<AgendaEvent[]>;
@@ -67,16 +73,22 @@ export class AgendaService {
     action: 'MODIFIED' | 'ADDED' | 'REMOVED';
     items: AgendaDyspoItem[];
   }>;
+  public holidays$!: Observable<{
+    action: 'MODIFIED' | 'ADDED' | 'REMOVED';
+    items: HolidaysEvent[];
+  }>;
   public isModified = false;
   eventsOnSnapshotCancel!: import('@angular/fire/firestore').Unsubscribe;
   eventInvitationsOnSnapshotCancel!: import('@angular/fire/firestore').Unsubscribe;
   dysposOnSpnashotCancel!: import('@angular/fire/firestore').Unsubscribe;
+  holidaysOnSnapshotCancel!: import('@angular/fire/firestore').Unsubscribe;
 
   constructor(private firestore: Firestore, private utils: UtilsService) {
     this.agendaEvents$ = this.agendaEventsSubject.asObservable();
     this.agendaEventInvitations$ =
       this.agendaEventInvitationsSubject.asObservable();
     this.agendaDyspos$ = this.agendaDysposSubject.asObservable();
+    this.holidays$ = this.holidaysSubject.asObservable();
   }
 
   initService(uid: string) {
@@ -105,6 +117,8 @@ export class AgendaService {
       this.firestore,
       `agenda_dyspos/${uid}/dyspo_list`
     );
+
+    const holidaysCollectionRef = collection(this.firestore, `holidays`);
 
     this.eventsOnSnapshotCancel = onSnapshot(queryAgendaEvents, (snapshot) => {
       snapshot.docChanges().forEach((change) => {
@@ -220,6 +234,43 @@ export class AgendaService {
             this.agendaDysposSubject.next({
               action: 'REMOVED',
               items: this.agendaDyspos,
+            });
+          }
+        });
+      }
+    );
+
+    //Holidays
+    this.holidaysOnSnapshotCancel = onSnapshot(
+      holidaysCollectionRef,
+      (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          const holidaysFetched = change.doc.data() as HolidaysEvent;
+
+          const foundIndex = this.holidays.findIndex(
+            (elt) => elt.uid === holidaysFetched.uid
+          );
+          if (change.type === 'modified' && foundIndex > -1) {
+            this.holidays[foundIndex] = holidaysFetched;
+            this.holidaysSubject.next({
+              action: 'MODIFIED',
+              items: this.holidays,
+            });
+          }
+          if (change.type === 'added' && foundIndex === -1) {
+            this.holidays.push(holidaysFetched);
+            this.holidaysSubject.next({
+              action: 'ADDED',
+              items: this.holidays,
+            });
+          }
+          if (change.type === 'removed') {
+            if (foundIndex >= 0) {
+              this.holidays.splice(foundIndex, 1);
+            }
+            this.holidaysSubject.next({
+              action: 'REMOVED',
+              items: this.holidays,
             });
           }
         });
@@ -648,14 +699,20 @@ export class AgendaService {
   unsubscribeAllAfterLogoutEvent() {
     if (this.dysposOnSpnashotCancel) this.dysposOnSpnashotCancel();
     if (this.eventsOnSnapshotCancel) this.eventsOnSnapshotCancel();
+    if (this.holidaysOnSnapshotCancel) this.holidaysOnSnapshotCancel();
     this.agendaEvents = [];
     this.agendaDyspos = [];
+    this.holidays = [];
     this.agendaEventInvitations = [];
     this.agendaEventInvitationsSubject.next(this.agendaEventInvitations);
     this.agendaEventsSubject.next(this.agendaEvents);
     this.agendaDysposSubject.next({
       action: 'REMOVED',
       items: this.agendaDyspos,
+    });
+    this.holidaysSubject.next({
+      action: 'REMOVED',
+      items: this.holidays,
     });
   }
 }

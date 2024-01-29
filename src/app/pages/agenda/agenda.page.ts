@@ -31,6 +31,7 @@ import {
   AgendaEvent,
   AppUser,
   Friend,
+  HolidaysEvent,
   ShowHelper,
   UserDyspoStatus,
 } from 'src/app/models/models';
@@ -78,6 +79,9 @@ export class AgendaPage implements AfterViewInit {
 
   agendaDyspos: AgendaDyspoItem[] = [];
   agendaDysposSubscription: Subscription | undefined;
+
+  holidays: HolidaysEvent[] = [];
+  holidaysSubscription: Subscription | undefined;
 
   agendaMode: AgendaMode = AgendaMode.READONLY;
   isFriendMode = false;
@@ -160,6 +164,14 @@ export class AgendaPage implements AfterViewInit {
           this.utils.showAlert('Ne souhaite pas partager son calendrier');
         }
       }
+
+      this.holidaysSubscription = this.agendaSvc.holidays$.subscribe(
+        (holidays) => {
+          console.log(holidays.action);
+          this.holidays = holidays.items;
+          this.tagHolidays();
+        }
+      );
     });
   }
 
@@ -169,6 +181,9 @@ export class AgendaPage implements AfterViewInit {
     }
     if (this.userSubscription) {
       this.userSubscription.unsubscribe();
+    }
+    if (this.holidaysSubscription) {
+      this.holidaysSubscription.unsubscribe();
     }
   }
 
@@ -232,6 +247,7 @@ export class AgendaPage implements AfterViewInit {
     this.agendaSvc.isModified = false;
     this.tagCalendarEventsDataForMonth();
     this.tagCalendarUserDyspoData();
+    this.tagHolidays();
   }
 
   tagCalendarEventsDataForMonth() {
@@ -277,26 +293,25 @@ export class AgendaPage implements AfterViewInit {
     }
   }
 
-  // getAgendaEventsForCurrentMonth() {
-  //   this.eventsForDate = [];
-  //   this.eventsForDate = this.agendaEvents.filter((elt: AgendaEvent) =>
-  //     isSameMonth(
-  //       this.calendarMonthData?.original.month,
-  //       parseISO(elt.startISO)
-  //     )
-  //   );
-  //   this.eventsForDate.sort((item1, item2) => {
-  //     const date1 = parseISO(item1.startISO);
-  //     const date2 = parseISO(item2.startISO);
-  //     if (isBefore(date1, date2)) {
-  //       return -1; // item1 doit être trié avant item2
-  //     } else if (isAfter(date1, date2)) {
-  //       return 1; // item1 doit être trié après item2
-  //     } else {
-  //       return 0; // les dates sont égales
-  //     }
-  //   });
-  // }
+  tagHolidays() {
+    if (!this.calendarMonthData) {
+      console.log('Can not tag calendar holidays');
+    } else {
+      this.calendarMonthData.days.forEach((day) => {
+        day.isHolidays = false;
+
+        this.holidays.forEach((h) => {
+          if (
+            h.geo_zone === this.userSvc.userInfo?.geo_zone &&
+            h.start_date_ts <= day.time &&
+            h.end_date_ts >= day.time
+          ) {
+            day.isHolidays = true;
+          }
+        });
+      });
+    }
+  }
 
   getAgendaEventsForDate(ts: number) {
     this.eventsForDate = [];

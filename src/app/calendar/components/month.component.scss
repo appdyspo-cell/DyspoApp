@@ -91,6 +91,11 @@
   color: #fff !important;
 }
 
+:host .is-holidays {
+  border: 2px solid #1f1f1f !important;
+  font-style: italic;
+}
+
 :host .event-badge {
   //width: 10px;
   //height: 10px;

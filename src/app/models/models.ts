@@ -254,6 +254,17 @@ export interface WarnReportGroup {
   result_group_status?: string;
 }
 
+export interface HolidaysEvent {
+  uid: string;
+  start_date_formatted?: string;
+  start_date_ISO: string;
+  start_date_ts: number;
+  end_date_ISO: string;
+  end_date_formatted?: string;
+  end_date_ts: number;
+  geo_zone: string;
+}
+
 export enum DiscussionType {
   ARCHIVE = 'ARCHIVE',
   ACTIVE = 'ACTIVE',

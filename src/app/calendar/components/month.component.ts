@@ -82,6 +82,7 @@ export const MONTH_VALUE_ACCESSOR: any = {
                   [class.on-selected-no-dyspo]="
                     day.userDyspo === userDyspoStatus.NODYSPO
                   "
+                  [class.is-holidays]="day.isHolidays"
                   [disabled]="day.disable"
                   [attr.aria-label]="getDayLabel(day) | date : DAY_DATE_FORMAT"
                 >

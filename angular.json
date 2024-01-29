@@ -58,10 +58,10 @@
             },
             "development": {
               "buildOptimizer": true,
-              "optimization": true,
+              "optimization": false,
               "vendorChunk": true,
               "extractLicenses": false,
-              "sourceMap": false,
+              "sourceMap": true,
               "namedChunks": true
             },
             "ci": {
