@@ -85,10 +85,6 @@ export interface Chatroom {
   //lastMessage: string;
   startMessageId: number;
   nextMessageId: number;
-  blocked?: boolean;
-  blockedBy?: string;
-  blockedTime?: string;
-  blockedTimeMs?: number;
   quit_chatroom_at?: number;
   isArchived?: boolean;
   isNotifications: boolean;
@@ -211,47 +207,43 @@ export interface ChatMessage {
   is_deleted?: boolean;
 }
 
-export interface WarnReportUser {
-  id?: string;
-  report_date_ms: number;
-  report_date_ISO?: string;
+export interface WarnReport {
+  uid: string;
+  date_ms: number;
+  date_ISO: string;
+  date_formatted?: string;
   from_user_id: string;
   from_user_data?: AppUser;
-  report_user_data?: AppUser;
-  report_user_id: string;
   report_text: string;
-  result_user_status?: string;
+  report_type: ReportType;
 }
 
-export interface WarnReportMsg {
-  uid: string;
+export interface WarnReportUser extends WarnReport {
+  report_user_data?: AppUser;
+  report_user_id: string;
+  result_user_status?: string;
+  report_type: ReportType.USER;
+}
+
+export interface WarnReportMsg extends WarnReport {
   msg_uid: string;
   msg_sender_uid: string;
   msg_sender_data?: AppUser;
   agenda_event_uid: string;
-  date_ms: number;
-  date_ISO?: string;
-  from_user_id: string;
-  from_user_data?: AppUser;
-  report_text?: string;
   status: WarnReportMsgStatus;
   result_user_status?: string;
   result_msg_status?: string;
+  report_type: ReportType.MSG;
 }
 
-export interface WarnReportGroup {
-  uid: string;
+export interface WarnReportGroup extends WarnReport {
   agenda_event_uid: string;
   last_five_messages: string[];
   members_uid: string[];
-  date_ms: number;
-  date_ISO?: string;
-  from_user_id: string;
-  from_user_data?: AppUser;
-  report_text: string;
   status: WarnReportGroupStatus;
   result_user_status?: string;
   result_group_status?: string;
+  report_type: ReportType.GROUP;
 }
 
 export interface HolidaysEvent {
@@ -265,6 +257,12 @@ export interface HolidaysEvent {
   geo_zone: string;
 }
 
+export enum ReportType {
+  USER = 'USER',
+  GROUP = 'GROUP',
+  MSG = 'MSG',
+}
+
 export enum DiscussionType {
   ARCHIVE = 'ARCHIVE',
   ACTIVE = 'ACTIVE',
@@ -273,6 +271,7 @@ export enum DiscussionType {
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
   DELETED = 'DELETED',
+  BANNED = 'BANNED',
 }
 
 export enum UserDyspoStatus {

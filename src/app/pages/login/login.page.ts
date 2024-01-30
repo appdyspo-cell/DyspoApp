@@ -61,34 +61,19 @@ export class LoginPage implements OnInit {
 
     try {
       const credentials = await this.authService.login(email, password);
-      // if (!fromBiometric && Capacitor.getPlatform() !== 'web') {
-      //   NativeBiometric.deleteCredentials({
-      //     server: environment.BIOMETRIC_KEY,
-      //   });
-      //   // Save user's credentials
-      //   NativeBiometric.setCredentials({
-      //     username: email,
-      //     password: password,
-      //     server: environment.BIOMETRIC_KEY,
-      //   }).then(() => {
-      //     console.log('Credentials set');
-      //   });
-      // }
 
       this.logger.logDebug('user logged');
       this.utils.hideLoader();
-      this.navController.navigateRoot('/tabs');
+      // this.navController.navigateRoot('/tabs');
       this.logger.logDebug(credentials);
       this.utils.hideLoader();
       return credentials;
     } catch (error: any) {
       this.utils.hideLoader();
-      console.log('Error login');
+      console.log('Error login', error);
       this.utils.showFirebaseError(error);
       return null;
     }
-
-    return null;
   }
 
   async forgotPassword() {

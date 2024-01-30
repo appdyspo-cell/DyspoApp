@@ -30,6 +30,7 @@ import {
   UserDyspoStatus,
   WarnReportGroup,
   WarnReportGroupStatus,
+  ReportType,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
 import { ChatService, GetMessagesResult } from 'src/app/services/chat.service';
@@ -412,10 +413,11 @@ export class GroupChattingPage implements OnInit, OnDestroy {
           date_ms: now.getTime(),
           date_ISO: now_ISO,
           from_user_id: my_id,
-          report_text: this.msgSelected.message,
+          report_text: this.msgSelected.message!,
           status: WarnReportMsgStatus.CREATED,
           from_user_data: this.userSvc.userInfo,
           msg_sender_data: senderInfo,
+          report_type: ReportType.MSG,
         };
         this.msgSelected = undefined;
 
@@ -460,6 +462,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
         from_user_data: this.userSvc.userInfo,
         last_five_messages: [],
         members_uid: this.agendaEvent.members_uid,
+        report_type: ReportType.GROUP,
       };
       this.chatSvc
         .warnReportGroup(report_data)

@@ -477,7 +477,7 @@ export class FriendsService {
       this.friendGroupsSubject.next(this.friendGroups);
       this.friendsSubject.next(this.friends);
     } catch (err) {
-      console.log('Can not unsubscribe ', err);
+      //console.log('Can not unsubscribe ', err);
     }
   }
 

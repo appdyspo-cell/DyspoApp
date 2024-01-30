@@ -12,6 +12,7 @@ import { NotificationService } from './services/notification.service';
 import { environment } from 'src/environments/environment';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { App } from '@capacitor/app';
+import { UtilsService } from './services/utils.service';
 
 @Component({
   selector: 'app-root',
@@ -34,7 +35,8 @@ export class AppComponent {
     private friendsSvc: FriendsService,
     private agendaSvc: AgendaService,
     private chatSvc: ChatService,
-    private notificationSvc: NotificationService
+    private notificationSvc: NotificationService,
+    private utils: UtilsService
   ) {
     //Lang
     this.translate.setDefaultLang('fr');
@@ -66,6 +68,7 @@ export class AppComponent {
             .catch((err) => {
               this.logger.logDebug('ERR validateAuthState ', err);
               this.navController.navigateRoot('/login');
+              this.utils.showToastError(err.msg);
               SplashScreen.hide();
             });
         } else {

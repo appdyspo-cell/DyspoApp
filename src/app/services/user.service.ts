@@ -68,16 +68,21 @@ export class UserService {
           (firebaseUserDocData: any) => {
             if (!firebaseUserDocData) {
               console.error('User not found');
-              reject('NOTFOUND');
+              reject({ msg: 'Utilisateur non trouvé', error: true });
             } else {
-              firebaseUserDocData['uid'] = uid;
-              this.userInfo = { ...firebaseUserDocData };
-              this._appUserInfoSubject.next(this.userInfo!);
-              //Si l'utilisateur a été effacé
-              if (firebaseUserDocData.status === UserStatus.DELETED) {
+              //Si l'utilisateur a été effacé ou banni
+              if (
+                firebaseUserDocData.status === UserStatus.DELETED ||
+                firebaseUserDocData.status === UserStatus.BANNED
+              ) {
                 this.authSvc.logout();
+                reject({ msg: 'Utilisateur banni', error: true });
+              } else {
+                firebaseUserDocData['uid'] = uid;
+                this.userInfo = { ...firebaseUserDocData };
+                this._appUserInfoSubject.next(this.userInfo!);
+                resolve(this.userInfo!);
               }
-              resolve(this.userInfo!);
             }
           }
         );

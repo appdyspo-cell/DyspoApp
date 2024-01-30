@@ -49,6 +49,9 @@ export class UtilsService {
       case 'auth/invalid-login-credentials':
         return 'Mauvais identifiant / mot de passe incorrect';
         break;
+      case 'auth/invalid-credential':
+        return 'Mauvais identifiant / mot de passe incorrect';
+        break;
       case 'auth/invalid-email':
         return "L'email n'est pas valide";
         break;
