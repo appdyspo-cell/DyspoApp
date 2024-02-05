@@ -56,9 +56,9 @@
     <p></p>
   </ion-toolbar>
 </ion-header>
-<ion-content class="ion-padding">
+<ion-content class="ion-padding bg_color" [fullscreen]="true">
   <div class="form" padding>
-    <ion-list class="f-list" lines="full">
+    <ion-list class="f-list" lines="none">
       <ion-item lines="none">
         <ion-label mode="md" position="floating">Nom *</ion-label>
         <ion-input
@@ -171,8 +171,9 @@
     </ion-list>
   </div>
 </ion-content>
-<ion-footer class="bg_color">
+<ion-footer>
   <ion-button expand="block" (click)="save()"
-    >{{'SAVE' | translate}}</ion-button
-  >
+    >{{'SAVE' | translate}}
+    <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+  </ion-button>
 </ion-footer>

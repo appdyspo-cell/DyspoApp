@@ -1,3 +1,13 @@
+ion-toolbar {
+  // --background: none;
+}
+
+ion-card {
+  box-shadow: none;
+  --background: var(--bg-color-secondary);
+  margin: 0 16px 10px 16px;
+}
+
 ion-radio::part(container) {
   width: 30px;
   height: 30px;
@@ -248,4 +258,14 @@ ion-list-header {
 
 ion-item:last-child {
   --inner-border-width: 0;
+}
+
+ion-item::part(native) {
+  --background: transparent;
+}
+
+ion-searchbar {
+  padding: 0;
+  --box-shadow: none;
+  --background: transparent;
 }

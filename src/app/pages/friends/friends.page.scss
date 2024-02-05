@@ -1,9 +1,22 @@
 ion-list {
   padding-bottom: 0px;
+  background: transparent;
+}
+
+ion-item::part(native) {
+  --background: transparent;
 }
 
 ion-header {
   box-shadow: none !important;
+}
+
+.ion-page {
+  --background: none;
+  background-image: url("/assets/fd_ecran_principal.jpg");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .friend-item {
@@ -209,7 +222,7 @@ ion-fab {
 ion-toolbar {
   --background: transparent;
   ion-title {
-    --color: white;
+    // --color: white;
   }
 }
 

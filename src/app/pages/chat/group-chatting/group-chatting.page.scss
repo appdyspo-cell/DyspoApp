@@ -90,7 +90,7 @@ ion-content {
   //--background: url('../../../../assets/img/bg.png') no-repeat cover;
 
   --background: none;
-  background-image: url("../../../../assets/img/bg.png");
+  background-image: url("../../../../assets/fd_ecran_principal.jpg");
   background-position: center top;
   background-repeat: no-repeat;
   background-size: cover;
@@ -109,7 +109,7 @@ ion-content {
 
     p {
       margin: 0;
-      color: var(--white);
+      //color: var(--white);
       font-size: 0.6rem;
       font-weight: 400;
       min-width: 60px;

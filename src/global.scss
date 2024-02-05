@@ -59,13 +59,25 @@
 //   background: var(--bg-color);
 // }
 
+// .bg_color {
+//   --background: radial-gradient(circle, var(--bg-color), var(--bg-color-dark));
+// }
+
 .bg_color {
-  //--background: var(--bg-color);
-  --background: radial-gradient(circle, var(--bg-color), var(--bg-color-dark));
+  --background: none;
+  background-image: url("./assets/fd_ecran_principal.jpg");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .bg-nokids {
-  background-color: var(--text-dyspo);
+  background-image: url("./assets/fd_ecran_event_kid.jpg");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  background-color: var(--text-dyspo-no-kids);
 }
 
 .bg-kid {
@@ -212,7 +224,7 @@ ion-item {
     box-shadow: none !important;
     margin: 0 auto;
     --background: var(--transparent);
-    background: var(--white);
+    //background: var(--white);
     align-items: center;
     --inner-padding-end: 0px;
     --inner-min-height: unset !important;
@@ -310,11 +322,11 @@ ion-item {
   //border-color: var(--text-dyspo);
 }
 
-.bg-nokids {
-  --background: #328bc6;
-  color: var(--white);
-  //color: var(--text-no-dyspo);
-}
+// .bg-nokids {
+//   --background: #328bc6;
+//   color: var(--white);
+//   //color: var(--text-no-dyspo);
+// }
 
 .bg-free {
   --background: #2fb62d;

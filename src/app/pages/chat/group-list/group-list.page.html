@@ -1,4 +1,4 @@
-<ion-header class="ion-no-border">
+<!-- <ion-header class="ion-no-border">
   <div class="header-ct">
     <div class="header">
       <ion-toolbar>
@@ -12,8 +12,21 @@
       </ion-toolbar>
     </div>
   </div>
+</ion-header> -->
+
+<ion-header>
+  <ion-toolbar>
+    <!-- <ion-thumbnail slot="start">
+      <ion-img
+        src="assets/chatrooms.png"
+        class="animate__animated animate__fadeInLeft"
+      ></ion-img>
+    </ion-thumbnail> -->
+    <ion-title> <h1>{{ 'discussions' | translate }}</h1></ion-title>
+  </ion-toolbar>
 </ion-header>
-<div class="shape"></div>
+
+<!-- <div class="shape"></div> -->
 <ion-content [fullscreen]="true" class="bg_color">
   <ion-segment mode="md" [(ngModel)]="selectDiscussionsType" lines="none">
     <ion-segment-button mode="md" value="{{discussionType.ACTIVE}}">
@@ -27,7 +40,7 @@
   </ion-segment>
   <div *ngIf="selectDiscussionsType === discussionType.ACTIVE">
     <div *ngIf="agendaEvents.length === 0 && !isLoading">
-      <h3 style="padding-left: 4px">Pas de discussions en cours</h3>
+      <h3 style="text-align: center">Pas de discussions en cours</h3>
     </div>
     <ion-list lines="none">
       <ion-item
@@ -36,19 +49,6 @@
         class="animate__animated animate__slideInRight"
         (click)="goToChat(agendaEvent, discussionType.ACTIVE, $event)"
       >
-        <!-- <div
-            [ngClass]="{
-            'thumb-event-kids': agendaEvent.type === agendaEventType.KIDS,
-            'thumb-event-nokids': agendaEvent.type === agendaEventType.NOKIDS,
-            'thumb-event-free': agendaEvent.type === agendaEventType.FREE,
-            'profile_img_box': true
-          }"
-          >
-            <div class="profile_img">
-              <img src="{{agendaEvent.avatar}}" />
-            </div>
-          </div> -->
-
         <ion-thumbnail
           slot="start"
           [ngClass]="{
@@ -87,7 +87,7 @@
   </div>
   <div *ngIf="selectDiscussionsType === discussionType.ARCHIVE">
     <div *ngIf="agendaEventsArchived.length === 0 && !isLoading">
-      <h3 style="padding-left: 4px">Pas de discussions archivées</h3>
+      <h3 style="text-align: center">Pas de discussions archivées</h3>
     </div>
     <ion-list lines="none">
       <ion-item
@@ -96,31 +96,33 @@
         class="animate__animated animate__slideInRight"
         (click)="goToChat(agendaEvent, discussionType.ARCHIVE, $event)"
       >
-        <div class="item_inner d-flex">
-          <div class="profile_img_box">
-            <div class="profile_img">
-              <img src="{{agendaEvent.avatar}}" />
-            </div>
-          </div>
-          <div class="text-box">
-            <h2 class="d-flex">
-              <span>{{agendaEvent.title}}</span>
-              <small>{{getLastMessageDate(agendaEvent)}}</small>
-            </h2>
-            <p class="d-flex">
-              <ion-icon
-                *ngIf="agendaEvent.last_message?.image"
-                class="ion-text-start zmdi zmdi-attachment"
-              ></ion-icon>
-              <span class="message">{{agendaEvent.last_message?.message}}</span>
+        <ion-thumbnail
+          slot="start"
+          [ngClass]="{
+        'thumb-event-kids': agendaEvent.type === agendaEventType.KIDS,
+        'thumb-event-nokids': agendaEvent.type === agendaEventType.NOKIDS,
+        'thumb-event-free': agendaEvent.type === agendaEventType.FREE}"
+        >
+          <img src="{{agendaEvent.avatar}}" />
+        </ion-thumbnail>
+        <div class="text-box">
+          <h2 class="d-flex">
+            <span>{{agendaEvent.title}}</span>
+            <small>{{getLastMessageDate(agendaEvent)}}</small>
+          </h2>
+          <p class="d-flex">
+            <ion-icon
+              *ngIf="agendaEvent.last_message?.image"
+              class="ion-text-start zmdi zmdi-attachment"
+            ></ion-icon>
+            <span class="message">{{agendaEvent.last_message?.message}}</span>
 
-              <ng-container
-                *ngIf="chatrooms[agendaEvent.uid!] && chatrooms[agendaEvent.uid!].count > 0"
-              >
-                <span class="end">{{chatrooms[agendaEvent.uid!].count}}</span>
-              </ng-container>
-            </p>
-          </div>
+            <ng-container
+              *ngIf="chatrooms[agendaEvent.uid!] && chatrooms[agendaEvent.uid!].count > 0"
+            >
+              <span class="end">{{chatrooms[agendaEvent.uid!].count}}</span>
+            </ng-container>
+          </p>
         </div>
       </ion-item>
     </ion-list>

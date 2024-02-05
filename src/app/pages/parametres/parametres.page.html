@@ -1,66 +1,10 @@
-<ion-header class="ion-no-border">
-  <div class="header-ct">
-    <div class="header">
-      <ion-toolbar>
-        <ion-thumbnail slot="start">
-          <ion-img
-            src="assets/settings.png"
-            class="animate__animated animate__fadeInLeft"
-          ></ion-img>
-        </ion-thumbnail>
-        <ion-title> <h1>Paramètres</h1></ion-title>
-      </ion-toolbar>
-    </div>
-  </div>
+<ion-header>
+  <ion-toolbar>
+    <ion-title> <h1>Paramètres</h1></ion-title>
+  </ion-toolbar>
 </ion-header>
-<div class="shape"></div>
 
 <ion-content class="bg_color" [fullscreen]="true">
-  <!-- <ion-list-header>
-    <h2>Mon Status</h2>
-  </ion-list-header>
-
-  <div
-    button
-    id="open-status-modal"
-    class="ion-padding"
-    style="background-color: transparent"
-  >
-    
-    <div
-      class="dyspo-button dyspo ion-activatable"
-      *ngIf="userInfo?.dyspoStatus === dyspoStatus.DYSPO"
-    >
-      Dyspo
-      <ion-ripple-effect></ion-ripple-effect>
-    </div>
-
-    <div
-      *ngIf="userInfo?.dyspoStatus === dyspoStatus.DYSPOWITHKIDS"
-      class="dyspo-button dyspo-with-kids ion-activatable"
-    >
-      Dyspo With Kids
-      <ion-ripple-effect></ion-ripple-effect>
-    </div>
-
-    <div
-      *ngIf="userInfo?.dyspoStatus === dyspoStatus.NODYSPO"
-      class="dyspo-button no-dyspo ion-activatable"
-    >
-      No Dyspo
-      <ion-ripple-effect></ion-ripple-effect>
-    </div>
-
-    <div
-      *ngIf="!userInfo?.dyspoStatus"
-      class="dyspo-button no-dyspo ion-activatable"
-    >
-      Dyspo ?
-      <ion-ripple-effect></ion-ripple-effect>
-    </div>
-
-  </div> -->
-
   <ion-list-header>
     <h2>Mon Profil</h2>
   </ion-list-header>
@@ -69,9 +13,9 @@
     <ion-item
       type="button"
       mode="ios"
+      lines="none"
       routerLink="/tabs/parametres/profile"
       routerDirection="forward"
-      style="padding-top: 3px"
     >
       <!-- <ion-avatar slot="start">
       <ion-img [src]="avatar"></ion-img>
@@ -91,9 +35,9 @@
     <h2>Notifications</h2>
   </ion-list-header>
   <ion-card>
-    <ion-list>
+    <ion-list lines="none" class="ion-no-padding">
       <div *ngIf="appSettings">
-        <ion-item>
+        <ion-item lines="none">
           <ion-toggle
             color="primary"
             [(ngModel)]="appSettings!.receiveNotification"
@@ -108,19 +52,8 @@
         </ion-item>
       </div>
 
-      <!-- <div *ngIf="appSettings">
-        <ion-item>
-          <ion-toggle
-            color="primary"
-            [(ngModel)]="appSettings.actualiteDyspo"
-            slot="end"
-          ></ion-toggle>
-          <ion-label> Actualités </ion-label>
-        </ion-item>
-      </div> -->
-
       <div>
-        <ion-item>
+        <ion-item lines="none">
           <ion-toggle
             color="primary"
             [(ngModel)]="appSettings!.friendInvitation"
@@ -131,7 +64,7 @@
       </div>
 
       <div>
-        <ion-item>
+        <ion-item lines="none">
           <ion-toggle
             color="primary"
             [(ngModel)]="appSettings!.eventInvitation"
@@ -162,7 +95,7 @@
   <div *ngIf="appSettings">
     <ion-list-header><h2>Réglages</h2></ion-list-header>
     <ion-card>
-      <ion-list>
+      <ion-list lines="none" class="ion-no-padding">
         <div>
           <ion-item>
             <ion-toggle
@@ -181,31 +114,13 @@
       </ion-list>
     </ion-card>
   </div>
-  <!--
-  <ion-list-header>
-    <h2>Apparence</h2>
-  </ion-list-header>
-  <ion-card>
-    <ion-list>
-      <div>
-        <ion-item>
-          <ion-toggle
-            color="primary"
-            (ionChange)="toggleDarkMode($event)"
-            [(ngModel)]="darkmode"
-            >Mode Sombre</ion-toggle
-          >
-        </ion-item>
-      </div> 
-    </ion-list>
-  </ion-card>-->
 
   <ion-list-header>
     <h2>Mentions Légales</h2>
   </ion-list-header>
 
   <ion-card>
-    <ion-item tappable (click)="openMail()">
+    <ion-item tappable (click)="openMail()" lines="none">
       <ion-label class="ion-text-wrap">
         <ion-icon name="mail" class="iconmail" color="primary"></ion-icon>
         <ion-text class="contacttext">Contactez-nous</ion-text>
@@ -228,11 +143,6 @@
     </ion-item>
   </ion-card>
 
-  <!--<ion-card>
-    <ion-item>
-      <ion-button fill="clear" expand="full" class="logout" color="dark" (click)="logout()">Déconnexion</ion-button>
-    </ion-item>
-  </ion-card>-->
   <div class="ovelDivContentBottom">
     <ion-img src="../../assets/dyspo_black_logo.png" class="logo"></ion-img>
     <ion-footer>

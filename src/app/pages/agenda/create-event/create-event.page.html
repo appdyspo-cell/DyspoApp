@@ -1,23 +1,19 @@
-<ion-header>
+<ion-header class="ion-no-border">
   <ion-toolbar>
     <ion-buttons>
       <ion-back-button slot="start" text=""></ion-back-button>
     </ion-buttons>
     <!-- <ion-title>{{ pageTitle }}</ion-title> -->
     <ion-buttons slot="end">
-      <ion-button
-        fill="outline"
-        shape="round"
-        [disabled]=""
-        (click)="saveOrUpdateEvent()"
-      >
-        Enregistrer
+      <ion-button [disabled]="" fill="solid" (click)="saveOrUpdateEvent()">
+        Enregistrer l'évènement
+        <ion-icon slot="start" name="checkmark-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="bg_color">
+<ion-content class="bg_color" [fullscreen]="true">
   <div class="header-form-ct">
     <div class="profile">
       <div class="input-title">
@@ -32,6 +28,67 @@
       </div>
     </div>
   </div>
+
+  <ion-card *ngIf="is_multi">
+    <ion-item>
+      <ion-select aria-label="Type evenement" [(ngModel)]="agendaEvent!.type">
+        <ion-avatar slot="start" style="width: 40px; height: 40px">
+          <ion-img [src]="getIconTypeEvent()"></ion-img>
+        </ion-avatar>
+        <ion-select-option [value]="agendaEventType.KIDS"
+          >Kids</ion-select-option
+        >
+        <ion-select-option [value]="agendaEventType.NOKIDS"
+          >No Kids</ion-select-option
+        >
+        <ion-select-option [value]="agendaEventType.FREE">
+          <span style="color: var(--text-dyspo-free)"
+            >Avec ou sans Kids</span
+          ></ion-select-option
+        >
+      </ion-select>
+    </ion-item>
+
+    <!-- <ion-radio-group [(ngModel)]="agendaEvent!.type">
+      <ion-item lines="none">
+        <ion-avatar slot="start">
+          <ion-img src="../../../../assets/dyspo-kid.png"></ion-img>
+        </ion-avatar>
+        <span style="color: var(--text-dyspo-with-kids)">Kids</span>
+
+        <ion-radio
+          slot="end"
+          class="ion-text-center"
+          [value]="agendaEventType.KIDS"
+        ></ion-radio>
+      </ion-item>
+      <ion-item lines="none">
+        <ion-avatar slot="start">
+          <ion-img src="../../../../assets/dyspo-nokid.png"></ion-img>
+        </ion-avatar>
+        <span style="color: var(--text-dyspo)">No Kids</span>
+
+        <ion-radio
+          slot="end"
+          class="ion-text-center"
+          [value]="agendaEventType.NOKIDS"
+        ></ion-radio>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-avatar slot="start">
+          <ion-img src="../../../../assets/dyspo-free.png"></ion-img>
+        </ion-avatar>
+        <span style="color: var(--text-dyspo-free)">Au choix</span>
+
+        <ion-radio
+          slot="end"
+          class="ion-text-center"
+          [value]="agendaEventType.FREE"
+        ></ion-radio>
+      </ion-item>
+    </ion-radio-group> -->
+  </ion-card>
 
   <!-- <div style="height: 50px; width: 100%"></div> -->
   <ion-card>
@@ -198,85 +255,27 @@
     </ion-item>
   </ion-card>
 
-  <ion-card *ngIf="is_multi">
-    <ion-item>
-      <ion-select aria-label="Type evenement" [(ngModel)]="agendaEvent!.type">
-        <ion-avatar slot="start" style="width: 40px; height: 40px">
-          <ion-img [src]="getIconTypeEvent()"></ion-img>
-        </ion-avatar>
-        <ion-select-option [value]="agendaEventType.KIDS"
-          >Kids</ion-select-option
-        >
-        <ion-select-option [value]="agendaEventType.NOKIDS"
-          >No Kids</ion-select-option
-        >
-        <ion-select-option [value]="agendaEventType.FREE">
-          <span style="color: var(--text-dyspo-free)"
-            >Avec ou sans Kids</span
-          ></ion-select-option
-        >
-      </ion-select>
-    </ion-item>
-
-    <!-- <ion-radio-group [(ngModel)]="agendaEvent!.type">
-      <ion-item lines="none">
-        <ion-avatar slot="start">
-          <ion-img src="../../../../assets/dyspo-kid.png"></ion-img>
-        </ion-avatar>
-        <span style="color: var(--text-dyspo-with-kids)">Kids</span>
-
-        <ion-radio
-          slot="end"
-          class="ion-text-center"
-          [value]="agendaEventType.KIDS"
-        ></ion-radio>
-      </ion-item>
-      <ion-item lines="none">
-        <ion-avatar slot="start">
-          <ion-img src="../../../../assets/dyspo-nokid.png"></ion-img>
-        </ion-avatar>
-        <span style="color: var(--text-dyspo)">No Kids</span>
-
-        <ion-radio
-          slot="end"
-          class="ion-text-center"
-          [value]="agendaEventType.NOKIDS"
-        ></ion-radio>
-      </ion-item>
-
-      <ion-item lines="none">
-        <ion-avatar slot="start">
-          <ion-img src="../../../../assets/dyspo-free.png"></ion-img>
-        </ion-avatar>
-        <span style="color: var(--text-dyspo-free)">Au choix</span>
-
-        <ion-radio
-          slot="end"
-          class="ion-text-center"
-          [value]="agendaEventType.FREE"
-        ></ion-radio>
-      </ion-item>
-    </ion-radio-group> -->
-  </ion-card>
-  <ion-searchbar
-    [(ngModel)]="autocompletePlaceInput.input"
-    (ngModelChange)="updateSearchResults()"
-    placeholder="Entrez une adresse"
-    (ionClear)="clearAutocomplete()"
-  >
-  </ion-searchbar>
-  <ion-list
-    class="ion-no-margin ion-no-padding"
-    [hidden]="autocompletePlaces.length === 0"
-  >
-    <ion-item
-      *ngFor="let place of autocompletePlaces"
-      tappable
-      (click)="selectSearchResult(place)"
+  <ion-card>
+    <ion-searchbar
+      [(ngModel)]="autocompletePlaceInput.input"
+      (ngModelChange)="updateSearchResults()"
+      placeholder="Entrez une adresse"
+      (ionClear)="clearAutocomplete()"
     >
-      {{ place.description }}
-    </ion-item>
-  </ion-list>
+    </ion-searchbar>
+    <ion-list
+      class="ion-no-margin ion-no-padding"
+      [hidden]="autocompletePlaces.length === 0"
+    >
+      <ion-item
+        *ngFor="let place of autocompletePlaces"
+        tappable
+        (click)="selectSearchResult(place)"
+      >
+        {{ place.description }}
+      </ion-item>
+    </ion-list>
+  </ion-card>
 
   <ion-card *ngIf="is_multi">
     <div class="ion-padding">
@@ -304,6 +303,7 @@
       max-width: 80%;
       min-height: 250px;
       margin: auto;
+      padding: 16px;
       background-image: url('{{agendaEvent?.avatar}}');"
     >
       <!-- <ion-img src="{{agendaEvent?.avatar}}" /> -->

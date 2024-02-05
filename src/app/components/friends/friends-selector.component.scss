@@ -130,3 +130,7 @@ ion-toolbar {
 ion-item:last-child {
   --inner-border-width: 0;
 }
+
+ion-chip {
+  border: none;
+}
