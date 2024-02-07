@@ -1,96 +1,127 @@
 <ion-content [fullscreen]="true" class="bg_color">
-  <div class="header-ct">
-    <div class="header">
-      <h2>Aujourd'hui {{todayFormatted}}</h2>
-      <div
-        button
-        id="open-status-modal"
-        class="ion-padding dyspo-btn-container"
-        style="background-color: transparent"
+  <div class="main">
+    <div style="display: flex; align-items: center; height: 50px">
+      <ion-icon
+        name="notifications-outline"
+        style="padding-right: 5px"
+      ></ion-icon>
+      <ion-text style="padding-right: 5px; line-height: 1.2"
+        >Notifications</ion-text
       >
-        <!-- <div class="change-status-icon">
-      <ion-icon name="create-outline" size="large"></ion-icon>
-    </div> -->
-
-        <!-- <ion-avatar slot="start">
-      <ion-img [src]="avatar"></ion-img>
-      </ion-avatar> -->
+      <ion-badge>3</ion-badge>
+    </div>
+    <ion-text style="padding-top: 30px">- Aujourd'hui -</ion-text>
+    <span style="font-size: 1.4em; font-weight: 600">{{todayFormatted}}</span>
+    <div
+      style="
+        margin-block: 32px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      "
+    >
+      <div button id="open-status-modal" class="dyspo-btn-container">
         <div
-          class="dyspo-button dyspo ion-activatable animate__animated animate__fadeIn"
-          style="
-            box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px,
-              rgba(0, 0, 0, 0.24) 0px 1px 2px;
-          "
+          class="dyspo-button ion-activatable animate__animated animate__fadeIn"
           *ngIf="todayDyspo?.userDyspo === dyspoStatus.DYSPO"
         >
-          Dyspo
-          <ion-ripple-effect></ion-ripple-effect>
+          <ion-img src="/assets/newimg/home_dyspo.png"></ion-img>
+          <!-- <ion-ripple-effect></ion-ripple-effect> -->
         </div>
 
         <div
           *ngIf="todayDyspo?.userDyspo === dyspoStatus.DYSPOWITHKIDS"
-          class="dyspo-button dyspo-with-kids ion-activatable animate__animated animate__fadeIn"
-          style="
-            box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px,
-              rgba(0, 0, 0, 0.24) 0px 1px 2px;
-          "
+          class="dyspo-button ion-activatable animate__animated animate__fadeIn"
         >
-          Dyspo With Kids
-          <ion-ripple-effect></ion-ripple-effect>
+          <ion-img src="/assets/newimg/home_dyspo_wk.png"></ion-img>
+          <!-- <ion-ripple-effect></ion-ripple-effect> -->
         </div>
 
         <div
           *ngIf="todayDyspo?.userDyspo === dyspoStatus.NODYSPO"
-          class="dyspo-button no-dyspo ion-activatable animate__animated animate__fadeIn"
-          style="
-            box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px,
-              rgba(0, 0, 0, 0.24) 0px 1px 2px;
-          "
+          class="dyspo-button ion-activatable animate__animated animate__fadeIn"
         >
-          No Dyspo
-          <ion-ripple-effect></ion-ripple-effect>
+          <ion-img src="/assets/newimg/home_pas_dyspo.png"></ion-img>
+          <!-- <ion-ripple-effect></ion-ripple-effect> -->
         </div>
 
         <div
           *ngIf="todayDyspo.userDyspo === dyspoStatus.UNDEFINED "
-          class="dyspo-button no-dyspo ion-activatable animate__animated animate__fadeIn"
+          class="dyspo-button ion-activatable animate__animated animate__fadeIn"
         >
-          Dyspo ?
-          <ion-ripple-effect></ion-ripple-effect>
+          <ion-img src="/assets/newimg/home_pas_dyspo.png"></ion-img>
+          <!-- <ion-ripple-effect></ion-ripple-effect> -->
         </div>
       </div>
     </div>
-  </div>
-  <div class="shape"></div>
 
-  <!-- <h1>Bonjour {{userSvc.userInfo?.firstname}}</h1> -->
-
-  <div style="padding-top: 24px">
-    <div
-      class="d-flex ion-justify-content-between ion-align-items-center ion-padding"
-      style="padding-bottom: 0px; padding-top: 0px"
+    <ion-text style="font-size: 0.85em"
+      >Créer un évènement de groupe ou perso :</ion-text
     >
-      <span style="margin-right: 8px; font-size: 22px"
-        ><h2>Evenements a venir</h2></span
-      >
-      <ion-button (click)="openCreateEvent()">Créer</ion-button>
+    <div
+      style="
+        display: flex;
+
+        margin-bottom: 35px;
+        justify-content: center;
+        padding: 10px;
+        width: 100%;
+        align-items: center;
+      "
+    >
+      <div
+        class="btn-create-evt create-dyspo"
+        (click)="openCreateEventDyspo()"
+      ></div>
+      <div
+        class="btn-create-evt create-dyspo-with-kids"
+        (click)="openCreateEventDyspoWithKids()"
+      ></div>
+      <div
+        class="btn-create-evt create-perso"
+        (click)="openCreateEventPerso()"
+      ></div>
     </div>
-    <ion-card-content>
-      <div *ngIf="nextAgendaEvents.length === 0">Aucun événement planifié</div>
-      <div class="next-agenda-container">
-        <div class="next-agenda-content">
-          <app-agenda-event-mini
-            *ngFor="let nextEvent of nextAgendaEvents"
-            class="animate__animated animate__fadeIn"
-            [agendaEvent]="nextEvent"
-            [isInvitation]="false"
-            (click)="openAgendaEventInfo(nextEvent)"
-          >
-          </app-agenda-event-mini>
-        </div>
+
+    <div style="display: flex; align-items: center; width: 100%">
+      <div style="border: 1px solid lightgray; width: 100%; height: 2px"></div>
+
+      <div
+        style="
+          text-align: center;
+          font-size: 1.05em;
+          font-weight: 600;
+          min-width: 205px;
+          text-transform: uppercase;
+        "
+      >
+        Evenements a venir
       </div>
-    </ion-card-content>
+
+      <div style="border: 1px solid lightgray; width: 100%; height: 2px"></div>
+    </div>
   </div>
+
+  <div
+    class="d-flex ion-justify-content-between ion-align-items-center ion-padding"
+    style="padding-bottom: 0px; padding-top: 0px"
+  ></div>
+
+  <ion-card-content style="padding-top: 0">
+    <div *ngIf="nextAgendaEvents.length === 0">Aucun événement planifié</div>
+    <div class="next-agenda-container">
+      <div class="next-agenda-content">
+        <app-agenda-event-mini
+          *ngFor="let nextEvent of nextAgendaEvents"
+          class="animate__animated animate__fadeIn"
+          [agendaEvent]="nextEvent"
+          [isInvitation]="false"
+          (click)="openAgendaEventInfo(nextEvent)"
+        >
+        </app-agenda-event-mini>
+      </div>
+    </div>
+  </ion-card-content>
 
   <div *ngIf="invitations.length > 0">
     <ion-list-header>

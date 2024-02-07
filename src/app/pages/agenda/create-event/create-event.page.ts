@@ -122,6 +122,8 @@ export class CreateEventPage implements OnInit {
             this.router.getCurrentNavigation()?.extras.state?.['tsDate'];
           this.is_multi =
             this.router.getCurrentNavigation()?.extras.state?.['is_multi'];
+          const is_kids =
+            this.router.getCurrentNavigation()?.extras.state?.['is_kids'];
           const dateHPlus1 = setHours(
             new Date(this.tsInputDate),
             getHours(add(new Date(), { hours: 1 }))
@@ -156,7 +158,7 @@ export class CreateEventPage implements OnInit {
             startISO: formatISO(dateHPlus1),
             endISO: formatISO(dateHPlus2),
             title: '',
-            type: AgendaEventType.FREE,
+            type: is_kids ? AgendaEventType.KIDS : AgendaEventType.NOKIDS,
             status: AgendaEventStatus.ACTIVE,
             all_can_edit: false,
             all_can_see_title: true,

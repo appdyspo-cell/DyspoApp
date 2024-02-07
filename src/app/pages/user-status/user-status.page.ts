@@ -243,6 +243,47 @@ export class UserStatusPage implements OnInit {
     }
   }
 
+  async openCreateEventPerso() {
+    const navigationExtras: NavigationExtras = {
+      state: {
+        tsDate: new Date().getTime(),
+        is_multi: false,
+      },
+    };
+    this.navCtrl.navigateForward(
+      '/agenda/me/create-event/new',
+      navigationExtras
+    );
+  }
+
+  async openCreateEventDyspo() {
+    const navigationExtras: NavigationExtras = {
+      state: {
+        tsDate: new Date().getTime(),
+        is_multi: true,
+        is_kids: false,
+      },
+    };
+    this.navCtrl.navigateForward(
+      '/agenda/me/create-event/new',
+      navigationExtras
+    );
+  }
+
+  async openCreateEventDyspoWithKids() {
+    const navigationExtras: NavigationExtras = {
+      state: {
+        tsDate: new Date().getTime(),
+        is_multi: true,
+        is_kids: true,
+      },
+    };
+    this.navCtrl.navigateForward(
+      '/agenda/me/create-event/new',
+      navigationExtras
+    );
+  }
+
   async openCreateEvent() {
     const buttons = [];
     buttons.push({
