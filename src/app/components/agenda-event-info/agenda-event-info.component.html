@@ -312,7 +312,7 @@
     </ng-template>
   </ion-modal>
 </ion-content>
-<ion-footer class="ion-no-border">
+<ion-footer class="ion-no-border" *ngIf="isInvitation">
   <ion-toolbar
     [ngClass]="{
       'bg-kids': agendaEvent.type === agendaEventType.KIDS,
@@ -322,7 +322,6 @@
     }"
   >
     <div
-      *ngIf="isInvitation"
       class="d-flex ion-justify-content-center"
       style="color: #eee; padding-bottom: var(--ion-safe-area-bottom)"
     >

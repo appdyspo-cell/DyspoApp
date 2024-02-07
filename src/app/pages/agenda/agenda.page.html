@@ -1,13 +1,13 @@
 <ion-header>
-  <ion-toolbar *ngIf="!isFriendMode">
+  <ion-toolbar *ngIf="!isFriendMode" mode="md">
     <ion-title> <h1>Calendrier</h1></ion-title>
     <ion-buttons slot="end">
       <ion-toggle
-        color="secondary"
         labelPlacement="start"
+        color="primary"
         [enableOnOffLabels]="true"
         (ionChange)="onChangeMode($event)"
-        >Edit</ion-toggle
+        >Editer</ion-toggle
       >
     </ion-buttons>
   </ion-toolbar>
@@ -42,7 +42,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="bg_color">
+<ion-content class="bg_color" [fullscreen]="true" style="padding-top: 50px">
   <div class="header-ct" *ngIf="isFriendMode">
     <div class="header">
       <ion-toolbar>
@@ -168,7 +168,10 @@
         [button]="true"
         (click)="openEvent(agendaEvent)"
       >
-        <div slot="start" style="font-size: 1.2rem; margin: 0; width: 90px">
+        <div
+          slot="start"
+          style="font-size: 1.05rem; font-weight: 600; margin: 0; width: 90px"
+        >
           <div
             *ngIf="agendaEvent.start_date_day_of_year === agendaEvent.end_date_day_of_year"
           >
@@ -187,7 +190,7 @@
           </div>
           <div
             *ngIf="agendaEvent.start_date_day_of_year === agendaEvent.end_date_day_of_year"
-            style="font-size: 0.9rem; padding-left: 4px"
+            style="font-size: 0.9rem"
           >
             <ion-text color="medium"
               >{{agendaEvent.start_time_formatted}} -
@@ -214,16 +217,25 @@
     class="ion-padding ion-text-center"
   >
     Vous êtes en mode édition
-    <ion-button *ngIf="agendaSvc.isModified" (click)="saveAgenda()">
+    <ion-button
+      *ngIf="agendaSvc.isModified"
+      (click)="saveAgenda()"
+      mode="ios"
+      expand="full"
+    >
       Sauvegarder mon agenda
+      <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
     </ion-button>
-    <br />
+
     <ion-button
       *ngIf="agendaSvc.isModified"
       color="danger"
+      expand="full"
+      mode="ios"
       (click)="cancelAgenda()"
     >
       Annuler
+      <ion-icon name="close-circle-outline" slot="start"></ion-icon>
     </ion-button>
   </div>
   <!-- <ion-fab

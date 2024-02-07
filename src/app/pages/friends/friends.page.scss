@@ -9,6 +9,12 @@ ion-item::part(native) {
 
 ion-header {
   box-shadow: none !important;
+  h1 {
+    margin: 0;
+    font-weight: 500;
+    letter-spacing: 0;
+    font-size: 1.625rem;
+  }
 }
 
 .ion-page {
@@ -256,4 +262,14 @@ ion-toolbar {
 
 app-alphabet-scroll {
   z-index: 1000000000;
+}
+
+.black-button {
+  --color: var(--color);
+}
+
+ion-searchbar {
+  // padding: 0;
+  --box-shadow: none;
+  --background: transparent;
 }

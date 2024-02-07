@@ -145,7 +145,7 @@ export class CreateEventPage implements OnInit {
             milliseconds: 999,
           });
 
-          this.pageTitle = 'Créer un evenement';
+          this.pageTitle = 'Créer un évènement';
           this.saveLabel = 'Sauvegarder';
 
           this.agendaEvent = {
@@ -163,7 +163,7 @@ export class CreateEventPage implements OnInit {
             // day: getDate(new Date(this.tsInputDate)),
             // month: getMonth(new Date(this.tsInputDate)),
             // year: getYear(new Date(this.tsInputDate)),
-            avatar: 'assets/date-du-calendrier.png',
+            avatar: 'assets/ajout_photo.jpg',
             is_multi: this.is_multi,
             recurrence: AgendaEventRecurrence.ONE,
             recurrence_nb: '0',

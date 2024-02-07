@@ -6,7 +6,7 @@ ion-header {
     left: 0;
     display: block;
     width: 100%;
-    height: 102px;
+    height: 97px;
     background: linear-gradient(
       to bottom,
       rgba(134, 143, 181, 0.82) 0%,
@@ -24,8 +24,8 @@ ion-header {
         min-width: 39px;
 
         .profile_img {
-          width: 35px;
-          height: 35px;
+          width: 50px;
+          height: 50px;
           position: relative;
           overflow: hidden;
           border-radius: 50%;
@@ -127,9 +127,9 @@ ion-content {
         padding: 7px 7px;
 
         .profile_img {
-          min-width: 35px;
-          width: 35px;
-          height: 35px;
+          min-width: 50px;
+          width: 50px;
+          height: 50px;
           border-radius: 50%;
         }
 

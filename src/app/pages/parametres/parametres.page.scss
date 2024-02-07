@@ -1,24 +1,9 @@
 ion-header {
-  .banner {
-    padding-bottom: 24px;
-    padding-top: 10px;
-
-    h1 {
-      color: var(--primary);
-      font-size: 2.1rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      width: fit-content;
-      margin: 0 auto;
-      --animate-duration: 0.3s !important;
-
-      ion-icon {
-        font-size: 1rem;
-        position: relative;
-        right: -10px;
-      }
-    }
+  h1 {
+    margin: 0;
+    font-weight: 500;
+    letter-spacing: 0;
+    font-size: 1.625rem;
   }
 }
 
@@ -132,7 +117,8 @@ ion-img::part(image) {
 }
 
 ion-list-header {
-  font-weight: bold;
+  font-weight: 600;
+  border-top: 1px solid lightgray;
 }
 
 .excepTextSize {

@@ -27,6 +27,8 @@ import { AgendaService } from 'src/app/services/agenda.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import Swal, { SweetAlertResult } from 'sweetalert2';
 import { resolve } from 'dns';
+import { format, parseISO } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 export const ION_CAL_VALUE_ACCESSOR: Provider = {
   provide: NG_VALUE_ACCESSOR,
@@ -152,13 +154,13 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
     showMonthPicker: true,
     monthPickerFormat: [
       'JAN',
-      'FEB',
+      'FEV',
       'MAR',
-      'APR',
-      'MAY',
+      'AVR',
+      'MAI',
       'JUN',
       'JUL',
-      'AUG',
+      'AOU',
       'SEP',
       'OCT',
       'NOV',
@@ -491,8 +493,12 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
   }
 
   _monthFormat(date: number): string {
+    console.log('month format', date);
     // @ts-ignore
-    return moment(date).format(this._d.monthFormat.replace(/y/g, 'Y'));
+    const f = moment(date).format(this._d.monthFormat.replace(/y/g, 'Y'));
+    console.log('f', f);
+    return format(date, 'MMM yyyy', { locale: fr });
+    //return f;
   }
 
   private initOpt(): void {

@@ -1,3 +1,12 @@
+ion-header {
+  h1 {
+    margin: 0;
+    font-weight: 500;
+    letter-spacing: 0;
+    font-size: 1.625rem;
+  }
+}
+
 .container {
   display: flex;
   justify-content: center;
@@ -80,9 +89,9 @@ ion-toolbar {
   }
 }
 
-ion-toggle::part(label) {
-  color: white;
-}
+// ion-toggle::part(label) {
+//   color: white;
+// }
 
 .thumbnail-friend {
   ion-thumbnail {

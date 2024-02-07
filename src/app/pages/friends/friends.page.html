@@ -1,5 +1,5 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar>
+  <ion-toolbar mode="md">
     <!-- <ion-thumbnail slot="start">
           <ion-img
             src="assets/friends.png"
@@ -7,13 +7,15 @@
           ></ion-img>
         </ion-thumbnail> -->
     <ion-title> <h1>Amis</h1></ion-title>
-    <ion-buttons slot="end">
-      <ion-button fill="clear" (click)="openContacts()"
-        ><ion-icon
-          name="reader-outline"
-          color="primary"
-          slot="icon-only"
-        ></ion-icon>
+    <ion-buttons slot="end" mode="ios">
+      <ion-button
+        fill="clear"
+        mode="ios"
+        class="black-button"
+        (click)="openContacts()"
+      >
+        Répertoire
+        <ion-icon name="reader-outline" slot="start"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -21,11 +23,19 @@
 <!-- <div class="shape"></div> -->
 <ion-content [fullscreen]="true" class="bg_color">
   <ion-segment mode="md" [(ngModel)]="selectSegment" lines="none">
-    <ion-segment-button mode="md" value="friends">
+    <ion-segment-button
+      mode="md"
+      value="friends"
+      style="text-transform: none !important"
+    >
       <ion-icon name="person"></ion-icon>
       <ion-label> Amis </ion-label>
     </ion-segment-button>
-    <ion-segment-button mode="md" value="friendsgroup">
+    <ion-segment-button
+      mode="md"
+      value="friendsgroup"
+      style="text-transform: none !important"
+    >
       <ion-icon name="people"></ion-icon>
       <ion-label> Groupes</ion-label>
     </ion-segment-button>
@@ -33,7 +43,11 @@
       <ion-icon name="people"></ion-icon>
       <ion-label> Contacts</ion-label>
     </ion-segment-button> -->
-    <ion-segment-button mode="md" value="suggestions">
+    <ion-segment-button
+      mode="md"
+      value="suggestions"
+      *ngIf="friendsSuggested.length>0"
+    >
       <ion-icon name="person-add"></ion-icon>
       <ion-label> Invitations </ion-label>
       <ion-badge
@@ -44,23 +58,6 @@
       >
     </ion-segment-button>
   </ion-segment>
-
-  <!-- <ion-segment [(ngModel)]="selectSegment">
-    <ion-segment-button value="friends" class="segmentButton" color="light">
-      <ion-icon name="person"></ion-icon>
-      <ion-label>Mes amis</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="suggestions" color="light">
-      <ion-icon name="person-add"></ion-icon>
-      <ion-label>Invitations</ion-label>
-      <ion-badge
-        *ngIf="friendsSuggested.length>0"
-        color="danger"
-        style="position: absolute; right: 15px"
-        >{{ friendsSuggested.length }}</ion-badge
-      >
-    </ion-segment-button>
-  </ion-segment> -->
 
   <div *ngIf="selectSegment === 'friends'" class="ion-no-margin">
     <ion-searchbar

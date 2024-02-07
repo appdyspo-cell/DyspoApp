@@ -1,15 +1,9 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar>
-    <ion-buttons>
+<ion-header>
+  <ion-toolbar mode="md">
+    <ion-buttons slot="start">
       <ion-back-button slot="start" text=""></ion-back-button>
     </ion-buttons>
-    <!-- <ion-title>{{ pageTitle }}</ion-title> -->
-    <ion-buttons slot="end">
-      <ion-button [disabled]="" fill="solid" (click)="saveOrUpdateEvent()">
-        Enregistrer l'évènement
-        <ion-icon slot="start" name="checkmark-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
+    <ion-title style="padding-left: 0px"><h1>{{ pageTitle }}</h1></ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -18,7 +12,6 @@
     <div class="profile">
       <div class="input-title">
         <ion-input
-          class="ion-text-center"
           maxlength="30"
           autocapitalize="words"
           [(ngModel)]="agendaEvent!.title"
@@ -48,46 +41,6 @@
         >
       </ion-select>
     </ion-item>
-
-    <!-- <ion-radio-group [(ngModel)]="agendaEvent!.type">
-      <ion-item lines="none">
-        <ion-avatar slot="start">
-          <ion-img src="../../../../assets/dyspo-kid.png"></ion-img>
-        </ion-avatar>
-        <span style="color: var(--text-dyspo-with-kids)">Kids</span>
-
-        <ion-radio
-          slot="end"
-          class="ion-text-center"
-          [value]="agendaEventType.KIDS"
-        ></ion-radio>
-      </ion-item>
-      <ion-item lines="none">
-        <ion-avatar slot="start">
-          <ion-img src="../../../../assets/dyspo-nokid.png"></ion-img>
-        </ion-avatar>
-        <span style="color: var(--text-dyspo)">No Kids</span>
-
-        <ion-radio
-          slot="end"
-          class="ion-text-center"
-          [value]="agendaEventType.NOKIDS"
-        ></ion-radio>
-      </ion-item>
-
-      <ion-item lines="none">
-        <ion-avatar slot="start">
-          <ion-img src="../../../../assets/dyspo-free.png"></ion-img>
-        </ion-avatar>
-        <span style="color: var(--text-dyspo-free)">Au choix</span>
-
-        <ion-radio
-          slot="end"
-          class="ion-text-center"
-          [value]="agendaEventType.FREE"
-        ></ion-radio>
-      </ion-item>
-    </ion-radio-group> -->
   </ion-card>
 
   <!-- <div style="height: 50px; width: 100%"></div> -->
@@ -157,7 +110,11 @@
         <ion-item slot="header" color="light">
           <ion-label> {{getNbMembers()}}</ion-label>
         </ion-item>
-        <div class="ion-padding" slot="content">
+        <div
+          class="ion-padding"
+          slot="content"
+          style="padding-bottom: 0 !important"
+        >
           <div style="max-height: 650px; min-height: 300px; width: 100%">
             <!-- <div style="padding: 4px 4px 0px 4px">{{getNbMembers()}}</div> -->
             <ion-row class="friends-wrapper">
@@ -300,15 +257,37 @@
       background-size: cover;
       background-position: center;
       min-width: 50%;
-      max-width: 80%;
-      min-height: 250px;
+      max-width: 60%;
+      min-height: 150px;
       margin: auto;
       padding: 16px;
+      margin-bottom: 24px;
       background-image: url('{{agendaEvent?.avatar}}');"
     >
       <!-- <ion-img src="{{agendaEvent?.avatar}}" /> -->
     </div>
   </div>
+
+  <ion-button
+    [disabled]=""
+    class="ion-padding"
+    fill="solid"
+    expand="full"
+    mode="ios"
+    (click)="saveOrUpdateEvent()"
+  >
+    Enregistrer l'évènement
+    <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+  </ion-button>
+
+  <!-- <ion-toolbar class="footer">
+    <ion-buttons slot="end">
+      <ion-button [disabled]="" fill="solid" (click)="saveOrUpdateEvent()">
+        Enregistrer l'évènement
+        <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar> -->
 
   <ion-popover
     #popoverUserEvents

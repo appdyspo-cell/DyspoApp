@@ -15,7 +15,7 @@
 </ion-header> -->
 
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar mode="md">
     <!-- <ion-thumbnail slot="start">
       <ion-img
         src="assets/chatrooms.png"
@@ -29,11 +29,19 @@
 <!-- <div class="shape"></div> -->
 <ion-content [fullscreen]="true" class="bg_color">
   <ion-segment mode="md" [(ngModel)]="selectDiscussionsType" lines="none">
-    <ion-segment-button mode="md" value="{{discussionType.ACTIVE}}">
+    <ion-segment-button
+      mode="md"
+      value="{{discussionType.ACTIVE}}"
+      style="text-transform: none !important"
+    >
       <!-- <ion-icon name="person"></ion-icon> -->
       <ion-label> Actives </ion-label>
     </ion-segment-button>
-    <ion-segment-button mode="md" value="{{discussionType.ARCHIVE}}">
+    <ion-segment-button
+      mode="md"
+      value="{{discussionType.ARCHIVE}}"
+      style="text-transform: none !important"
+    >
       <!-- <ion-icon name="people"></ion-icon> -->
       <ion-label> Archives</ion-label>
     </ion-segment-button>
@@ -44,6 +52,7 @@
     </div>
     <ion-list lines="none">
       <ion-item
+        [button]="true"
         *ngFor="let agendaEvent of agendaEvents; let i=index;"
         [ngClass]="getDelayClass(i)"
         class="animate__animated animate__slideInRight"
@@ -91,6 +100,7 @@
     </div>
     <ion-list lines="none">
       <ion-item
+        [button]="true"
         *ngFor="let agendaEvent of agendaEventsArchived; let i=index;"
         [ngClass]="getDelayClass(i)"
         class="animate__animated animate__slideInRight"
