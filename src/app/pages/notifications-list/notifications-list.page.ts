@@ -13,11 +13,11 @@ export class NotificationsListPage implements OnInit {
   invitations: AgendaEvent[] = [];
 
   constructor(private router: Router, private modalCtrl: ModalController) {
-    const myinvitations =
+    this.invitations =
       this.router.getCurrentNavigation()?.extras.state?.['invitations'];
-    for (let i = 0; i < 35; i++) {
-      this.invitations = this.invitations.concat(myinvitations);
-    }
+    // for (let i = 0; i < 35; i++) {
+    //   this.invitations = this.invitations.concat(myinvitations);
+    // }
     console.log(this.invitations);
   }
 
@@ -28,7 +28,7 @@ export class NotificationsListPage implements OnInit {
       component: AgendaEventInfoComponent,
       componentProps: {
         agendaEvent,
-        isInvitation: false,
+        isInvitation: true,
       },
     });
     modal.present();

@@ -27,7 +27,21 @@
 </ion-header>
 
 <!-- <div class="shape"></div> -->
-<ion-content [fullscreen]="true" class="bg_color">
+<ion-content class="bg_color">
+  <div class="chip-container">
+    <ion-chip [outline]="true"
+      ><div class="chip-evt bg-color-kid">&nbsp;</div>
+      Kid(s)</ion-chip
+    >
+    <ion-chip [outline]="true"
+      ><div class="chip-evt bg-color-nokids">&nbsp;</div>
+      NoKid(s)</ion-chip
+    >
+    <ion-chip [outline]="true"
+      ><div class="chip-evt bg-color-free">&nbsp;</div>
+      Au choix</ion-chip
+    >
+  </div>
   <ion-segment mode="md" [(ngModel)]="selectDiscussionsType" lines="none">
     <ion-segment-button
       mode="md"
@@ -148,19 +162,5 @@
         </div>
       </ion-item>
     </ion-list>
-  </div>
-  <div class="chip-container">
-    <ion-chip [outline]="true"
-      ><div class="chip-evt bg-color-kid">&nbsp;</div>
-      Kid(s)</ion-chip
-    >
-    <ion-chip [outline]="true"
-      ><div class="chip-evt bg-color-nokids">&nbsp;</div>
-      NoKid(s)</ion-chip
-    >
-    <ion-chip [outline]="true"
-      ><div class="chip-evt bg-color-free">&nbsp;</div>
-      Au choix</ion-chip
-    >
   </div>
 </ion-content>

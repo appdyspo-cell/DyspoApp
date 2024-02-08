@@ -34,7 +34,6 @@
   --primary: #93b7ff;
   --bg-color: #f3f4f8;
   --bg-color-dark: #93a9d8;
-  --green_color: #00ff5a;
   --gray: #d5d5d5;
   --transparent: rgba(0, 0, 0, 0);
   --text-dark: #bdbdbe;
@@ -44,10 +43,10 @@
   --text-no-dyspo: #fa7538;
   --text-dyspo-with-kids: #46a2c2;
   --text-dyspo: #3ada6a;
-  --text-dyspo-free: #c951df;
+  --text-dyspo-free: #ac3e61;
   --text-dyspo-with-kids-secondary: #9eb7c0;
   --text-dyspo-secondary: #aeddbc;
-  --text-dyspo-free-secondary: #d0aad6;
+  --text-dyspo-free-secondary: #a98892;
 }
 
 .transparent-modal {
@@ -610,4 +609,8 @@ ion-chip {
 .chip-container {
   display: flex;
   justify-content: center;
+}
+
+.dyspo-button {
+  font-size: 1.13em;
 }

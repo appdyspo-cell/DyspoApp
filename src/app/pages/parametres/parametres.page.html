@@ -4,7 +4,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="bg_color" [fullscreen]="true">
+<ion-content class="bg_color">
   <ion-list-header>
     <h2>Mon Profil</h2>
   </ion-list-header>
@@ -149,18 +149,24 @@
       <ion-button
         fill="solid"
         expand="full"
-        class="logout ion-text-capitalize"
+        mode="ios"
+        class="dyspo-button"
         color="danger"
         (click)="deleteAccount()"
-        >Supprimer mon compte
+      >
+        <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+        Supprimer mon compte
       </ion-button>
       <ion-button
         fill="solid"
         expand="full"
-        class="logout ion-text-capitalize"
+        class="dyspo-button"
         color="danger"
+        mode="ios"
         (click)="logout()"
-        >Deconnexion
+      >
+        <ion-icon name="log-out-outline" slot="start"></ion-icon>
+        Déconnexion
       </ion-button>
     </ion-footer>
     <p class="excepTextSize">Version 0.0.1</p>

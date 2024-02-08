@@ -3,7 +3,7 @@
     <div
       button
       (click)="openNotifications()"
-      *ngIf="notifications.length > 0"
+      *ngIf="nb_notifications > 0"
       style="display: flex; align-items: center; height: 50px"
     >
       <ion-icon
@@ -13,7 +13,7 @@
       <ion-text style="padding-right: 5px; line-height: 1.2"
         >Notifications</ion-text
       >
-      <ion-badge>{{invitations.length + friendsSuggested.length}}</ion-badge>
+      <ion-badge>{{nb_notifications}}</ion-badge>
     </div>
     <ion-text style="padding-top: 30px">- Aujourd'hui -</ion-text>
     <span style="font-size: 1.4em; font-weight: 600">{{todayFormatted}}</span>
@@ -126,10 +126,9 @@
       </app-agenda-event-mini>
     </div>
   </ion-card-content>
-
-  <!-- <div *ngIf="invitations.length > 0">
+  <!-- 
+  <div *ngIf="invitations.length > 0">
     <ion-list-header>
-     
       <span style="margin-right: 8px"><h2>Invitations</h2></span>
     </ion-list-header>
 

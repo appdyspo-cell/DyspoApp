@@ -23,9 +23,17 @@
   </div>
 
   <ion-card *ngIf="is_multi">
-    <ion-item>
-      <ion-select aria-label="Type evenement" [(ngModel)]="agendaEvent!.type">
-        <ion-avatar slot="start" style="width: 40px; height: 40px">
+    <div style="font-size: 1.12em; margin-left: 8px; color: rgb(0, 0, 0)">
+      <ion-select
+        aria-label="Type evenement"
+        [(ngModel)]="agendaEvent!.type"
+        mode="md"
+        color="dark"
+      >
+        <ion-avatar
+          slot="start"
+          style="width: 40px; height: 40px; margin-right: 6px"
+        >
           <ion-img [src]="getIconTypeEvent()"></ion-img>
         </ion-avatar>
         <ion-select-option [value]="agendaEventType.KIDS"
@@ -40,7 +48,7 @@
           ></ion-select-option
         >
       </ion-select>
-    </ion-item>
+    </div>
   </ion-card>
 
   <!-- <div style="height: 50px; width: 100%"></div> -->
@@ -270,8 +278,9 @@
 
   <ion-button
     [disabled]=""
-    class="ion-padding"
+    class="dyspo-button"
     fill="solid"
+    color="dark"
     expand="full"
     mode="ios"
     (click)="saveOrUpdateEvent()"

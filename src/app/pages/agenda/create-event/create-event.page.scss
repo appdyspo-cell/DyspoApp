@@ -220,7 +220,6 @@ ion-list-header {
       background: #f4f5f8;
       ion-label {
         font-size: 10px;
-        margin-top: 10px;
       }
       ion-thumbnail {
         border-radius: 50%;
@@ -250,11 +249,10 @@ ion-list-header {
           background: rgb(55, 108, 207);
           border-radius: 20px;
           position: absolute;
-          bottom: -22px;
+          bottom: -5px;
+          right: -5px;
           color: white;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          font-size: 23px;
+          font-size: 20px;
         }
         img {
           border-radius: 50%;
@@ -281,4 +279,9 @@ ion-searchbar {
   padding: 0;
   --box-shadow: none;
   --background: transparent;
+}
+
+ion-select {
+  --highlight-color-focused: #101010;
+  --ripple-color: #532f2f;
 }

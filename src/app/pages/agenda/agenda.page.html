@@ -42,7 +42,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="bg_color" [fullscreen]="true" style="padding-top: 50px">
+<ion-content class="bg_color" style="padding-top: 50px">
   <div class="header-ct" *ngIf="isFriendMode">
     <div class="header">
       <ion-toolbar>
@@ -221,6 +221,8 @@
       *ngIf="agendaSvc.isModified"
       (click)="saveAgenda()"
       mode="ios"
+      color="dark"
+      class="dyspo-button"
       expand="full"
     >
       Sauvegarder mon agenda
@@ -229,9 +231,10 @@
 
     <ion-button
       *ngIf="agendaSvc.isModified"
-      color="danger"
+      color="dark"
       expand="full"
       mode="ios"
+      class="dyspo-button"
       (click)="cancelAgenda()"
     >
       Annuler

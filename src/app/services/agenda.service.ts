@@ -147,14 +147,6 @@ export class AgendaService {
 
             this.agendaEvents.push(agendaEvent);
             this.agendaEventsSubject.next(this.agendaEvents);
-            // this.getAgendaEventAndPush(agendaEvent)
-            //   .then((resPromise: any) => {
-            //     console.log('agendaEvent Hydrated ', resPromise);
-            //     that.agendaEventsSubject.next(that.agendaEvents);
-            //   })
-            //   .catch((err: any) => {
-            //     console.log(err);
-            //   });
           }
         }
         if (change.type === 'removed') {
@@ -584,15 +576,14 @@ export class AgendaService {
     uid: string,
     agendaEventToCompare: AgendaEvent
   ): Promise<UserAgendaEventsByDay> {
-    console.log('Get user events ', uid);
     const agendaEventsCollectionRef = collection(
       this.firestore,
       `agenda_events/`
     );
 
-    console.log('Get user events ', uid);
-    console.log('startDateRef', formatISO(agendaEventToCompare.start_date_ts));
-    console.log('endDateRef', formatISO(agendaEventToCompare.end_date_ts));
+    // console.log('Get user events ', uid);
+    // console.log('startDateRef', formatISO(agendaEventToCompare.start_date_ts));
+    // console.log('endDateRef', formatISO(agendaEventToCompare.end_date_ts));
     const queryAgendaEvents = query(
       agendaEventsCollectionRef,
       where('members_uid', 'array-contains', uid),

@@ -21,6 +21,9 @@ ion-item:last-child {
 
 ion-item {
   --background: transparent;
+  &:last-child {
+    border: none;
+  }
 }
 
 ion-chip {

@@ -69,6 +69,8 @@ export class UserStatusPage implements OnInit {
   agendaEventType = AgendaEventType;
   showHelper = true;
 
+  nb_notifications = 0;
+
   constructor(
     public userSvc: UserService,
     private modalCtrl: ModalController,
@@ -114,6 +116,7 @@ export class UserStatusPage implements OnInit {
             return 0; // les dates sont égales
           }
         });
+        // console.log('Sort events', this.nextAgendaEvents);
       }
     );
 
@@ -159,6 +162,8 @@ export class UserStatusPage implements OnInit {
           console.log('Push notif invit', invit);
           // this.notifications.push(notif);
         });
+
+        this.nb_notifications = this.invitations.length;
       });
 
     this.agendaDysposSubscription = this.agendaSvc.agendaDyspos$.subscribe(

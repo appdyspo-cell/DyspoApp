@@ -16,6 +16,9 @@ ion-item {
   padding-top: 12px;
   border-bottom: 1px solid;
   border-color: var(--border-color);
+  &:last-child {
+    border: none;
+  }
 }
 
 ion-list {

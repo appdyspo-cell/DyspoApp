@@ -7,12 +7,19 @@
       
     }"
   >
-    <ion-button slot="start" (click)="close()" fill="clear" size="large">
+    <ion-button
+      slot="start"
+      (click)="close()"
+      fill="clear"
+      size="large"
+      class="white-btn"
+    >
       <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
     </ion-button>
     <ion-button
       *ngIf="!isInvitation"
       slot="end"
+      class="white-btn"
       (click)="openPopoverMenu($event)"
       fill="clear"
       size="large"
@@ -37,7 +44,7 @@
       
     }"
   >
-    <div style="padding: 5px">
+    <div style="padding: 8px">
       <div class="admin-ct d-flex" *ngIf="agendaEvent.is_multi">
         <ion-thumbnail
           slot="start"
@@ -79,18 +86,24 @@
         class="d-flex ion-padding ion-align-items-center ion-justify-content-center"
       >
         <div>
-          <div>
+          <div style="font-size: 1.2rem; font-weight: 600">
             {{ display_date_1 }}
           </div>
-          <div *ngIf="display_date_2">{{ display_date_2 }}</div>
-          <div *ngIf="agendaEvent.is_multi" class="ion-text-center">
-            <span
-              style="font-size: 1.3rem; font-weight: bold; margin-right: 5px"
-              >{{
-                members_presence_confirmed.length +
-                  members_presence_not_confirmed.length
-              }}</span
-            >
+          <div
+            *ngIf="display_date_2"
+            style="font-size: 1.2rem; font-weight: 600"
+          >
+            {{ display_date_2 }}
+          </div>
+          <div
+            *ngIf="agendaEvent.is_multi"
+            class="ion-text-center"
+            style="font-size: 1.2rem; margin-right: 5px"
+          >
+            <span>{{
+              members_presence_confirmed.length +
+                members_presence_not_confirmed.length
+            }}</span>
             <span
               *ngIf="
                 members_presence_confirmed.length +
@@ -154,7 +167,7 @@
             >
             <ion-icon
               *ngIf="member.is_my_friend === false"
-              class="zmdi zmdi-plus end invite-icon"
+              class="zmdi zmdi-plus invite-icon"
             ></ion-icon>
             <div
               class="d-flex ion-align-items-center thumbnail-status animate__animated animate__zoomIn"
@@ -224,10 +237,18 @@
       <!-- My Status and Dyspo  -->
       <div
         *ngIf="isInvitation"
-        class="d-flex ion-text-center ion-justify-content-center ion-padding-top"
+        class="d-flex ion-padding-top ion-justify-content-center"
       >
-        {{ my_dyspoStatus_label }}<br />
-        {{ my_agendaEvents_label }}
+        <div
+          *ngIf="my_dyspoStatus_label !== '' || my_agendaEvents_label !== ''"
+          style="margin-right: 6px"
+        >
+          <ion-icon name="information-circle-outline" size="large"></ion-icon>
+        </div>
+        <div style="text-align: left">
+          {{ my_dyspoStatus_label }}<br />
+          {{ my_agendaEvents_label }}
+        </div>
       </div>
     </div>
   </div>
@@ -325,13 +346,28 @@
       class="d-flex ion-justify-content-center"
       style="color: #eee; padding-bottom: var(--ion-safe-area-bottom)"
     >
-      <ion-button (click)="acceptInvitation()" class="form-btn" fill="clear"
+      <ion-button
+        (click)="acceptInvitation()"
+        class="dyspo-btn"
+        mode="ios"
+        fill="solid"
+        color="dark"
         >Dyspo <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon
       ></ion-button>
-      <ion-button (click)="declineInvitation()" class="form-btn" fill="clear"
+      <ion-button
+        (click)="declineInvitation()"
+        class="dyspo-btn"
+        mode="ios"
+        fill="solid"
+        color="dark"
         >Pas dyspo <ion-icon slot="start" name="close-circle-outline"></ion-icon
       ></ion-button>
-      <ion-button (click)="close()" class="form-btn" fill="clear"
+      <ion-button
+        (click)="close()"
+        class="dyspo-btn"
+        mode="ios"
+        color="dark"
+        fill="solid"
         >A Voir <ion-icon slot="start" name="help-circle-outline"></ion-icon
       ></ion-button>
     </div>

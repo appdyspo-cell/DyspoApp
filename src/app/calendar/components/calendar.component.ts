@@ -493,10 +493,9 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
   }
 
   _monthFormat(date: number): string {
-    console.log('month format', date);
     // @ts-ignore
     const f = moment(date).format(this._d.monthFormat.replace(/y/g, 'Y'));
-    console.log('f', f);
+
     return format(date, 'MMM yyyy', { locale: fr });
     //return f;
   }
