@@ -74,16 +74,16 @@
   </ion-grid>
   <div class="chip-container">
     <ion-chip [outline]="true"
-      ><div class="chip-evt bg-kid">&nbsp;</div>
+      ><div class="chip-evt bg-color-kid">&nbsp;</div>
       Kids</ion-chip
     >
     <ion-chip [outline]="true"
-      ><div class="chip-evt bg-nokids">&nbsp;</div>
+      ><div class="chip-evt bg-color-nokids">&nbsp;</div>
       Dyspo</ion-chip
     >
     <ion-chip [outline]="true"
-      ><div class="chip-evt bg-nodyspo">&nbsp;</div>
-      No Dyspo</ion-chip
+      ><div class="chip-evt bg-color-nodyspo">&nbsp;</div>
+      Pas Dyspo</ion-chip
     >
   </div>
 </div>
@@ -127,10 +127,11 @@
 
             <ion-button
               size="small"
+              fill="clear"
               (click)="addGroup(group, $event)"
-              fill="outline"
-              >Ajouter</ion-button
             >
+              <ion-icon name="add-circle-outline" slot="icon-only"></ion-icon>
+            </ion-button>
           </div>
         </ion-item>
         <div class="ion-padding" slot="content">
@@ -190,16 +191,16 @@
           </ion-grid>
           <div class="chip-container">
             <ion-chip [outline]="true"
-              ><div class="chip-evt bg-kid">&nbsp;</div>
+              ><div class="chip-evt bg-color-kid">&nbsp;</div>
               Kids</ion-chip
             >
             <ion-chip [outline]="true"
-              ><div class="chip-evt bg-nokids">&nbsp;</div>
+              ><div class="chip-evt bg-color-nokids">&nbsp;</div>
               Dyspo</ion-chip
             >
             <ion-chip [outline]="true"
-              ><div class="chip-evt bg-nodyspo">&nbsp;</div>
-              No Dyspo</ion-chip
+              ><div class="chip-evt bg-color-nodyspo">&nbsp;</div>
+              Pas Dyspo</ion-chip
             >
           </div>
         </div>

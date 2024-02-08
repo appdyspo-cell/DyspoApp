@@ -114,24 +114,8 @@ ion-toolbar {
   opacity: 0.5;
 }
 
-.chip-evt {
-  width: 15px;
-  height: 15px;
-  border-radius: 10px;
-  margin-right: 5px;
-}
-
-.chip-container {
-  display: flex;
-  justify-content: center;
-}
-
 ion-item:last-child {
   --inner-border-width: 0;
-}
-
-ion-chip {
-  border: none;
 }
 
 .segmentButton {

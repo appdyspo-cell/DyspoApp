@@ -69,7 +69,13 @@
         </ion-thumbnail>
         <div class="text-box">
           <h2 class="d-flex">
-            <span>{{agendaEvent.title}}</span>
+            <span
+              [ngClass]="{
+              'color-kid': agendaEvent.type === agendaEventType.KIDS,
+              'color-nokids': agendaEvent.type === agendaEventType.NOKIDS,
+              'color-free': agendaEvent.type === agendaEventType.FREE}"
+              >{{agendaEvent.title}}</span
+            >
             <small>{{getLastMessageDate(agendaEvent)}}</small>
             <ion-icon
               *ngIf="chatrooms[agendaEvent.uid!] && !chatrooms[agendaEvent.uid!].isNotifications"
@@ -117,7 +123,13 @@
         </ion-thumbnail>
         <div class="text-box">
           <h2 class="d-flex">
-            <span>{{agendaEvent.title}}</span>
+            <span
+              [ngClass]="{
+              'color-kid': agendaEvent.type === agendaEventType.KIDS,
+              'color-nokids': agendaEvent.type === agendaEventType.NOKIDS,
+              'color-free': agendaEvent.type === agendaEventType.FREE}"
+              >{{agendaEvent.title}}</span
+            >
             <small>{{getLastMessageDate(agendaEvent)}}</small>
           </h2>
           <p class="d-flex">
@@ -136,5 +148,19 @@
         </div>
       </ion-item>
     </ion-list>
+  </div>
+  <div class="chip-container">
+    <ion-chip [outline]="true"
+      ><div class="chip-evt bg-color-kid">&nbsp;</div>
+      Kid(s)</ion-chip
+    >
+    <ion-chip [outline]="true"
+      ><div class="chip-evt bg-color-nokids">&nbsp;</div>
+      NoKid(s)</ion-chip
+    >
+    <ion-chip [outline]="true"
+      ><div class="chip-evt bg-color-free">&nbsp;</div>
+      Au choix</ion-chip
+    >
   </div>
 </ion-content>

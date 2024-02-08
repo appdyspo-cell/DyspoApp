@@ -346,7 +346,7 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     });
     if (this.userSvc.userInfo?.with_kids) {
       buttons.push({
-        text: 'Dyspo with Kid(s)',
+        text: 'Kid(s)',
         cssClass: 'dyspo-sheet-dyspo-with-kids',
         data: {
           action: UserDyspoStatus.DYSPOWITHKIDS,
@@ -354,7 +354,7 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
       });
     }
     buttons.push({
-      text: 'No Dyspo',
+      text: 'Pas dyspo',
       cssClass: 'dyspo-sheet-no-dyspo',
       data: {
         action: UserDyspoStatus.NODYSPO,

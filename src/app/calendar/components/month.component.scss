@@ -99,7 +99,7 @@
 :host .event-badge {
   //width: 10px;
   //height: 10px;
-  background-color: rgb(252, 83, 83);
+  background-color: var(--text-no-dyspo);
   //position: absolute;
 
   //border-radius: 5px;
@@ -112,7 +112,7 @@
   width: 12px; /* Largeur du badge */
   height: 12px; /* Hauteur du badge */
   border-radius: 50%; /* Pour créer un badge circulaire */
-  background-color: red; /* Couleur de fond du badge */
+
   color: white; /* Couleur du texte du badge */
   display: flex;
   align-items: center;

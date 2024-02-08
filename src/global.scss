@@ -41,10 +41,13 @@
   --text-black: #444444;
   --text-light: #8e8e8e;
   --text-light2: #464646;
-  --text-no-dyspo: #fb860a;
-  --text-dyspo-with-kids: #e1e163;
-  --text-dyspo: #3492d0;
-  --text-dyspo-free: #67e163;
+  --text-no-dyspo: #fa7538;
+  --text-dyspo-with-kids: #46a2c2;
+  --text-dyspo: #3ada6a;
+  --text-dyspo-free: #c951df;
+  --text-dyspo-with-kids-secondary: #9eb7c0;
+  --text-dyspo-secondary: #aeddbc;
+  --text-dyspo-free-secondary: #d0aad6;
 }
 
 .transparent-modal {
@@ -69,23 +72,6 @@
   background-position: center top;
   background-repeat: no-repeat;
   background-size: cover;
-}
-
-.bg-nokids {
-  background-image: url("./assets/fd_ecran_event_kid.jpg");
-  background-position: center top;
-  background-repeat: no-repeat;
-  background-size: cover;
-
-  background-color: var(--text-dyspo-no-kids);
-}
-
-.bg-kid {
-  background-color: var(--text-dyspo-with-kids);
-}
-
-.bg-nodyspo {
-  background-color: var(--text-no-dyspo);
 }
 
 .margin-bottom {
@@ -316,49 +302,85 @@ ion-item {
   border: 3px solid var(--text-dyspo-free);
 }
 
-.bg-kids {
-  --background: #8c8c1f;
+.bg-nokids {
+  --background: var(--text-dyspo);
   color: var(--white);
-  //border-color: var(--text-dyspo);
 }
 
-// .bg-nokids {
-//   --background: #328bc6;
-//   color: var(--white);
-//   //color: var(--text-no-dyspo);
-// }
+.bg-kids {
+  --background: var(--text-dyspo-with-kids);
+  color: var(--white);
+}
+
+.bg-nodyspo {
+  --background: var(--text-no-dyspo);
+  color: var(--white);
+}
 
 .bg-free {
-  --background: #2fb62d;
+  --background: var(--text-dyspo-free);
   color: var(--white);
 }
+
+.bg-color-nokids {
+  background-color: var(--text-dyspo);
+}
+
+.bg-color-kid {
+  background-color: var(--text-dyspo-with-kids);
+}
+
+.bg-color-nodyspo {
+  background-color: var(--text-no-dyspo);
+}
+
+.bg-color-free {
+  background-color: var(--text-dyspo-free);
+}
+
+.color-nokids {
+  color: var(--text-dyspo);
+}
+
+.color-kid {
+  color: var(--text-dyspo-with-kids);
+}
+
+.color-nodyspo {
+  color: var(--text-no-dyspo);
+}
+
+.color-free {
+  color: var(--text-dyspo-free);
+}
+
 .label-bg-kids {
-  background-color: #4b4be6;
+  background-color: var(--text-dyspo-with-kids);
   color: var(--white);
 }
 
 .label-bg-nokids {
-  background-color: #32c63e;
+  background-color: var(--text-dyspo);
   color: var(--white);
 }
 
 .label-bg-free {
-  background-color: #a42db6;
+  background-color: var(--text-dyspo-free);
   color: var(--white);
 }
 
 .bg-kids-secondary {
-  background-color: #e1e1b7;
+  background-color: var(--text-dyspo-with-kids-secondary);
   //color: var(--white);
 }
 
 .bg-nokids-secondary {
-  background-color: #94b8d0;
+  background-color: var(--text-dyspo-secondary);
   //color: var(--white);
 }
 
 .bg-free-secondary {
-  background-color: #b4e0b3;
+  background-color: var(--text-dyspo-free-secondary);
   //color: var(--white);
 }
 
@@ -572,4 +594,20 @@ ion-app[dir="rtl"] {
 .roundedInput25px {
   @extend .styledInput;
   --border-radius: 25px;
+}
+
+ion-chip {
+  border: none;
+}
+
+.chip-evt {
+  width: 15px;
+  height: 15px;
+  border-radius: 10px;
+  margin-right: 5px;
+}
+
+.chip-container {
+  display: flex;
+  justify-content: center;
 }
