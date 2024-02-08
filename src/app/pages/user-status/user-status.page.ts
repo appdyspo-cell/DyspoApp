@@ -56,6 +56,7 @@ export class UserStatusPage implements OnInit {
   dyspoStatus = UserDyspoStatus;
   nextAgendaEvents: AgendaEvent[] = [];
   notifications: Notif[] = [];
+
   invitations: AgendaEvent[] = [];
   friendsSuggested: Friend[] = [];
   friends$!: Observable<Friend[]>;
@@ -120,6 +121,19 @@ export class UserStatusPage implements OnInit {
       this.friendsSuggested = friends.filter(
         (elt) => elt.friend_status === FriendStatus.SUGGESTED
       );
+      this.friendsSuggested.forEach((friendSuggestion) => {
+        console.log('Push notif ', friendSuggestion);
+        const notif: Notif = {
+          user_id: '',
+          title: '',
+          message: '',
+          subject: '',
+          create_at_ms: 0,
+          create_at_ISO: '',
+          status: '',
+        };
+        this.notifications.push(notif);
+      });
     });
 
     this.invitationsSubscription =
@@ -135,6 +149,15 @@ export class UserStatusPage implements OnInit {
           } else {
             return 0; // les dates sont égales
           }
+        });
+
+        this.invitations = invitations.filter((ev) => {
+          return isAfter(parseISO(ev.endISO), new Date().getTime());
+        });
+
+        this.invitations.forEach((invit) => {
+          console.log('Push notif invit', invit);
+          // this.notifications.push(notif);
         });
       });
 
@@ -323,5 +346,14 @@ export class UserStatusPage implements OnInit {
         navigationExtras
       );
     }
+  }
+
+  openNotifications() {
+    const navigationExtras: NavigationExtras = {
+      state: {
+        invitations: this.invitations,
+      },
+    };
+    this.navCtrl.navigateForward('/notifications-list', navigationExtras);
   }
 }

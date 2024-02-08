@@ -52,7 +52,10 @@ export class GroupListPage implements OnInit {
           );
         });
         this.agendaEventsArchived = agendaEvents.filter((ev) => {
-          return isBefore(parseISO(ev.endISO), new Date().getTime());
+          return (
+            ev.members_uid.length > 1 &&
+            isBefore(parseISO(ev.endISO), new Date().getTime())
+          );
         });
         agendaEvents.forEach((agEvent) => {
           this.chatrooms[agEvent.uid!] = agEvent[

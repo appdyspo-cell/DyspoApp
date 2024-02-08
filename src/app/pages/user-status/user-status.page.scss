@@ -82,24 +82,10 @@ ion-badge {
 }
 
 .next-agenda-content {
-  width: 250px; /* Laissez la largeur automatique pour s'adapter aux éléments enfants */
+  // min-width: 250px; /* Laissez la largeur automatique pour s'adapter aux éléments enfants */
   //font-size: 0; /* Pour supprimer l'espacement entre les éléments */
   margin-top: 10px;
-}
-
-.next-agenda-element {
-  width: 250px; /* Largeur de chaque élément */
-  height: 100px; /* Hauteur de chaque élément, vous pouvez ajuster selon vos besoins */
-  background-color: #f8f8f8; /* Ajoutez une couleur de fond pour les éléments */
-  display: inline-block; /* Afficher les éléments en ligne côte à côte */
-  margin-right: 10px; /* Ajoutez une marge à droite pour séparer les éléments */
-  margin-left: 0; /* La marge à gauche du premier élément */
-  border-radius: 5px;
-  padding: 3px;
-  text-align: center;
-  white-space: overflow-wrap;
-  box-shadow: #f8f8f8;
-  overflow: hidden;
+  // max-width: 350px;
 }
 
 .title-notif {
@@ -120,6 +106,7 @@ ion-badge {
 
 .dyspo-btn-container {
   width: 70%;
+  max-width: 270px;
   display: flex;
   justify-content: center;
 }

@@ -18,10 +18,22 @@ export class AgendaEventMiniComponent implements OnInit {
   agendaEventType = AgendaEventType;
   display_date_1: string | undefined;
   display_date_2: string | undefined;
+  eventTypeLabel = '';
 
   constructor(private navCtrl: NavController) {}
 
   ngOnInit() {
+    switch (this.agendaEvent.type) {
+      case AgendaEventType.KIDS:
+        this.eventTypeLabel = 'Kid(s)';
+        break;
+      case AgendaEventType.NOKIDS:
+        this.eventTypeLabel = 'NoKid(s)';
+        break;
+      case AgendaEventType.FREE:
+        this.eventTypeLabel = 'Kid(s) ou NoKid(s)';
+        break;
+    }
     if (
       isSameDay(this.agendaEvent.start_date_ts, this.agendaEvent.end_date_ts)
     ) {

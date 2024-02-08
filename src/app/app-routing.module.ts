@@ -107,6 +107,10 @@ const routes: Routes = [
         (m) => m.DeviceContactsPageModule
       ),
   },
+  {
+    path: 'notifications-list',
+    loadChildren: () => import('./pages/notifications-list/notifications-list.module').then( m => m.NotificationsListPageModule)
+  },
 ];
 @NgModule({
   imports: [

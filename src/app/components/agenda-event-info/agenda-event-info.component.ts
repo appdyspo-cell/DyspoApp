@@ -84,13 +84,13 @@ export class AgendaEventInfoComponent implements OnInit {
     console.log(this.agendaEvent);
     switch (this.agendaEvent.type) {
       case AgendaEventType.KIDS:
-        this.eventTypeLabel = 'avec kids';
+        this.eventTypeLabel = 'Kid(s)';
         break;
       case AgendaEventType.NOKIDS:
-        this.eventTypeLabel = 'no kids';
+        this.eventTypeLabel = 'NoKid(s)';
         break;
       case AgendaEventType.FREE:
-        this.eventTypeLabel = 'avec ou sans kids';
+        this.eventTypeLabel = 'Kid(s) ou NoKid(s)';
         break;
     }
     this.members_loaded = false;

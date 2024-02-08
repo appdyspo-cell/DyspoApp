@@ -1,16 +1,23 @@
 .agenda-event-container {
-  width: 100%; /* Largeur de chaque élément */
-  height: 120px; /* Hauteur de chaque élément, vous pouvez ajuster selon vos besoins */
-  background-color: #f8f8f8; /* Ajoutez une couleur de fond pour les éléments */
+  //width: 100%; /* Largeur de chaque élément */
+  //height: 120px; /* Hauteur de chaque élément, vous pouvez ajuster selon vos besoins */
+  //background-color: #f8f8f8; /* Ajoutez une couleur de fond pour les éléments */
   display: inline-block; /* Afficher les éléments en ligne côte à côte */
-  margin-right: 10px; /* Ajoutez une marge à droite pour séparer les éléments */
+  margin-right: 15px; /* Ajoutez une marge à droite pour séparer les éléments */
   margin-left: 0; /* La marge à gauche du premier élément */
-  border-radius: 5px;
+  //border-radius: 5px;
   padding: 3px;
   text-align: center;
   white-space: overflow-wrap;
-  box-shadow: #f8f8f8;
   overflow: hidden;
+}
+
+.label-type {
+  width: fit-content;
+  border-radius: 3px;
+  padding: 0px 5px;
+  font-size: 0.85rem;
+  line-height: 1.4em;
 }
 
 .title-notif {
@@ -24,8 +31,9 @@
 }
 
 .event-avatar {
-  width: 55px;
-  height: 55px;
+  min-width: 85px;
+  height: 65px;
+  border: 2px solid #fbfbfb;
 }
 ion-col {
   --padding-inline-start: 0;

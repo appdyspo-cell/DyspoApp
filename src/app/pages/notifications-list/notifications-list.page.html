@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-toolbar mode="md">
+    <ion-buttons slot="start">
+      <ion-back-button slot="start" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title style="padding-left: 0px"><h1>Notifications</h1></ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content
+  [fullscreen]="true"
+  class="bg_color"
+  style="padding: var(--ion-safe-area-top) 0px var(--ion-safe-area-bottom) 0px"
+>
+  <div class="event-wrapper" *ngFor="let nextEvent of invitations">
+    <app-agenda-event-mini
+      class="animate__animated animate__fadeIn"
+      [agendaEvent]="nextEvent"
+      [isInvitation]="false"
+      (click)="openAgendaEventInfo(nextEvent)"
+    >
+    </app-agenda-event-mini>
+  </div>
+</ion-content>

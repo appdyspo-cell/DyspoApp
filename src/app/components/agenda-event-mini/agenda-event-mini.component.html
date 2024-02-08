@@ -1,5 +1,5 @@
-<div class="agenda-event-container box-1">
-  <ion-row style="border-bottom: 1px solid" class="ion-align-items-center">
+<div class="agenda-event-container">
+  <!-- <ion-row style="border-bottom: 1px solid" class="ion-align-items-center">
     <ion-col size="2" *ngIf="agendaEvent.is_multi">
       <ion-avatar class="event-type-avatar">
         <ion-img
@@ -27,8 +27,61 @@
         {{ agendaEvent.title }}
       </div></ion-col
     ></ion-row
-  >
-  <ion-row class="ion-align-items-center">
+  > -->
+  <div style="display: flex; width: auto; align-items: center">
+    <ion-thumbnail
+      class="event-avatar"
+      style="overflow: hidden; margin-right: 8px"
+    >
+      <img src="{{ agendaEvent.avatar }}" />
+    </ion-thumbnail>
+
+    <div
+      style="
+        display: block;
+        justify-content: start;
+        text-align: left;
+        overflow: hidden;
+      "
+    >
+      <div style="font-weight: 600; width: auto">{{ agendaEvent.title }}</div>
+      <div
+        [ngClass]="{
+          'label-bg-kids': agendaEvent.type === agendaEventType.KIDS,
+          'label-bg-nokids': agendaEvent.type === agendaEventType.NOKIDS,
+          'label-bg-free': agendaEvent.type === agendaEventType.FREE,
+          'label-type': true
+        }"
+      >
+        {{ eventTypeLabel }}
+      </div>
+      <div style="font-size: 0.8em">
+        {{ display_date_1 }} - {{ display_date_2 }}
+      </div>
+      <div style="font-size: 0.8em">
+        {{ agendaEvent.place_description }}
+      </div>
+    </div>
+    <div
+      *ngIf="!isInvitation && agendaEvent.members_uid.length > 1"
+      style="min-width: 45px"
+      class="ion-align-items-center ion-text-center"
+    >
+      <ion-button
+        *ngIf="agendaEvent.members_uid.length > 1"
+        size="small"
+        fill="clear"
+        (click)="goToChat(agendaEvent, $event)"
+      >
+        <ion-icon
+          slot="icon-only"
+          name="chatbubble-ellipses-outline"
+        ></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- <ion-row class="ion-align-items-center">
     <ion-col *ngIf="agendaEvent.avatar" size="3">
       <ion-thumbnail
         class="event-avatar"
@@ -60,5 +113,5 @@
           name="chatbubble-ellipses-outline"
         ></ion-icon>
       </ion-button> </ion-col
-  ></ion-row>
+  ></ion-row> -->
 </div>
