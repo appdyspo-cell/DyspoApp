@@ -1,5 +1,32 @@
+.bg-kids-img {
+  --background: none;
+  background-image: url("/assets/newimg/fd_ecran_event_kid.jpg");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.bg-nokids-img {
+  --background: none;
+  background-image: url("/assets/newimg/fd_ecran_event_nokid.jpg");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.bg-free-img {
+  --background: none;
+  background-image: url("/assets/newimg/fd_ecran_event_kidnokid.jpg");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+ion-toolbar {
+  --background: transparent;
+}
+
 ion-button {
-  // --color: #eee;
   --border-radius: 0px;
 }
 

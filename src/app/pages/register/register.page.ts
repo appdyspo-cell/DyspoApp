@@ -130,11 +130,11 @@ export class RegisterPage implements OnInit {
 
     this.utils.hideLoader();
 
-    if (user) {
-      // auth statechanged is intercepted and go to tabs automatically
-    } else {
-      this.utils.swalError(this.translate.instant('REGISTER_FAILED'));
-    }
+    // if (user) {
+    //   // auth statechanged is intercepted and go to tabs automatically
+    // } else {
+    //   this.utils.swalError(this.translate.instant('REGISTER_FAILED'));
+    // }
   }
 
   gotoLegal() {

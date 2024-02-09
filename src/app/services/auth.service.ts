@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import {
   Auth,
-  User,
   UserCredential,
   createUserWithEmailAndPassword,
   deleteUser,
@@ -9,18 +8,9 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from '@angular/fire/auth';
-import {
-  Firestore,
-  deleteDoc,
-  doc,
-  setDoc,
-  updateDoc,
-} from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, updateDoc } from '@angular/fire/firestore';
 import { UtilsService } from './utils.service';
 import { AppUser, UserStatus } from '../models/models';
-import Swal from 'sweetalert2';
-
-import { getApp } from '@angular/fire/app';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -53,6 +43,7 @@ export class AuthService {
       return credentials;
     } catch (e) {
       this.utils.log(e);
+      this.utils.showFirebaseError(e);
       return null;
     }
   }
@@ -74,7 +65,13 @@ export class AuthService {
       deleteUser(user)
         .then(() => {
           this.utils.log("L'utilisateur a été supprimé avec succès");
-          updateDoc(refUser, { status: UserStatus.DELETED });
+          updateDoc(refUser, {
+            status: UserStatus.DELETED,
+            firstname: 'Compte effacé',
+            lastname: 'Compte effacé',
+            avatarPath: environment.DEFAULT_AVATAR,
+            email: '',
+          });
         })
         .catch((error) => {
           this.utils.showFirebaseError(error);

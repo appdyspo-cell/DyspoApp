@@ -36,9 +36,7 @@ import { NotificationService } from 'src/app/services/notification.service';
   styleUrls: ['./profile.page.scss'],
 })
 export class ProfilePage implements OnInit {
-  showZonesInfos() {
-    throw new Error('Method not implemented.');
-  }
+  originalEmail: string | undefined;
   academies = '';
   user!: AppUser;
   avatarPath = '';
@@ -63,6 +61,7 @@ export class ProfilePage implements OnInit {
     this.userSubscription = this.userSvc.appUserInfoObs$.subscribe((user) => {
       this.user = user;
       this.getAcademies();
+      this.originalEmail = this.user.email;
       console.log('user subscription profile page', user);
     });
     //this.user! = Object.assign({}, this.userSvc.userInfo);
@@ -129,14 +128,18 @@ export class ProfilePage implements OnInit {
     }
 
     //Changement de mail?
-    if (this.user.email !== this.userSvc.userInfo?.email) {
+
+    console.log('Update email');
+    if (this.user.email !== this.originalEmail) {
       if (!this.utils.validateEmail(this.user.email!)) {
         this.utils.showToastError("L'email n'est pas correct");
       } else {
         const auth = getAuth();
         const firebaseUser = auth.currentUser;
+        const newEmail = this.user!.email!.trim();
+        console.log('Update email');
         if (firebaseUser) {
-          updateEmail(firebaseUser, this.user!.email!.trim())
+          updateEmail(firebaseUser, newEmail)
             .then(async (res) => {
               this.userSvc
                 .updateUser(Object.assign({}, this.user))
