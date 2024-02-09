@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Auth, User, authState, user } from '@angular/fire/auth';
-import { MenuController, NavController } from '@ionic/angular';
+import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
 import { UserService } from './services/user.service';
@@ -29,7 +29,7 @@ export class AppComponent {
     private auth: Auth,
     private translate: TranslateService,
     private navController: NavController,
-    private menuCtrl: MenuController,
+
     private userSvc: UserService,
     private logger: LoggerService,
     private friendsSvc: FriendsService,
@@ -41,12 +41,9 @@ export class AppComponent {
     //Lang
     this.translate.setDefaultLang('fr');
     this.loadScripts();
-    const preferredLang = localStorage.getItem('lang');
-    if (!preferredLang) {
-      this.translate.use('fr');
-    } else {
-      this.translate.use(preferredLang);
-    }
+
+    this.translate.use('fr');
+
     this.user$ = user(this.auth);
     this.authState$ = authState(this.auth);
 
@@ -77,8 +74,6 @@ export class AppComponent {
           );
           this.navController.navigateRoot('/login');
 
-          this.menuCtrl.enable(false);
-          localStorage.clear();
           this.killAllServices();
           this.userSvc.unsubscribeUserInfo();
         }
@@ -87,7 +82,6 @@ export class AppComponent {
   }
 
   ngOnDestroy() {
-    // when manually subscribing to an observable remember to unsubscribe in ngOnDestroy
     this.authStateSubscription.unsubscribe();
     //this.userSubscription.unsubscribe();
   }

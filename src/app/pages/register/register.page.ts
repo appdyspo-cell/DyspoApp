@@ -127,7 +127,7 @@ export class RegisterPage implements OnInit {
     const user = await this.authSvc.register(this.userInfo, this.password);
 
     console.log('register user', user);
-    //localStorage.setItem('isLoggedIn', 'true');
+
     this.utils.hideLoader();
 
     if (user) {

@@ -1,7 +1,11 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button text="" icon="chevron-back-outline"></ion-back-button>
+      <ion-back-button
+        text=""
+        color="dark"
+        icon="chevron-back-outline"
+      ></ion-back-button>
     </ion-buttons>
     <ion-title>{{'REGISTER' | translate}}</ion-title>
   </ion-toolbar>
@@ -181,8 +185,13 @@
     </ion-list>
   </div>
   <div class="ion-padding">
-    <ion-button size="large" shape="block" (click)="checkBeforeRegister()"
-      >Inscription</ion-button
-    >
+    <ion-button
+      class="dyspo-button"
+      mode="ios"
+      expand="full"
+      color="dark"
+      (click)="checkBeforeRegister()"
+      >Inscription<ion-icon name="person-outline" slot="start"></ion-icon
+    ></ion-button>
   </div>
 </ion-content>

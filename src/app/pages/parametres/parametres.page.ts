@@ -35,7 +35,6 @@ export class ParametresPage implements OnInit {
 
   presentingElement: any;
 
-  darkmode: boolean = false;
   ionRangeMin = 10;
   ionRangeMax = 1000;
   ionRangeStep = 10;
@@ -110,25 +109,8 @@ export class ParametresPage implements OnInit {
   ngOnInit() {
     this.presentingElement = document.querySelector('.ion-page');
     this.logger.logDebug('ngOnInit Parametres');
-    if (!localStorage.getItem('darkmode')) {
-      this.darkmode = false;
-    } else {
-      this.darkmode = true;
-    }
-    this.loadInfos();
-  }
 
-  toggleDarkMode(ev: any) {
-    this.logger.logDebug('toggle');
-    if (ev.detail.checked) {
-      this.darkmode = true;
-      document.body.classList.toggle('dark', true);
-      localStorage.setItem('darkmode', 'true');
-    } else {
-      this.darkmode = false;
-      document.body.classList.toggle('dark', false);
-      localStorage.removeItem('darkmode');
-    }
+    this.loadInfos();
   }
 
   ionViewWillEnter() {

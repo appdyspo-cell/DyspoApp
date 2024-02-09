@@ -510,7 +510,4 @@ export class AgendaPage implements AfterViewInit {
       //this.route.navigate(['chat-home'], navigationExtras);
     }
   }
-  goBack() {
-    this.navCtrl.pop();
-  }
 }

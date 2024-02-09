@@ -14,20 +14,21 @@ ion-header {
 
 ion-list {
   background: transparent;
-}
-ion-item:last-child {
-  --inner-border-width: 0;
-}
-
-ion-item {
-  --background: transparent;
-  &:last-child {
-    border: none;
+  ion-item {
+    --background: transparent;
+    &:last-child {
+      border: none;
+      --inner-border-width: 0;
+    }
+    &:last-of-type {
+      border: none;
+    }
   }
 }
 
 ion-chip {
   border: none;
+  padding: 0;
 }
 
 ion-calendar {
@@ -37,13 +38,6 @@ ion-calendar {
   top: 0;
   // box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
   //   rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
-}
-
-.chip-evt {
-  width: 15px;
-  height: 15px;
-  border-radius: 10px;
-  margin-right: 5px;
 }
 
 .holidays {
@@ -82,13 +76,6 @@ ion-calendar {
         font-size: 14px;
       }
     }
-  }
-}
-
-ion-toolbar {
-  --background: transparent;
-  ion-title {
-    //--color: white;
   }
 }
 

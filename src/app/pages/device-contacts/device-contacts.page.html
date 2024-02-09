@@ -1,15 +1,19 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar mode="md">
     <ion-buttons slot="start">
-      <ion-back-button text=""></ion-back-button>
+      <ion-back-button
+        text=""
+        color="dark"
+        icon="chevron-back-outline"
+      ></ion-back-button>
     </ion-buttons>
-    <ion-title>Contacts</ion-title>
+    <ion-title><h1>Contacts</h1></ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="shareApp()">
         <ion-icon
           slot="icon-only"
           name="share-social-outline"
-          color="primary"
+          color="dark"
         ></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -41,7 +45,10 @@
     showCancelButton="never"
   ></ion-searchbar>
   <ion-list [hidden]="autocompleteItems.length === 0" class="ion-no-padding">
-    <ion-item *ngFor="let contact of autocompleteItems; let i=index">
+    <ion-item
+      *ngFor="let contact of autocompleteItems; let i=index"
+      lines="full"
+    >
       <div slot="start" class="avatar-container">
         <ion-thumbnail class="thumb" *ngIf="contact.avatar">
           <img src="{{contact.avatar}}" />

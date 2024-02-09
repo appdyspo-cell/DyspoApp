@@ -1,5 +1,13 @@
 $colors: #a2b9bc, #6b5b95, #feb236, #d64161, #ff7b25, #b2ad7f, #878f99;
 
+ion-header {
+  h1 {
+    margin: 0;
+    font-weight: 500;
+    letter-spacing: 0;
+    font-size: 1.625rem;
+  }
+}
 .avatar {
   color: #fff;
   margin: 5px;

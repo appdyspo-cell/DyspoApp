@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { MenuController, NavController } from '@ionic/angular';
+
 import { UtilsService } from 'src/app/services/utils.service';
-import { environment } from 'src/environments/environment';
+
 import Swal from 'sweetalert2';
 import { TranslateService } from '@ngx-translate/core';
-import { Auth } from '@angular/fire/auth';
-import { Firestore } from '@angular/fire/firestore';
+
 import { AuthService } from 'src/app/services/auth.service';
 import { LoggerService } from 'src/app/services/logger.service';
 
@@ -26,20 +25,13 @@ export class LoginPage implements OnInit {
 
   constructor(
     private router: Router,
-    private menuCtrl: MenuController,
     private utils: UtilsService,
     public translate: TranslateService,
-    private auth: Auth,
-    private navController: NavController,
     private logger: LoggerService,
     private authService: AuthService
   ) {}
 
   ngOnInit() {}
-
-  ionViewDidEnter() {
-    this.menuCtrl.enable(false);
-  }
 
   signup() {
     this.router.navigateByUrl('/register');

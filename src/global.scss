@@ -597,13 +597,14 @@ ion-app[dir="rtl"] {
 
 ion-chip {
   border: none;
+  margin-right: 8px;
 }
 
 .chip-evt {
   width: 15px;
   height: 15px;
   border-radius: 10px;
-  margin-right: 5px;
+  margin-right: 3px;
 }
 
 .chip-container {

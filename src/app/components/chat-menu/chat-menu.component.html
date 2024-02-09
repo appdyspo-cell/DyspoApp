@@ -1,38 +1,9 @@
 <ion-content>
   <ion-list>
-    <!-- <ion-item tappable (click)="requestBlock()" lines="none">
-      <ion-icon name="ban" color="danger" style="margin-right: 15px"></ion-icon>
-      <ion-text>Bloquer l'utilisateur</ion-text>
-    </ion-item>
-    <ion-item (click)="requestReport()" lines="none">
-      <ion-icon
-        name="stop-outline"
-        color="danger"
-        style="margin-right: 15px"
-      ></ion-icon>
-      <ion-text>Signaler l'utilisateur</ion-text>
-    </ion-item> -->
     <ion-item *ngIf="can_quit" (click)="quitEvent()" lines="none">
-      <!-- <ion-icon
-        name="remove-circle-outline"
-        color="danger"
-        slot="start"
-      ></ion-icon> -->
       <ion-text>Quitter l'évènement</ion-text>
     </ion-item>
     <ion-item (click)="toggleNotifications()" lines="none">
-      <!-- <ion-icon
-        *ngIf="my_chatroom.isNotifications"
-        name="notifications-off-outline"
-        color="danger"
-        slot="start"
-      ></ion-icon>
-      <ion-icon
-        *ngIf="!my_chatroom.isNotifications"
-        name="notifications-outline"
-        color="danger"
-        slot="start"
-      ></ion-icon> -->
       <ion-text>{{
         my_chatroom.isNotifications
           ? "Désactiver les notifications"
@@ -40,7 +11,6 @@
       }}</ion-text>
     </ion-item>
     <ion-item (click)="requestReport()" lines="none">
-      <!-- <ion-icon name="stop-outline" color="danger" slot="start"></ion-icon> -->
       <ion-text>Signaler le groupe</ion-text>
     </ion-item>
   </ion-list>

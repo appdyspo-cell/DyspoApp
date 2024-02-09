@@ -66,7 +66,6 @@
     </div>
     <ion-list lines="none">
       <ion-item
-        [button]="true"
         *ngFor="let agendaEvent of agendaEvents; let i=index;"
         [ngClass]="getDelayClass(i)"
         class="animate__animated animate__slideInRight"
@@ -90,13 +89,18 @@
               'color-free': agendaEvent.type === agendaEventType.FREE}"
               >{{agendaEvent.title}}</span
             >
-            <small>{{getLastMessageDate(agendaEvent)}}</small>
+
             <ion-icon
               *ngIf="chatrooms[agendaEvent.uid!] && !chatrooms[agendaEvent.uid!].isNotifications"
               name="notifications-off-outline"
-              style="position: absolute; right: 0px"
+              style="position: absolute; right: 12px"
             ></ion-icon>
           </h2>
+          <p>
+            <ion-text style="font-size: 0.85rem"
+              >{{getLastMessageDate(agendaEvent)}}</ion-text
+            >
+          </p>
           <p class="d-flex">
             <ion-icon
               *ngIf="agendaEvent.last_message?.image"
@@ -144,8 +148,12 @@
               'color-free': agendaEvent.type === agendaEventType.FREE}"
               >{{agendaEvent.title}}</span
             >
-            <small>{{getLastMessageDate(agendaEvent)}}</small>
           </h2>
+          <p>
+            <ion-text style="font-size: 0.85rem"
+              >{{getLastMessageDate(agendaEvent)}}</ion-text
+            >
+          </p>
           <p class="d-flex">
             <ion-icon
               *ngIf="agendaEvent.last_message?.image"

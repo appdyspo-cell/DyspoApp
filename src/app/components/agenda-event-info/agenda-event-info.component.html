@@ -54,8 +54,7 @@
             'thumb-nodyspo': admin?.dyspoStatus === UserDyspoStatus.NODYSPO
           }"
         >
-          <img src="{{ admin?.avatarPath }}" />
-          <!-- <ion-icon name="add" color="light"></ion-icon> -->
+          <img [defaultImage]="defaultAvatar" [lazyLoad]="admin?.avatarPath!" />
         </ion-thumbnail>
         <div>
           <span style="font-weight: bold; font-size: 1.15rem">{{
@@ -348,7 +347,7 @@
     >
       <ion-button
         (click)="acceptInvitation()"
-        class="dyspo-btn"
+        class="dyspo-button"
         mode="ios"
         fill="solid"
         color="dark"
@@ -356,7 +355,7 @@
       ></ion-button>
       <ion-button
         (click)="declineInvitation()"
-        class="dyspo-btn"
+        class="dyspo-button"
         mode="ios"
         fill="solid"
         color="dark"
@@ -364,7 +363,7 @@
       ></ion-button>
       <ion-button
         (click)="close()"
-        class="dyspo-btn"
+        class="dyspo-button"
         mode="ios"
         color="dark"
         fill="solid"

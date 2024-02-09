@@ -1,14 +1,18 @@
 <ion-header>
-  <ion-toolbar *ngIf="!msgSelected">
+  <ion-toolbar *ngIf="!msgSelected" mode="md">
     <ion-buttons slot="start">
-      <ion-back-button text="" icon="chevron-back-outline"></ion-back-button>
+      <ion-back-button
+        color="dark"
+        text=""
+        icon="chevron-back-outline"
+      ></ion-back-button>
     </ion-buttons>
     <ion-title (click)="openEvent()" mode="md">
       <div class="profile d-flex">
         <div *ngIf="agendaEvent.avatar" class="profile_img_box">
-          <div class="profile_img">
+          <ion-thumbnail class="thumb-avatar-event">
             <img src="{{agendaEvent.avatar}}" />
-          </div>
+          </ion-thumbnail>
         </div>
         <div class="title-container">
           <h2><b>{{agendaEvent.title}}</b></h2>
@@ -28,7 +32,7 @@
         tappable
         slot="end"
         name="ellipsis-vertical"
-        color="primary"
+        color="dark"
         (click)="openMenu($event)"
       >
       </ion-icon>
@@ -40,7 +44,7 @@
         tappable
         slot="end"
         name="close-outline"
-        color="primary"
+        color="dark"
         (click)="msgSelected = undefined"
       >
       </ion-icon>
@@ -51,7 +55,7 @@
         tappable
         slot="end"
         name="trash-outline"
-        color="primary"
+        color="dark"
         (click)="deleteMsg($event)"
       >
       </ion-icon>
@@ -60,7 +64,7 @@
         tappable
         slot="end"
         name="warning-outline"
-        color="primary"
+        color="dark"
         (click)="reportMsg($event)"
       >
       </ion-icon>
@@ -192,7 +196,7 @@
   </div>
 </ion-content>
 
-<ion-footer class="animate__animated animate__slideInUp delay_3">
+<ion-footer class="ion-no-border ion-no-padding">
   <div
     class="bg-theme d-flex"
     [ngClass]="viewType === '' ? 'option':'option active'"
@@ -202,7 +206,7 @@
     <ion-icon class="zmdi zmdi-close" (click)="setViewType('')"></ion-icon>
   </div>
 
-  <ion-toolbar>
+  <ion-toolbar style="--background: none">
     <div slot="start">
       <ion-button fill="clear" (click)="setViewType('active')">
         <ion-icon
@@ -212,7 +216,7 @@
         ></ion-icon>
       </ion-button>
     </div>
-    <ion-item lines="none">
+    <ion-item lines="none" class="ion-no-padding">
       <ion-input
         type="text"
         [(ngModel)]="userInput"

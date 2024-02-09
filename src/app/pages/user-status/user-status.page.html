@@ -165,8 +165,8 @@
     #statusmodal
     trigger="open-status-modal"
     (willDismiss)="onWillDismiss($event)"
-    [initialBreakpoint]="userSvc.userInfo?.with_kids? 0.4: 0.3"
-    [breakpoints]="userSvc.userInfo?.with_kids? [0, 0.4] : [0, 0.3]"
+    [initialBreakpoint]="userSvc.userInfo?.with_kids? 0.5: 0.4"
+    [breakpoints]="userSvc.userInfo?.with_kids? [0, 0.5] : [0, 0.4]"
   >
     <ng-template>
       <ion-header>

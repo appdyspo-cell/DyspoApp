@@ -302,9 +302,11 @@ export class AgendaService {
         parseISO(agendaEvent.recurrence_end_ISO!)
       );
 
+      let recId = new Date().getTime();
       while (cloneIsBeforeRecEndDate) {
+        recId++;
         const agendaClone = cloneDeep(agendaEvent);
-        agendaClone.uid = 'agev_rec_' + new Date().getTime();
+        agendaClone.uid = 'agev_rec_' + recId;
         docRef = doc(this.firestore, `agenda_events/`, agendaClone.uid!);
         agendaClone.parent_agenda_event_uid = agendaEvent.uid;
 

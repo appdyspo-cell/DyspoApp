@@ -1,13 +1,14 @@
-<ion-header [translucent]="true" class="ion-no-border">
-  <ion-toolbar>
+<ion-header class="ion-no-border">
+  <ion-toolbar mode="md">
     <ion-buttons slot="start">
-      <ion-back-button text="" icon="chevron-back-outline"></ion-back-button>
+      <ion-back-button
+        text=""
+        icon="chevron-back-outline"
+        color="dark"
+      ></ion-back-button>
     </ion-buttons>
-    <!-- <ion-title
-      >{{pageTitle}}
-    
-    </ion-title> -->
-    <ion-buttons slot="end">
+    <ion-title><h1>{{pageTitle}}</h1> </ion-title>
+    <!-- <ion-buttons slot="end">
       <ion-button
         slot="end"
         fill="outline"
@@ -15,15 +16,12 @@
         (click)="saveFriendGroup()"
         >{{saveLabel}}</ion-button
       >
-      <!-- <ion-button>
-       <ion-icon slot="icon-only" class="zmdi zmdi-search ion-text-start"></ion-icon>
-       
-      </ion-button> -->
-    </ion-buttons>
+     
+    </ion-buttons> -->
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding-top">
+<ion-content class="ion-padding-top bg_color">
   <!-- <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title
@@ -60,12 +58,13 @@
     ></ion-input>
   </ion-item>
 
-  <ion-list lines="none">
+  <ion-list>
     <ion-item
       *ngFor="let checkedFriend of checkedFriends"
+      lines="full"
       class="animated slideInRight delay_11"
     >
-      <ion-thumbnail slot="start">
+      <ion-thumbnail slot="start" class="thumb-avatar">
         <img src="{{checkedFriend.friend.userData?.avatarPath}}" />
       </ion-thumbnail>
 
@@ -99,30 +98,16 @@
   </ion-list>
 </ion-content>
 
-<ion-footer class="ion-no-border animate__animated animate__slideInUp delay_4">
-  <h2 class="d-flex">
-    <span> {{countCheckedItems()}} {{'members_selected' | translate}}</span>
-  </h2>
-
-  <!-- <div class="scroll_container">
-  
-    <div class="profile_img_box">
-      <div class="profile_img">
-        <img src="assets/img/4.png" />
-      </div>
-      <ion-icon class="zmdi zmdi-close-circle"></ion-icon>
-    </div>
-    <div class="profile_img_box">
-      <div class="profile_img">
-        <img src="assets/img/5.png" />
-      </div>
-      <ion-icon class="zmdi zmdi-close-circle"></ion-icon>
-    </div>
-    <div class="profile_img_box">
-      <div class="profile_img">
-        <img src="assets/img/6.png" />
-      </div>
-      <ion-icon class="zmdi zmdi-close-circle"></ion-icon>
-    </div>
-  </div> -->
+<ion-footer class="ion-no-border">
+  <ion-button
+    fill="solid"
+    class="dyspo-button ion-no-margin"
+    color="dark"
+    expand="full"
+    mode="ios"
+    (click)="saveFriendGroup()"
+  >
+    <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+    {{countCheckedItems()}} {{'members_selected' | translate}}
+  </ion-button>
 </ion-footer>

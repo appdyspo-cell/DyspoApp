@@ -41,6 +41,7 @@ export class AgendaEventInfoComponent implements OnInit {
   @ViewChild('popovermenu') popoverMenu: any;
   @ViewChild('popoverUserEvents') popoverUserEvents: any;
 
+  defaultAvatar = 'assets/img/user.png';
   UserDyspoStatus = UserDyspoStatus;
   FriendStatus = FriendStatus;
   agendaEventType = AgendaEventType;

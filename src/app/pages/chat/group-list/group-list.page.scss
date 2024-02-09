@@ -51,7 +51,7 @@ ion-thumbnail {
   width: 100%;
 
   h2 {
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 500;
     margin: 0;
     color: var(--text-black);
@@ -76,10 +76,10 @@ ion-thumbnail {
   }
 
   p {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     font-weight: 400;
     padding-top: 3px;
-    color: var(--text-dark);
+    //color: var(--text-dark);
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;

@@ -1,7 +1,11 @@
 <ion-header>
   <ion-toolbar mode="md">
     <ion-buttons slot="start">
-      <ion-back-button slot="start" text=""></ion-back-button>
+      <ion-back-button
+        color="dark"
+        text=""
+        icon="chevron-back-outline"
+      ></ion-back-button>
     </ion-buttons>
     <ion-title style="padding-left: 0px"><h1>{{ pageTitle }}</h1></ion-title>
   </ion-toolbar>
@@ -37,10 +41,10 @@
           <ion-img [src]="getIconTypeEvent()"></ion-img>
         </ion-avatar>
         <ion-select-option [value]="agendaEventType.KIDS"
-          >Kids</ion-select-option
+          >Kid(s)</ion-select-option
         >
         <ion-select-option [value]="agendaEventType.NOKIDS"
-          >No Kids</ion-select-option
+          >NoKid(s)</ion-select-option
         >
         <ion-select-option [value]="agendaEventType.FREE">
           <span style="color: var(--text-dyspo-free)"
@@ -118,12 +122,8 @@
         <ion-item slot="header" color="light">
           <ion-label> {{getNbMembers()}}</ion-label>
         </ion-item>
-        <div
-          class="ion-padding"
-          slot="content"
-          style="padding-bottom: 0 !important"
-        >
-          <div style="max-height: 650px; min-height: 300px; width: 100%">
+        <div slot="content">
+          <div style="max-height: 950px; min-height: 275px; width: 100%">
             <!-- <div style="padding: 4px 4px 0px 4px">{{getNbMembers()}}</div> -->
             <ion-row class="friends-wrapper">
               <div class="category_div">

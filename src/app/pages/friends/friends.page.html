@@ -21,7 +21,7 @@
   </ion-toolbar>
 </ion-header>
 <!-- <div class="shape"></div> -->
-<ion-content [fullscreen]="true" class="bg_color">
+<ion-content class="bg_color">
   <ion-segment mode="md" [(ngModel)]="selectSegment" lines="none">
     <ion-segment-button
       mode="md"
@@ -70,15 +70,17 @@
       showCancelButton="never"
     ></ion-searchbar>
     <ion-list [hidden]="autocompleteItems.length === 0" class="ion-no-padding">
-      <ion-item *ngFor="let user of autocompleteItems">
-        <ion-avatar slot="start">
-          <img src="{{user.avatarPath}}" />
-        </ion-avatar>
+      <ion-item *ngFor="let user of autocompleteItems" lines="full">
+        <ion-thumbnail slot="start" class="avatar-thumbnail">
+          <img
+            [defaultImage]="defaultImage"
+            [lazyLoad]="user.avatarPath!"
+            class="crop_img fade-img"
+          />
+        </ion-thumbnail>
         <ion-label>
           <ion-row class="ion-align-items-center">
-            <p class="ion-no-margin">
-              {{user.lastname | uppercase}} {{user.firstname}}
-            </p>
+            {{user.lastname | uppercase}} {{user.firstname}}
           </ion-row>
         </ion-label>
         <ion-button
@@ -118,7 +120,7 @@
             <ion-icon slot="icon-only" name="trash"></ion-icon>
           </ion-item-option>
         </ion-item-options>
-        <ion-item lines="none" class="friend-item">
+        <ion-item lines="full" class="friend-item">
           <ion-thumbnail slot="start">
             <img
               [defaultImage]="defaultImage"
@@ -138,6 +140,7 @@
           <ion-button
             fill="clear"
             slot="end"
+            color="dark"
             (click)="showAgenda(friendListDoc, $event)"
             class="animate__animated animate__fadeInRight"
           >
@@ -157,7 +160,11 @@
         >
       </strong>
     </div>
-    <ion-list *ngIf="friendGroups.length > 0" class="ion-no-padding">
+    <ion-list
+      *ngIf="friendGroups.length > 0"
+      class="ion-no-padding"
+      lines="full"
+    >
       <ion-item-sliding
         [id]="'slidingItemGroup' + i"
         *ngFor="let friendGroup of friendGroups ; let i = index;"
@@ -173,7 +180,6 @@
         <ion-item
           (click)="showFriendGroup(friendGroup, $event)"
           class="friend-item"
-          lines="none"
         >
           <ion-thumbnail slot="start">
             <img src="{{friendGroup.avatarPath}}" />
@@ -181,12 +187,10 @@
 
           <div>
             <ion-row class="ion-align-items-center">
-              <p class="ion-no-margin">{{friendGroup.label}}</p>
+              {{friendGroup.label}}
             </ion-row>
             <ion-row class="ion-align-items-center">
-              <p class="ion-no-margin">
-                {{friendGroup.members_uid.length}} membres
-              </p>
+              {{friendGroup.members_uid.length}} membres
             </ion-row>
             <!-- <ion-row class="ion-align-items-center">
               <rating [rating]="rate" (ratingChange)="onRateChanged($event)">
@@ -223,21 +227,17 @@
             <ion-icon slot="icon-only" name="trash"></ion-icon>
           </ion-item-option>
         </ion-item-options>
-        <ion-item (click)="showProfile(friendSuggested, $event)">
+        <ion-item (click)="showProfile(friendSuggested, $event)" lines="full">
           <ion-avatar slot="start">
             <img src="{{friendSuggested.userData?.avatarPath}}" />
           </ion-avatar>
 
           <ion-label>
             <ion-row class="ion-align-items-center">
-              <p class="ion-no-margin">
-                {{friendSuggested.userData?.lastname | uppercase}}
-              </p>
+              {{friendSuggested.userData?.lastname | uppercase}}
             </ion-row>
             <ion-row class="ion-align-items-center">
-              <p class="ion-no-margin">
-                {{friendSuggested.userData?.firstname}}
-              </p>
+              {{friendSuggested.userData?.firstname}}
             </ion-row>
           </ion-label>
           <ion-buttons slot="end">

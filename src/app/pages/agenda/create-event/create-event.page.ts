@@ -165,7 +165,7 @@ export class CreateEventPage implements OnInit {
             // day: getDate(new Date(this.tsInputDate)),
             // month: getMonth(new Date(this.tsInputDate)),
             // year: getYear(new Date(this.tsInputDate)),
-            avatar: 'assets/ajout_photo.jpg',
+            avatar: 'assets/newimg/ajout_photo.jpg',
             is_multi: this.is_multi,
             recurrence: AgendaEventRecurrence.ONE,
             recurrence_nb: '0',
@@ -668,11 +668,11 @@ export class CreateEventPage implements OnInit {
   getIconTypeEvent(): string {
     let path = '';
     if (this.agendaEvent?.type === AgendaEventType.KIDS) {
-      path = 'assets/dyspo-kid.png';
+      path = 'assets/newimg/picto_discussion_kid.png';
     } else if (this.agendaEvent?.type === AgendaEventType.NOKIDS) {
-      path = 'assets/dyspo-nokid.png';
+      path = 'assets/newimg/picto_discussion_nokid.png';
     } else if (this.agendaEvent?.type === AgendaEventType.FREE) {
-      path = 'assets/dyspo-free.png';
+      path = 'assets/newimg/picto_discussion_kidnokid.png';
     }
     return path;
   }
