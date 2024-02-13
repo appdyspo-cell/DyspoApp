@@ -40,34 +40,27 @@
   </ion-toolbar>
   <ion-toolbar *ngIf="msgSelected">
     <ion-buttons slot="start">
-      <ion-icon
-        tappable
-        slot="end"
-        name="close-outline"
-        color="dark"
-        (click)="msgSelected = undefined"
-      >
-      </ion-icon>
+      <ion-button (click)="msgSelected = undefined">
+        <ion-icon tappable slot="icon-only" name="close-outline" color="dark">
+        </ion-icon>
+      </ion-button>
     </ion-buttons>
 
     <ion-buttons slot="end">
-      <ion-icon
-        tappable
-        slot="end"
-        name="trash-outline"
-        color="dark"
-        (click)="deleteMsg($event)"
-      >
-      </ion-icon>
-      <ion-icon
-        *ngIf="msgSelected.sender !== my_uid"
-        tappable
-        slot="end"
-        name="warning-outline"
-        color="dark"
-        (click)="reportMsg($event)"
-      >
-      </ion-icon>
+      <ion-button (click)="deleteMsg($event)">
+        <ion-icon tappable slot="icon-only" name="trash-outline" color="dark">
+        </ion-icon>
+      </ion-button>
+      <ion-button (click)="reportMsg($event)">
+        <ion-icon
+          *ngIf="msgSelected.sender !== my_uid"
+          tappable
+          slot="icon-only"
+          name="warning-outline"
+          color="dark"
+        >
+        </ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
   <div class="category_div">
