@@ -21,6 +21,7 @@ import {
   Friend,
   FriendGroup,
   FriendStatus,
+  UserStatus,
 } from '../models/models';
 import { UtilsService } from './utils.service';
 import { NotificationService } from './notification.service';
@@ -222,6 +223,7 @@ export class FriendsService {
   }
 
   isMyFriend(uid: string): boolean {
+    console.log('is my friend');
     const my_uid = this.userSvc.userInfo?.uid || 'unknown';
     const myFriendsUids = this.friends.map((friend) => friend.friend_uid);
     if (my_uid !== uid) {
@@ -242,14 +244,34 @@ export class FriendsService {
     }
   }
 
+  async getUserStatus(uid: string): Promise<UserStatus | undefined> {
+    const docRef = doc(this.firestore, `users`, uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const user = docSnap.data() as AppUser;
+      return user.status;
+    }
+    return undefined;
+  }
+
   async invite(membre: AppUser, showToast = false): Promise<boolean> {
     try {
       const uid = this.userSvc.userInfo?.uid || 'unknown';
-      console.log(membre);
-      //Check if membre has been blocked
-      //this.friendService
-      //this.utils.showLoader();
+      //Check if membre has been blocked or deleted
 
+      const userSatus = await this.getUserStatus(membre.uid);
+      if (userSatus === UserStatus.DELETED) {
+        this.utils.showToastError('Ce compte a été supprimé');
+        return false;
+      }
+      if (userSatus === UserStatus.BANNED) {
+        this.utils.showToastError('Ce compte a été suspendu');
+        return false;
+      }
+      if (!userSatus) {
+        this.utils.showToastError("Ce compte n'existe pas");
+        return false;
+      }
       const myInviteData = {
         friend_uid: membre.uid,
         friendLastname: membre.lastname,

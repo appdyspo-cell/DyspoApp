@@ -64,7 +64,7 @@ export class UserStatusPage implements OnInit {
   agendaDysposSubscription!: Subscription;
   invitationsSubscription!: Subscription;
   friendsSubscrition!: Subscription;
-  todayFormatted = format(new Date(), 'iii dd MMM yyyy', { locale: fr });
+  todayFormatted = format(new Date(), 'iiii dd MMMM yyyy', { locale: fr });
   todayDyspo!: AgendaDyspoItem;
   agendaEventType = AgendaEventType;
   showHelper = true;

@@ -19,7 +19,7 @@ ion-header {
     margin: 0;
     font-weight: 500;
     letter-spacing: 0;
-    font-size: 1.625rem;
+    font-size: 1.525rem;
   }
 }
 
@@ -147,7 +147,11 @@ ion-header {
   width: 20px; /* Largeur du badge */
   height: 20px; /* Hauteur du badge */
   border-radius: 50%; /* Pour créer un badge circulaire */
-  background-color: red; /* Couleur de fond du badge */
+  background: linear-gradient(
+    210deg,
+    var(--text-no-dyspo) 38%,
+    var(--text-no-dyspo-secondary)
+  ); /* Couleur de fond du badge */
   color: white; /* Couleur du texte du badge */
   display: flex;
   align-items: center;
@@ -157,11 +161,11 @@ ion-header {
 ion-fab {
   ion-fab-button {
     --background: var(--primary);
-    width: 48px;
-    height: 48px;
+    width: 65px;
+    height: 65px;
 
     ion-icon {
-      font-size: 1.15rem;
+      font-size: 1.9rem;
     }
   }
 }

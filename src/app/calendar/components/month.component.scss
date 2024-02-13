@@ -93,13 +93,17 @@
 
 :host .is-holidays {
   border: 1px dashed #1f1f1f !important;
-  font-style: italic;
+  //font-style: italic;
 }
 
 :host .event-badge {
   //width: 10px;
   //height: 10px;
-  background-color: var(--text-no-dyspo);
+  background: linear-gradient(
+    210deg,
+    var(--text-no-dyspo) 38%,
+    var(--text-no-dyspo-secondary)
+  );
   //position: absolute;
 
   //border-radius: 5px;
@@ -127,7 +131,11 @@ ion-badge {
   width: 20px; /* Largeur du badge */
   height: 20px; /* Hauteur du badge */
   border-radius: 50%; /* Pour créer un badge circulaire */
-  background-color: red; /* Couleur de fond du badge */
+  background: linear-gradient(
+    210deg,
+    var(--text-no-dyspo) 38%,
+    var(--text-no-dyspo-secondary)
+  );
   color: white; /* Couleur du texte du badge */
   display: flex;
   align-items: center;

@@ -149,12 +149,17 @@
             }"
           >
             <img src="{{ member.avatarPath }}" />
+            <!-- <ion-badge
+              *ngIf="member.agendaEvents!.length > 0"
+              name="warning-outline"
+              class="thumbnail-badge"
+              >{{ member.agendaEvents!.length }}</ion-badge
+            > -->
             <ion-badge
               *ngIf="member.agendaEvents!.length > 0"
               name="warning-outline"
-              color="danger"
               class="thumbnail-badge"
-              >{{ member.agendaEvents!.length }}</ion-badge
+              >&nbsp;</ion-badge
             >
             <ion-icon
               *ngIf="member.is_my_friend === false"
@@ -181,12 +186,18 @@
             }"
           >
             <img src="{{ member.avatarPath }}" />
+            <!-- <ion-badge
+              *ngIf="member.agendaEvents!.length > 0"
+              name="warning-outline"
+              class="thumbnail-badge"
+              >{{ member.agendaEvents!.length }}</ion-badge
+            > -->
+
             <ion-badge
               *ngIf="member.agendaEvents!.length > 0"
               name="warning-outline"
-              color="danger"
               class="thumbnail-badge"
-              >{{ member.agendaEvents!.length }}</ion-badge
+              >&nbsp;</ion-badge
             >
             <ion-icon
               (click)="invite(member)"
@@ -256,7 +267,8 @@
         mode="ios"
         fill="solid"
         color="dark"
-        >Dyspo <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon
+        >Dyspo!
+        <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon
       ></ion-button>
       <ion-button
         (click)="declineInvitation()"
@@ -272,7 +284,7 @@
         mode="ios"
         color="dark"
         fill="solid"
-        >A Voir <ion-icon slot="start" name="help-circle-outline"></ion-icon
+        >À Voir <ion-icon slot="start" name="help-circle-outline"></ion-icon
       ></ion-button>
     </div>
   </ion-toolbar>
@@ -310,16 +322,33 @@
       >
         Demander en Ami
       </ion-item>
-      <ion-item *ngIf="selectedUserFriendStatus !== FriendStatus.NOFRIEND">
+      <ion-item
+        *ngIf="selectedUserFriendStatus !== FriendStatus.NOFRIEND"
+        lines="full"
+      >
         {{ selectedUserFriendStatusLabel }}
       </ion-item>
       <ion-list *ngIf="selectedUserEvents && selectedUserEvents.length > 0">
-        <ion-note style="padding-left: 10px">Indisponibilités</ion-note>
-        <ion-item *ngFor="let agEv of selectedUserEvents">
-          <ion-text color="danger" style="font-size: 0.75rem">{{
-            getOtherEventLabel(agEv)
-          }}</ion-text>
-        </ion-item>
+        <ion-note
+          style="
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 5px;
+          "
+          >Pas dyspo dans ces horaires:</ion-note
+        >
+        <div
+          *ngFor="let agEv of selectedUserEvents"
+          class="ion-justify-content-center;text-align:center"
+          style="width: 100%; display: flex; padding: 5px"
+        >
+          <ion-text
+            color="danger"
+            style="font-size: 0.75rem; width: 100%; text-align: center"
+            >{{ getOtherEventLabel(agEv) }}</ion-text
+          >
+        </div>
       </ion-list>
     </ng-template>
   </ion-popover>

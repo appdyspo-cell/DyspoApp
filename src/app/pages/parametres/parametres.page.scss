@@ -3,7 +3,7 @@ ion-header {
     margin: 0;
     font-weight: 500;
     letter-spacing: 0;
-    font-size: 1.625rem;
+    font-size: 1.525rem;
   }
 }
 
@@ -34,10 +34,6 @@ ion-list {
   background: var(--transparent) !important;
 }
 
-ion-card {
-  box-shadow: none !important;
-}
-
 .iconmail {
   font-size: 20px;
   padding-top: 5px;
@@ -54,12 +50,13 @@ ion-card {
 }
 
 ion-card {
+  box-shadow: none !important;
   p {
     font-weight: 500;
     font-weight: bold;
   }
   --background: var(--bg-color-secondary);
-  margin: 0 16px 10px 16px;
+  margin: 0 16px 10px 0px;
 }
 
 .ovelDivContentBottom {

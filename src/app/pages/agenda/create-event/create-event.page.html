@@ -19,7 +19,7 @@
           maxlength="30"
           autocapitalize="words"
           [(ngModel)]="agendaEvent!.title"
-          placeholder="Saisissez un Titre"
+          placeholder="Saisissez un titre"
           required
         ></ion-input>
       </div>
@@ -144,9 +144,8 @@
                       <ion-badge
                         *ngIf="member.agendaEvents!.length > 0"
                         name="warning-outline"
-                        color="danger"
                         class="thumbnail-badge"
-                        >{{ member.agendaEvents!.length }}</ion-badge
+                        >&nbsp;</ion-badge
                       >
                       <ion-icon
                         *ngIf="member.is_my_friend === false"
@@ -305,21 +304,39 @@
   >
     <ng-template>
       <ion-item
+        lines="full"
         (click)="invite(selectedUser!)"
         *ngIf="selectedUserFriendStatus === FriendStatus.NOFRIEND"
       >
         Demander en Ami
       </ion-item>
-      <ion-item *ngIf="selectedUserFriendStatus !== FriendStatus.NOFRIEND">
+      <ion-item
+        *ngIf="selectedUserFriendStatus !== FriendStatus.NOFRIEND"
+        lines="full"
+      >
         {{ selectedUserFriendStatusLabel }}
       </ion-item>
       <ion-list *ngIf="selectedUserEvents && selectedUserEvents.length > 0">
-        <ion-note style="padding-left: 10px">Indisponibilités</ion-note>
-        <ion-item *ngFor="let agEv of selectedUserEvents">
-          <ion-text color="danger" style="font-size: 0.75rem"
+        <ion-note
+          style="
+            display: block;
+            margin-bottom: 5px;
+            width: 100%;
+            text-align: center;
+          "
+          >Pas dyspo dans ces horaires:</ion-note
+        >
+        <div
+          *ngFor="let agEv of selectedUserEvents"
+          style="width: 100%; display: flex; padding: 5px"
+          class="ion-justify-content-center; text-align: center;"
+        >
+          <ion-text
+            color="danger"
+            style="font-size: 0.75rem; width: 100%; text-align: center"
             >{{ getOtherEventLabel(agEv) }}</ion-text
           >
-        </ion-item>
+        </div>
       </ion-list>
     </ng-template>
   </ion-popover>

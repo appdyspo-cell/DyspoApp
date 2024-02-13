@@ -46,12 +46,18 @@
               }"
             >
               <img src="{{ checkedFriend.friend.userData?.avatarPath }}" />
-              <ion-badge
+              <!-- <ion-badge
                 *ngIf="checkedFriend.agendaEvents.length > 0"
                 name="warning-outline"
                 color="danger"
                 class="thumbnail-badge"
                 >{{ checkedFriend.agendaEvents.length }}</ion-badge
+              > -->
+              <ion-badge
+                *ngIf="checkedFriend.agendaEvents.length > 0"
+                name="warning-outline"
+                class="thumbnail-badge"
+                >&nbsp;</ion-badge
               >
               <div
                 *ngIf="checkedFriend.isChecked"
@@ -163,12 +169,17 @@
                       <img
                         src="{{ checkedFriend.friend.userData?.avatarPath }}"
                       />
+                      <!-- <ion-badge
+                        *ngIf="checkedFriend.agendaEvents.length > 0"
+                        name="warning-outline"
+                        class="thumbnail-badge"
+                        >{{ checkedFriend.agendaEvents.length }}</ion-badge
+                      > -->
                       <ion-badge
                         *ngIf="checkedFriend.agendaEvents.length > 0"
                         name="warning-outline"
-                        color="danger"
                         class="thumbnail-badge"
-                        >{{ checkedFriend.agendaEvents.length }}</ion-badge
+                        >&nbsp;</ion-badge
                       >
                       <div
                         *ngIf="checkedFriend.isChecked"
@@ -215,15 +226,29 @@
   (didDismiss)="isPopoverConfirmInvitEventOpen = false"
 >
   <ng-template>
-    <ion-item (click)="confirmInviteToEvent()"> Inviter </ion-item>
+    <ion-item (click)="confirmInviteToEvent()" lines="full"> Inviter </ion-item>
 
     <ion-list *ngIf="selectedFriend && selectedFriend.agendaEvents.length > 0">
-      <ion-note style="padding-left: 10px">Indisponible</ion-note>
-      <ion-item *ngFor="let agEv of selectedFriend.agendaEvents">
-        <ion-text color="danger" style="font-size: 0.75rem">{{
-          getOtherEventLabel(agEv)
-        }}</ion-text>
-      </ion-item>
+      <ion-note
+        style="
+          display: block;
+          margin-bottom: 5px;
+          width: 100%;
+          text-align: center;
+        "
+        >Pas dyspo dans ces horaires:</ion-note
+      >
+      <div
+        *ngFor="let agEv of selectedFriend.agendaEvents"
+        class="ion-justify-content-center;text-align:center"
+        style="width: 100%; display: flex; padding: 5px"
+      >
+        <ion-text
+          color="danger"
+          style="font-size: 0.75rem; width: 100%; text-align: center"
+          >{{ getOtherEventLabel(agEv) }}</ion-text
+        >
+      </div>
     </ion-list>
   </ng-template>
 </ion-popover>

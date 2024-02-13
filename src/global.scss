@@ -31,7 +31,7 @@
 
 :root {
   --white: #fff;
-  --primary: #93b7ff;
+  --primary: #46a2c2;
   --bg-color: #f3f4f8;
   --bg-color-dark: #93a9d8;
   --gray: #d5d5d5;
@@ -40,9 +40,10 @@
   --text-black: #444444;
   --text-light: #8e8e8e;
   --text-light2: #464646;
-  --text-no-dyspo: #fa7538;
-  --text-dyspo-with-kids: #46a2c2;
-  --text-dyspo: #3ada6a;
+  --text-no-dyspo: #f95812;
+  --text-no-dyspo-secondary: #a36437;
+  --text-dyspo-with-kids: #48a1c3;
+  --text-dyspo: #7ae198;
   --text-dyspo-free: #ac3e61;
   --text-dyspo-with-kids-secondary: #9eb7c0;
   --text-dyspo-secondary: #aeddbc;
@@ -614,4 +615,12 @@ ion-chip {
 
 .dyspo-button {
   font-size: 1.13em;
+}
+
+.thin-alert-radio {
+  padding-inline-start: 33px;
+}
+
+.alert-radio-label.sc-ion-alert-md {
+  padding-inline-start: 33px !important;
 }

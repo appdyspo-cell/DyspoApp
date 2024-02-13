@@ -72,11 +72,9 @@ export class AgendaEventInfoComponent implements OnInit {
     private modalCtrl: ModalController,
     private agendaSvc: AgendaService,
     public userSvc: UserService,
-    private alertCtrl: AlertController,
     private utils: UtilsService,
     private navCtrl: NavController,
-    private friendsSvc: FriendsService,
-    private ngZone: NgZone
+    private friendsSvc: FriendsService
   ) {
     this.members_loaded = false;
   }
@@ -110,7 +108,7 @@ export class AgendaEventInfoComponent implements OnInit {
     ) {
       this.display_date_1 =
         'Le ' +
-        format(parseISO(this.agendaEvent.startISO), 'iii dd MMM', {
+        format(parseISO(this.agendaEvent.startISO), 'iiii dd MMMM', {
           locale: fr,
         }) +
         ' à ' +
@@ -120,12 +118,12 @@ export class AgendaEventInfoComponent implements OnInit {
     } else {
       this.display_date_1 =
         'Du ' +
-        format(parseISO(this.agendaEvent.startISO), 'iii dd MMM HH:mm', {
+        format(parseISO(this.agendaEvent.startISO), 'iiii dd MMMM HH:mm', {
           locale: fr,
         });
       this.display_date_2 =
         'Au ' +
-        format(parseISO(this.agendaEvent.endISO), 'iii dd MMM HH:mm', {
+        format(parseISO(this.agendaEvent.endISO), 'iiii dd MMMM HH:mm', {
           locale: fr,
         });
     }
@@ -139,9 +137,7 @@ export class AgendaEventInfoComponent implements OnInit {
       this.agendaEvent!.members_uid
     );
 
-    //setTimeout(() => {
     this.members_loaded = true;
-    //}, 500);
 
     // New Admin candidates
     if (this.agendaEvent.admin_uid === this.userSvc.userInfo?.uid) {

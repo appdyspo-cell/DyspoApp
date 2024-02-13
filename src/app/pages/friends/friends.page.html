@@ -65,7 +65,7 @@
       mode="ios"
       [(ngModel)]="inputSearch"
       (ngModelChange)="updateSearchResults()"
-      placeholder="Rechercher un membre Dyspo"
+      placeholder="Rechercher un membre dyspo!"
       (ionClear)="clearAutocomplete()"
       showCancelButton="never"
     ></ion-searchbar>
@@ -257,7 +257,7 @@
 <ion-fab
   *ngIf="selectSegment === 'friendsgroup'"
   slot="fixed"
-  horizontal="end"
+  horizontal="center"
   vertical="bottom"
 >
   <ion-fab-button (click)="openFriendGroupForm()">

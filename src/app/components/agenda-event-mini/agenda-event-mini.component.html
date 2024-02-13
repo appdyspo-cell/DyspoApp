@@ -41,7 +41,7 @@
         display: block;
         justify-content: start;
         text-align: left;
-        overflow: hidden;
+        max-width: 245px;
       "
     >
       <div style="font-weight: 600; width: auto">{{ agendaEvent.title }}</div>
@@ -58,7 +58,14 @@
       <div style="font-size: 0.8em">
         {{ display_date_1 }} - {{ display_date_2 }}
       </div>
-      <div style="font-size: 0.8em">
+      <div
+        style="
+          font-size: 0.8em;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        "
+      >
         {{ agendaEvent.place_description }}
       </div>
     </div>

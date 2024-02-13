@@ -23,7 +23,7 @@
         tappable
         (click)="changeAvatar()"
       >
-        <div
+        <!-- <div
           style="
             position: absolute;
             right: -7px;
@@ -39,7 +39,7 @@
             color="primary"
             style="position: relative; top: 4px"
           ></ion-icon>
-        </div>
+        </div> -->
 
         <ion-avatar slot="start">
           <img [src]="user.avatarPath || defaultAvatar" />
@@ -102,7 +102,7 @@
         ></ion-input>
       </ion-item>
 
-      <ion-item lines="none">
+      <ion-item lines="none" style="padding-bottom: 0px">
         <ion-select
           label="Zone"
           [(ngModel)]="user.geo_zone"
@@ -114,11 +114,10 @@
           <ion-select-option value="zone_C">Zone C</ion-select-option>
         </ion-select>
       </ion-item>
-      <ion-item>
-        <div class="d-flex ion-align-items-center">
-          <ion-note> {{academies}} </ion-note>
-        </div>
-      </ion-item>
+
+      <div class="d-flex ion-align-items-center" style="margin-bottom: 30px">
+        <ion-note> {{academies}} </ion-note>
+      </div>
 
       <ion-item>
         <ion-text>J'ai des enfants </ion-text>

@@ -3,14 +3,14 @@ ion-header {
     margin: 0;
     font-weight: 500;
     letter-spacing: 0;
-    font-size: 1.625rem;
+    font-size: 1.525rem;
   }
 }
 
 .event-wrapper {
   border-bottom: 1px solid lightgray;
-  padding: 4px;
-  padding-top: 6px;
+  padding: 12px 5px 8px 5px;
+  //padding-top: 16px;
   width: 100%;
   &:last-child {
     border: none;
