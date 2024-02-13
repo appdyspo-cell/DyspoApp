@@ -115,7 +115,7 @@ export class AgendaPage implements AfterViewInit {
     });
     this.activatedRoute.params.subscribe(async (params) => {
       this.dataMode = params['dataMode'];
-      if (this.dataMode === 'me') {
+      if (this.dataMode !== 'friend') {
         this.agendaEvents$ = this.agendaSvc.agendaEvents$;
         this.agendaEventsSubscription = this.agendaSvc.agendaEvents$.subscribe(
           (agendaEvents: AgendaEvent[]) => {

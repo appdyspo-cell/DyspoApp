@@ -327,10 +327,7 @@ export class CreateEventPage implements OnInit {
 
       this.navCtrl.pop();
     } else {
-      Swal.fire({
-        title: 'Veuillez donner un titre à l evt',
-        heightAuto: false,
-      });
+      this.utils.showToastError("Veuillez donner un titre à l'événement");
       return;
     }
   }

@@ -27,6 +27,11 @@ const routes: Routes = [
           import('../agenda/agenda.module').then((m) => m.AgendaPageModule),
       },
       {
+        path: 'agenda',
+        loadChildren: () =>
+          import('../agenda/agenda.module').then((m) => m.AgendaPageModule),
+      },
+      {
         path: 'pro-calendar',
         loadChildren: () =>
           import('../pro-calendar/pro-calendar.module').then(

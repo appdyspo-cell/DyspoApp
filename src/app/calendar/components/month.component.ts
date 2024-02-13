@@ -338,7 +338,7 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   async presentAction() {
     const buttons = [];
     buttons.push({
-      text: 'Dyspo',
+      text: 'Dyspo!',
       cssClass: 'dyspo-sheet-dyspo',
       data: {
         action: UserDyspoStatus.DYSPO,

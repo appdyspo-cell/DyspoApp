@@ -109,7 +109,10 @@ const routes: Routes = [
   },
   {
     path: 'notifications-list',
-    loadChildren: () => import('./pages/notifications-list/notifications-list.module').then( m => m.NotificationsListPageModule)
+    loadChildren: () =>
+      import('./pages/notifications-list/notifications-list.module').then(
+        (m) => m.NotificationsListPageModule
+      ),
   },
 ];
 @NgModule({
