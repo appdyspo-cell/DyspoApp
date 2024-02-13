@@ -226,15 +226,20 @@
   (didDismiss)="isPopoverConfirmInvitEventOpen = false"
 >
   <ng-template>
-    <ion-item (click)="confirmInviteToEvent()" lines="full"> Inviter </ion-item>
+    <div class="popover-events-header" (click)="confirmInviteToEvent()">
+      Inviter
+    </div>
 
     <ion-list *ngIf="selectedFriend && selectedFriend.agendaEvents.length > 0">
       <ion-note
         style="
           display: block;
-          margin-bottom: 5px;
+          margin-bottom: 2px;
           width: 100%;
+          padding: 4px;
+          padding-top: 0px;
           text-align: center;
+          font-size: 0.75em;
         "
         >Pas dyspo dans ces horaires:</ion-note
       >

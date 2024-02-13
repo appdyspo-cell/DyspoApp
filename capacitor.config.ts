@@ -3,8 +3,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.liaisongraphique.dyspo',
-  appName: 'Dyspo!',
+  appId: 'com.rovincent.dyspo.staging',
+  appName: 'Dyspo! stg',
   webDir: 'www',
   server: {
     androidScheme: 'https',
@@ -16,7 +16,7 @@ const config: CapacitorConfig = {
 
     SplashScreen: {
       launchShowDuration: 5000,
-      launchAutoHide: true,
+      launchAutoHide: false,
       backgroundColor: '#ffffffff',
       androidSplashResourceName: 'splash',
       androidScaleType: 'CENTER_CROP',
@@ -31,12 +31,12 @@ const config: CapacitorConfig = {
     },
   },
   ios: {
-    path: 'ios/prod',
+    path: 'ios/stg',
     appendUserAgent: 'ios:application',
     webContentsDebuggingEnabled: true,
   },
   android: {
-    path: 'android/prod',
+    path: 'android/stg',
     webContentsDebuggingEnabled: true,
   },
 };

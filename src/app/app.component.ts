@@ -60,7 +60,9 @@ export class AppComponent {
               this.initAllServices(appUser.uid!);
               this.logger.logDebug('validateAuthState userInfo ---> ', appUser);
               this.navController.navigateRoot('/tabs');
-              SplashScreen.hide();
+              setTimeout(() => {
+                SplashScreen.hide();
+              }, 800);
             })
             .catch((err) => {
               this.logger.logDebug('ERR validateAuthState ', err);

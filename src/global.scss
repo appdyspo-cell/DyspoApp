@@ -86,6 +86,13 @@
   }
 }
 
+.popover-events-header {
+  width: 100%;
+  text-align: center;
+  padding: 8px;
+  border-bottom: 1px solid lightgray;
+}
+
 ion-item {
   --ripple-color: var(--bg-color);
 }

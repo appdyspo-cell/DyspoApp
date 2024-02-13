@@ -303,26 +303,29 @@
     (didDismiss)="isPopoverUserEventsOpen = false"
   >
     <ng-template>
-      <ion-item
-        lines="full"
+      <div
+        class="popover-events-header"
         (click)="invite(selectedUser!)"
         *ngIf="selectedUserFriendStatus === FriendStatus.NOFRIEND"
       >
         Demander en Ami
-      </ion-item>
-      <ion-item
+      </div>
+      <div
+        class="popover-events-header"
         *ngIf="selectedUserFriendStatus !== FriendStatus.NOFRIEND"
-        lines="full"
       >
         {{ selectedUserFriendStatusLabel }}
-      </ion-item>
+      </div>
       <ion-list *ngIf="selectedUserEvents && selectedUserEvents.length > 0">
         <ion-note
           style="
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
             width: 100%;
+            padding: 4px;
+            padding-top: 0px;
             text-align: center;
+            font-size: 0.75em;
           "
           >Pas dyspo dans ces horaires:</ion-note
         >
