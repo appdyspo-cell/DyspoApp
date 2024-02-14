@@ -60,9 +60,9 @@
   <div class="form" padding>
     <ion-list class="f-list" lines="none">
       <ion-item lines="none">
-        <ion-label mode="md" position="floating">Nom *</ion-label>
         <ion-input
-          mode="md"
+          label="Nom *"
+          labelPlacement="floating"
           type="name"
           minlength="3"
           maxlength="20"
@@ -76,9 +76,9 @@
         ></ion-input>
       </ion-item>
       <ion-item lines="none">
-        <ion-label mode="md" position="floating">Prénom *</ion-label>
         <ion-input
-          mode="md"
+          label="Prénom *"
+          labelPlacement="floating"
           minlength="3"
           maxlength="20"
           autocapitalize="words"
@@ -90,15 +90,30 @@
       </ion-item>
 
       <ion-item lines="none">
-        <ion-label mode="md" position="floating">Email *</ion-label>
         <ion-input
-          mode="md"
+          label="Email *"
+          labelPlacement="floating"
           type="text"
           minlength="3"
           maxlength="25"
           [(ngModel)]="user.email"
           name="email"
           placeholder="Entrez votre email"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-input
+          [maskito]="phoneMask"
+          [maskitoElement]="maskPredicate"
+          label="Téléphone *"
+          labelPlacement="floating"
+          type="tel"
+          [(ngModel)]="user.phoneNumber"
+          autocomplete="off"
+          name="phoneNumber"
+          required="true"
+          placeholder="Entrez votre téléphone"
         ></ion-input>
       </ion-item>
 
@@ -155,12 +170,10 @@
       <ion-list>
         <ion-radio-group [(ngModel)]="user.gender">
           <ion-item>
-            <ion-label>Homme</ion-label>
-            <ion-radio value="M"></ion-radio>
+            <ion-radio value="M" labelPlacement="start">Homme</ion-radio>
           </ion-item>
           <ion-item>
-            <ion-label>Femme</ion-label>
-            <ion-radio value="F"></ion-radio>
+            <ion-radio value="F" labelPlacement="start">Femme</ion-radio>
           </ion-item>
         </ion-radio-group>
       </ion-list>

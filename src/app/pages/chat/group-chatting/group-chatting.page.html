@@ -21,21 +21,13 @@
           </div>
           <div *ngIf="display_date_2"><h3>{{ display_date_2 }}</h3></div>
         </div>
-
-        <!-- <span class="end">
-          <ion-icon class="zmdi zmdi-more-vert ion-text-center"></ion-icon>
-        </span> -->
       </div>
     </ion-title>
     <ion-buttons slot="end">
-      <ion-icon
-        tappable
-        slot="end"
-        name="ellipsis-vertical"
-        color="dark"
-        (click)="openMenu($event)"
-      >
-      </ion-icon>
+      <ion-button (click)="openMenu($event)">
+        <ion-icon slot="icon-only" name="ellipsis-vertical" color="dark">
+        </ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
   <ion-toolbar *ngIf="msgSelected">

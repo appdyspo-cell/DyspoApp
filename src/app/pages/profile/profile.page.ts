@@ -29,6 +29,7 @@ import { LoggerService } from 'src/app/services/logger.service';
 import { Subscription } from 'rxjs';
 import { MediaService } from 'src/app/services/media.service';
 import { NotificationService } from 'src/app/services/notification.service';
+import { MaskitoElementPredicateAsync, MaskitoOptions } from '@maskito/core';
 
 @Component({
   selector: 'app-profile',
@@ -43,6 +44,26 @@ export class ProfilePage implements OnInit {
   avatarChangedURL = '';
   defaultAvatar = environment.DEFAULT_AVATAR;
   userSubscription: Subscription | undefined;
+  readonly maskPredicate: MaskitoElementPredicateAsync = async (el) =>
+    (el as HTMLIonInputElement).getInputElement();
+  readonly phoneMask: MaskitoOptions = {
+    mask: [
+      /\d/,
+      /\d/,
+      ' ',
+      /\d/,
+      /\d/,
+      ' ',
+      /\d/,
+      /\d/,
+      ' ',
+      /\d/,
+      /\d/,
+      ' ',
+      /\d/,
+      /\d/,
+    ],
+  };
 
   constructor(
     public actionSheetController: ActionSheetController,

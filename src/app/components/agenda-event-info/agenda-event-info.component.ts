@@ -283,7 +283,7 @@ export class AgendaEventInfoComponent implements OnInit {
 
   async quitEvent() {
     Swal.fire({
-      title: 'Voulez-vous vraiment supprimer cet evenement de votre agenda?',
+      title: 'Voulez-vous vraiment supprimer cet événement de votre agenda?',
       showDenyButton: true,
       heightAuto: false,
       confirmButtonText: 'Oui',

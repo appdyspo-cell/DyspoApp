@@ -445,6 +445,8 @@ export class GroupChattingPage implements OnInit, OnDestroy {
       inputAttributes: {
         'aria-label': 'Type your message here',
       },
+      cancelButtonText: 'Annuler',
+      confirmButtonText: 'Envoyer',
       showCancelButton: true,
     });
     if (text) {

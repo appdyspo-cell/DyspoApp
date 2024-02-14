@@ -228,7 +228,7 @@ export class CreateEventPage implements OnInit {
           break;
         case 'edit':
           this.saveLabel = 'Mettre à jour';
-          this.pageTitle = 'Editer un evenement';
+          this.pageTitle = 'Editer un événement';
           this.agendaEvent =
             this.router.getCurrentNavigation()?.extras.state?.['agendaEvent'];
           this.is_multi = this.agendaEvent!.is_multi;

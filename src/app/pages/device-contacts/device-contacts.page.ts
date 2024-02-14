@@ -143,7 +143,7 @@ export class DeviceContactsPage implements OnInit {
 
   async shareApp() {
     await Share.share({
-      text: "Rejoins moi sur Dyspo. Installe l'application Dyspo et rejoins moi ! N'oublie pas de me demander en ami",
+      text: "Rejoins moi sur dyspo! Installe l'application dyspo!, crée un compte et n'oublie pas de me demander en ami",
     });
   }
 

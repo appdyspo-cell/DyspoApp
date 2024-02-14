@@ -29,7 +29,7 @@
   <ion-card *ngIf="is_multi">
     <div style="font-size: 1.12em; margin-left: 8px; color: rgb(0, 0, 0)">
       <ion-select
-        aria-label="Type evenement"
+        aria-label="Type événement"
         [(ngModel)]="agendaEvent!.type"
         mode="md"
         color="dark"
@@ -282,6 +282,7 @@
     color="dark"
     expand="full"
     mode="ios"
+    style="margin-left: 0; margin-right: 0"
     (click)="saveOrUpdateEvent()"
   >
     Enregistrer l'évènement

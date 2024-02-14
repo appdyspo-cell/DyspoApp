@@ -81,7 +81,7 @@ export class ChatMenuComponent implements OnInit {
   async quitEvent() {
     Swal.fire({
       title:
-        "Voulez-vous vraiment quitter ce groupe ? Ceci effacera l'evenement de votre agenda",
+        "Voulez-vous vraiment quitter ce groupe ? Ceci effacera l'événement de votre agenda",
       showDenyButton: true,
       heightAuto: false,
       confirmButtonText: 'Oui',
@@ -100,7 +100,7 @@ export class ChatMenuComponent implements OnInit {
       //cssClass: 'my-custom-class',
       header: 'Confirmation',
       message:
-        "Voulez-vous vraiment quitter ce groupe ? Ceci effacera l'evenement de votre agenda",
+        "Voulez-vous vraiment quitter ce groupe ? Ceci effacera l'événement de votre agenda",
       buttons: [
         {
           text: 'NON',

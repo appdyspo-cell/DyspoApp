@@ -20,6 +20,10 @@ ion-item::part(native) {
   --background: transparent;
 }
 
+ion-item {
+  padding-bottom: 0;
+}
+
 ion-list {
   background: transparent !important;
 }

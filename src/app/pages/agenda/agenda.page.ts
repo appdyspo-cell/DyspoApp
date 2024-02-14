@@ -368,7 +368,7 @@ export class AgendaPage implements AfterViewInit {
     console.log();
     if (isBefore(new Date(addHours(this.selectedDateMs!, 1)), todayMorning)) {
       this.utils.showAlert(
-        'Vous ne pouvez pas creer un evenement dans le passé'
+        'Vous ne pouvez pas créer un événement dans le passé'
       );
       return;
     }
