@@ -214,12 +214,12 @@ export class UserService {
         allUsers.push(user);
       }
     });
-    docFriendSnaps.forEach((snap) => {
-      const user = snap.data() as AppUser;
-      if (user.phoneNumber) {
-        allPhones.push(user.phoneNumber);
-      }
-    });
+    // docFriendSnaps.forEach((snap) => {
+    //   const user = snap.data() as AppUser;
+    //   if (user.phoneNumber) {
+    //     allPhones.push(user.phoneNumber);
+    //   }
+    // });
     //  appContacts.map(appContact => {
     //   return appContact.is_member = true
     // })

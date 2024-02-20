@@ -38,6 +38,18 @@ export class AppComponent {
     private notificationSvc: NotificationService,
     private utils: UtilsService
   ) {
+    const that = this;
+    window.onerror = function (msg, url, lineNo, columnNo, error) {
+      that.logger.sendUncaughtError(
+        msg,
+        url,
+        lineNo,
+        columnNo,
+        error,
+        that.userSvc.userInfo?.uid
+      );
+      return false;
+    };
     //Lang
     this.translate.setDefaultLang('fr');
     this.loadScripts();

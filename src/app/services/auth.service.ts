@@ -10,8 +10,9 @@ import {
 } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, updateDoc } from '@angular/fire/firestore';
 import { UtilsService } from './utils.service';
-import { AppUser, UserStatus } from '../models/models';
+import { AppUser, ShowHelper, UserStatus } from '../models/models';
 import { environment } from 'src/environments/environment';
+import { Preferences } from '@capacitor/preferences';
 
 @Injectable({
   providedIn: 'root',
@@ -48,7 +49,19 @@ export class AuthService {
     }
   }
 
-  logout() {
+  async logout() {
+    await Preferences.remove({
+      key: ShowHelper.FRIENDS,
+    });
+    await Preferences.remove({
+      key: ShowHelper.AGENDA,
+    });
+    await Preferences.remove({
+      key: ShowHelper.CHATS,
+    });
+    await Preferences.remove({
+      key: ShowHelper.DASHBOARD,
+    });
     return signOut(this.afAuth);
   }
 

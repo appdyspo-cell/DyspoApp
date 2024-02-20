@@ -196,9 +196,6 @@ export class AgendaPage implements AfterViewInit {
   }
 
   async ngAfterViewInit() {
-    await Preferences.remove({
-      key: ShowHelper.AGENDA,
-    });
     const { value } = await Preferences.get({ key: ShowHelper.AGENDA });
     if (!value) {
       this.showHelper = true;

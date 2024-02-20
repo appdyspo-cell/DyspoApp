@@ -194,9 +194,6 @@ export class UserStatusPage implements OnInit {
   }
 
   async ngOnInit() {
-    await Preferences.remove({
-      key: ShowHelper.DASHBOARD,
-    });
     const { value } = await Preferences.get({ key: ShowHelper.DASHBOARD });
     if (!value) {
       this.showHelper = true;

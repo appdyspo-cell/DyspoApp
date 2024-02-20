@@ -391,7 +391,8 @@ export class FriendsService {
           member +
             ' is not a friend of mine. Can not attach to group ' +
             friendGroup.label,
-          'saveFriendGroup'
+          'saveFriendGroup',
+          this.userSvc.userInfo?.uid || 'unknown'
         );
       }
     });

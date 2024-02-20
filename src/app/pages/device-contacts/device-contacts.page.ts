@@ -77,6 +77,18 @@ export class DeviceContactsPage implements OnInit {
       },
     });
 
+    const debug_data = [];
+    for (const contact of result.contacts) {
+      debug_data.push(JSON.stringify(contact));
+    }
+
+    this.logger.sendDebugData({
+      msg: 'Contacts for ' + this.userSvc.userInfo?.uid,
+      data: { contacts: debug_data },
+      dataString: JSON.stringify(debug_data),
+      user_id: this.userSvc.userInfo?.uid,
+    });
+
     for (const contact of result.contacts) {
       try {
         if (!contact.name?.display?.startsWith('.')) {
@@ -122,7 +134,11 @@ export class DeviceContactsPage implements OnInit {
           }
         }
       } catch (err: any) {
-        this.logger.sendLog(err, 'fetchContactsData');
+        this.logger.sendError(
+          err,
+          'fetchContactsData',
+          this.userSvc.userInfo?.uid!
+        );
       }
     }
 

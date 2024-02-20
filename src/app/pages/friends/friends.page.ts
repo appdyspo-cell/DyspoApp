@@ -121,9 +121,6 @@ export class FriendsPage implements OnInit {
   }
 
   async ngOnInit() {
-    await Preferences.remove({
-      key: ShowHelper.FRIENDS,
-    });
     const { value } = await Preferences.get({ key: ShowHelper.FRIENDS });
     if (!value) {
       this.showHelper = true;

@@ -79,8 +79,7 @@ export class ChatService {
   constructor(
     public utils: UtilsService,
     private loggerSvc: LoggerService,
-    private firestore: Firestore,
-    private db: Database
+    private firestore: Firestore
   ) {
     //this.eventService.observeBlockChatroom().subscribe( data => {
     //this.blockChatroom(data.friendUid);
@@ -199,7 +198,7 @@ export class ChatService {
       });
       console.log('Transaction successfully committed!');
     } catch (e: any) {
-      this.loggerSvc.sendLog(e, 'sendMsg');
+      this.loggerSvc.sendError(e, 'sendMsg', this.uid);
     }
   }
 
@@ -235,13 +234,18 @@ export class ChatService {
 
           transaction.update(agendaDocRef, updateObject);
         } else {
-          this.loggerSvc.sendLog('Can not find uid', 'markLastMessageRead');
+          this.loggerSvc.sendLog(
+            'Can not find uid',
+            'markLastMessageRead',
+            this.uid
+          );
         }
       });
     } else {
       this.loggerSvc.sendLog(
         'Can not find user_' + this.uid,
-        'markLastMessageRead'
+        'markLastMessageRead',
+        this.uid
       );
     }
   }
@@ -275,7 +279,8 @@ export class ChatService {
         } else {
           this.loggerSvc.sendLog(
             'Can not find user_' + this.uid,
-            'toggleUserNotification'
+            'toggleUserNotification',
+            this.uid
           );
         }
       });
@@ -307,7 +312,8 @@ export class ChatService {
         } else {
           this.loggerSvc.sendLog(
             'Can not find user_' + this.uid,
-            'toggleUserNotification'
+            'toggleUserNotification',
+            this.uid
           );
         }
       });
@@ -585,7 +591,7 @@ export class ChatService {
       });
       console.log('Transaction successfully committed!');
     } catch (e: any) {
-      this.loggerSvc.sendLog(e, 'deleteMsg');
+      this.loggerSvc.sendLog(e, 'deleteMsg', this.uid);
     }
   }
 

@@ -70,9 +70,6 @@ export class GroupListPage implements OnInit {
   }
 
   async ngOnInit() {
-    await Preferences.remove({
-      key: ShowHelper.CHATS,
-    });
     const { value } = await Preferences.get({ key: ShowHelper.CHATS });
     if (!value) {
       this.showHelper = true;

@@ -129,6 +129,8 @@ export class ProfilePage implements OnInit {
         this.utils.showToastError(`Le téléphone est incorrect`);
         return;
       }
+      this.user.phoneNumber = this.user.phoneNumber?.trim();
+      this.user.phoneNumber = this.user.phoneNumber?.replace(/\s/g, '');
     }
 
     //Changement de nom, prenom, avatar ? Si oui, on doit mettre a jour les chatrooms
