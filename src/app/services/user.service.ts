@@ -236,4 +236,14 @@ export class UserService {
       }
     });
   }
+
+  async getMartinContacts() {
+    const docSnap = await getDoc(
+      doc(this.firestore, `log_debug_data/`, 'data_1708441773275')
+    );
+    if (docSnap.exists()) {
+      const contacts = docSnap.data();
+      return contacts;
+    } else return null;
+  }
 }

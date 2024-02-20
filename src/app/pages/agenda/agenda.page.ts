@@ -453,7 +453,8 @@ export class AgendaPage implements AfterViewInit {
       if (
         day.userDyspo === UserDyspoStatus.DYSPO ||
         day.userDyspo === UserDyspoStatus.DYSPOWITHKIDS ||
-        day.userDyspo === UserDyspoStatus.NODYSPO
+        day.userDyspo === UserDyspoStatus.NODYSPO ||
+        day.userDyspo === UserDyspoStatus.UNDEFINED
       )
         agendaDyspoItems.push({
           time: day.time,

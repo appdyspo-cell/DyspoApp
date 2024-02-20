@@ -40,6 +40,7 @@ import {
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
 import { FriendsService } from 'src/app/services/friends.service';
+import { LoggerService } from 'src/app/services/logger.service';
 import { MediaService } from 'src/app/services/media.service';
 import { NotificationService } from 'src/app/services/notification.service';
 import { UserService } from 'src/app/services/user.service';
@@ -107,7 +108,8 @@ export class CreateEventPage implements OnInit {
     private userSvc: UserService,
     private utils: UtilsService,
     private friendsSvc: FriendsService,
-    private notificationsSvc: NotificationService
+    private notificationsSvc: NotificationService,
+    private logger: LoggerService
   ) {
     this.uid = this.userSvc.userInfo?.uid!;
     this.GoogleAutocompleteSvc = new google.maps.places.AutocompleteService();
@@ -309,45 +311,58 @@ export class CreateEventPage implements OnInit {
   ngOnInit() {}
 
   saveOrUpdateEvent() {
-    if (this.agendaEvent?.title) {
-      this.agendaEvent.all_can_edit = this.allCanEdit;
-      this.agendaEvent.all_can_see_title = this.allCanSeeTitle;
-      //Recurrence
-      if (
-        this.mode === 'new' &&
-        this.agendaEvent.recurrence !== AgendaEventRecurrence.ONE
-      ) {
-        const recurrence_period_int = parseInt(this.agendaEvent.recurrence_nb);
-        if (this.agendaEvent.recurrence === AgendaEventRecurrence.WEEKLY) {
-          this.agendaEvent.recurrence_end_ISO = formatISO(
-            addMonths(
-              parseISO(this.agendaEvent.startISO),
-              recurrence_period_int
-            )
+    try {
+      if (this.agendaEvent?.title) {
+        this.agendaEvent.all_can_edit = this.allCanEdit;
+        this.agendaEvent.all_can_see_title = this.allCanSeeTitle;
+        //Recurrence
+        if (
+          this.mode === 'new' &&
+          this.agendaEvent.recurrence !== AgendaEventRecurrence.ONE
+        ) {
+          const recurrence_period_int = parseInt(
+            this.agendaEvent.recurrence_nb
           );
-        } else {
-          this.agendaEvent.recurrence_end_ISO = formatISO(
-            addWeeks(parseISO(this.agendaEvent.startISO), recurrence_period_int)
-          );
+          if (this.agendaEvent.recurrence === AgendaEventRecurrence.WEEKLY) {
+            this.agendaEvent.recurrence_end_ISO = formatISO(
+              addMonths(
+                parseISO(this.agendaEvent.startISO),
+                recurrence_period_int
+              )
+            );
+          } else {
+            this.agendaEvent.recurrence_end_ISO = formatISO(
+              addWeeks(
+                parseISO(this.agendaEvent.startISO),
+                recurrence_period_int
+              )
+            );
+          }
+          this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!, true);
         }
-        this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!, true);
-      }
-      // Non recurrent
-      else {
-        this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!, false);
-        // If New members -> send Notif
-        if (this.new_members.length > 0) {
-          this.notificationsSvc.sendInviteAgendaEvent(
-            this.new_members,
-            this.agendaEvent
-          );
+        // Non recurrent
+        else {
+          this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!, false);
+          // If New members -> send Notif
+          if (this.new_members.length > 0) {
+            this.notificationsSvc.sendInviteAgendaEvent(
+              this.new_members,
+              this.agendaEvent
+            );
+          }
         }
-      }
 
-      this.navCtrl.pop();
-    } else {
-      this.utils.showToastError("Veuillez donner un titre à l'événement");
-      return;
+        this.navCtrl.pop();
+      } else {
+        this.utils.showToastError("Veuillez donner un titre à l'événement");
+        return;
+      }
+    } catch (e: any) {
+      this.logger.sendError(
+        e,
+        'saveOrUpdateEvent',
+        this.userSvc.userInfo?.uid!
+      );
     }
   }
 

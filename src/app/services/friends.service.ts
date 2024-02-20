@@ -223,7 +223,6 @@ export class FriendsService {
   }
 
   isMyFriend(uid: string): boolean {
-    console.log('is my friend');
     const my_uid = this.userSvc.userInfo?.uid || 'unknown';
     const myFriendsUids = this.friends.map((friend) => friend.friend_uid);
     if (my_uid !== uid) {

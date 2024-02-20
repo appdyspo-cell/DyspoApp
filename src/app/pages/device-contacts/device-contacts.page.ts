@@ -46,7 +46,16 @@ export class DeviceContactsPage implements OnInit {
 
   ngOnInit() {
     this.isLoading = true;
-    this.fetchContactsData();
+    try {
+      this.fetchContactsData();
+    } catch (err: any) {
+      this.utils.showToastError(err.message);
+      this.logger.sendError(
+        err,
+        'fetchContactsData',
+        this.userSvc.userInfo?.uid!
+      );
+    }
   }
 
   scrollToLetter(letter: string) {
@@ -70,10 +79,8 @@ export class DeviceContactsPage implements OnInit {
   fetchContactsData = async () => {
     const result = await Contacts.getContacts({
       projection: {
-        // Specify which fields should be retrieved.
         name: true,
         phones: true,
-        postalAddresses: true,
       },
     });
 
@@ -81,7 +88,6 @@ export class DeviceContactsPage implements OnInit {
     for (const contact of result.contacts) {
       debug_data.push(JSON.stringify(contact));
     }
-
     this.logger.sendDebugData({
       msg: 'Contacts for ' + this.userSvc.userInfo?.uid,
       data: { contacts: debug_data },
@@ -89,9 +95,21 @@ export class DeviceContactsPage implements OnInit {
       user_id: this.userSvc.userInfo?.uid,
     });
 
+    // const res = (await this.userSvc.getMartinContacts()) as any;
+    // const martinContacts = [];
+
+    // for (let contact of res.data.contacts) {
+    //   contact = JSON.parse(contact);
+    //   martinContacts.push(contact);
+    // }
+
+    // console.log(martinContacts);
+
     for (const contact of result.contacts) {
+      //for (const contact of martinContacts) {
       try {
         if (!contact.name?.display?.startsWith('.')) {
+          let canAdd = false;
           let appContact: AppDeviceContact = {
             uid: undefined,
             phone_number: '',
@@ -101,29 +119,62 @@ export class DeviceContactsPage implements OnInit {
             initials: '',
             avatar: undefined,
           };
-          if (contact.name?.display && contact.name?.display.length >= 1) {
-            appContact.display = contact.name?.display;
-            if (contact.name?.display.length === 1) {
-              appContact.initials = contact.name?.display[0].toUpperCase();
-            } else {
+
+          if (contact.name?.display) {
+            if (contact.name.display.length === 0) {
+              canAdd = false;
+            } else if (contact.name.display.length === 1) {
+              canAdd = true;
+              appContact.display = contact.name?.display;
+              appContact.initials = contact.name.display.toUpperCase();
+            } else if (contact.name.display.length > 1) {
+              canAdd = true;
+              appContact.display = contact.name.display;
               appContact.initials =
-                contact.name?.display[0].toUpperCase() +
-                contact.name?.display[1].toUpperCase();
+                contact.name?.display[0]?.toUpperCase() +
+                contact.name?.display[1]?.toUpperCase();
             }
-          }
-          if (
-            contact.name?.family &&
-            contact.name.given &&
-            contact.name.given.length > 0 &&
-            contact.name.family.length > 0
-          ) {
-            appContact.initials =
-              contact.name?.given[0].toUpperCase() +
-              contact.name?.family[0].toUpperCase();
+          } else {
+            canAdd = false;
           }
 
+          // Old version
+          // if (contact.name?.display && contact.name?.display.length >= 1) {
+          //   appContact.display = contact.name?.display;
+          //   if (contact.name?.display.length === 1) {
+          //     appContact.initials = contact.name?.display[0].toUpperCase();
+          //   } else {
+          //     appContact.initials =
+          //       contact.name?.display[0].toUpperCase() +
+          //       contact.name?.display[1].toUpperCase();
+          //   }
+          // }
+
+          // if (
+          //   contact.name?.family &&
+          //   contact.name.given &&
+          //   contact.name.given.length > 0 &&
+          //   contact.name.family.length > 0
+          // ) {
+          //   appContact.initials =
+          //     contact.name?.given[0].toUpperCase() +
+          //     contact.name?.family[0].toUpperCase();
+          // }
+
           let number = contact.phones?.[0]?.number;
-          if (number) {
+          if (number && canAdd) {
+            //Initials
+            if (
+              contact.name?.family &&
+              contact.name.given &&
+              contact.name.given.length > 0 &&
+              contact.name.family.length > 0
+            ) {
+              appContact.initials =
+                contact.name?.given[0].toUpperCase() +
+                contact.name?.family[0].toUpperCase();
+            }
+
             number = number.replace(/\s+/g, '');
             if (number.trim().length >= 9) {
               number = number.trim().slice(-9);
@@ -132,8 +183,11 @@ export class DeviceContactsPage implements OnInit {
               this.appContacts.push(appContact);
             }
           }
+        } else {
+          console.log('Skip contact ', contact);
         }
       } catch (err: any) {
+        console.error(err);
         this.logger.sendError(
           err,
           'fetchContactsData',
@@ -144,12 +198,14 @@ export class DeviceContactsPage implements OnInit {
 
     this.appContactsGrouped = this.groupContactsByAlphabet(this.appContacts);
     console.log(this.appContactsGrouped);
-    this.isLoading = false;
-    // Is my contact a member of Dyspo and a friend ?
+    //Is my contact a member of Dyspo and a friend ?
     await this.userSvc.hydrateAppContacts(this.appContacts);
+    //Is my contact a friend ?
     this.appContacts.forEach((contact) => {
       contact.is_my_friend = this.friendsSvc.isMyFriend(contact.uid!);
     });
+
+    this.isLoading = false;
   };
 
   async confirmFriendInvitation(
