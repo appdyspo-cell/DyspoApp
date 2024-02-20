@@ -610,6 +610,8 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
           item.userDyspo = UserDyspoStatus.DYSPOWITHKIDS;
         } else if (item.userDyspo === UserDyspoStatus.DYSPOWITHKIDS) {
           item.userDyspo = UserDyspoStatus.NODYSPO;
+        } else if (item.userDyspo === UserDyspoStatus.NODYSPO) {
+          item.userDyspo = undefined;
         } else {
           item.userDyspo = UserDyspoStatus.DYSPO;
         }
@@ -619,6 +621,8 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
           item.userDyspo === UserDyspoStatus.DYSPOWITHKIDS
         ) {
           item.userDyspo = UserDyspoStatus.NODYSPO;
+        } else if (item.userDyspo === UserDyspoStatus.NODYSPO) {
+          item.userDyspo = undefined;
         } else {
           item.userDyspo = UserDyspoStatus.DYSPO;
         }

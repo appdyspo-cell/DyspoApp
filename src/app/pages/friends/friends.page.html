@@ -83,9 +83,9 @@
         <ion-button
           slot="end"
           *ngIf="!user.is_my_friend"
+          size="small"
           (click)="inviteFriend(user)"
         >
-          <ion-icon class="icon-user-follow" slot="start"></ion-icon>
           Inviter
         </ion-button>
       </ion-item>
@@ -183,7 +183,7 @@
               {{friendGroup.label}}
             </ion-row>
             <ion-row class="ion-align-items-center">
-              {{friendGroup.members_uid.length}} membres
+              {{getMembreLabel(friendGroup.members_uid.length)}}
             </ion-row>
             <!-- <ion-row class="ion-align-items-center">
               <rating [rating]="rate" (ratingChange)="onRateChanged($event)">
@@ -220,10 +220,18 @@
             <ion-icon slot="icon-only" name="trash"></ion-icon>
           </ion-item-option>
         </ion-item-options>
-        <ion-item (click)="showProfile(friendSuggested, $event)" lines="full">
-          <ion-avatar slot="start">
-            <img src="{{friendSuggested.userData?.avatarPath}}" />
-          </ion-avatar>
+        <ion-item
+          (click)="showProfile(friendSuggested, $event)"
+          lines="full"
+          class="friend-item"
+        >
+          <ion-thumbnail slot="start">
+            <img
+              [defaultImage]="defaultImage"
+              [lazyLoad]="friendSuggested.userData?.avatarPath!"
+              class="crop_img fade-img"
+            />
+          </ion-thumbnail>
 
           <ion-label>
             <ion-row class="ion-align-items-center">
@@ -233,15 +241,18 @@
               {{friendSuggested.userData?.firstname}}
             </ion-row>
           </ion-label>
-          <ion-buttons slot="end">
-            <ion-button
-              color="primary"
-              size="small"
-              (click)="confirmFriendInvitation(friendSuggested, i, $event)"
-            >
-              <ion-icon [id]="'add'+i" name="person-add"></ion-icon>
-            </ion-button>
-          </ion-buttons>
+
+          <ion-button
+            slot="end"
+            fill="clear"
+            (click)="confirmFriendInvitation(friendSuggested, i, $event)"
+          >
+            <ion-icon
+              [id]="'add'+i"
+              name="person-add"
+              slot="icon-only"
+            ></ion-icon>
+          </ion-button>
         </ion-item>
       </ion-item-sliding>
     </ion-list>

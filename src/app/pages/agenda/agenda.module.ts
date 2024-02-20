@@ -10,6 +10,7 @@ import { AgendaPage } from './agenda.page';
 import { NgCalendarModule } from 'src/app/components/calendar';
 import { CalendarModule } from 'src/app/calendar';
 import { SharedPipesModule } from 'src/app/modules/shared-pipes/shared-pipes.module';
+import { LazyLoadImageModule } from 'ng-lazyload-image';
 
 @NgModule({
   imports: [
@@ -19,6 +20,7 @@ import { SharedPipesModule } from 'src/app/modules/shared-pipes/shared-pipes.mod
     CalendarModule,
     IonicModule,
     AgendaPageRoutingModule,
+    LazyLoadImageModule,
     SharedPipesModule,
   ],
 

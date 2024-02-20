@@ -5,8 +5,8 @@
 export const environment = {
   production: false,
   debug: true,
-  DEFAULT_AVATAR: './assets/img/user.png',
-  DEFAULT_AVATAR_GROUP: './assets/group_icon.png',
+  DEFAULT_AVATAR: './assets/img/user.jpg',
+  DEFAULT_AVATAR_GROUP: './assets/img/user.jpg',
   dyspo_email: 'contact@dyspo.com',
   BIOMETRIC_KEY: 'dyspo_123456',
   firebaseConfig: {

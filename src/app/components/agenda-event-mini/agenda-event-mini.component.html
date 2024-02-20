@@ -31,7 +31,7 @@
   <div style="display: flex; width: auto; align-items: center">
     <ion-thumbnail
       class="event-avatar"
-      style="overflow: hidden; margin-right: 8px"
+      style="overflow: hidden; margin-right: 8px; margin-top: 3px"
     >
       <img src="{{ agendaEvent.avatar }}" />
     </ion-thumbnail>
@@ -50,6 +50,7 @@
           'label-bg-kids': agendaEvent.type === agendaEventType.KIDS,
           'label-bg-nokids': agendaEvent.type === agendaEventType.NOKIDS,
           'label-bg-free': agendaEvent.type === agendaEventType.FREE,
+          'label-bg-solo': agendaEvent.type === agendaEventType.SOLO,
           'label-type': true
         }"
       >

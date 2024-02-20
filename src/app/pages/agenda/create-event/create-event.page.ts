@@ -147,8 +147,19 @@ export class CreateEventPage implements OnInit {
             milliseconds: 999,
           });
 
-          this.pageTitle = 'Créer un évènement';
+          this.pageTitle = 'Créer un événement';
           this.saveLabel = 'Sauvegarder';
+
+          let eventType;
+          if (!this.is_multi) {
+            eventType = AgendaEventType.SOLO;
+          } else {
+            if (is_kids) {
+              eventType = AgendaEventType.KIDS;
+            } else {
+              eventType = AgendaEventType.NOKIDS;
+            }
+          }
 
           this.agendaEvent = {
             admin_uid: this.uid,
@@ -158,7 +169,7 @@ export class CreateEventPage implements OnInit {
             startISO: formatISO(dateHPlus1),
             endISO: formatISO(dateHPlus2),
             title: '',
-            type: is_kids ? AgendaEventType.KIDS : AgendaEventType.NOKIDS,
+            type: eventType,
             status: AgendaEventStatus.ACTIVE,
             all_can_edit: false,
             all_can_see_title: true,
@@ -216,19 +227,24 @@ export class CreateEventPage implements OnInit {
           this.agendaEvent!['user_' + this.uid] = userChatroom;
 
           //if (isSameDay(this.tsInputDate, new Date())) {
-          this.min_time_ISO_start = this.agendaEvent.startISO;
-          this.min_time_ISO_end = this.agendaEvent.startISO;
+
+          // Le minimum c aujourdhui
+          // this.min_time_ISO_start = this.agendaEvent.startISO;
+          // this.min_time_ISO_end = this.agendaEvent.startISO;
+          this.min_time_ISO_start = formatISO(new Date().getTime());
+          this.min_time_ISO_end = formatISO(new Date().getTime());
+
           //}
           this.max_time_ISO_end = formatISO(
             addDays(new Date(parseISO(this.min_time_ISO_end)), 30)
           );
-          // console.log('min time ', this.min_time_ISO_start);
-          // console.log('max time ', this.max_time_ISO_end);
+          console.log('min time ', this.min_time_ISO_start);
+          console.log('max time ', this.max_time_ISO_end);
 
           break;
         case 'edit':
           this.saveLabel = 'Mettre à jour';
-          this.pageTitle = 'Editer un événement';
+          this.pageTitle = 'Éditer un événement';
           this.agendaEvent =
             this.router.getCurrentNavigation()?.extras.state?.['agendaEvent'];
           this.is_multi = this.agendaEvent!.is_multi;
@@ -672,5 +688,13 @@ export class CreateEventPage implements OnInit {
       path = 'assets/newimg/picto_discussion_kidnokid.png';
     }
     return path;
+  }
+
+  getSemaineLabel(s: number) {
+    if (s > 1) {
+      return s + ' semaines';
+    } else {
+      return s + ' semaine';
+    }
   }
 }

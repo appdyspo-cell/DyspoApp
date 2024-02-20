@@ -196,9 +196,9 @@ export class AgendaPage implements AfterViewInit {
   }
 
   async ngAfterViewInit() {
-    // await Preferences.remove({
-    //   key: ShowHelper.AGENDA,
-    // });
+    await Preferences.remove({
+      key: ShowHelper.AGENDA,
+    });
     const { value } = await Preferences.get({ key: ShowHelper.AGENDA });
     if (!value) {
       this.showHelper = true;
@@ -435,6 +435,7 @@ export class AgendaPage implements AfterViewInit {
       componentProps: {
         agendaEvent,
         isInvitation: false,
+        isMulti: agendaEvent.is_multi,
       },
     });
     modal.present();

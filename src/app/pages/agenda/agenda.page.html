@@ -8,7 +8,7 @@
           color="primary"
           [enableOnOffLabels]="true"
           (ionChange)="onChangeMode($event)"
-          >Editer</ion-toggle
+          >Éditer</ion-toggle
         >
       </ion-buttons>
     </ng-container>
@@ -23,7 +23,7 @@
 
       <ion-title style="padding-left: 0">
         <div class="d-flex">
-          <ion-thumbnail style="margin-right: 5px">
+          <ion-thumbnail class="thumb-friend">
             <ion-img src="{{agendaFriend?.userData?.avatarPath}}"></ion-img>
           </ion-thumbnail>
           <h1>{{agendaFriend?.userData?.firstname}}</h1>
@@ -34,37 +34,14 @@
 </ion-header>
 
 <ion-content class="bg_color">
-  <!-- <div class="header-ct" *ngIf="isFriendMode">
-    <div class="header">
-      <ion-toolbar>
-        <div
-          slot="start"
-          style="display: flex"
-          class="ion-align-items-center thumbnail-friend"
-        >
-          <ion-button fill="clear" (click)="goBack()">
-            <ion-icon
-              name="close-outline"
-              color="light"
-              slot="icon-only"
-            ></ion-icon>
-          </ion-button>
-          <ion-thumbnail
-            slot="start"
-            class="animate__animated animate__fadeInLeft"
-          >
-            <ion-img src="{{agendaFriend?.userData?.avatarPath}}"></ion-img>
-          </ion-thumbnail>
-        </div>
-
-        <ion-title> <h1>{{agendaFriend?.userData?.firstname}}</h1></ion-title>
- 
-      </ion-toolbar>
-    </div>
-  </div> -->
-
   <div class="container">
-    <ion-chip *ngIf="my_info.with_kids" [outline]="true"
+    <ion-chip *ngIf="!isFriendMode && my_info.with_kids" [outline]="true"
+      ><div class="chip-evt bg-color-kid">&nbsp;</div>
+      Kid(s)</ion-chip
+    >
+    <ion-chip
+      *ngIf="isFriendMode && agendaFriend?.userData?.with_kids"
+      [outline]="true"
       ><div class="chip-evt bg-color-kid">&nbsp;</div>
       Kid(s)</ion-chip
     >
@@ -95,10 +72,23 @@
     [readonly]="agendaMode === agendaModes.READONLY"
   ></ion-calendar>
   <div *ngIf="agendaMode === agendaModes.READONLY" style="padding-top: 5px">
-    <ion-toolbar style="padding: 0px 6px; --background: transparent">
+    <!-- <ion-toolbar style="padding: 0px 6px; --background: transparent"> -->
+    <div
+      style="
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 8px;
+      "
+    >
       <div
         slot="start"
-        style="display: flex; align-items: center; font-size: 1.2rem"
+        style="
+          display: flex;
+          align-items: center;
+          font-size: 1.2rem;
+          min-width: 150px;
+        "
       >
         <ion-icon
           name="calendar-outline"
@@ -110,13 +100,18 @@
       <ion-button
         *ngIf="!isFriendMode && selectedDateMs"
         slot="end"
-        fill="clear"
+        class="dyspo-button no-margin"
+        style="margin: 0px !important"
+        color="tertiary"
+        style="text-transform: none"
         (click)="openCreateEvent()"
       >
         <ion-icon name="add-circle-outline" slot="start"></ion-icon
-        >Nouveau</ion-button
+        >nouveau</ion-button
       >
-    </ion-toolbar>
+    </div>
+
+    <!-- </ion-toolbar> -->
 
     <ion-list>
       <ion-item
@@ -176,16 +171,17 @@
 
   <div
     *ngIf="agendaMode === agendaModes.EDIT"
-    class="ion-padding ion-text-center"
+    class="ion-padding ion-text-center d-flex"
+    style="flex-direction: column"
   >
-    Vous êtes en mode édition
+    <ion-text> Vous êtes en mode édition </ion-text>
     <ion-button
       *ngIf="agendaSvc.isModified"
       (click)="saveAgenda()"
       mode="ios"
-      color="dark"
+      color="tertiary"
       class="dyspo-button"
-      expand="full"
+      style="padding-top: 8px"
     >
       Sauvegarder mon agenda
       <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
@@ -193,8 +189,7 @@
 
     <ion-button
       *ngIf="agendaSvc.isModified"
-      color="dark"
-      expand="full"
+      color="tertiary"
       mode="ios"
       class="dyspo-button"
       (click)="cancelAgenda()"

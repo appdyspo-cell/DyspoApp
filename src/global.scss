@@ -49,9 +49,11 @@
   --text-dyspo-with-kids: #48a1c3;
   --text-dyspo: #7ae198;
   --text-dyspo-free: #ac3e61;
+  --text-dyspo-solo: #f95812;
   --text-dyspo-with-kids-secondary: #9eb7c0;
   --text-dyspo-secondary: #aeddbc;
   --text-dyspo-free-secondary: #a98892;
+  --text-dyspo-solo-secondary: #f4c7b3;
 }
 
 .transparent-modal {
@@ -73,7 +75,7 @@
 .bg_color {
   --background: none;
   background-image: url("./assets/fd_ecran_principal.jpg");
-  background-position: center top;
+  background-position: center bottom;
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -303,6 +305,16 @@ ion-item {
   border: 3px solid var(--text-no-dyspo);
 }
 
+.thumb-kid-thick {
+  border: 5px solid var(--text-dyspo-with-kids);
+}
+.thumb-nokids-thick {
+  border: 5px solid var(--text-dyspo);
+}
+.thumb-nodyspo-thick {
+  border: 5px solid var(--text-no-dyspo);
+}
+
 .thumb-event-kids {
   border: 3px solid var(--text-dyspo-with-kids);
 }
@@ -380,6 +392,11 @@ ion-item {
   color: var(--white);
 }
 
+.label-bg-solo {
+  background-color: var(--text-dyspo-solo);
+  color: var(--white);
+}
+
 .bg-kids-secondary {
   background-color: var(--text-dyspo-with-kids-secondary);
   //color: var(--white);
@@ -393,6 +410,10 @@ ion-item {
 .bg-free-secondary {
   background-color: var(--text-dyspo-free-secondary);
   //color: var(--white);
+}
+
+.bg-solo-secondary {
+  background-color: var(--text-dyspo-solo-secondary);
 }
 
 ion-modal {
@@ -626,6 +647,11 @@ ion-chip {
 
 .dyspo-button {
   font-size: 1.13em;
+  margin: 7px;
+  --border-radius: 7px;
+  &.no-margin {
+    margin: 0px;
+  }
 }
 
 .thin-alert-radio {
@@ -634,4 +660,10 @@ ion-chip {
 
 .alert-radio-label.sc-ion-alert-md {
   padding-inline-start: 33px !important;
+}
+
+.title-tuto {
+  font-size: 1.3rem;
+  font-weight: 900;
+  margin-top: 12px;
 }

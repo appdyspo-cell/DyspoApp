@@ -22,16 +22,6 @@
 </ion-header>
 
 <ion-content class="ion-padding-top bg_color">
-  <!-- <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title
-        >{{'select_members' | translate}}
-         <span class="ion-float-end">
-                     <ion-icon class="zmdi zmdi-search ion-text-start"></ion-icon>
-                 </span> 
-      </ion-title>
-    </ion-toolbar>
-  </ion-header> -->
   <div
     class="d-flex ion-align-items-center ion-justify-content-center"
     button
@@ -99,15 +89,16 @@
 </ion-content>
 
 <ion-footer class="ion-no-border">
-  <ion-button
-    fill="solid"
-    class="dyspo-button ion-no-margin"
-    color="dark"
-    expand="full"
-    mode="ios"
-    (click)="saveFriendGroup()"
-  >
-    <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
-    {{countCheckedItems()}} {{'members_selected' | translate}}
-  </ion-button>
+  <div class="d-flex ion-justify-content-center">
+    <ion-button
+      fill="solid"
+      class="dyspo-button"
+      color="tertiary"
+      mode="ios"
+      (click)="saveFriendGroup()"
+    >
+      <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+      {{countCheckedItems()}}
+    </ion-button>
+  </div>
 </ion-footer>

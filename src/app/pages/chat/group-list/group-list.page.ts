@@ -1,17 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
-import { NavController } from '@ionic/angular';
+import { Preferences } from '@capacitor/preferences';
+import { ModalController, NavController } from '@ionic/angular';
 import { format, isAfter, isBefore, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
+import { HelperComponent } from 'src/app/components/helper/helper.component';
 import {
   AgendaEvent,
   AgendaEventType,
   Chatroom,
   DiscussionType,
+  ShowHelper,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
-import { ChatService } from 'src/app/services/chat.service';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
@@ -30,10 +32,11 @@ export class GroupListPage implements OnInit {
   chatrooms: Record<string, Chatroom> = {};
   selectDiscussionsType: DiscussionType;
   isLoading = true;
+  showHelper = false;
 
   constructor(
     private route: Router,
-    private chatSvc: ChatService,
+    private modalCtrl: ModalController,
     private agendaSvc: AgendaService,
     private userSvc: UserService,
     private navCtrl: NavController
@@ -66,7 +69,27 @@ export class GroupListPage implements OnInit {
     );
   }
 
-  ngOnInit() {}
+  async ngOnInit() {
+    await Preferences.remove({
+      key: ShowHelper.CHATS,
+    });
+    const { value } = await Preferences.get({ key: ShowHelper.CHATS });
+    if (!value) {
+      this.showHelper = true;
+      const modal = await this.modalCtrl.create({
+        component: HelperComponent,
+        componentProps: {
+          showHelper: ShowHelper.CHATS,
+        },
+      });
+      modal.present();
+
+      await Preferences.set({
+        key: ShowHelper.CHATS,
+        value: 'SHOWN',
+      });
+    }
+  }
 
   goToChat(
     agendaEvent: AgendaEvent | undefined,

@@ -109,7 +109,9 @@ ion-img::part(image) {
 }
 
 ion-list-header {
-  font-weight: 600;
+  h2 {
+    font-weight: 700;
+  }
   border-top: 1px solid lightgray;
 }
 
@@ -139,9 +141,6 @@ ion-range {
 .help {
   width: 100%;
   height: 100%;
-  font-weight: bold;
-}
-ion-button {
   font-weight: bold;
 }
 

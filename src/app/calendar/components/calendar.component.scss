@@ -36,12 +36,14 @@
 
 :host .title .back {
   margin-left: -100%;
+  margin-top: 8px;
   left: -40px;
   width: 40px;
 }
 
 :host .title .forward {
   margin-left: -40px;
+  margin-top: 8px;
   right: -40px;
   width: 40px;
 }

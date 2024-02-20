@@ -185,7 +185,14 @@ export class ParametresPage implements OnInit {
   }
 
   async openMail() {
-    await EmailComposer.open({ to: [environment.dyspo_email] });
+    const canOpen = await EmailComposer.hasAccount();
+    if (canOpen.hasAccount) {
+      await EmailComposer.open({ to: [environment.dyspo_email] });
+    } else {
+      this.utils.showToastError(
+        'Vous devez configurer une messagerie sur cet appareil'
+      );
+    }
   }
 
   openBlockedUsers() {

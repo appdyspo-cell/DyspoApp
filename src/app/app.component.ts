@@ -71,6 +71,9 @@ export class AppComponent {
               SplashScreen.hide();
             });
         } else {
+          setTimeout(() => {
+            SplashScreen.hide();
+          }, 800);
           this.logger.logDebug(
             'authStateSubscription NOUSER -> navigateRoot: Login'
           );

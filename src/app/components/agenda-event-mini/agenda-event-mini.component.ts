@@ -33,6 +33,9 @@ export class AgendaEventMiniComponent implements OnInit {
       case AgendaEventType.FREE:
         this.eventTypeLabel = 'Kid(s) ou NoKid(s)';
         break;
+      case AgendaEventType.SOLO:
+        this.eventTypeLabel = 'Perso';
+        break;
     }
     if (
       isSameDay(this.agendaEvent.start_date_ts, this.agendaEvent.end_date_ts)

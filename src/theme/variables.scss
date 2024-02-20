@@ -90,6 +90,12 @@
   font-weight: 500;
   font-style: italic;
 }
+@font-face {
+  font-family: "ProtestRiot";
+  src: url("../assets/font/ProtestRiot-Regular.ttf");
+  font-weight: 500;
+  font-style: normal;
+}
 
 // $font-family-base: "Lato";
 // $font-family-ios-base: "Lato";
@@ -99,6 +105,7 @@
 /** Ionic CSS Variables **/
 :root {
   --ion-font-family: "Lato";
+  --ion-safe-area-bottom: 16px;
   --ion-color-primary: #46a2c2;
   --ion-color-primary-rgb: 52, 146, 208;
   --ion-color-primary-contrast: #ffffff;
@@ -113,12 +120,12 @@
   --ion-color-secondary-shade: #006bb4;
   --ion-color-secondary-tint: #1a87d1;
 
-  --ion-color-tertiary: #2770a0;
-  --ion-color-tertiary-rgb: 39, 112, 160;
+  --ion-color-tertiary: #33363d;
+  --ion-color-tertiary-rgb: 51, 54, 61;
   --ion-color-tertiary-contrast: #ffffff;
   --ion-color-tertiary-contrast-rgb: 255, 255, 255;
-  --ion-color-tertiary-shade: #22638d;
-  --ion-color-tertiary-tint: #3d7eaa;
+  --ion-color-tertiary-shade: #2d3036;
+  --ion-color-tertiary-tint: #474a50;
 
   /** success **/
   --ion-color-success: #242424;

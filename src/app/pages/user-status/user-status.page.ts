@@ -88,7 +88,7 @@ export class UserStatusPage implements OnInit {
         this.agendaDysposSubscription.unsubscribe();
       if (this.agendaDysposSubscription)
         this.agendaDysposSubscription.unsubscribe();
-      this.todayFormatted = format(new Date(), 'iii dd MMM yyyy', {
+      this.todayFormatted = format(new Date(), 'iiii dd MMMM yyyy', {
         locale: fr,
       });
 
@@ -194,9 +194,9 @@ export class UserStatusPage implements OnInit {
   }
 
   async ngOnInit() {
-    // await Preferences.remove({
-    //   key: ShowHelper.DASHBOARD,
-    // });
+    await Preferences.remove({
+      key: ShowHelper.DASHBOARD,
+    });
     const { value } = await Preferences.get({ key: ShowHelper.DASHBOARD });
     if (!value) {
       this.showHelper = true;
@@ -242,6 +242,7 @@ export class UserStatusPage implements OnInit {
       componentProps: {
         agendaEvent,
         isInvitation: false,
+        isMulti: agendaEvent.is_multi,
       },
     });
     modal.present();
@@ -259,6 +260,7 @@ export class UserStatusPage implements OnInit {
       componentProps: {
         agendaEvent,
         isInvitation: true,
+        isMulti: agendaEvent.is_multi,
       },
     });
     modal.present();

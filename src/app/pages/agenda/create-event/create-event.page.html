@@ -17,7 +17,7 @@
       <div class="input-title">
         <ion-input
           maxlength="30"
-          autocapitalize="words"
+          autocapitalize="sentences"
           [(ngModel)]="agendaEvent!.title"
           placeholder="Saisissez un titre"
           required
@@ -57,7 +57,14 @@
 
   <!-- <div style="height: 50px; width: 100%"></div> -->
   <ion-card>
-    <ion-item button="true" id="open-time-item" lines="none">
+    <ion-item
+      button="true"
+      detail="false"
+      id="open-time-item"
+      lines="none"
+      class="ion-no-padding"
+      style="padding-left: 7px"
+    >
       <ion-text slot="start">{{agendaEvent?.start_date_formatted}}</ion-text>
       <ion-text slot="end">{{agendaEvent?.start_time_formatted}}</ion-text>
       <ion-popover
@@ -85,7 +92,14 @@
       </ion-popover>
     </ion-item>
 
-    <ion-item button="true" id="open-end-time-item" lines="none">
+    <ion-item
+      button="true"
+      detail="false"
+      id="open-end-time-item"
+      lines="none"
+      class="ion-no-padding"
+      style="padding-left: 7px"
+    >
       <ion-text slot="start">{{agendaEvent?.end_date_formatted}}</ion-text>
       <ion-text slot="end">{{agendaEvent?.end_time_formatted}}</ion-text>
 
@@ -141,12 +155,11 @@
                     }"
                     >
                       <img src="{{ member.avatarPath }}" />
-                      <ion-badge
+                      <div
                         *ngIf="member.agendaEvents!.length > 0"
                         name="warning-outline"
                         class="thumbnail-badge"
-                        >&nbsp;</ion-badge
-                      >
+                      ></div>
                       <ion-icon
                         *ngIf="member.is_my_friend === false"
                         class="zmdi zmdi-plus end"
@@ -180,6 +193,7 @@
         [(ngModel)]="agendaEvent!.recurrence"
         (ionChange)="onRecurrenceChanged($event)"
         placeholder="Recurrence"
+        cancelText="Annuler"
       >
         <ion-select-option [value]="AgendaEventRecurrence.ONE"
           >1 fois</ion-select-option
@@ -213,7 +227,7 @@
         placeholder="Pendant"
       >
         <ion-select-option *ngFor="let s of [1,2,3,4]" value="{{s}}"
-          >{{s}} semaines</ion-select-option
+          >{{ getSemaineLabel(s)}}</ion-select-option
         >
       </ion-select>
     </ion-item>
@@ -242,57 +256,59 @@
   </ion-card>
 
   <ion-card *ngIf="is_multi">
-    <div class="ion-padding">
+    <div style="padding-left: 5px; padding-bottom: 16px">
       <ion-checkbox [(ngModel)]="allCanEdit" labelPlacement="end"
         >Autoriser l'édition pour tout le monde</ion-checkbox
       >
     </div>
   </ion-card>
   <ion-card *ngIf="!is_multi">
-    <div class="ion-padding">
+    <div style="padding-left: 5px; padding-bottom: 16px">
       <ion-checkbox [(ngModel)]="allCanSeeTitle" labelPlacement="end"
-        >Afficher le titre de l'événement pour tout le monde</ion-checkbox
+        >Afficher le titre pour tout le monde</ion-checkbox
       >
     </div>
   </ion-card>
 
-  <div class="item_inner">
+  <div style="width: 100%">
+    <ion-text style="padding-left: 23px; font-size: 1.05rem">Photo</ion-text>
     <div
       *ngIf="agendaEvent?.avatar"
       (click)="takePhotoPrompt()"
       style="background-repeat: no-repeat;
       background-size: cover;
       background-position: center;
-      min-width: 50%;
-      max-width: 60%;
-      min-height: 150px;
+      width: 250px;
+      height: 187px;
       margin: auto;
-      padding: 16px;
+      
       margin-bottom: 24px;
+      margin-top: 16px;
       background-image: url('{{agendaEvent?.avatar}}');"
     >
       <!-- <ion-img src="{{agendaEvent?.avatar}}" /> -->
     </div>
   </div>
 
-  <ion-button
-    [disabled]=""
-    class="dyspo-button"
-    fill="solid"
-    color="dark"
-    expand="full"
-    mode="ios"
-    style="margin-left: 0; margin-right: 0"
-    (click)="saveOrUpdateEvent()"
-  >
-    Enregistrer l'évènement
-    <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
-  </ion-button>
+  <div class="d-flex ion-justify-content-center">
+    <ion-button
+      [disabled]=""
+      class="dyspo-button"
+      style="margin-left: 16px"
+      fill="solid"
+      color="tertiary"
+      mode="ios"
+      (click)="saveOrUpdateEvent()"
+    >
+      Enregistrer l'événement
+      <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+    </ion-button>
+  </div>
 
   <!-- <ion-toolbar class="footer">
     <ion-buttons slot="end">
       <ion-button [disabled]="" fill="solid" (click)="saveOrUpdateEvent()">
-        Enregistrer l'évènement
+        Enregistrer l'événement
         <ion-icon slot="start" name="checkmark-outline"></ion-icon>
       </ion-button>
     </ion-buttons>

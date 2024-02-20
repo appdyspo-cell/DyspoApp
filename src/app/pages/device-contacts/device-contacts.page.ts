@@ -10,6 +10,7 @@ import { Share } from '@capacitor/share';
 import { IonItemGroup } from '@ionic/angular';
 import { AppDeviceContact } from 'src/app/models/models';
 import { FriendsService } from 'src/app/services/friends.service';
+import { LoggerService } from 'src/app/services/logger.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
 
@@ -39,7 +40,8 @@ export class DeviceContactsPage implements OnInit {
   constructor(
     private userSvc: UserService,
     private utils: UtilsService,
-    private friendsSvc: FriendsService
+    private friendsSvc: FriendsService,
+    private logger: LoggerService
   ) {}
 
   ngOnInit() {
@@ -76,38 +78,51 @@ export class DeviceContactsPage implements OnInit {
     });
 
     for (const contact of result.contacts) {
-      if (!contact.name?.display?.startsWith('.')) {
-        let appContact: AppDeviceContact = {
-          uid: undefined,
-          phone_number: '',
-          is_member: undefined,
-          is_my_friend: undefined,
-          display: 'unknown',
-          initials: '',
-          avatar: undefined,
-        };
-        if (contact.name?.display) {
-          appContact.display = contact.name?.display;
-          appContact.initials =
-            contact.name?.display[0].toUpperCase() +
-            contact.name?.display[1].toUpperCase();
-        }
-        if (contact.name?.family && contact.name.given) {
-          appContact.initials =
-            contact.name?.given[0].toUpperCase() +
-            contact.name?.family[0].toUpperCase();
-        }
+      try {
+        if (!contact.name?.display?.startsWith('.')) {
+          let appContact: AppDeviceContact = {
+            uid: undefined,
+            phone_number: '',
+            is_member: undefined,
+            is_my_friend: undefined,
+            display: 'unknown',
+            initials: '',
+            avatar: undefined,
+          };
+          if (contact.name?.display && contact.name?.display.length >= 1) {
+            appContact.display = contact.name?.display;
+            if (contact.name?.display.length === 1) {
+              appContact.initials = contact.name?.display[0].toUpperCase();
+            } else {
+              appContact.initials =
+                contact.name?.display[0].toUpperCase() +
+                contact.name?.display[1].toUpperCase();
+            }
+          }
+          if (
+            contact.name?.family &&
+            contact.name.given &&
+            contact.name.given.length > 0 &&
+            contact.name.family.length > 0
+          ) {
+            appContact.initials =
+              contact.name?.given[0].toUpperCase() +
+              contact.name?.family[0].toUpperCase();
+          }
 
-        let number = contact.phones?.[0]?.number;
-        if (number) {
-          number = number.replace(/\s+/g, '');
-          if (number.trim().length >= 9) {
-            number = number.trim().slice(-9);
-            appContact.phone_number = number;
+          let number = contact.phones?.[0]?.number;
+          if (number) {
+            number = number.replace(/\s+/g, '');
+            if (number.trim().length >= 9) {
+              number = number.trim().slice(-9);
+              appContact.phone_number = number;
 
-            this.appContacts.push(appContact);
+              this.appContacts.push(appContact);
+            }
           }
         }
+      } catch (err: any) {
+        this.logger.sendLog(err, 'fetchContactsData');
       }
     }
 

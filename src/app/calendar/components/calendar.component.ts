@@ -52,7 +52,6 @@ interface CompatibleIcons {
     <div class="title">
       <ng-template [ngIf]="_showMonthPicker" [ngIfElse]="title">
         <ion-button
-          type="button"
           fill="clear"
           class="switch-btn"
           [attr.aria-label]="
@@ -496,7 +495,7 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
     // @ts-ignore
     const f = moment(date).format(this._d.monthFormat.replace(/y/g, 'Y'));
 
-    return format(date, 'MMM yyyy', { locale: fr });
+    return format(date, 'MMMM yyyy', { locale: fr });
     //return f;
   }
 

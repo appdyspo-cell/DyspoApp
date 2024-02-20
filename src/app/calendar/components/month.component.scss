@@ -39,11 +39,12 @@
 :host .primary button.days-btn small,
 :host .primary .days .marked p,
 :host .primary .days .today p {
-  color: var(--ion-color-primary);
+  //color: var(--ion-color-primary);
 }
 
 :host .primary .days .today p {
-  font-weight: 700;
+  font-weight: 900;
+  font-size: 1.8em;
 }
 
 :host .primary .days .last-month-day p,
@@ -78,7 +79,7 @@
 }
 
 :host .out-of-month {
-  opacity: 0.5;
+  opacity: 0.3;
 }
 
 :host .on-selected-dyspo-kids {
@@ -99,22 +100,17 @@
 :host .event-badge {
   //width: 10px;
   //height: 10px;
-  background: linear-gradient(
-    210deg,
-    var(--text-no-dyspo) 38%,
-    var(--text-no-dyspo-secondary)
-  );
+  background: var(--text-no-dyspo);
   //position: absolute;
-
   //border-radius: 5px;
   z-index: 15;
 
   position: absolute;
   top: -4px; /* Ajustez cette valeur pour positionner verticalement */
-  right: 0px; /* Ajustez cette valeur pour positionner horizontalement */
+  right: -3px; /* Ajustez cette valeur pour positionner horizontalement */
   font-size: 12px; /* Taille du texte du badge */
-  width: 12px; /* Largeur du badge */
-  height: 12px; /* Hauteur du badge */
+  width: 8px; /* Largeur du badge */
+  height: 8px; /* Hauteur du badge */
   border-radius: 50%; /* Pour créer un badge circulaire */
 
   color: white; /* Couleur du texte du badge */

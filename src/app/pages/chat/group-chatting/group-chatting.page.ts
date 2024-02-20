@@ -77,7 +77,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   messagesSubscription!: Subscription;
   member_infos: AppUser[] = [];
   member_infos_obj: Record<string, AppUser> = {};
-  defaultAvatar = 'assets/img/user.png';
+  defaultAvatar = 'assets/img/user.jpg';
   pendingAttachment: string | undefined;
   deviceInfo!: DeviceInfo;
   display_date_1: string | undefined;
@@ -260,7 +260,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   async sendMsg() {
     console.log('Send msg');
 
-    if (this.userInput !== '') {
+    if (this.userInput !== '' || this.pendingAttachment !== undefined) {
       const timeMoment = format(new Date(), 'dd/MM/yyyy HH:mm');
       const d = new Date();
 
@@ -513,7 +513,8 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     this.scrollDown();
   }
 
-  async openImage(msg: ChatMessage) {
+  async openImage(msg: ChatMessage, event: any) {
+    event?.stopPropagation();
     const modal = await this.modalCtrl.create({
       component: DyspoViewerComponent,
       componentProps: {
@@ -553,6 +554,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
       componentProps: {
         agendaEvent: this.agendaEvent,
         isInvitation: false,
+        isMulti: this.agendaEvent.is_multi,
       },
     });
     modal.present();

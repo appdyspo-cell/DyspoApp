@@ -75,7 +75,7 @@ export class CreateGroupPage implements OnInit {
           break;
         case 'edit':
           this.saveLabel = 'Mettre à jour';
-          this.pageTitle = 'Editer un Groupe';
+          this.pageTitle = 'Éditer un groupe';
           this.friendGroup =
             this.router.getCurrentNavigation()?.extras.state?.['friendGroup'];
 
@@ -98,8 +98,13 @@ export class CreateGroupPage implements OnInit {
   //   this.route.navigate(['./create-group-info']);
   // }
 
-  countCheckedItems(): number {
-    return this.checkedFriends.filter((item) => item.isChecked).length;
+  countCheckedItems(): string {
+    const count = this.checkedFriends.filter((item) => item.isChecked).length;
+    if (count > 1) {
+      return count + ' membres sélectionnés';
+    } else {
+      return count + ' membre sélectionné';
+    }
   }
 
   getCheckedItems(): string[] {

@@ -242,7 +242,7 @@ export class NotificationService {
         this.userSvc.userInfo!.firstname +
         ' ' +
         this.userSvc.userInfo!.lastname +
-        ' propose un évenement ' +
+        ' propose un événement ' +
         this.formatInvitMsg(agendaEvent);
       const f = httpsCallable(this.functions, 'test');
 
@@ -407,6 +407,7 @@ export class NotificationService {
         componentProps: {
           agendaEvent: eventFetched,
           isInvitation: true,
+          isMulti: eventFetched.is_multi,
         },
       });
       modal.present();

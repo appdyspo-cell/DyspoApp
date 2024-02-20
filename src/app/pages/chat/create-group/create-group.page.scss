@@ -21,13 +21,13 @@ ion-header {
   height: 120px;
 
   border-radius: 50%;
-  border: 1px solid var(--text-light);
+  // border: 1px solid var(--text-light);
   ion-thumbnail {
     height: 120px;
     width: 120px;
     --border-radius: 50%;
 
-    padding: 5px;
+    //padding: 5px;
     //border: 1px solid #fd6a58;
   }
   ion-icon {

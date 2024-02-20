@@ -121,9 +121,9 @@ export class FriendsPage implements OnInit {
   }
 
   async ngOnInit() {
-    // await Preferences.remove({
-    //   key: ShowHelper.FRIENDS,
-    // });
+    await Preferences.remove({
+      key: ShowHelper.FRIENDS,
+    });
     const { value } = await Preferences.get({ key: ShowHelper.FRIENDS });
     if (!value) {
       this.showHelper = true;
@@ -382,5 +382,13 @@ export class FriendsPage implements OnInit {
       letter,
       contacts: groups[letter],
     }));
+  }
+
+  getMembreLabel(nb: number) {
+    if (nb > 1) {
+      return nb + ' membres';
+    } else {
+      return nb + ' membre';
+    }
   }
 }

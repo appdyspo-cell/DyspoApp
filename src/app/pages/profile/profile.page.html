@@ -179,16 +179,17 @@
       </ion-list>
     </ion-list>
   </div>
+  <div class="d-flex ion-justify-content-center">
+    <ion-button
+      fill="solid"
+      (click)="save()"
+      mode="ios"
+      color="tertiary"
+      class="dyspo-button"
+      style="margin-left: 0px"
+      >Sauvegarder
+      <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+    </ion-button>
+  </div>
 </ion-content>
-<ion-footer class="ion-no-border">
-  <ion-button
-    expand="full"
-    fill="solid"
-    (click)="save()"
-    mode="ios"
-    color="dark"
-    class="dyspo-button ion-no-margin"
-    >{{'SAVE' | translate}}
-    <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
-  </ion-button>
-</ion-footer>
+<!-- <ion-footer class="ion-no-border"> </ion-footer> -->

@@ -64,6 +64,7 @@ export class NotificationsListPage implements OnInit {
       componentProps: {
         agendaEvent,
         isInvitation: true,
+        isMulti: agendaEvent.is_multi,
       },
     });
     modal.present();

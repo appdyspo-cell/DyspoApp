@@ -147,11 +147,7 @@ ion-header {
   width: 20px; /* Largeur du badge */
   height: 20px; /* Hauteur du badge */
   border-radius: 50%; /* Pour créer un badge circulaire */
-  background: linear-gradient(
-    210deg,
-    var(--text-no-dyspo) 38%,
-    var(--text-no-dyspo-secondary)
-  ); /* Couleur de fond du badge */
+  background: var(--text-no-dyspo); /* Couleur de fond du badge */
   color: white; /* Couleur du texte du badge */
   display: flex;
   align-items: center;

@@ -53,12 +53,11 @@
                 class="thumbnail-badge"
                 >{{ checkedFriend.agendaEvents.length }}</ion-badge
               > -->
-              <ion-badge
+              <div
                 *ngIf="checkedFriend.agendaEvents.length > 0"
                 name="warning-outline"
                 class="thumbnail-badge"
-                >&nbsp;</ion-badge
-              >
+              ></div>
               <div
                 *ngIf="checkedFriend.isChecked"
                 class="d-flex ion-align-items-center thumbnail-checked animate__animated animate__zoomIn"
@@ -179,8 +178,7 @@
                         *ngIf="checkedFriend.agendaEvents.length > 0"
                         name="warning-outline"
                         class="thumbnail-badge"
-                        >&nbsp;</ion-badge
-                      >
+                      ></ion-badge>
                       <div
                         *ngIf="checkedFriend.isChecked"
                         class="d-flex ion-align-items-center thumbnail-checked animate__animated animate__zoomIn"

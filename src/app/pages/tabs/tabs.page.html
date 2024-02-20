@@ -1,5 +1,33 @@
-<ion-tabs>
-  <ion-tab-bar slot="bottom">
+<ion-tabs *ngIf="!isIos">
+  <ion-tab-bar slot="bottom" mode="android">
+    <ion-tab-button tab="user-status">
+      <ion-icon aria-hidden="true" class="icon-ghost icon-android"></ion-icon>
+      <ion-label>Statut</ion-label>
+    </ion-tab-button>
+    <ion-tab-button tab="agenda">
+      <ion-icon
+        aria-hidden="true"
+        class="icon-calendar icon-android"
+      ></ion-icon>
+      <ion-label>Calendrier</ion-label>
+    </ion-tab-button>
+    <ion-tab-button tab="friends">
+      <ion-icon aria-hidden="true" class="icon-users icon-android"></ion-icon>
+      <ion-label>Amis</ion-label>
+    </ion-tab-button>
+    <ion-tab-button tab="group-list">
+      <ion-icon aria-hidden="true" class="icon-speech icon-android"></ion-icon>
+      <ion-label>Discussions</ion-label>
+    </ion-tab-button>
+    <ion-tab-button tab="parametres">
+      <ion-icon class="icon-equalizer icon-android"></ion-icon>
+      <ion-label>Mon Compte</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>
+
+<ion-tabs *ngIf="isIos">
+  <ion-tab-bar slot="bottom" mode="ios" style="min-height: 65px">
     <ion-tab-button tab="user-status">
       <ion-icon aria-hidden="true" class="icon-ghost"></ion-icon>
       <ion-label>Statut</ion-label>
@@ -21,9 +49,5 @@
       <ion-icon class="icon-equalizer"></ion-icon>
       <ion-label>Mon Compte</ion-label>
     </ion-tab-button>
-    <!-- <ion-tab-button tab="pro-calendar">
-      <ion-icon name="calendar-outline"></ion-icon>
-      <ion-label>ProCalendar</ion-label>
-    </ion-tab-button> -->
   </ion-tab-bar>
 </ion-tabs>

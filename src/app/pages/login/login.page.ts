@@ -15,7 +15,7 @@ import { LoggerService } from 'src/app/services/logger.service';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
-  userInfo: any = { email: '', password: '123456' };
+  userInfo: any = { email: '', password: '' };
 
   langArr = [];
   lang = 'en';

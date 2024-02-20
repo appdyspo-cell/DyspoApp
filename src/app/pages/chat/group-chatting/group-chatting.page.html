@@ -130,7 +130,11 @@
             </div>
           </div>
 
-          <div class="attachment" *ngIf="msg.image" (click)="openImage(msg)">
+          <div
+            class="attachment"
+            *ngIf="msg.image"
+            (click)="openImage(msg, $event)"
+          >
             <img src="{{msg.image}}" />
           </div>
         </div>
@@ -154,7 +158,11 @@
               <img src="{{my_avatar}}" class="crop_img" />
             </div>
           </div>
-          <div *ngIf="msg.image" class="attachment" (click)="openImage(msg)">
+          <div
+            *ngIf="msg.image"
+            class="attachment"
+            (click)="openImage(msg, $event)"
+          >
             <img src="{{msg.image}}" />
           </div>
         </div>

@@ -1,5 +1,5 @@
 <ion-content [fullscreen]="true" scrollY="false">
-  <ion-toolbar>
+  <ion-toolbar style="margin-top: var(--ion-safe-area-top)">
     <ion-buttons slot="start">
       <ion-button fill="clear" (click)="close()">
         <ion-icon name="close" slot="icon-only"></ion-icon>
@@ -10,7 +10,15 @@
     class="animate__animated animate__fadeIn"
     [fullImage]="url"
   ></lib-ngx-image-zoom> -->
-  <div style="position: absolute; top: 50px; bottom: 0; left: 0; right: 0">
+  <div
+    style="
+      position: absolute;
+      top: calc(var(--ion-safe-area-top) + 50px);
+      bottom: 0;
+      left: 0;
+      right: 0;
+    "
+  >
     <pan-zoom [config]="panZoomConfig">
       <div style="position: relative">
         <img [src]="message.image" />

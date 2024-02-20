@@ -290,6 +290,7 @@ export enum AgendaEventType {
   KIDS = 'KIDS',
   NOKIDS = 'NOKIDS',
   FREE = 'FREE',
+  SOLO = 'SOLO',
 }
 
 export enum AgendaEventRecurrence {
@@ -335,4 +336,5 @@ export enum ShowHelper {
   DASHBOARD = 'DASHBOARD',
   FRIENDS = 'FRIENDS',
   AGENDA = 'AGENDA',
+  CHATS = 'CHATS',
 }

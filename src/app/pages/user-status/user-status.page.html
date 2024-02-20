@@ -62,7 +62,7 @@
     </div>
 
     <ion-text style="font-size: 0.85em"
-      >Créer un évènement de groupe ou perso :</ion-text
+      >Créer un événement de groupe ou perso :</ion-text
     >
     <div
       style="
@@ -108,17 +108,17 @@
           text-transform: uppercase;
         "
       >
-        Evénements à venir
+        événements à venir
       </div>
 
       <div style="border: 1px solid lightgray; width: 100%; height: 2px"></div>
     </div>
   </div>
 
-  <div
+  <!-- <div
     class="d-flex ion-justify-content-between ion-align-items-center ion-padding"
     style="padding-bottom: 0px; padding-top: 0px"
-  ></div>
+  ></div> -->
 
   <ion-card-content style="padding-top: 0">
     <div *ngIf="nextAgendaEvents.length === 0">Aucun événement planifié</div>
@@ -178,7 +178,9 @@
     <ng-template>
       <ion-header>
         <ion-toolbar>
-          <ion-title style="text-align: center">Changer mon statut</ion-title>
+          <ion-title style="text-align: center"
+            >Changer mon statut du jour</ion-title
+          >
         </ion-toolbar>
       </ion-header>
       <ion-content class="ion-padding ion-margin">

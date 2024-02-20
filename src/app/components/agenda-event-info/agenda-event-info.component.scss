@@ -22,12 +22,20 @@
   background-size: cover;
 }
 
+.bg-solo-img {
+  --background: none;
+  background-image: url("/assets/newimg/fd_ecran_event_solo.jpg");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 ion-toolbar {
   --background: transparent;
 }
 
 ion-button {
-  --border-radius: 0px;
+  margin-left: 0px;
 }
 
 .white-btn {
@@ -45,7 +53,7 @@ ion-button {
     width: 100px;
     --border-radius: 50%;
     margin-right: 10px;
-    padding: 5px;
+    padding: 3px;
   }
   .admin {
   }
@@ -88,24 +96,6 @@ ion-button {
         //border: 2px solid rgb(255, 95, 122);
         position: relative;
 
-        ion-badge {
-          position: absolute;
-          top: -5px; /* Ajustez cette valeur pour positionner verticalement */
-          right: -5px; /* Ajustez cette valeur pour positionner horizontalement */
-          font-size: 12px; /* Taille du texte du badge */
-          width: 20px; /* Largeur du badge */
-          height: 20px; /* Hauteur du badge */
-          border-radius: 50%; /* Pour créer un badge circulaire */
-          background: linear-gradient(
-            210deg,
-            var(--text-no-dyspo) 38%,
-            var(--text-no-dyspo-secondary)
-          );
-          color: white; /* Couleur du texte du badge */
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
         .invite-icon {
           background: var(--primary);
           border-radius: 20px;
@@ -163,11 +153,13 @@ ion-row {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  min-width: 50%;
-  max-width: 60%;
-  min-height: 150px;
+  // min-width: 50%;
+  // max-width: 60%;
+  // min-height: 150px;
+  width: 250px;
+  height: 187px;
   position: relative;
-  border: 2px solid rgb(181, 181, 181);
+  border: 2px solid rgb(255, 255, 255);
   transform-origin: top left;
 
   transform: rotate(-2deg); /* Ajustez l'angle de rotation selon vos besoins */
@@ -215,4 +207,20 @@ ion-row {
 
 ion-item:last-child {
   --inner-border-width: 0;
+}
+
+.thumbnail-badge {
+  position: absolute;
+  top: -5px; /* Ajustez cette valeur pour positionner verticalement */
+  right: -5px; /* Ajustez cette valeur pour positionner horizontalement */
+  font-size: 12px; /* Taille du texte du badge */
+  width: 9px; /* Largeur du badge */
+  height: 9px; /* Hauteur du badge */
+  border-radius: 8px; /* Pour créer un badge circulaire */
+  background: var(--text-no-dyspo); /* Couleur de fond du badge */
+  color: white; /* Couleur du texte du badge */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100000000;
 }

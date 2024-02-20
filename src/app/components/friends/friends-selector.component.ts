@@ -8,14 +8,10 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
-import { ModalController, NavController } from '@ionic/angular';
-import { IonNav } from '@ionic/angular/common';
+
 import { cloneDeep } from 'lodash';
 import {
   AgendaEvent,
-  AppUser,
-  AppUserWithEvents,
   CheckedFriends,
   Friend,
   FriendDyspo,
@@ -28,8 +24,6 @@ import { AgendaService } from 'src/app/services/agenda.service';
 import { FriendsService } from 'src/app/services/friends.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
-import { ChatMenuComponent } from '../chat-menu/chat-menu.component';
-import { AgendaPage } from 'src/app/pages/agenda/agenda.page';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 

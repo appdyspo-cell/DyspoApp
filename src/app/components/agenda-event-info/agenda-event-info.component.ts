@@ -38,10 +38,11 @@ export class AgendaEventInfoComponent implements OnInit {
   @Output() outevt = new EventEmitter<string>();
   @Input() agendaEvent!: AgendaEvent;
   @Input() isInvitation!: boolean;
+  @Input() isMulti!: boolean;
   @ViewChild('popovermenu') popoverMenu: any;
   @ViewChild('popoverUserEvents') popoverUserEvents: any;
 
-  defaultAvatar = 'assets/img/user.png';
+  defaultAvatar = 'assets/img/user.jpg';
   UserDyspoStatus = UserDyspoStatus;
   FriendStatus = FriendStatus;
   agendaEventType = AgendaEventType;
@@ -90,6 +91,9 @@ export class AgendaEventInfoComponent implements OnInit {
         break;
       case AgendaEventType.FREE:
         this.eventTypeLabel = 'Kid(s) ou NoKid(s)';
+        break;
+      case AgendaEventType.SOLO:
+        this.eventTypeLabel = 'Perso';
         break;
     }
     this.members_loaded = false;
@@ -141,7 +145,11 @@ export class AgendaEventInfoComponent implements OnInit {
 
     // New Admin candidates
     if (this.agendaEvent.admin_uid === this.userSvc.userInfo?.uid) {
-      this.admin = this.userSvc.userInfo;
+      //this.admin = this.userSvc.userInfo;
+
+      this.admin = this.members_presence_confirmed.filter(
+        (member) => member.uid === this.agendaEvent.admin_uid
+      )[0];
       this.new_admin_candidates = this.members_presence_confirmed.filter(
         (m) => {
           return m.uid !== this.userSvc.userInfo?.uid;
@@ -410,6 +418,21 @@ export class AgendaEventInfoComponent implements OnInit {
         ' - ' +
         ev.end_time_formatted
       );
+    }
+  }
+
+  async goToChat(agendaEvent: AgendaEvent | undefined, event: any) {
+    event.stopPropagation();
+    console.log('goToChat', agendaEvent);
+
+    if (agendaEvent) {
+      const navigationExtras: NavigationExtras = {
+        state: {
+          agendaEvent,
+        },
+      };
+      await this.close();
+      this.navCtrl.navigateForward('/group-chatting', navigationExtras);
     }
   }
 }

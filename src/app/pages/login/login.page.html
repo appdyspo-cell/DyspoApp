@@ -79,19 +79,23 @@
         </ion-row>
         <ion-row>
           <ion-col>
-            <ion-button
-              #btn1
-              [disabled]="disablePage"
-              expand="full"
-              mode="ios"
-              (click)="submitLoginForm()"
-              color="dark"
-              class="dyspo-button"
-              >{{ 'LOGIN' | translate }}<ion-icon
-                name="log-in-outline"
-                slot="start"
-              ></ion-icon
-            ></ion-button>
+            <div
+              style="width: 100%; display: flex"
+              class="ion-justify-content-center"
+            >
+              <ion-button
+                #btn1
+                [disabled]="disablePage"
+                mode="ios"
+                (click)="submitLoginForm()"
+                color="tertiary"
+                class="dyspo-button"
+                >{{ 'LOGIN' | translate }}<ion-icon
+                  name="log-in-outline"
+                  slot="start"
+                ></ion-icon
+              ></ion-button>
+            </div>
           </ion-col>
         </ion-row>
 
@@ -106,17 +110,21 @@
 
         <ion-row>
           <ion-col>
-            <ion-button
-              expand="full"
-              (click)="signup()"
-              color="dark"
-              class="dyspo-button"
-              mode="ios"
-              >{{ 'REGISTER' | translate }}<ion-icon
-                name="person-outline"
-                slot="start"
-              ></ion-icon
-            ></ion-button>
+            <div
+              style="width: 100%; display: flex"
+              class="ion-justify-content-center"
+            >
+              <ion-button
+                (click)="signup()"
+                color="tertiary"
+                class="dyspo-button"
+                mode="ios"
+                >{{ 'REGISTER' | translate }}<ion-icon
+                  name="person-outline"
+                  slot="start"
+                ></ion-icon
+              ></ion-button>
+            </div>
           </ion-col>
         </ion-row>
         <div class="line"></div>
