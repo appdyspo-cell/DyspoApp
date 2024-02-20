@@ -256,11 +256,14 @@ export class CreateEventPage implements OnInit {
           this.allCanEdit = this.agendaEvent!.all_can_edit;
           this.allCanSeeTitle = this.agendaEvent!.all_can_see_title;
 
+          console.log('Sert min values');
           this.min_time_ISO_start = formatISO(addHours(new Date(), 1));
 
-          this.min_time_ISO_end = this.min_time_ISO_start;
+          //this.min_time_ISO_end = this.min_time_ISO_start;
+
+          this.min_time_ISO_end = this.agendaEvent!.startISO;
           this.max_time_ISO_end = formatISO(
-            addDays(new Date(parseISO(this.min_time_ISO_start)), 30)
+            addDays(new Date(parseISO(this.min_time_ISO_end)), 30)
           );
           break;
       }
