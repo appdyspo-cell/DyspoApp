@@ -7,7 +7,7 @@
     'bg-solo-img': agendaEvent.type === agendaEventType.SOLO,
   }"
 >
-  <ion-toolbar style="padding-top: var(--ion-safe-area-top)">
+  <ion-toolbar style="padding-top: calc(var(--ion-safe-area-top) / 2)">
     <ion-button
       slot="start"
       (click)="close()"
@@ -258,10 +258,42 @@
 
       <span style="font-size: 1.3rem; font-weight: bold">{{
         agendaEvent.title
-      }}</span
-      ><br />
-      {{ agendaEvent.place_description }}
-      <br />
+      }}</span>
+      <p *ngIf="agendaEvent.place_description !== ''" style="margin-top: 0px">
+        {{ agendaEvent.place_description }}
+      </p>
+
+      <div
+        *ngIf="isInvitation"
+        class="d-flex"
+        style="padding-bottom: 0px; justify-content: space-around"
+      >
+        <ion-button
+          (click)="acceptInvitation()"
+          class="dyspo-button no-margin"
+          mode="ios"
+          color="tertiary"
+          >dyspo!
+          <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon
+        ></ion-button>
+        <ion-button
+          (click)="declineInvitation()"
+          class="dyspo-button no-margin"
+          mode="ios"
+          color="tertiary"
+          >pas dyspo<ion-icon
+            slot="start"
+            name="close-circle-outline"
+          ></ion-icon
+        ></ion-button>
+        <ion-button
+          (click)="close()"
+          class="dyspo-button no-margin"
+          mode="ios"
+          color="tertiary"
+          >à voir<ion-icon slot="start" name="help-circle-outline"></ion-icon
+        ></ion-button>
+      </div>
       <!-- My Status and Dyspo  -->
       <div
         *ngIf="isInvitation"
@@ -282,7 +314,7 @@
     </div>
   </div>
 
-  <ion-toolbar>
+  <!-- <ion-toolbar>
     <div
       *ngIf="isInvitation"
       class="d-flex"
@@ -311,7 +343,7 @@
         >à voir<ion-icon slot="start" name="help-circle-outline"></ion-icon
       ></ion-button>
     </div>
-  </ion-toolbar>
+  </ion-toolbar> -->
 
   <ion-popover
     #popovermenu
@@ -372,8 +404,12 @@
           style="width: 100%; display: flex; padding: 5px"
         >
           <ion-text
-            color="danger"
-            style="font-size: 0.75rem; width: 100%; text-align: center"
+            style="
+              font-size: 0.75rem;
+              width: 100%;
+              text-align: center;
+              color: var(--text-no-dyspo);
+            "
             >{{ getOtherEventLabel(agEv) }}</ion-text
           >
         </div>

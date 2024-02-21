@@ -60,7 +60,7 @@ ion-button {
 }
 
 .body-inner {
-  color: #eee;
+  //color: #eee;
 }
 
 .category_div {
@@ -68,7 +68,7 @@ ion-button {
   display: flex;
   flex-direction: row;
   min-height: 82px;
-  padding: 8px;
+  padding: 0px 8px 8px 8px;
   .menu {
     width: 100%;
     display: flex;
@@ -156,8 +156,8 @@ ion-row {
   // min-width: 50%;
   // max-width: 60%;
   // min-height: 150px;
-  width: 250px;
-  height: 187px;
+  width: 189px;
+  height: 140px;
   position: relative;
   border: 2px solid rgb(255, 255, 255);
   transform-origin: top left;

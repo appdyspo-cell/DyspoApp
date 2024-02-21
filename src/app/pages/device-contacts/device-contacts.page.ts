@@ -118,6 +118,7 @@ export class DeviceContactsPage implements OnInit {
             display: 'unknown',
             initials: '',
             avatar: undefined,
+            contactId: contact.contactId,
           };
 
           if (contact.name?.display) {

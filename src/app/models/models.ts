@@ -33,6 +33,7 @@ export interface AppDeviceContact {
   is_my_friend: boolean | undefined;
   initials: string | undefined;
   avatar: string | undefined;
+  contactId: string;
 }
 
 export interface Friend extends AppUser {
