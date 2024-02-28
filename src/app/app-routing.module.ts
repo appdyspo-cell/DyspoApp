@@ -114,6 +114,13 @@ const routes: Routes = [
         (m) => m.NotificationsListPageModule
       ),
   },
+  {
+    path: 'fix-contacts',
+    loadChildren: () =>
+      import('./pages/fix-contacts/fix-contacts.module').then(
+        (m) => m.FixContactsPageModule
+      ),
+  },
 ];
 @NgModule({
   imports: [

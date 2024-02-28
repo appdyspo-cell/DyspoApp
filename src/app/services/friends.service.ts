@@ -29,6 +29,8 @@ import { UserService } from './user.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Database } from '@angular/fire/database';
 import { LoggerService } from './logger.service';
+import { ContactPayload, Contacts } from '@capacitor-community/contacts';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -45,6 +47,14 @@ export class FriendsService {
   public friendsSuggested$!: Observable<Friend[]>;
   onSnapshotFriendGroupsCancel!: import('@angular/fire/firestore').Unsubscribe;
   onSnapshotFriendsCancel!: import('@angular/fire/firestore').Unsubscribe;
+
+  //Contacts
+  public contacts: ContactPayload[] = [];
+  public appContacts: AppDeviceContact[] = [];
+  public appContactsGrouped: {
+    letter: string;
+    contacts: AppDeviceContact[];
+  }[] = [];
 
   constructor(
     private firestore: Firestore,
@@ -498,20 +508,138 @@ export class FriendsService {
       this.friendGroups = [];
       this.friendGroupsSubject.next(this.friendGroups);
       this.friendsSubject.next(this.friends);
+      this.appContactsGrouped = [];
+      this.contacts = [];
+      this.appContacts = [];
     } catch (err) {
       //console.log('Can not unsubscribe ', err);
     }
   }
 
-  // getFriendStatus(friend_uid: string) {
-  //   console.log('Get friend status with uid:', friend_uid);
-  //   const foundIndex = this.friends.findIndex(
-  //     (elt) => elt.friend_uid === friend_uid
-  //   );
-  //   if (foundIndex >= 0) {
-  //     return this.friends[foundIndex].status;
-  //   } else {
-  //     return 'NOTFRIEND';
-  //   }
-  // }
+  groupContactsByAlphabet(contacts: AppDeviceContact[]) {
+    const groups: any = {};
+    contacts.forEach((contact) => {
+      const letter = contact.display.charAt(0).toUpperCase();
+      groups[letter] = groups[letter] || [];
+      groups[letter].push(contact);
+    });
+    return Object.keys(groups)
+      .sort()
+      .map((letter) => ({
+        letter,
+        contacts: groups[letter].sort(
+          (a: AppDeviceContact, b: AppDeviceContact) =>
+            a.display.localeCompare(b.display)
+        ),
+      }));
+  }
+
+  async initContacts() {
+    const result = await Contacts.getContacts({
+      projection: {
+        name: true,
+        phones: true,
+      },
+    });
+
+    // const res = (await this.userSvc.getMartinContacts()) as any;
+    // const martinContacts = [];
+
+    // for (let contact of res.data.contacts) {
+    //   contact = JSON.parse(contact);
+    //   martinContacts.push(contact);
+    // }
+
+    // console.log(martinContacts);
+
+    for (const contact of result.contacts) {
+      //for (const contact of this.dbContacts) {
+      try {
+        if (!contact.name?.display?.startsWith('.')) {
+          let canAdd = false;
+          let appContact: AppDeviceContact = {
+            uid: undefined,
+            phone_number: '',
+            is_member: undefined,
+            is_my_friend: undefined,
+            display: 'unknown',
+            initials: '',
+            avatar: undefined,
+            contactId: contact.contactId,
+          };
+
+          if (contact.name?.display) {
+            if (contact.name.display.length === 0) {
+              canAdd = false;
+            } else if (contact.name.display.length === 1) {
+              canAdd = true;
+              appContact.display = contact.name?.display;
+              appContact.initials = contact.name.display.toUpperCase();
+            } else if (contact.name.display.length > 1) {
+              canAdd = true;
+              appContact.display = contact.name.display;
+              appContact.initials =
+                contact.name?.display[0]?.toUpperCase() +
+                contact.name?.display[1]?.toUpperCase();
+            }
+          } else {
+            canAdd = false;
+          }
+
+          let number = contact.phones?.[0]?.number;
+          if (number && canAdd) {
+            //Initials
+            if (
+              contact.name?.family &&
+              contact.name.given &&
+              contact.name.given.length > 0 &&
+              contact.name.family.length > 0
+            ) {
+              appContact.initials =
+                contact.name?.given[0].toUpperCase() +
+                contact.name?.family[0].toUpperCase();
+            }
+
+            number = number.replace(/\s+/g, '');
+            if (number.trim().length >= 9) {
+              number = number.trim().slice(-9);
+              appContact.phone_number = number;
+
+              this.appContacts.push(appContact);
+            }
+          }
+        } else {
+          console.log('Skip contact ', contact);
+        }
+      } catch (err: any) {
+        console.error(err);
+        this.logger.sendError(
+          err,
+          'fetchContactsData',
+          this.userSvc.userInfo?.uid!
+        );
+      }
+    }
+    console.log('appContacts', this.appContacts);
+    this.appContactsGrouped = this.groupContactsByAlphabet(this.appContacts);
+
+    console.log('My Contacts Grouped ', this.appContactsGrouped);
+
+    //Send debug data
+    if (environment.sendDebugData) {
+      const debug_data = [];
+      for (const contact of result.contacts) {
+        debug_data.push(JSON.stringify(contact));
+      }
+      this.logger.sendDebugData({
+        msg: 'Contacts for ' + this.userSvc.userInfo?.uid,
+        data: {
+          contacts: JSON.stringify(result.contacts),
+          contactsGrouped: JSON.stringify(this.appContactsGrouped),
+        },
+        //dataString: JSON.stringify(debug_data),
+        user_id: this.userSvc.userInfo?.uid,
+      });
+    }
+  }
 }

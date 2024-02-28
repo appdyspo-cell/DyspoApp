@@ -93,7 +93,7 @@ export class LoggerService {
       {
         msg: payload.msg,
         user_id: payload.user_id,
-        dataString: payload.dataString,
+        //dataString: payload.dataString,
         data: payload.data,
       }
     );

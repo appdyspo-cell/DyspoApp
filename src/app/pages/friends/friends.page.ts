@@ -13,6 +13,7 @@ import {
   IonItemGroup,
   ModalController,
   NavController,
+  Platform,
 } from '@ionic/angular';
 import { Observable, Subscription } from 'rxjs';
 import { HelperComponent } from 'src/app/components/helper/helper.component';
@@ -55,12 +56,9 @@ export class FriendsPage implements OnInit {
     }
   }
 
-  letterScrollActive(active: boolean) {
-    this.scroll = active;
-  }
-
   openContacts() {
-    this.navCtrl.navigateForward('device-contacts');
+    //this.navCtrl.navigateForward('device-contacts');
+    this.navCtrl.navigateForward('fix-contacts');
   }
 
   defaultImage = 'assets/logo.svg';
@@ -90,18 +88,18 @@ export class FriendsPage implements OnInit {
     public friendService: FriendsService,
     public animationCtrl: AnimationController,
     private navCtrl: NavController,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private platform: Platform
   ) {
     this.friends$ = this.friendService.friends$;
     this.friendGroups$ = this.friendService.friendGroups$;
 
     this.friendsSubscrition = this.friends$.subscribe((friends) => {
-      console.log('Friends  ', friends);
       this.friends = friends.filter(
         (elt) => elt.friend_status === FriendStatus.FRIEND
       );
       this.friendsAlpha = this.groupContactsByAlphabet(this.friends);
-      console.log(this.friendsAlpha);
+
       this.friendsSuggested = friends.filter(
         (elt) => elt.friend_status === FriendStatus.SUGGESTED
       );
@@ -121,6 +119,10 @@ export class FriendsPage implements OnInit {
   }
 
   async ngOnInit() {
+    // Bug Android. Authorization is not prompted at launch time. Init on Contacts page for Android
+    if (this.platform.is('android')) {
+      this.friendService.initContacts();
+    }
     const { value } = await Preferences.get({ key: ShowHelper.FRIENDS });
     if (!value) {
       this.showHelper = true;

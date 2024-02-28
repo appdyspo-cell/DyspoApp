@@ -6,8 +6,10 @@ export const environment = {
   production: false,
   debug: true,
   DEFAULT_AVATAR: './assets/img/user.jpg',
+  DEFAULT_AVATAR_FB_PATH:
+    'https://firebasestorage.googleapis.com/v0/b/dyspo-stg.appspot.com/o/avatarsStorage%2Fuser.jpg?alt=media&token=fa867680-e743-4648-8385-210c8da4eff4',
   DEFAULT_AVATAR_GROUP: './assets/img/user.jpg',
-  dyspo_email: 'contact@dyspo.com',
+  dyspo_email: 'appdyspo@gmail.com',
   BIOMETRIC_KEY: 'dyspo_123456',
   firebaseConfig: {
     apiKey: 'AIzaSyB2Juhy49t_9N4d-aGfhcuQmC-o4ulvrwg',
@@ -25,6 +27,7 @@ export const environment = {
   firebase_avatar_event_storage_path: 'avatarEventsStorage/',
   firebase_event_root: 'eventsMediaStorage/',
   messages_fetch_limit: 50,
+  sendDebugData: false,
 };
 
 /*

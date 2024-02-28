@@ -189,10 +189,10 @@
   <ion-card *ngIf="!is_multi && mode==='new'">
     <ion-item lines="none">
       <ion-select
-        label="Recurrence"
+        label="Récurrence"
         [(ngModel)]="agendaEvent!.recurrence"
         (ionChange)="onRecurrenceChanged($event)"
-        placeholder="Recurrence"
+        placeholder="Récurrence"
         cancelText="Annuler"
       >
         <ion-select-option [value]="AgendaEventRecurrence.ONE"
@@ -294,7 +294,6 @@
     <ion-button
       [disabled]=""
       class="dyspo-button"
-      style="margin-left: 16px"
       fill="solid"
       color="tertiary"
       mode="ios"

@@ -5,6 +5,9 @@ project(':capacitor-android').projectDir = new File('../../node_modules/@capacit
 include ':capacitor-community-contacts'
 project(':capacitor-community-contacts').projectDir = new File('../../node_modules/@capacitor-community/contacts/android')
 
+include ':capacitor-firebase-app'
+project(':capacitor-firebase-app').projectDir = new File('../../node_modules/@capacitor-firebase/app/android')
+
 include ':capacitor-firebase-messaging'
 project(':capacitor-firebase-messaging').projectDir = new File('../../node_modules/@capacitor-firebase/messaging/android')
 
@@ -13,6 +16,9 @@ project(':capacitor-app').projectDir = new File('../../node_modules/@capacitor/a
 
 include ':capacitor-camera'
 project(':capacitor-camera').projectDir = new File('../../node_modules/@capacitor/camera/android')
+
+include ':capacitor-device'
+project(':capacitor-device').projectDir = new File('../../node_modules/@capacitor/device/android')
 
 include ':capacitor-haptics'
 project(':capacitor-haptics').projectDir = new File('../../node_modules/@capacitor/haptics/android')
@@ -23,6 +29,12 @@ project(':capacitor-keyboard').projectDir = new File('../../node_modules/@capaci
 include ':capacitor-local-notifications'
 project(':capacitor-local-notifications').projectDir = new File('../../node_modules/@capacitor/local-notifications/android')
 
+include ':capacitor-preferences'
+project(':capacitor-preferences').projectDir = new File('../../node_modules/@capacitor/preferences/android')
+
+include ':capacitor-share'
+project(':capacitor-share').projectDir = new File('../../node_modules/@capacitor/share/android')
+
 include ':capacitor-splash-screen'
 project(':capacitor-splash-screen').projectDir = new File('../../node_modules/@capacitor/splash-screen/android')
 
@@ -31,6 +43,3 @@ project(':capacitor-status-bar').projectDir = new File('../../node_modules/@capa
 
 include ':capacitor-email-composer'
 project(':capacitor-email-composer').projectDir = new File('../../node_modules/capacitor-email-composer/android')
-
-include ':capacitor-native-biometric'
-project(':capacitor-native-biometric').projectDir = new File('../../node_modules/capacitor-native-biometric/android')

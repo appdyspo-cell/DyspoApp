@@ -35,6 +35,7 @@ import { format, isSameDay, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { AgendaEventInfoComponent } from '../components/agenda-event-info/agenda-event-info.component';
 import { ModalController, NavController } from '@ionic/angular';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -177,8 +178,7 @@ export class NotificationService {
         let avatarPath = this.userSvc.userInfo!.avatarPath;
 
         if (!avatarPath?.startsWith('http')) {
-          avatarPath =
-            'https://firebasestorage.googleapis.com/v0/b/dyspo-stg.appspot.com/o/avatarsStorage%2Fuser.png?alt=media&token=048bd715-8f53-4fbf-866a-84335b158a89';
+          avatarPath = environment.DEFAULT_AVATAR_FB_PATH;
         }
 
         const message =
@@ -234,8 +234,7 @@ export class NotificationService {
 
       let avatarPath = this.userSvc.userInfo!.avatarPath;
       if (!avatarPath?.startsWith('http')) {
-        avatarPath =
-          'https://firebasestorage.googleapis.com/v0/b/dyspo-stg.appspot.com/o/avatarsStorage%2Fuser.png?alt=media&token=048bd715-8f53-4fbf-866a-84335b158a89';
+        avatarPath = environment.DEFAULT_AVATAR_FB_PATH;
       }
 
       const message =
@@ -321,8 +320,7 @@ export class NotificationService {
 
       let avatarPath = this.userSvc.userInfo!.avatarPath;
       if (!avatarPath?.startsWith('http')) {
-        avatarPath =
-          'https://firebasestorage.googleapis.com/v0/b/dyspo-stg.appspot.com/o/avatarsStorage%2Fuser.png?alt=media&token=048bd715-8f53-4fbf-866a-84335b158a89';
+        avatarPath = environment.DEFAULT_AVATAR_FB_PATH;
       }
 
       const f = httpsCallable(this.functions, 'test');

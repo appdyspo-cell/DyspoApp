@@ -398,22 +398,23 @@ ion-item {
 }
 
 .bg-kids-secondary {
-  background-color: var(--text-dyspo-with-kids-secondary);
-  //color: var(--white);
+  //background-color: var(--text-dyspo-with-kids-secondary);
+  background-color: rgb(255 255 255 / 75%);
 }
 
 .bg-nokids-secondary {
-  background-color: var(--text-dyspo-secondary);
-  //color: var(--white);
+  // background-color: var(--text-dyspo-secondary);
+  background-color: rgb(255 255 255 / 75%);
 }
 
 .bg-free-secondary {
-  background-color: var(--text-dyspo-free-secondary);
-  //color: var(--white);
+  //background-color: var(--text-dyspo-free-secondary);
+  background-color: rgb(255 255 255 / 75%);
 }
 
 .bg-solo-secondary {
-  background-color: var(--text-dyspo-solo-secondary);
+  // background-color: var(--text-dyspo-solo-secondary);
+  background-color: rgb(255 255 255 / 75%);
 }
 
 ion-modal {

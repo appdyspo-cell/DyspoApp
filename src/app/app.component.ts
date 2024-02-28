@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Auth, User, authState, user } from '@angular/fire/auth';
-import { NavController } from '@ionic/angular';
+import { NavController, Platform } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
 import { UserService } from './services/user.service';
@@ -27,6 +27,7 @@ export class AppComponent {
 
   constructor(
     private auth: Auth,
+    public platform: Platform,
     private translate: TranslateService,
     private navController: NavController,
 
@@ -39,17 +40,17 @@ export class AppComponent {
     private utils: UtilsService
   ) {
     const that = this;
-    window.onerror = function (msg, url, lineNo, columnNo, error) {
-      that.logger.sendUncaughtError(
-        msg,
-        url,
-        lineNo,
-        columnNo,
-        error,
-        that.userSvc.userInfo?.uid
-      );
-      return false;
-    };
+    // window.onerror = function (msg, url, lineNo, columnNo, error) {
+    //   that.logger.sendUncaughtError(
+    //     msg,
+    //     url,
+    //     lineNo,
+    //     columnNo,
+    //     error,
+    //     that.userSvc.userInfo?.uid
+    //   );
+    //   return false;
+    // };
     //Lang
     this.translate.setDefaultLang('fr');
     this.loadScripts();
@@ -108,6 +109,11 @@ export class AppComponent {
     this.agendaSvc.initService(uid);
     this.chatSvc.initService(uid);
     this.notificationSvc.initService(uid);
+
+    // Bug Android. Authorization is not prompted at launch time. Init on Contacts page for Android
+    if (this.platform.is('ios')) {
+      this.friendsSvc.initContacts();
+    }
   }
 
   killAllServices() {

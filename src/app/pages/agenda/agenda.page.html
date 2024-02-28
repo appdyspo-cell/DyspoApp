@@ -144,7 +144,8 @@
         </div>
         <div>
           <div>
-            {{agendaEvent.all_can_see_title ? agendaEvent.title : '*****'}}
+            {{(agendaEvent.all_can_see_title || isFriendMode === false) ?
+            agendaEvent.title : '*****'}}
           </div>
           <div
             *ngIf="agendaEvent.start_date_day_of_year === agendaEvent.end_date_day_of_year"

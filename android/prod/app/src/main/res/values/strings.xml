@@ -1,7 +1,7 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='utf-8' ?>
 <resources>
-    <string name="app_name">dyspo</string>
-    <string name="title_activity_main">dyspo</string>
-    <string name="package_name">com.rovincent.dyspo</string>
-    <string name="custom_url_scheme">com.rovincent.dyspo</string>
+    <string name="app_name">dyspo!</string>
+    <string name="title_activity_main">dyspo!</string>
+    <string name="package_name">com.liaisongraphique.dyspo</string>
+    <string name="custom_url_scheme">com.liaisongraphique.dyspo</string>
 </resources>

@@ -235,6 +235,7 @@ export class UserService {
         appContact.is_member = false;
       }
     });
+    console.log('Hydration OK');
   }
 
   async getMartinContacts() {

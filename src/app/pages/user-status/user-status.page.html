@@ -64,7 +64,31 @@
     <ion-text style="font-size: 0.85em"
       >Créer un événement de groupe ou perso :</ion-text
     >
-    <div
+
+    <ion-row
+      class="ion-justify-content-center"
+      style="margin-bottom: 35px; margin-top: 10px"
+    >
+      <ion-col size="4">
+        <div (click)="openCreateEventDyspo()">
+          <ion-img src="../../../assets/newimg/creer_event_dyspo.png"></ion-img>
+        </div>
+      </ion-col>
+      <ion-col size="4">
+        <div (click)="openCreateEventDyspoWithKids()">
+          <ion-img
+            src="../../../assets/newimg/creer_event_dyspo_wk.png"
+          ></ion-img>
+        </div>
+      </ion-col>
+      <ion-col size="4">
+        <div (click)="openCreateEventPerso()">
+          <ion-img src="../../../assets/newimg/creer_event_perso.png"></ion-img>
+        </div>
+      </ion-col>
+    </ion-row>
+
+    <!-- <div
       style="
         display: flex;
 
@@ -87,7 +111,7 @@
         class="btn-create-evt create-perso"
         (click)="openCreateEventPerso()"
       ></div>
-    </div>
+    </div> -->
 
     <div
       style="
@@ -178,9 +202,9 @@
     <ng-template>
       <ion-header>
         <ion-toolbar>
-          <ion-title style="text-align: center"
-            >Changer mon statut du jour</ion-title
-          >
+          <div style="text-align: center; width: 100%">
+            Changer mon statut du jour
+          </div>
         </ion-toolbar>
       </ion-header>
       <ion-content class="ion-padding ion-margin">

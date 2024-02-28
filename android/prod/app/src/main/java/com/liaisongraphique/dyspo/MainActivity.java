@@ -1,4 +1,4 @@
-package com.rovincent.dyspo;
+package com.liaisongraphique.dyspo;
 
 import com.getcapacitor.BridgeActivity;
 

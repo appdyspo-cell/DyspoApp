@@ -125,7 +125,6 @@ export class UserStatusPage implements OnInit {
         (elt) => elt.friend_status === FriendStatus.SUGGESTED
       );
       this.friendsSuggested.forEach((friendSuggestion) => {
-        console.log('Push notif ', friendSuggestion);
         const notif: Notif = {
           user_id: '',
           title: '',
@@ -158,10 +157,10 @@ export class UserStatusPage implements OnInit {
           return isAfter(parseISO(ev.endISO), new Date().getTime());
         });
 
-        this.invitations.forEach((invit) => {
-          console.log('Push notif invit', invit);
-          // this.notifications.push(notif);
-        });
+        // this.invitations.forEach((invit) => {
+        //   //console.log('Push notif invit', invit);
+        //   // this.notifications.push(notif);
+        // });
 
         this.nb_notifications = this.invitations.length;
       });

@@ -10,7 +10,7 @@ PODS:
   - CapacitorCordova (5.5.1)
   - CapacitorDevice (5.0.6):
     - Capacitor
-  - CapacitorEmailComposer (2.0.1):
+  - CapacitorEmailComposer (5.0.0):
     - Capacitor
   - CapacitorFirebaseApp (5.3.0):
     - Capacitor
@@ -150,7 +150,7 @@ SPEC CHECKSUMS:
   CapacitorCommunityContacts: 45de2477f7dc6265d267677939a2c75465d2ed87
   CapacitorCordova: e128cc7688c070ca0bfa439898a5f609da8dbcfe
   CapacitorDevice: 2c968f98a1ec4d22357418c1521e7ddc46c675e6
-  CapacitorEmailComposer: c18cf90a4712839c967c6a22466c4c1a07521898
+  CapacitorEmailComposer: 551949d4269197efc9f0d51a19c0d2d06e7fb452
   CapacitorFirebaseApp: ca0583791fafaae11607c8a643eb1ad4398c59d7
   CapacitorFirebaseMessaging: 1da1774c4545c4457e3d09d09db66eec7602fb1c
   CapacitorHaptics: 1fffc1217c7e64a472d7845be50fb0c2f7d4204c

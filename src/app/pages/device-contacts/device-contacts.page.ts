@@ -88,12 +88,12 @@ export class DeviceContactsPage implements OnInit {
     for (const contact of result.contacts) {
       debug_data.push(JSON.stringify(contact));
     }
-    this.logger.sendDebugData({
-      msg: 'Contacts for ' + this.userSvc.userInfo?.uid,
-      data: { contacts: debug_data },
-      dataString: JSON.stringify(debug_data),
-      user_id: this.userSvc.userInfo?.uid,
-    });
+    // this.logger.sendDebugData({
+    //   msg: 'Contacts for ' + this.userSvc.userInfo?.uid,
+    //   data: { contacts: debug_data },
+    //   dataString: JSON.stringify(debug_data),
+    //   user_id: this.userSvc.userInfo?.uid,
+    // });
 
     // const res = (await this.userSvc.getMartinContacts()) as any;
     // const martinContacts = [];
