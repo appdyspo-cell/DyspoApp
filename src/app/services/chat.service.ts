@@ -491,8 +491,25 @@ export class ChatService {
   async warnReportMsg(report: WarnReportMsg) {
     console.log('Report Msg', report);
     const reportMsgClone: WarnReportMsg = { ...report };
-    const ref = doc(this.firestore, 'mail', report.uid);
-    setDoc(ref, reportMsgClone);
+    const ref = doc(this.firestore, 'reports', report.uid);
+    const refMails = doc(
+      this.firestore,
+      'mails',
+      'mail_' + new Date().getTime()
+    );
+    await setDoc(ref, reportMsgClone);
+    const mail = {
+      to: environment.dyspo_email,
+      message: {
+        subject: 'Nouveau signalement',
+        html:
+          'Nouveau signalement de type ' +
+          report.report_type +
+          '<br><br>' +
+          report.report_text,
+      },
+    };
+    await setDoc(refMails, mail);
 
     return true;
     // return new Promise(async (resolve, reject) => {
@@ -524,34 +541,27 @@ export class ChatService {
   async warnReportGroup(report: WarnReportGroup) {
     console.log('Report Msg', report);
     const reportGroupClone: WarnReportGroup = { ...report };
-    const ref = doc(this.firestore, 'mail', report.uid);
-    setDoc(ref, reportGroupClone);
-
+    const ref = doc(this.firestore, 'reports', report.uid);
+    await setDoc(ref, reportGroupClone);
+    const refMails = doc(
+      this.firestore,
+      'mails',
+      'mail_' + new Date().getTime()
+    );
+    await setDoc(ref, reportGroupClone);
+    const mail = {
+      to: environment.dyspo_email,
+      message: {
+        subject: 'Nouveau signalement',
+        html:
+          'Nouveau signalement de type ' +
+          report.report_type +
+          '<br><br>' +
+          report.report_text,
+      },
+    };
+    await setDoc(refMails, mail);
     return true;
-    // return new Promise(async (resolve, reject) => {
-    //   this.afs
-    //     .collection<ReportMsg>(`report_msg`)
-    //     .add(report)
-    //     .then((res) => {
-    //       this.afs
-    //         .collection('mail')
-    //         .add({
-    //           to: environment.email,
-    //           message: {
-    //             subject: 'Signalement message',
-    //             html:
-    //               'Un message a été signalé. Contenu du message:<br><br>' +
-    //               report.report_text,
-    //           },
-    //         })
-    //         .then(() => {
-    //           resolve(true);
-    //         })
-    //         .catch((error) => {
-    //           reject(error);
-    //         });
-    //     });
-    // });
   }
 
   async deleteMessage(message: ChatMessage, agendaEvent: AgendaEvent) {
