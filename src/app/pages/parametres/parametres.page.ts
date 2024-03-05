@@ -22,7 +22,6 @@ import { environment } from 'src/environments/environment';
 import { EmailComposer } from 'capacitor-email-composer';
 import { LoggerService } from 'src/app/services/logger.service';
 
-import { UserCredential } from '@angular/fire/auth';
 import { NotificationService } from 'src/app/services/notification.service';
 
 @Component({

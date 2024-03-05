@@ -372,7 +372,7 @@ export class AgendaPage implements AfterViewInit {
 
     const buttons = [];
     buttons.push({
-      text: 'Personnel',
+      text: 'Rendez-vous personnel',
       // cssClass: 'dyspo-sheet-dyspo',
       data: {
         is_multi: false,
@@ -380,7 +380,7 @@ export class AgendaPage implements AfterViewInit {
     });
 
     buttons.push({
-      text: 'Groupe',
+      text: 'Événement avec mes amis',
       // cssClass: 'dyspo-sheet-dyspo-with-kids',
       data: {
         is_multi: true,
@@ -388,7 +388,7 @@ export class AgendaPage implements AfterViewInit {
     });
 
     const actionSheet = await this.actionSheetCtrl.create({
-      header: "Saisissez le type de l' événement",
+      header: "Saisissez le type d'événement",
       cssClass: 'dyspo-sheet',
       buttons,
     });
