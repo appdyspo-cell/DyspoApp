@@ -23,6 +23,7 @@ import { EmailComposer } from 'capacitor-email-composer';
 import { LoggerService } from 'src/app/services/logger.service';
 
 import { NotificationService } from 'src/app/services/notification.service';
+import { Browser } from '@capacitor/browser';
 
 @Component({
   selector: 'app-parametres',
@@ -192,6 +193,12 @@ export class ParametresPage implements OnInit {
         'Vous devez configurer une messagerie sur cet appareil'
       );
     }
+  }
+
+  async openCGU() {
+    await Browser.open({
+      url: environment.cgu_url,
+    });
   }
 
   openBlockedUsers() {

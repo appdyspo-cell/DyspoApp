@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Browser } from '@capacitor/browser';
 import { NavController } from '@ionic/angular';
 import { MaskitoElementPredicateAsync, MaskitoOptions } from '@maskito/core';
 import { TranslateService } from '@ngx-translate/core';
@@ -137,7 +138,13 @@ export class RegisterPage implements OnInit {
     // }
   }
 
-  gotoLegal() {
+  _gotoLegal() {
     this.navCtrl.navigateForward('/cgu');
+  }
+
+  async gotoLegal() {
+    await Browser.open({
+      url: environment.cgu_url,
+    });
   }
 }

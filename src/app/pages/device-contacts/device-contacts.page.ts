@@ -13,6 +13,7 @@ import { FriendsService } from 'src/app/services/friends.service';
 import { LoggerService } from 'src/app/services/logger.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-device-contacts',
@@ -231,7 +232,8 @@ export class DeviceContactsPage implements OnInit {
 
   async shareApp() {
     await Share.share({
-      text: "Rejoins moi sur dyspo! Installe l'application dyspo!, crée un compte et n'oublie pas de me demander en ami",
+      //text: "Rejoins moi sur dyspo! Installe l'application dyspo!, crée un compte et n'oublie pas de me demander en ami." + environment.stores_url,
+      url: environment.stores_url,
     });
   }
 

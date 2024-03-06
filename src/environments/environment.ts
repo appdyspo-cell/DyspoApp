@@ -28,6 +28,8 @@ export const environment = {
   firebase_event_root: 'eventsMediaStorage/',
   messages_fetch_limit: 50,
   sendDebugData: false,
+  cgu_url: 'https://dyspo.app/cgu.html',
+  stores_url: 'https://dyspo.app/stores.html',
 };
 
 /*

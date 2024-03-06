@@ -126,12 +126,13 @@
         <ion-text class="contacttext">Contactez-nous</ion-text>
       </ion-label>
     </ion-item>
-    <ion-item
+    <!-- <ion-item
       [routerDirection]="'forward'"
       [routerLink]="['/cgu']"
       routerLinkActive="active-item"
       lines="none"
-    >
+    > -->
+    <ion-item tappable (click)="openCGU()" lines="none">
       <ion-label class="ion-text-wrap text">
         <ion-icon
           name="information-circle"
