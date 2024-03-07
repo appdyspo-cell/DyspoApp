@@ -31,6 +31,7 @@ import { Database } from '@angular/fire/database';
 import { LoggerService } from './logger.service';
 import { ContactPayload, Contacts } from '@capacitor-community/contacts';
 import { environment } from 'src/environments/environment';
+import { App } from '@capacitor/app';
 
 @Injectable({
   providedIn: 'root',
@@ -65,6 +66,14 @@ export class FriendsService {
   ) {
     this.friends$ = this.friendsSubject.asObservable();
     this.friendGroups$ = this.friendGroupsSubject.asObservable();
+
+    App.addListener('resume', () => {
+      if (this.userSvc.userInfo?.uid) {
+        this.unsubscribeAllAfterLogoutEvent();
+        this.initService(this.userSvc.userInfo?.uid);
+        this.initContacts();
+      }
+    });
   }
 
   async unblockFriend(friend: Friend) {
@@ -152,6 +161,7 @@ export class FriendsService {
       friendsCollectionRef,
       (snapshot) => {
         snapshot.docChanges().forEach((change) => {
+          console.log('Friend has modifsied', change);
           if (change.type === 'modified') {
             const friendModified = change.doc.data() as Friend;
 
@@ -600,12 +610,15 @@ export class FriendsService {
                 contact.name?.family[0].toUpperCase();
             }
 
-            number = number.replace(/\s+/g, '');
-            if (number.trim().length >= 9) {
-              number = number.trim().slice(-9);
-              appContact.phone_number = number;
+            let chiffresTrouves = number.match(/[0-9]/g);
+            if (chiffresTrouves) {
+              number = chiffresTrouves.join('');
+              if (number.trim().length >= 9) {
+                number = number.trim().slice(-9);
+                appContact.phone_number = number;
 
-              this.appContacts.push(appContact);
+                this.appContacts.push(appContact);
+              }
             }
           }
         } else {

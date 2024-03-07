@@ -177,12 +177,15 @@ export class DeviceContactsPage implements OnInit {
                 contact.name?.family[0].toUpperCase();
             }
 
-            number = number.replace(/\s+/g, '');
-            if (number.trim().length >= 9) {
-              number = number.trim().slice(-9);
-              appContact.phone_number = number;
+            let chiffresTrouves = number.match(/[0-9]/g);
+            if (chiffresTrouves) {
+              number = chiffresTrouves.join('');
+              if (number.trim().length >= 9) {
+                number = number.trim().slice(-9);
+                appContact.phone_number = number;
 
-              this.appContacts.push(appContact);
+                this.appContacts.push(appContact);
+              }
             }
           }
         } else {

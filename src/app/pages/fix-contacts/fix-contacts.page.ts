@@ -49,7 +49,6 @@ export class FixContactsPage implements OnInit, AfterViewInit {
 
   constructor(
     private userSvc: UserService,
-    private platform: Platform,
     private utils: UtilsService,
     private friendsSvc: FriendsService,
     private logger: LoggerService

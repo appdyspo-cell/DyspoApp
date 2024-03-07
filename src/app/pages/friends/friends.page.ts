@@ -120,9 +120,9 @@ export class FriendsPage implements OnInit {
 
   async ngOnInit() {
     // Bug Android. Authorization is not prompted at launch time. Init on Contacts page for Android
-    if (this.platform.is('android')) {
-      this.friendService.initContacts();
-    }
+    // if (this.platform.is('android')) {
+    //   this.friendService.initContacts();
+    // }
     const { value } = await Preferences.get({ key: ShowHelper.FRIENDS });
     if (!value) {
       this.showHelper = true;

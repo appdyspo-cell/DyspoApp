@@ -123,19 +123,17 @@ export class RegisterPage implements OnInit {
 
   async register() {
     this.utils.showLoader();
-    this.userInfo.phoneNumber = this.userInfo.phoneNumber?.trim();
-    this.userInfo.phoneNumber = this.userInfo.phoneNumber?.replace(/\s/g, '');
-    const user = await this.authSvc.register(this.userInfo, this.password);
 
-    console.log('register user', user);
-
-    this.utils.hideLoader();
-
-    // if (user) {
-    //   // auth statechanged is intercepted and go to tabs automatically
-    // } else {
-    //   this.utils.swalError(this.translate.instant('REGISTER_FAILED'));
-    // }
+    let chiffresTrouves = this.userInfo.phoneNumber?.match(/[0-9]/g);
+    if (chiffresTrouves) {
+      this.userInfo.phoneNumber = chiffresTrouves.join('');
+      const user = await this.authSvc.register(this.userInfo, this.password);
+      console.log('register user', user);
+      this.utils.hideLoader();
+    } else {
+      this.utils.hideLoader();
+      this.utils.showToastError('Téléphone invalide');
+    }
   }
 
   _gotoLegal() {

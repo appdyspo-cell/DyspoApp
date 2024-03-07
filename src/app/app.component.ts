@@ -13,6 +13,7 @@ import { environment } from 'src/environments/environment';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { App } from '@capacitor/app';
 import { UtilsService } from './services/utils.service';
+import { Contacts } from '@capacitor-community/contacts';
 
 @Component({
   selector: 'app-root',
@@ -52,6 +53,7 @@ export class AppComponent {
     //   return false;
     // };
     //Lang
+
     this.translate.setDefaultLang('fr');
     this.loadScripts();
 
@@ -104,16 +106,17 @@ export class AppComponent {
     //this.userSubscription.unsubscribe();
   }
 
-  initAllServices(uid: string) {
+  async initAllServices(uid: string) {
+    await Contacts.requestPermissions();
     this.friendsSvc.initService(uid);
     this.agendaSvc.initService(uid);
     this.chatSvc.initService(uid);
     this.notificationSvc.initService(uid);
 
     // Bug Android. Authorization is not prompted at launch time. Init on Contacts page for Android
-    if (this.platform.is('ios')) {
-      this.friendsSvc.initContacts();
-    }
+    //if (this.platform.is('ios')) {
+    this.friendsSvc.initContacts();
+    //}
   }
 
   killAllServices() {
