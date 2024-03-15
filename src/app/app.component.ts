@@ -107,16 +107,20 @@ export class AppComponent {
   }
 
   async initAllServices(uid: string) {
-    await Contacts.requestPermissions();
+    try {
+      await Contacts.requestPermissions();
+    } catch (err) {
+      console.log(err);
+    }
     this.friendsSvc.initService(uid);
     this.agendaSvc.initService(uid);
     this.chatSvc.initService(uid);
     this.notificationSvc.initService(uid);
 
-    // Bug Android. Authorization is not prompted at launch time. Init on Contacts page for Android
-    //if (this.platform.is('ios')) {
-    this.friendsSvc.initContacts();
-    //}
+    console.log('Init Contacts');
+    if (this.platform.is('ios') || this.platform.is('android')) {
+      this.friendsSvc.initContacts();
+    }
   }
 
   killAllServices() {

@@ -125,6 +125,8 @@ export interface AgendaEvent {
   recurrence_nb: string;
   recurrence_end_ISO?: string;
   parent_agenda_event_uid?: string;
+  ref_start_ISO?: string;
+  ref_end_ISO?: string;
   [member_uid: string]:
     | string
     | number

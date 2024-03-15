@@ -27,7 +27,6 @@ import { UtilsService } from './utils.service';
 import { NotificationService } from './notification.service';
 import { UserService } from './user.service';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Database } from '@angular/fire/database';
 import { LoggerService } from './logger.service';
 import { ContactPayload, Contacts } from '@capacitor-community/contacts';
 import { environment } from 'src/environments/environment';

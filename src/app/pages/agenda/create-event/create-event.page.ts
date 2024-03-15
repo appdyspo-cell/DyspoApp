@@ -24,6 +24,7 @@ import {
   setHours,
   setMinutes,
 } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 import fr from 'date-fns/locale/fr';
 
 import {
@@ -136,18 +137,41 @@ export class CreateEventPage implements OnInit {
           );
           const start_date_day_of_year = getDayOfYear(dateHPlus1);
           const end_date_day_of_year = getDayOfYear(dateHPlus2);
-          const refStart = set(dateHPlus1, {
-            hours: 0,
-            minutes: 0,
-            seconds: 0,
-            milliseconds: 0,
-          });
-          const refEnd = set(dateHPlus2, {
-            hours: 23,
-            minutes: 59,
-            seconds: 59,
-            milliseconds: 999,
-          });
+          // const refStart = set(dateHPlus1, {
+          //   hours: 0,
+          //   minutes: 0,
+          //   seconds: 0,
+          //   milliseconds: 0,
+          // });
+          // const refEnd = set(dateHPlus2, {
+          //   hours: 23,
+          //   minutes: 59,
+          //   seconds: 59,
+          //   milliseconds: 999,
+          // });
+
+          const refStart = new Date(
+            dateHPlus1.getFullYear(), // Année
+            dateHPlus1.getMonth(), // Mois (0-11, janvier = 0)
+            dateHPlus1.getDate(), // Jour du mois
+            0, // Heure (23 pour 23h)
+            0, // Minutes
+            0, // Secondes
+            0
+          );
+
+          const refEnd = new Date(
+            dateHPlus2.getFullYear(), // Année
+            dateHPlus2.getMonth(), // Mois (0-11, janvier = 0)
+            dateHPlus2.getDate(), // Jour du mois
+            23, // Heure (23 pour 23h)
+            59, // Minutes
+            59, // Secondes
+            999
+          );
+
+          console.log('refStart', refStart);
+          console.log('refEnd', refEnd);
 
           this.pageTitle = 'Créer un événement';
           this.saveLabel = 'Sauvegarder';
@@ -188,7 +212,10 @@ export class CreateEventPage implements OnInit {
             end_date_year: getYear(dateHPlus2),
             start_date_ts: refStart.getTime(),
             end_date_ts: refEnd.getTime(),
+            ref_start_ISO: formatISO(refStart),
+            ref_end_ISO: formatISO(refEnd),
           };
+          console.log('New event', this.agendaEvent);
           //   start_date_index:
           //     getDate(new Date(this.tsInputDate)).toString() +
           //     '_' +

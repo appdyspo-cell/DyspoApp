@@ -13,9 +13,7 @@ import {
   getYear,
   isAfter,
   isBefore,
-  isPast,
   isSameDay,
-  isSameMonth,
   parseISO,
   setHours,
 } from 'date-fns';
@@ -119,7 +117,7 @@ export class AgendaPage implements AfterViewInit {
         this.agendaEvents$ = this.agendaSvc.agendaEvents$;
         this.agendaEventsSubscription = this.agendaSvc.agendaEvents$.subscribe(
           (agendaEvents: AgendaEvent[]) => {
-            console.log('Ag events');
+            console.log('Ag events', agendaEvents);
             this.agendaEvents = agendaEvents;
             this.tagCalendarEventsDataForMonth();
           }
