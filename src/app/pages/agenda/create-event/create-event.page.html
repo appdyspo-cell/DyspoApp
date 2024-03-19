@@ -151,7 +151,8 @@
                       [ngClass]="{
                       'thumb-kid': member.dyspoStatus === UserDyspoStatus.DYSPOWITHKIDS,
                       'thumb-nokids': member.dyspoStatus === UserDyspoStatus.DYSPO,
-                      'thumb-nodyspo': member.dyspoStatus === UserDyspoStatus.NODYSPO
+                      'thumb-nodyspo': member.dyspoStatus === UserDyspoStatus.NODYSPO,
+                      'thumb-dyspo-undefined': member.dyspoStatus === UserDyspoStatus.UNDEFINED
                     }"
                     >
                       <img src="{{ member.avatarPath }}" />
@@ -272,21 +273,16 @@
 
   <div style="width: 100%">
     <ion-text style="padding-left: 23px; font-size: 1.05rem">Photo</ion-text>
+
     <div
       *ngIf="agendaEvent?.avatar"
+      class="d-flex ion-justify-content-center"
       (click)="takePhotoPrompt()"
-      style="background-repeat: no-repeat;
-      background-size: cover;
-      background-position: center;
-      width: 250px;
-      height: 187px;
-      margin: auto;
-      
-      margin-bottom: 24px;
-      margin-top: 16px;
-      background-image: url('{{agendaEvent?.avatar}}');"
     >
-      <!-- <ion-img src="{{agendaEvent?.avatar}}" /> -->
+      <div
+        style="background-image: url('{{ agendaEvent?.avatar }}');"
+        class="bg-event-avatar d-flex ion-justify-content-center ion-margin-bottom"
+      ></div>
     </div>
   </div>
 

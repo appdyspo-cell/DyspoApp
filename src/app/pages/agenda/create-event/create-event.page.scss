@@ -287,3 +287,32 @@ ion-select {
   justify-content: center;
   z-index: 100000000;
 }
+
+.bg-event-avatar {
+  overflow: hidden;
+  border-radius: 3px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  // min-width: 50%;
+  // max-width: 60%;
+  // min-height: 150px;
+  width: 189px;
+  height: 140px;
+  position: relative;
+  border: 2px solid rgb(255, 255, 255);
+  transform-origin: top left;
+
+  transform: rotate(-2deg); /* Ajustez l'angle de rotation selon vos besoins */
+
+  ion-img {
+    min-width: calc(100% + 30px);
+    min-height: 100%;
+    transform-origin: top left;
+    transform: rotate(2deg); /* Ajustez l'angle de rotation selon vos besoins */
+
+    position: absolute;
+    top: -20px;
+    left: -10px;
+  }
+}

@@ -39,7 +39,7 @@
     "@capacitor/device": "^5.0.6",
     "@capacitor/haptics": "^5.0.6",
     "@capacitor/ios": "5.5.1",
-    "@capacitor/keyboard": "^5.0.6",
+    "@capacitor/keyboard": "^5.0.8",
     "@capacitor/local-notifications": "^5.0.6",
     "@capacitor/preferences": "^5.0.6",
     "@capacitor/share": "^5.0.6",

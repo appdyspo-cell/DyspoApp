@@ -17,6 +17,7 @@ import {
   getMonth,
   getYear,
   isAfter,
+  isBefore,
   isEqual,
   isSameDay,
   parseISO,
@@ -585,22 +586,6 @@ export class CreateEventPage implements OnInit {
     });
   }
 
-  // showUserEvents(user: AppUserWithEvents, e: Event) {
-  //   this.selectedUserEvents = user.agendaEvents;
-  //   if (this.selectedUserEvents && this.selectedUserEvents?.length > 0) {
-  //     this.popoverUserEvents.event = e;
-  //     this.isPopoverUserEventsOpen = true;
-  //   }
-  // }
-
-  // onShowEvents(data: { agendaEvents: AgendaEvent[]; ev: Event }) {
-  //   this.selectedUserEvents = data.agendaEvents;
-  //   if (this.selectedUserEvents && this.selectedUserEvents?.length > 0) {
-  //     this.popoverUserEvents.event = data.ev;
-  //     this.isPopoverUserEventsOpen = true;
-  //   }
-  // }
-
   onSelectUser(user: AppUserWithEvents, e?: Event) {
     if (user.uid === this.userSvc.userInfo?.uid) return;
     this.selectedUserEvents = user.agendaEvents;
@@ -637,6 +622,13 @@ export class CreateEventPage implements OnInit {
         ) {
           this.agendaEvent!.members_invited_uid.push(item.friend.friend_uid!);
           this.new_members.push(item.friend.friend_uid!);
+          console.log(
+            'Push new member ' +
+              item.friend.friendFirstname +
+              ' ' +
+              item.friend.friend_uid
+          );
+          console.log('New members ', this.new_members);
           const newMember = (
             await this.userSvc.getUserInfos([item.friend.friend_uid!])
           )[0];
@@ -667,8 +659,11 @@ export class CreateEventPage implements OnInit {
         const foundIndexNewMembers = this.new_members.findIndex((uid) => {
           return uid === item.friend.friend_uid!;
         });
+
         if (foundIndexNewMembers >= 0) {
+          console.log('YES Remove member ' + item.friend.friendFirstname);
           this.new_members.splice(foundIndexNewMembers, 1);
+          console.log('New members ', this.new_members);
         }
       }
     }

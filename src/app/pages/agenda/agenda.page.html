@@ -8,7 +8,7 @@
           color="primary"
           [enableOnOffLabels]="true"
           (ionChange)="onChangeMode($event)"
-          >Éditer</ion-toggle
+          >Modifier</ion-toggle
         >
       </ion-buttons>
     </ng-container>
@@ -175,7 +175,7 @@
     class="ion-padding ion-text-center d-flex"
     style="flex-direction: column"
   >
-    <ion-text> Vous êtes en mode édition </ion-text>
+    <ion-text> Vous êtes en mode modification </ion-text>
     <ion-button
       *ngIf="agendaSvc.isModified"
       (click)="saveAgenda()"

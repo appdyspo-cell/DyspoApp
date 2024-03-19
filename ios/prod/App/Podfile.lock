@@ -22,7 +22,7 @@ PODS:
     - FirebaseMessaging (= 10.8.0)
   - CapacitorHaptics (5.0.6):
     - Capacitor
-  - CapacitorKeyboard (5.0.6):
+  - CapacitorKeyboard (5.0.8):
     - Capacitor
   - CapacitorLocalNotifications (5.0.6):
     - Capacitor
@@ -160,7 +160,7 @@ SPEC CHECKSUMS:
   CapacitorFirebaseApp: ca0583791fafaae11607c8a643eb1ad4398c59d7
   CapacitorFirebaseMessaging: 1da1774c4545c4457e3d09d09db66eec7602fb1c
   CapacitorHaptics: 1fffc1217c7e64a472d7845be50fb0c2f7d4204c
-  CapacitorKeyboard: b978154b024a5f65e044908e37d15b7de58b9d12
+  CapacitorKeyboard: aec619a578235c6ce279075009a2689c2cf5c42c
   CapacitorLocalNotifications: c2d8b14794064fd4814b1d6c4ddbac8029afa295
   CapacitorPreferences: f03954bcb0ff09c792909e46bff88e3183c16b10
   CapacitorShare: cd41743331cb71d217c029de54b681cbd91e0fcc

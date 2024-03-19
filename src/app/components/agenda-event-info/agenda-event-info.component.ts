@@ -13,7 +13,7 @@ import {
   ModalController,
   NavController,
 } from '@ionic/angular';
-import { format, isSameDay, parseISO } from 'date-fns';
+import { format, isBefore, isSameDay, parseISO, setHours } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import {
   AgendaEvent,
@@ -100,6 +100,18 @@ export class AgendaEventInfoComponent implements OnInit {
     this.allowEdit =
       this.agendaEvent.admin_uid === this.userSvc.userInfo?.uid ||
       this.agendaEvent.all_can_edit;
+
+    // We can not edit an event in the past, except the title
+    let agendaEventIsPast = false;
+    const todayMorning = setHours(new Date(), 0);
+    if (isBefore(parseISO(this.agendaEvent?.startISO!), todayMorning)) {
+      // this.utils.showAlert(
+      //   'Vous ne pouvez pas editer un événement dans le passé'
+      // );
+      agendaEventIsPast = true;
+    }
+
+    this.allowEdit = this.allowEdit && !agendaEventIsPast;
 
     this.isSoloEvent =
       this.agendaEvent.admin_uid === this.userSvc.userInfo?.uid &&

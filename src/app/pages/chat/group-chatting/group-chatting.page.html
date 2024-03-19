@@ -110,7 +110,22 @@
           <div
             [ngClass]="{'chat_detail': true, 'msg-selected':msgSelected === msg}"
           >
-            <div class="profile_img center_img">
+            <div style="width: 35px">
+              <ion-thumbnail class="avatar-thumbnail-received">
+                <img
+                  class="animate__animated animated__fadeIn"
+                  *ngIf="member_infos_obj[msg.sender]"
+                  [defaultImage]="defaultAvatar"
+                  [lazyLoad]="member_infos_obj[msg.sender].avatarPath!"
+                />
+                <img
+                  *ngIf="!member_infos_obj[msg.sender]"
+                  [src]="defaultAvatar"
+                />
+              </ion-thumbnail>
+            </div>
+
+            <!-- <div class="profile_img center_img">
               <img
                 class="animate__animated animated__fadeIn"
                 *ngIf="member_infos_obj[msg.sender]"
@@ -123,10 +138,10 @@
                 [src]="defaultAvatar"
                 class="crop_img"
               />
-            </div>
+            </div> -->
             <div class="text">
               <h6>{{member_infos_obj[msg.sender]?.firstname}}</h6>
-              <h2>{{msg.message}}</h2>
+              {{msg.message}}
             </div>
           </div>
 
@@ -152,10 +167,16 @@
           >
             <div class="text">
               <h6>Vous</h6>
-              <h2>{{msg.message}}</h2>
+              {{msg.message}}
             </div>
-            <div class="profile_img center_img">
+            <!-- <div class="profile_img center_img">
               <img src="{{my_avatar}}" class="crop_img" />
+            </div> -->
+
+            <div style="min-width: 35px">
+              <ion-thumbnail class="avatar-thumbnail-sender">
+                <img src="{{my_avatar}}" />
+              </ion-thumbnail>
             </div>
           </div>
           <div
@@ -199,7 +220,7 @@
     <ion-icon class="zmdi zmdi-close" (click)="setViewType('')"></ion-icon>
   </div>
 
-  <ion-toolbar style="--background: none">
+  <ion-toolbar style="--background: #fff">
     <div slot="start">
       <ion-button fill="clear" (click)="setViewType('active')">
         <ion-icon
@@ -210,11 +231,16 @@
       </ion-button>
     </div>
     <ion-item lines="none" class="ion-no-padding">
-      <ion-input
+      <ion-textarea
         type="text"
+        spellcheck="true"
+        autocapitalize="sentences"
+        [autoGrow]="true"
+        rows="1"
         [(ngModel)]="userInput"
         placeholder="{{ 'type_your_message' | translate}} "
-      ></ion-input>
+        style="--padding-top: 12px; --padding-bottom: 8px"
+      ></ion-textarea>
     </ion-item>
 
     <ion-button slot="end" fill="clear" (click)=" sendMsg()">

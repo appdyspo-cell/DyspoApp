@@ -33,11 +33,14 @@
 .nodyspo {
   border: 3px solid var(--text-no-dyspo);
 }
+.dyspo-undefined {
+  border: 3px solid #f5f5f5;
+}
 
 .thumbnail-badge {
   position: absolute;
-  top: -5px; /* Ajustez cette valeur pour positionner verticalement */
-  right: -5px; /* Ajustez cette valeur pour positionner horizontalement */
+  top: -2px; /* Ajustez cette valeur pour positionner verticalement */
+  right: -2px; /* Ajustez cette valeur pour positionner horizontalement */
   font-size: 12px; /* Taille du texte du badge */
   width: 9px; /* Largeur du badge */
   height: 9px; /* Hauteur du badge */

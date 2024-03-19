@@ -66,8 +66,10 @@
     </div>
     <ion-list lines="none">
       <ion-item
+        button
         *ngFor="let agendaEvent of agendaEvents; let i=index;"
         [ngClass]="getDelayClass(i)"
+        detail="false"
         class="animate__animated animate__slideInRight"
         (click)="goToChat(agendaEvent, discussionType.ACTIVE, $event)"
       >
@@ -124,7 +126,8 @@
     </div>
     <ion-list lines="none">
       <ion-item
-        [button]="true"
+        button
+        detail="false"
         *ngFor="let agendaEvent of agendaEventsArchived; let i=index;"
         [ngClass]="getDelayClass(i)"
         class="animate__animated animate__slideInRight"

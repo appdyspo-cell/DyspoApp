@@ -42,6 +42,8 @@
                 kid: checkedFriend.dyspo === UserDyspoStatus.DYSPOWITHKIDS,
                 nokids: checkedFriend.dyspo === UserDyspoStatus.DYSPO,
                 nodyspo: checkedFriend.dyspo === UserDyspoStatus.NODYSPO,
+                'dyspo-undefined':
+                  checkedFriend.dyspo === UserDyspoStatus.UNDEFINED,
                 'ion-thumbnail-friend-grid': true
               }"
             >
@@ -96,7 +98,7 @@
 <div
   *ngIf="selectSegment === friendSelectionType.GROUP"
   class="ion-no-margin"
-  style="width: 100%; max-height: 250px; overflow: scroll"
+  style="width: 100%; max-height: 550px; overflow: scroll"
 >
   <div
     id="contsainer-friends"
@@ -174,11 +176,13 @@
                         class="thumbnail-badge"
                         >{{ checkedFriend.agendaEvents.length }}</ion-badge
                       > -->
-                      <ion-badge
+
+                      <div
                         *ngIf="checkedFriend.agendaEvents.length > 0"
                         name="warning-outline"
                         class="thumbnail-badge"
-                      ></ion-badge>
+                      ></div>
+
                       <div
                         *ngIf="checkedFriend.isChecked"
                         class="d-flex ion-align-items-center thumbnail-checked animate__animated animate__zoomIn"

@@ -119,7 +119,9 @@ ion-content {
 
         .text {
           color: var(--white);
-
+          margin: 0;
+          font-size: 0.95rem;
+          letter-spacing: 0;
           h6 {
             margin: 0;
             font-size: 0.65rem;
@@ -128,11 +130,11 @@ ion-content {
             font-weight: 400;
           }
 
-          h2 {
-            margin: 0;
-            font-size: 0.95rem;
-            letter-spacing: 0;
-          }
+          // h2 {
+          //   margin: 0;
+          //   font-size: 0.95rem;
+          //   letter-spacing: 0;
+          // }
         }
       }
 
@@ -155,7 +157,7 @@ ion-content {
         background: var(--white);
 
         .chat_detail {
-          padding-right: 20px;
+          // padding-right: 20px;
 
           .profile_img {
             margin-right: 15px;
@@ -164,6 +166,7 @@ ion-content {
           .text {
             color: var(--text-black);
             text-align: left;
+            white-space: pre-wrap;
           }
         }
       }
@@ -174,7 +177,8 @@ ion-content {
       //margin-left: auto;
       justify-content: flex-end;
       p {
-        text-align: left;
+        text-align: right;
+        padding-right: 3px;
       }
 
       .chat {
@@ -190,6 +194,7 @@ ion-content {
           .text {
             color: var(--white);
             text-align: right;
+            white-space: pre-wrap;
 
             h6 {
               color: var(--white);
@@ -271,6 +276,7 @@ ion-footer {
       background: #f4f5f8;
       ion-label {
         font-size: 10px;
+        color: var(--text-black);
       }
       ion-thumbnail {
         border-radius: 50%;
@@ -322,4 +328,16 @@ ion-fab {
   align-items: center;
   justify-content: center;
   z-index: 100000000;
+}
+
+.avatar-thumbnail-sender {
+  --size: 25px;
+  --border-radius: 50%;
+  margin-left: 7px;
+}
+
+.avatar-thumbnail-received {
+  --border-radius: 50%;
+  --size: 25px;
+  margin-right: 7px;
 }

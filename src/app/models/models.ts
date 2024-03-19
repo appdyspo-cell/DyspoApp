@@ -61,7 +61,7 @@ export interface FriendGroup {
 }
 
 export interface CheckedFriends {
-  friend: Friend;
+  friend: any;
   isChecked: boolean;
   isCheckedPending: boolean;
   disable: boolean;

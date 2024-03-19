@@ -21,11 +21,9 @@ import {
   updateDoc,
   where,
 } from '@angular/fire/firestore';
-import { UtilsService } from './utils.service';
 import { UserService } from './user.service';
 import {
   FirebaseMessaging,
-  GetTokenOptions,
   NotificationActionPerformedEvent,
   NotificationReceivedEvent,
   Notification,

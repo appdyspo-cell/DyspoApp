@@ -173,7 +173,10 @@
             [ngClass]="{
               'thumb-kid': member.dyspoStatus === UserDyspoStatus.DYSPOWITHKIDS,
               'thumb-nokids': member.dyspoStatus === UserDyspoStatus.DYSPO,
-              'thumb-nodyspo': member.dyspoStatus === UserDyspoStatus.NODYSPO
+              'thumb-nodyspo': member.dyspoStatus === UserDyspoStatus.NODYSPO,
+              'thumb-dyspo-undefined':
+                member.dyspoStatus === UserDyspoStatus.UNDEFINED ||
+                !member.dyspoStatus
             }"
           >
             <img src="{{ member.avatarPath }}" />
@@ -209,7 +212,10 @@
             [ngClass]="{
               'thumb-kid': member.dyspoStatus === UserDyspoStatus.DYSPOWITHKIDS,
               'thumb-nokids': member.dyspoStatus === UserDyspoStatus.DYSPO,
-              'thumb-nodyspo': member.dyspoStatus === UserDyspoStatus.NODYSPO
+              'thumb-nodyspo': member.dyspoStatus === UserDyspoStatus.NODYSPO,
+              'thumb-dyspo-undefined':
+                member.dyspoStatus === UserDyspoStatus.UNDEFINED ||
+                !member.dyspoStatus
             }"
           >
             <img src="{{ member.avatarPath }}" />
@@ -243,7 +249,7 @@
   </div>
 
   <div
-    style="width: 100%"
+    style="width: 100%; padding: 0px 5px"
     class="body-inner d-flex ion-margin-top ion-margin-bottom ion-justify-content-center"
   >
     <div class="ion-margin-top ion-text-center" style="width: 100%">

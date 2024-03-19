@@ -304,6 +304,9 @@ ion-item {
 .thumb-nodyspo {
   border: 3px solid var(--text-no-dyspo);
 }
+.thumb-dyspo-undefined {
+  border: 3px solid #e6e6e6;
+}
 
 .thumb-kid-thick {
   border: 5px solid var(--text-dyspo-with-kids);
