@@ -78,7 +78,17 @@ export class LoginPage implements OnInit {
       inputPlaceholder: 'Entrez votre email',
     });
     if (email) {
-      this.authService.resetPw(email);
+      this.authService
+        .resetPw(email)
+        .then(() => {
+          console.log('Un email');
+          this.utils.showToastSuccess(
+            'Un email vous a été envoyé pour réinitialiser votre mot de passe'
+          );
+        })
+        .catch((err: any) => {
+          this.utils.showFirebaseError(err);
+        });
     }
   }
 

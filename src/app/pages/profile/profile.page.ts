@@ -105,10 +105,10 @@ export class ProfilePage implements OnInit {
       this.authSvc
         .resetPw(email)
         .then(() => {
-          Swal.fire({
-            text: 'Un email vous a été envoyé pour réinitialiser votre mot de passe',
-            heightAuto: false,
-          });
+          console.log('Un email');
+          this.utils.showToastSuccess(
+            'Un email vous a été envoyé pour réinitialiser votre mot de passe'
+          );
         })
         .catch((err: any) => {
           this.utils.showFirebaseError(err);
