@@ -176,6 +176,30 @@
           </ion-button>
         </div>
       </ion-item>
+      <ion-item lines="none">
+        <ion-checkbox
+          slot="start"
+          [(ngModel)]="isPrivacyChecked"
+          labelPlacement="end"
+        ></ion-checkbox>
+        <div class="d-flex">
+          <ion-text>
+            J'ai lu et j'accepte la politique de confidentialité
+          </ion-text>
+
+          <ion-button (click)="gotoPrivacy()" slot="end" fill="clear">
+            <ion-icon
+              color="medium"
+              name="chevron-forward"
+              slot="icon-only"
+            ></ion-icon>
+          </ion-button>
+        </div>
+      </ion-item>
+      <ion-note *ngIf="errors['privacy']" class="note-error"
+        >Veuillez accepter la politique de confidentialité</ion-note
+      >
+      <br />
       <ion-note *ngIf="errors['cgu']" class="note-error"
         >Veuillez accepter les conditions générales d'utilisation</ion-note
       >

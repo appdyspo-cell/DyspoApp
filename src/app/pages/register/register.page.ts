@@ -27,6 +27,7 @@ declare interface RegisterErrors {
 })
 export class RegisterPage implements OnInit {
   isTermsChecked = false;
+  isPrivacyChecked = false;
   academies = '';
   readonly maskPredicate: MaskitoElementPredicateAsync = async (el) =>
     (el as HTMLIonInputElement).getInputElement();
@@ -101,6 +102,7 @@ export class RegisterPage implements OnInit {
     this.errors['email'] = !this.utils.validateEmail(this.userInfo.email!);
     this.errors['password'] = this.password === '' || this.password.length < 6;
     this.errors['cgu'] = !this.isTermsChecked;
+    this.errors['privacy'] = !this.isPrivacyChecked;
     //if (this.userInfo.phoneNumber !== '') {
     this.errors['phoneNumber'] = !this.utils.validatePhone(
       this.userInfo!.phoneNumber
@@ -141,6 +143,12 @@ export class RegisterPage implements OnInit {
   async gotoLegal() {
     await Browser.open({
       url: environment.cgu_url,
+    });
+  }
+
+  async gotoPrivacy() {
+    await Browser.open({
+      url: environment.privacy_url,
     });
   }
 }

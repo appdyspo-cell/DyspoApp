@@ -29,6 +29,7 @@ export const environment = {
   messages_fetch_limit: 50,
   sendDebugData: false,
   cgu_url: 'https://dyspo.app/cgu.html',
+  privacy_url: 'https://www.dyspo.app/charte-vie-privee.html',
   stores_url: 'https://dyspo.app/stores.html',
 };
 

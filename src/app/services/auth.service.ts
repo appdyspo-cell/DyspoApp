@@ -65,7 +65,7 @@ export class AuthService {
     return signOut(this.afAuth);
   }
 
-  resetPw(email: string) {
+  resetPw(email: string): Promise<void> {
     return sendPasswordResetEmail(this.afAuth, email);
   }
 
