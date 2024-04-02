@@ -16,7 +16,7 @@
     <div class="profile">
       <div class="input-title">
         <ion-input
-          maxlength="30"
+          maxlength="50"
           autocapitalize="sentences"
           [(ngModel)]="agendaEvent!.title"
           placeholder="Saisissez un titre"
@@ -55,6 +55,57 @@
     </div>
   </ion-card>
 
+  <ion-popover
+    #popover_time
+    trigger="open-time-item"
+    show-backdrop="false"
+    size="cover"
+  >
+    <ng-template>
+      <ion-datetime
+        #datetime_starttime
+        presentation="date-time"
+        showDefaultButtons="true"
+        doneText="OK"
+        hour-cycle="h23"
+        locale="fr-FR"
+        [value]="agendaEvent?.startISO"
+        cancelText="Fermer"
+        [min]="min_time_ISO_start"
+        [preferWheel]="true"
+        [minuteValues]="minuteValues"
+        (ionChange)="onStartTimeChanged($event)"
+        ><span slot="time-label">Heure</span></ion-datetime
+      >
+    </ng-template>
+  </ion-popover>
+
+  <ion-popover
+    #popover_time
+    trigger="open-end-time-item"
+    show-backdrop="false"
+    size="cover"
+  >
+    <ng-template>
+      <ion-datetime
+        presentation="date-time"
+        [preferWheel]="true"
+        showDefaultButtons="true"
+        doneText="OK"
+        hour-cycle="h23"
+        locale="fr-FR"
+        [value]="agendaEvent?.endISO"
+        [min]="min_time_ISO_end"
+        [max]="max_time_ISO_end"
+        [minuteValues]="minuteValues"
+        cancelText="Fermer"
+        (ionChange)="onEndTimeChanged($event)"
+      >
+        <span slot="time-label">Heure</span></ion-datetime
+      >
+    </ng-template>
+  </ion-popover>
+
   <!-- <div style="height: 50px; width: 100%"></div> -->
   <ion-card>
     <ion-item
@@ -67,30 +118,6 @@
     >
       <ion-text slot="start">{{agendaEvent?.start_date_formatted}}</ion-text>
       <ion-text slot="end">{{agendaEvent?.start_time_formatted}}</ion-text>
-      <ion-popover
-        #popover_time
-        trigger="open-time-item"
-        show-backdrop="false"
-        size="cover"
-      >
-        <ng-template>
-          <ion-datetime
-            #datetime_starttime
-            presentation="date-time"
-            showDefaultButtons="true"
-            doneText="OK"
-            hour-cycle="h23"
-            locale="fr-FR"
-            [value]="agendaEvent?.startISO"
-            cancelText="Annuler"
-            [min]="min_time_ISO_start"
-            [preferWheel]="true"
-            [minuteValues]="minuteValues"
-            (ionChange)="onStartTimeChanged($event)"
-            ><span slot="time-label">Heure</span></ion-datetime
-          >
-        </ng-template>
-      </ion-popover>
     </ion-item>
 
     <ion-item
@@ -103,32 +130,6 @@
     >
       <ion-text slot="start">{{agendaEvent?.end_date_formatted}}</ion-text>
       <ion-text slot="end">{{agendaEvent?.end_time_formatted}}</ion-text>
-
-      <ion-popover
-        #popover_time
-        trigger="open-end-time-item"
-        show-backdrop="false"
-        size="cover"
-      >
-        <ng-template>
-          <ion-datetime
-            presentation="date-time"
-            [preferWheel]="true"
-            showDefaultButtons="true"
-            doneText="OK"
-            hour-cycle="h23"
-            locale="fr-FR"
-            [value]="agendaEvent?.endISO"
-            [min]="min_time_ISO_end"
-            [max]="max_time_ISO_end"
-            [minuteValues]="minuteValues"
-            cancelText="Annuler"
-            (ionChange)="onEndTimeChanged($event)"
-          >
-            <span slot="time-label">Heure</span></ion-datetime
-          >
-        </ng-template>
-      </ion-popover>
     </ion-item>
   </ion-card>
 
@@ -197,7 +198,7 @@
         [(ngModel)]="agendaEvent!.recurrence"
         (ionChange)="onRecurrenceChanged($event)"
         placeholder="Récurrence"
-        cancelText="Annuler"
+        cancelText="Fermer"
       >
         <ion-select-option [value]="AgendaEventRecurrence.ONE"
           >1 fois</ion-select-option
