@@ -95,12 +95,13 @@ export class MediaService {
         if (opt.noUpload) {
           return { filepath: result.dataUrl };
         }
+        this.utils.showLoader();
         const path = `${opt.firebasePath}${opt.filename}`;
         const fileRef = ref(this.storage, path);
 
         await uploadString(fileRef, captureDataUrl, StringFormat.BASE64);
         const fpath = await getDownloadURL(fileRef);
-
+        this.utils.hideLoader();
         return { filepath: fpath };
       } else {
         return { filepath: undefined };

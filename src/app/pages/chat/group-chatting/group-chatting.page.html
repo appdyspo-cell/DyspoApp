@@ -195,7 +195,7 @@
       </div>
     </div>
     <div *ngIf="pendingAttachment" class="chat-box d-flex send">
-      <p>Now</p>
+      <p>Maintenant</p>
       <div class="chat">
         <div class="chat_detail ion-justify-content-end">
           <div class="text">
@@ -203,8 +203,10 @@
             <h2>{{userInput}}</h2>
           </div>
 
-          <div class="profile_img center_img">
-            <img src="{{my_avatar}}" class="crop_img" />
+          <div style="min-width: 35px">
+            <ion-thumbnail class="avatar-thumbnail-sender">
+              <img src="{{my_avatar}}" />
+            </ion-thumbnail>
           </div>
         </div>
         <div class="attachment">
