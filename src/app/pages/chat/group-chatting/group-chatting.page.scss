@@ -16,11 +16,12 @@ ion-header {
   }
 
   .thumb-avatar-event {
-    height: 60px;
-    width: 60px;
+    height: 50px !important;
+    width: 50px !important;
     --border-radius: 50%;
-    padding: 5px;
-    padding-left: 0px;
+    margin: 0px 3px 0px 0px;
+    padding: 2px;
+    position: relative;
   }
 
   ion-title {
@@ -150,7 +151,8 @@ ion-content {
       // margin-right: auto;
       justify-content: flex-start;
       p {
-        text-align: right;
+        text-align: left;
+        padding-left: 3px;
       }
 
       .chat {

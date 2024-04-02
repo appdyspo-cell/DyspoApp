@@ -62,12 +62,10 @@ export class RegisterPage implements OnInit {
   password = '';
 
   constructor(
-    private translate: TranslateService,
     private authSvc: AuthService,
     private utils: UtilsService,
     private navCtrl: NavController,
-    private userSvc: UserService,
-    private router: Router
+    private userSvc: UserService
   ) {
     this.userInfo = this.userSvc.getEmptyUser();
     this.getAcademies();

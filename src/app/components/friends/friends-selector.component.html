@@ -164,6 +164,8 @@
                         nokids: checkedFriend.dyspo === UserDyspoStatus.DYSPO,
                         nodyspo:
                           checkedFriend.dyspo === UserDyspoStatus.NODYSPO,
+                        'dyspo-undefined':
+                          checkedFriend.dyspo === UserDyspoStatus.UNDEFINED,
                         'ion-thumbnail-friend-grid': true
                       }"
                     >
@@ -229,7 +231,7 @@
 >
   <ng-template>
     <div class="popover-events-header" (click)="confirmInviteToEvent()">
-      Inviter
+      Inviter quand même
     </div>
 
     <ion-list *ngIf="selectedFriend && selectedFriend.agendaEvents.length > 0">

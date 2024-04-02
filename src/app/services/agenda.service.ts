@@ -332,6 +332,8 @@ export class AgendaService {
         });
 
         console.log(refStart, refEnd);
+        agendaClone.ref_start_ISO = formatISO(refStart);
+        agendaClone.ref_end_ISO = formatISO(refEnd);
         agendaClone.start_date_ts = refStart.getTime();
         agendaClone.end_date_ts = refEnd.getTime();
 
@@ -583,7 +585,7 @@ export class AgendaService {
       `agenda_events/`
     );
 
-    // console.log('Get user events ', uid);
+    console.log('Get user events ', uid);
     // console.log('startDateRef', formatISO(agendaEventToCompare.start_date_ts));
     // console.log('endDateRef', formatISO(agendaEventToCompare.end_date_ts));
     const queryAgendaEvents = query(
@@ -613,19 +615,7 @@ export class AgendaService {
       // year: agendaEventToCompare.year,
     };
 
-    // console.log(
-    //   'Get ' +
-    //     events.length +
-    //     'user events for uid ' +
-    //     uid +
-    //     '=>' +
-    //     result.day +
-    //     '_' +
-    //     result.month +
-    //     '_' +
-    //     result.year,
-    //   result
-    // );
+    console.log('Get ' + events.length + 'user events for uid ' + uid, result);
     return result;
   }
 

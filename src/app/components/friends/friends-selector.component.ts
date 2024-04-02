@@ -38,6 +38,7 @@ export class FriendsSelectorComponent implements OnInit {
   @Input() agendaEvent!: AgendaEvent;
   @Input() startTime!: any;
   @Input() endTime!: any;
+  @Input() mode!: any;
   @Output() friendSelected = new EventEmitter<{
     friendSelected: CheckedFriends;
     checkedFriends: CheckedFriends[];
@@ -56,10 +57,11 @@ export class FriendsSelectorComponent implements OnInit {
   checkedFriends: CheckedFriends[] = [];
   friendGroups: FriendGroup[] = [];
 
-  mode!: string;
   uid!: string;
   friendDyspos: FriendDyspo[] = [];
   level = 0;
+  friendsAlreadyInvited!: string[];
+  isInit = false;
 
   constructor(
     private friendsSvc: FriendsService,
@@ -70,11 +72,13 @@ export class FriendsSelectorComponent implements OnInit {
   ) {}
 
   async ngOnChanges(changes: SimpleChanges) {
+    if (!this.isInit) return;
     this.changeDetectorRef.markForCheck();
     this.changeDetectorRef.detectChanges();
     this.checkedFriends = [];
-    await this.fillCheckedFriends();
-    console.log('Set group friends');
+    console.log('on changes ev', this.agendaEvent);
+    await this.fillCheckedFriends(true);
+
     this.friendGroups.forEach(async (group) => {
       group.checked_friends = this.checkedFriends.filter((checkedFriend) => {
         return group.members_uid.includes(checkedFriend.friend.friend_uid!);
@@ -83,8 +87,9 @@ export class FriendsSelectorComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.isInit = true;
     console.log('init friendSelection');
-    const friend_uids: string[] = [];
+
     this.uid = this.userSvc.userInfo?.uid!;
     this.friends = cloneDeep(this.friendsSvc.friends);
     this.friends = this.friends.filter((friend) => {
@@ -92,9 +97,12 @@ export class FriendsSelectorComponent implements OnInit {
     });
     this.friendGroups = cloneDeep(this.friendsSvc.friendGroups);
 
+    this.friendsAlreadyInvited = this.agendaEvent.members_uid.concat(
+      this.agendaEvent.members_invited_uid
+    );
+
     await this.fillCheckedFriends();
 
-    console.log('Set group friends');
     this.friendGroups.forEach(async (group) => {
       group.checked_friends = this.checkedFriends.filter((checkedFriend) => {
         return group.members_uid.includes(checkedFriend.friend.friend_uid!);
@@ -102,7 +110,7 @@ export class FriendsSelectorComponent implements OnInit {
     });
   }
 
-  fillCheckedFriends() {
+  fillCheckedFriends(fromChanges = false) {
     return new Promise(async (resolve, reject) => {
       const friendsToCheck = this.agendaEvent.members_uid.concat(
         this.agendaEvent.members_invited_uid
@@ -126,7 +134,7 @@ export class FriendsSelectorComponent implements OnInit {
             friend,
             isChecked: true,
             isCheckedPending: false,
-            disable: true,
+            disable: this.friendsAlreadyInvited.includes(friend.friend_uid!),
             dyspo: dyspoStatus,
             agendaEvents: events.agendaEvents,
           });

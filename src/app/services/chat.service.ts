@@ -564,7 +564,11 @@ export class ChatService {
     return true;
   }
 
-  async deleteMessage(message: ChatMessage, agendaEvent: AgendaEvent) {
+  async deleteMessage(
+    message: ChatMessage,
+    agendaEvent: AgendaEvent,
+    lastMessageToReplace: ChatMessage | undefined | null
+  ) {
     try {
       const messageCollectionRef = doc(
         this.firestore,
@@ -577,6 +581,12 @@ export class ChatService {
         if (!messageDoc.exists()) {
           throw 'Document does not exist!';
         }
+        const agendaEventRef = doc(
+          this.firestore,
+          'agenda_events',
+          agendaEvent.uid!
+        );
+        const agendaEventDoc = await transaction.get(agendaEventRef);
 
         //messageFetched -> Write values
         const messageFetched = messageDoc.data() as ChatMessage;
@@ -591,12 +601,40 @@ export class ChatService {
             deleted_by,
             is_deleted: true,
           });
-        } else {
+
+          //If the message to delete is the last message we have to update the group chatting's 'last message' attribute
+
+          if (lastMessageToReplace === null) {
+            transaction.update(agendaEventRef, {
+              last_message: null,
+            });
+          } else if (lastMessageToReplace) {
+            transaction.update(agendaEventRef, {
+              last_message: lastMessageToReplace,
+            });
+          }
+        }
+
+        // Delete for me
+        else {
           const deleted_by = messageFetched.deleted_by || [];
           if (!deleted_by.includes(this.uid)) {
             deleted_by.push(this.uid);
           }
           transaction.update(messageCollectionRef, { deleted_by });
+
+          const agendaEventFetched = agendaEventDoc.data() as AgendaEvent;
+          if (agendaEvent.last_message) {
+            const event_deleted_by =
+              agendaEventFetched.last_message!.deleted_by || [];
+            if (!event_deleted_by.includes(this.uid)) {
+              event_deleted_by.push(this.uid);
+              const updateObject: any = {};
+              updateObject['last_message.deleted_by'] = event_deleted_by;
+
+              transaction.update(agendaEventRef, updateObject);
+            }
+          }
         }
       });
       console.log('Transaction successfully committed!');

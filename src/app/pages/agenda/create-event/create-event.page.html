@@ -85,6 +85,7 @@
             cancelText="Annuler"
             [min]="min_time_ISO_start"
             [preferWheel]="true"
+            [minuteValues]="minuteValues"
             (ionChange)="onStartTimeChanged($event)"
             ><span slot="time-label">Heure</span></ion-datetime
           >
@@ -120,6 +121,7 @@
             [value]="agendaEvent?.endISO"
             [min]="min_time_ISO_end"
             [max]="max_time_ISO_end"
+            [minuteValues]="minuteValues"
             cancelText="Annuler"
             (ionChange)="onEndTimeChanged($event)"
           >
@@ -176,6 +178,7 @@
             </ion-row>
             <app-friends-selector
               [agendaEvent]="agendaEvent!"
+              [mode]="mode"
               [startTime]="startTime"
               [endTime]="endTime"
               (friendSelected)="onFriendSelected($event)"

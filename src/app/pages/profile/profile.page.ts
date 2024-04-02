@@ -179,10 +179,12 @@ export class ProfilePage implements OnInit {
                   );
                 })
                 .catch((err) => {
+                  this.user.email = this.originalEmail;
                   this.utils.showToastError(err);
                 });
             })
             .catch((err: any) => {
+              this.user.email = this.originalEmail;
               this.utils.showFirebaseError(err);
             });
         }

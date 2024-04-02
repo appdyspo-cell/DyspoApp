@@ -160,7 +160,6 @@ export class FriendsService {
       friendsCollectionRef,
       (snapshot) => {
         snapshot.docChanges().forEach((change) => {
-          console.log('Friend has modifsied', change);
           if (change.type === 'modified') {
             const friendModified = change.doc.data() as Friend;
 

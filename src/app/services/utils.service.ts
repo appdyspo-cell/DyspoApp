@@ -70,6 +70,9 @@ export class UtilsService {
       case 'auth/too-many-requests':
         return "L'accès à ce compte a été temporairement désactivé en raison de nombreuses tentatives de connexion infructueuses. Vous pouvez le restaurer immédiatement en réinitialisant votre mot de passe ou vous pouvez réessayer plus tard";
         break;
+      case 'auth/operation-not-allowed':
+        return "Impossible d'effectuer cette opération";
+        break;
       default:
         return 'Erreur inconnue';
     }

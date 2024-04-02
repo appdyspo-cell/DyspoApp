@@ -9,8 +9,14 @@
     </ion-buttons>
     <ion-title (click)="openEvent()" mode="md">
       <div class="profile d-flex">
-        <div *ngIf="agendaEvent.avatar" class="profile_img_box">
-          <ion-thumbnail class="thumb-avatar-event">
+        <div *ngIf="agendaEvent.avatar">
+          <ion-thumbnail
+            class="thumb-avatar-event"
+            [ngClass]="{
+            'thumb-event-kids': agendaEvent.type === AgendaEventType.KIDS,
+            'thumb-event-nokids': agendaEvent.type === AgendaEventType.NOKIDS,
+            'thumb-event-free': agendaEvent.type === AgendaEventType.FREE}"
+          >
             <img src="{{agendaEvent.avatar}}" />
           </ion-thumbnail>
         </div>
@@ -64,6 +70,8 @@
           'thumb-kid': member.dyspoStatus === UserDyspoStatus.DYSPOWITHKIDS,
           'thumb-nokids': member.dyspoStatus === UserDyspoStatus.DYSPO,
           'thumb-nodyspo': member.dyspoStatus === UserDyspoStatus.NODYSPO,
+          'thumb-dyspo-undefined':
+                member.dyspoStatus === UserDyspoStatus.UNDEFINED,
           'animate__animated animate__zoomIn': true
         }"
         >

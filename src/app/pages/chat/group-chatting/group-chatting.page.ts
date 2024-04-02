@@ -31,6 +31,7 @@ import {
   WarnReportGroup,
   WarnReportGroupStatus,
   ReportType,
+  AgendaEventType,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
 import { ChatService, GetMessagesResult } from 'src/app/services/chat.service';
@@ -54,6 +55,7 @@ import { UserInfoMenuComponent } from 'src/app/components/user-info-menu/user-in
 })
 export class GroupChattingPage implements OnInit, OnDestroy {
   UserDyspoStatus = UserDyspoStatus;
+  AgendaEventType = AgendaEventType;
 
   @ViewChild(IonContent) content!: IonContent;
   @ViewChild('txtInput') txtInput!: ElementRef;
@@ -157,6 +159,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
 
     this.messagesSubscription = this.chatSvc.messages$.subscribe((data) => {
       this.msgList = data.messages;
+      console.log('msg list', this.msgList);
 
       //Wait the last message Set zero to unread msgs
       if (data.action === 'ADDED') {
@@ -372,6 +375,33 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   }
 
   deleteMsg(ev: any) {
+    //Is it the last message of the discussion ?
+    const msgListNoDeleted = this.msgList.filter((msg) => {
+      return msg.is_deleted !== true;
+    });
+    const isLastMessage =
+      msgListNoDeleted.indexOf(this.msgSelected!) ===
+      msgListNoDeleted.length - 1;
+    let lastMessageToReplace: ChatMessage | undefined | null = undefined;
+
+    if (isLastMessage) {
+      const msgListNoDeletedExceptMsgSelected = this.msgList.filter((msg) => {
+        return msg.is_deleted !== true && msg.uid !== this.msgSelected!.uid;
+      });
+      if (msgListNoDeletedExceptMsgSelected.length > 0) {
+        lastMessageToReplace =
+          msgListNoDeletedExceptMsgSelected[
+            msgListNoDeletedExceptMsgSelected.length - 1
+          ];
+      } else {
+        // lastMessageToReplace = {...this.msgSelected!};
+        // lastMessageToReplace.message = '';
+        // lastMessageToReplace.video= undefined;
+        // lastMessageToReplace.image= undefined;
+        lastMessageToReplace = null;
+      }
+    }
+
     Swal.fire({
       title: 'Voulez-vous supprimer ce message ?',
       showDenyButton: true,
@@ -380,7 +410,11 @@ export class GroupChattingPage implements OnInit, OnDestroy {
       denyButtonText: `Non`,
     }).then((result) => {
       if (result.isConfirmed && this.msgSelected) {
-        this.chatSvc.deleteMessage(this.msgSelected, this.agendaEvent);
+        this.chatSvc.deleteMessage(
+          this.msgSelected,
+          this.agendaEvent,
+          lastMessageToReplace
+        );
         this.msgSelected = undefined;
       }
     });

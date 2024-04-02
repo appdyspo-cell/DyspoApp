@@ -83,6 +83,7 @@ export class CreateEventPage implements OnInit {
   selectedUser: AppUserWithEvents | undefined;
   selectedUserFriendStatus: FriendStatus | undefined;
   selectedUserFriendStatusLabel = '';
+  minuteValues = '0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55';
 
   friends = [];
   members: AppUserWithEvents[] = [];
@@ -437,6 +438,7 @@ export class CreateEventPage implements OnInit {
       milliseconds: 0,
     });
 
+    this.agendaEvent!.ref_start_ISO = formatISO(refStart);
     this.agendaEvent!.start_date_ts = refStart.getTime();
 
     this.agendaEvent!.endISO = formatISO(
@@ -483,6 +485,7 @@ export class CreateEventPage implements OnInit {
       seconds: 59,
       milliseconds: 999,
     });
+    this.agendaEvent!.ref_end_ISO = formatISO(refEnd);
     this.agendaEvent!.end_date_ts = refEnd.getTime();
     this.agendaEvent!.end_date_day_of_year = getDayOfYear(
       parseISO(this.agendaEvent!.endISO)

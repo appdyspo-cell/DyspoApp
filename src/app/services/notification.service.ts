@@ -105,7 +105,7 @@ export class NotificationService {
         // });
       } else {
         // Show some error
-        alert('err');
+        //alert('Vous avez désactivé les notifications pour cette application');
       }
     });
   }

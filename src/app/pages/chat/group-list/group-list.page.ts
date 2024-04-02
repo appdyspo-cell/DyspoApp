@@ -119,6 +119,19 @@ export class GroupListPage implements OnInit {
     return formattedLastMessageDate;
   }
 
+  getLastMessageMessage(agendaEvent: AgendaEvent) {
+    let lastMessage = '';
+    if (agendaEvent.last_message) {
+      console.log('Display last essage', this.my_uid);
+      lastMessage = agendaEvent.last_message.message!;
+      if (agendaEvent.last_message.deleted_by.includes(this.my_uid)) {
+        lastMessage = 'Message effacé';
+      }
+    }
+
+    return lastMessage;
+  }
+
   getDelayClass(index: number): string {
     if (index <= 11) {
       return 'animated delay_' + index;
