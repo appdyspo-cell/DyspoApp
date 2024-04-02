@@ -376,32 +376,10 @@ export class GroupChattingPage implements OnInit, OnDestroy {
 
   deleteMsg(ev: any) {
     //Is it the last message of the discussion ?
-    const msgListNoDeleted = this.msgList.filter((msg) => {
-      return msg.is_deleted !== true;
-    });
     const isLastMessage =
-      msgListNoDeleted.indexOf(this.msgSelected!) ===
-      msgListNoDeleted.length - 1;
-    let lastMessageToReplace: ChatMessage | undefined | null = undefined;
+      this.msgList.indexOf(this.msgSelected!) === this.msgList.length - 1;
 
-    if (isLastMessage) {
-      const msgListNoDeletedExceptMsgSelected = this.msgList.filter((msg) => {
-        return msg.is_deleted !== true && msg.uid !== this.msgSelected!.uid;
-      });
-      if (msgListNoDeletedExceptMsgSelected.length > 0) {
-        lastMessageToReplace =
-          msgListNoDeletedExceptMsgSelected[
-            msgListNoDeletedExceptMsgSelected.length - 1
-          ];
-      } else {
-        // lastMessageToReplace = {...this.msgSelected!};
-        // lastMessageToReplace.message = '';
-        // lastMessageToReplace.video= undefined;
-        // lastMessageToReplace.image= undefined;
-        lastMessageToReplace = null;
-      }
-    }
-
+    console.log('is last message? ', isLastMessage);
     Swal.fire({
       title: 'Voulez-vous supprimer ce message ?',
       showDenyButton: true,
@@ -413,7 +391,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
         this.chatSvc.deleteMessage(
           this.msgSelected,
           this.agendaEvent,
-          lastMessageToReplace
+          isLastMessage
         );
         this.msgSelected = undefined;
       }

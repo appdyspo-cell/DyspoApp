@@ -80,6 +80,10 @@ ion-thumbnail {
         white-space: nowrap;
         max-width: calc(100% - 60px);
         display: block;
+
+        &.message-deleted {
+          font-style: italic;
+        }
       }
 
       &.end {

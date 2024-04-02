@@ -567,7 +567,7 @@ export class ChatService {
   async deleteMessage(
     message: ChatMessage,
     agendaEvent: AgendaEvent,
-    lastMessageToReplace: ChatMessage | undefined | null
+    isLastMessage = false
   ) {
     try {
       const messageCollectionRef = doc(
@@ -590,7 +590,7 @@ export class ChatService {
 
         //messageFetched -> Write values
         const messageFetched = messageDoc.data() as ChatMessage;
-
+        const agendaEventFetched = agendaEventDoc.data() as AgendaEvent;
         //delete for me or for all
         if (message.sender === this.uid) {
           const deleted_by = messageFetched.deleted_by || [];
@@ -603,15 +603,17 @@ export class ChatService {
           });
 
           //If the message to delete is the last message we have to update the group chatting's 'last message' attribute
-
-          if (lastMessageToReplace === null) {
-            transaction.update(agendaEventRef, {
-              last_message: null,
-            });
-          } else if (lastMessageToReplace) {
-            transaction.update(agendaEventRef, {
-              last_message: lastMessageToReplace,
-            });
+          if (isLastMessage) {
+            const agenda_event_message_deleted_by =
+              agendaEventFetched.last_message?.deleted_by || [];
+            if (!agenda_event_message_deleted_by.includes(this.uid)) {
+              agenda_event_message_deleted_by.push(this.uid);
+              const updateObject: any = {};
+              updateObject['last_message.deleted_by'] =
+                agenda_event_message_deleted_by;
+              updateObject['last_message.is_deleted'] = true;
+              transaction.update(agendaEventRef, updateObject);
+            }
           }
         }
 
@@ -623,7 +625,6 @@ export class ChatService {
           }
           transaction.update(messageCollectionRef, { deleted_by });
 
-          const agendaEventFetched = agendaEventDoc.data() as AgendaEvent;
           if (agendaEvent.last_message) {
             const event_deleted_by =
               agendaEventFetched.last_message!.deleted_by || [];

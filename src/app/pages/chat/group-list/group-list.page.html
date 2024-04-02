@@ -105,10 +105,17 @@
           </p>
           <p class="d-flex">
             <ion-icon
-              *ngIf="agendaEvent.last_message?.image"
+              *ngIf="agendaEvent.last_message?.image && !agendaEvent.last_message?.deleted_by?.includes(my_uid)"
               class="ion-text-start zmdi zmdi-attachment"
             ></ion-icon>
-            <span class="message">{{getLastMessageMessage(agendaEvent)}}</span>
+            <span
+              [ngClass]="{
+            'message': true,
+            'message-deleted': agendaEvent.last_message?.deleted_by?.includes(my_uid) ||agendaEvent.last_message?.is_deleted ,
+           
+          }"
+              >{{getLastMessageMessage(agendaEvent)}}</span
+            >
 
             <ng-container
               *ngIf="chatrooms[agendaEvent.uid!] && chatrooms[agendaEvent.uid!].count > 0"
@@ -162,7 +169,14 @@
               *ngIf="agendaEvent.last_message?.image && !agendaEvent.last_message?.deleted_by?.includes(my_uid)"
               class="ion-text-start zmdi zmdi-attachment"
             ></ion-icon>
-            <span class="message">{{getLastMessageMessage(agendaEvent)}}</span>
+            <span
+              [ngClass]="{
+              'message': true,
+              'message-deleted': agendaEvent.last_message?.deleted_by?.includes(my_uid) || agendaEvent.last_message?.is_deleted,
+             
+            }"
+              >{{getLastMessageMessage(agendaEvent)}}</span
+            >
 
             <ng-container
               *ngIf="chatrooms[agendaEvent.uid!] && chatrooms[agendaEvent.uid!].count > 0"
