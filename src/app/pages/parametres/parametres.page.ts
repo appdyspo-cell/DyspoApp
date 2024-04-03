@@ -201,6 +201,12 @@ export class ParametresPage implements OnInit {
     });
   }
 
+  async openPrivacy() {
+    await Browser.open({
+      url: environment.privacy_url,
+    });
+  }
+
   openBlockedUsers() {
     //this.logger.logDebug('Open');
     this.navCtrl.navigateForward('banned-users');
