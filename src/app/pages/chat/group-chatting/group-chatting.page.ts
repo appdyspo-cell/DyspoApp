@@ -262,6 +262,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
 
   async sendMsg() {
     console.log('Send msg');
+    this.setViewType('');
 
     if (this.userInput !== '' || this.pendingAttachment !== undefined) {
       const timeMoment = format(new Date(), 'dd/MM/yyyy HH:mm');
@@ -590,5 +591,26 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   presentPopover(e: Event) {
     // this.popover.event = e;
     // this.isOpen = true;
+  }
+
+  getInputPlaceholder() {
+    if (this.pendingAttachment) {
+      return 'Ajoutez une légende';
+    } else {
+      return 'Tapez votre message';
+    }
+  }
+
+  getUserInputAttachment() {
+    if (this.userInput && this.userInput.length > 0) {
+      return this.userInput;
+    } else {
+      return 'Ajoutez une légende';
+    }
+  }
+
+  onMsgInputFocused() {
+    console.log('on focus');
+    this.setViewType('');
   }
 }

@@ -200,7 +200,7 @@
         <div class="chat_detail ion-justify-content-end">
           <div class="text">
             <h6>Vous</h6>
-            <h2>{{userInput}}</h2>
+            {{getUserInputAttachment()}}
           </div>
 
           <div style="min-width: 35px">
@@ -245,12 +245,13 @@
         [autoGrow]="true"
         rows="1"
         [(ngModel)]="userInput"
-        placeholder="{{ 'type_your_message' | translate}} "
+        (ionFocus)="onMsgInputFocused()"
+        [placeholder]="getInputPlaceholder()"
         style="--padding-top: 12px; --padding-bottom: 8px"
       ></ion-textarea>
     </ion-item>
 
-    <ion-button slot="end" fill="clear" (click)=" sendMsg()">
+    <ion-button slot="end" fill="clear" (click)="sendMsg()">
       <ion-icon name="send" color="medium" slot="icon-only"> </ion-icon>
 
       <!-- <ion-icon class="zmdi zmdi-mic ion-text-end"></ion-icon> -->
