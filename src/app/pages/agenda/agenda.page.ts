@@ -137,11 +137,11 @@ export class AgendaPage implements AfterViewInit {
           }
         );
 
-        this.selectedDateMs = new Date().getTime();
-        this.selectedDateFormatted = this.utils.formatDate(
-          new Date().getTime()
-        );
-        this.getAgendaEventsForDate(this.selectedDateMs);
+        // this.selectedDateMs = new Date().getTime();
+        // this.selectedDateFormatted = this.utils.formatDate(
+        //   new Date().getTime()
+        // );
+        // this.getAgendaEventsForDate(this.selectedDateMs);
       } else if (this.dataMode === 'friend') {
         // Check if shareAgenda is allowed
 
