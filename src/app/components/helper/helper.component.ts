@@ -30,7 +30,7 @@ export class HelperComponent implements OnInit {
 
         <p>Consultez d’un coup d’oeil les prochains événements à venir.</p>
 
-        <p>Les notifications permettent de voir les événements auxquels vous avez été conviés afin de valider ou non votre présence.</p></i>`;
+        <p>Les notifications permettent de voir les événements auxquels vous avez été convié afin de valider ou non votre présence.</p></i>`;
         break;
       case ShowHelper.AGENDA:
         this.text = `<i><h2 class="title-tuto">Première connexion à votre calendrier</h2>
