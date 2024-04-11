@@ -531,7 +531,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     const modal = await this.modalCtrl.create({
       component: DyspoViewerComponent,
       componentProps: {
-        message: msg,
+        image: msg.image,
       },
     });
     modal.present();

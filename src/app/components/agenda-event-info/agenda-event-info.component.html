@@ -253,7 +253,11 @@
     class="body-inner d-flex ion-margin-top ion-margin-bottom ion-justify-content-center"
   >
     <div class="ion-margin-top ion-text-center" style="width: 100%">
-      <div *ngIf="agendaEvent.avatar" class="d-flex ion-justify-content-center">
+      <div
+        *ngIf="agendaEvent.avatar"
+        class="d-flex ion-justify-content-center"
+        (click)="openImage(agendaEvent.avatar, $event)"
+      >
         <div
           style="background-image: url('{{ agendaEvent.avatar }}');"
           class="bg-event-avatar d-flex ion-justify-content-center ion-margin-bottom"

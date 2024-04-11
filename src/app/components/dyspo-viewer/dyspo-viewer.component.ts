@@ -14,7 +14,7 @@ import {
   styleUrls: ['./dyspo-viewer.component.scss'],
 })
 export class DyspoViewerComponent implements OnInit {
-  message!: ChatMessage;
+  image!: string;
   url: any;
   panZoomConfig: PanZoomConfig;
 
@@ -28,7 +28,7 @@ export class DyspoViewerComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.url = this.message.image;
+    this.url = this.image;
   }
 
   close() {

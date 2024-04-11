@@ -20,6 +20,7 @@ import {
   AgendaEventType,
   AppUser,
   AppUserWithEvents,
+  ChatMessage,
   FriendStatus,
   UserDyspoStatus,
 } from 'src/app/models/models';
@@ -28,6 +29,7 @@ import { FriendsService } from 'src/app/services/friends.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import Swal from 'sweetalert2';
+import { DyspoViewerComponent } from '../dyspo-viewer/dyspo-viewer.component';
 
 @Component({
   selector: 'app-agenda-event-info',
@@ -446,5 +448,16 @@ export class AgendaEventInfoComponent implements OnInit {
       await this.close();
       this.navCtrl.navigateForward('/group-chatting', navigationExtras);
     }
+  }
+
+  async openImage(image: string, event: any) {
+    event?.stopPropagation();
+    const modal = await this.modalCtrl.create({
+      component: DyspoViewerComponent,
+      componentProps: {
+        image: image,
+      },
+    });
+    modal.present();
   }
 }

@@ -585,7 +585,6 @@ export class AgendaService {
       `agenda_events/`
     );
 
-    console.log('Get user events ', uid);
     // console.log('startDateRef', formatISO(agendaEventToCompare.start_date_ts));
     // console.log('endDateRef', formatISO(agendaEventToCompare.end_date_ts));
     const queryAgendaEvents = query(
@@ -615,7 +614,6 @@ export class AgendaService {
       // year: agendaEventToCompare.year,
     };
 
-    console.log('Get ' + events.length + 'user events for uid ' + uid, result);
     return result;
   }
 
