@@ -27,7 +27,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>L'application vous permet d' ajouter une photo à votre profile et ajouter des pièces jointes à vos messages dans le chat</string>
 	<key>NSContactsUsageDescription</key>
-	<string>L'accès à vos contacts permet d'inviter vos amis à utiliser l'application</string>
+	<string>L'accès à vos contacts permet d'inviter vos amis à utiliser l'application. Ces données ne sont pas collectées sur nos serveurs.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>L'application souhaite accéder à votre galerie pour ajouter des pièces jointes à vos messages dans le chat</string>
 	<key>NSPhotoLibraryUsageDescription</key>
