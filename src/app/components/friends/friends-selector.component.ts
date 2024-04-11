@@ -62,6 +62,11 @@ export class FriendsSelectorComponent implements OnInit {
   level = 0;
   friendsAlreadyInvited!: string[];
   isInit = false;
+  dispalyByDyspo = false;
+  checkedFriendsDyspo: CheckedFriends[] = [];
+  checkedFriendsNoDyspo: CheckedFriends[] = [];
+  checkedFriendsDyspoWithKids: CheckedFriends[] = [];
+  checkedFriendsDyspoUndefined: CheckedFriends[] = [];
 
   constructor(
     private friendsSvc: FriendsService,
@@ -71,14 +76,24 @@ export class FriendsSelectorComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef
   ) {}
 
+  resetDyspos() {
+    this.checkedFriendsDyspo = [];
+    this.checkedFriendsDyspoUndefined = [];
+    this.checkedFriendsDyspoWithKids = [];
+    this.checkedFriends = [];
+    this.checkedFriendsNoDyspo = [];
+  }
+
   async ngOnChanges(changes: SimpleChanges) {
     if (!this.isInit) return;
     this.changeDetectorRef.markForCheck();
     this.changeDetectorRef.detectChanges();
     this.checkedFriends = [];
     console.log('on changes ev', this.agendaEvent);
+    this.resetDyspos();
+    this.utils.showLoader();
     await this.fillCheckedFriends(true);
-
+    this.utils.hideLoader();
     this.friendGroups.forEach(async (group) => {
       group.checked_friends = this.checkedFriends.filter((checkedFriend) => {
         return group.members_uid.includes(checkedFriend.friend.friend_uid!);
@@ -149,6 +164,30 @@ export class FriendsSelectorComponent implements OnInit {
           });
         }
       }
+
+      // Sort by dyspo
+      this.checkedFriendsDyspo = this.checkedFriends.filter((checkedFriend) => {
+        return checkedFriend.dyspo === UserDyspoStatus.DYSPO;
+      });
+
+      this.checkedFriendsNoDyspo = this.checkedFriends.filter(
+        (checkedFriend) => {
+          return checkedFriend.dyspo === UserDyspoStatus.NODYSPO;
+        }
+      );
+
+      this.checkedFriendsDyspoWithKids = this.checkedFriends.filter(
+        (checkedFriend) => {
+          return checkedFriend.dyspo === UserDyspoStatus.DYSPOWITHKIDS;
+        }
+      );
+
+      this.checkedFriendsDyspoUndefined = this.checkedFriends.filter(
+        (checkedFriend) => {
+          return checkedFriend.dyspo === UserDyspoStatus.UNDEFINED;
+        }
+      );
+
       resolve(this.checkedFriends);
     });
   }
@@ -243,5 +282,9 @@ export class FriendsSelectorComponent implements OnInit {
         ev.end_time_formatted
       );
     }
+  }
+
+  groupFriendsByDyspo() {
+    this.dispalyByDyspo = !this.dispalyByDyspo;
   }
 }

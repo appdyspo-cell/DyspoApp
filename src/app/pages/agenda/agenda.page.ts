@@ -507,4 +507,23 @@ export class AgendaPage implements AfterViewInit {
       //this.route.navigate(['chat-home'], navigationExtras);
     }
   }
+
+  // To include for private multi event
+  displayEventTitle(agendaEvent: AgendaEvent) {
+    if (agendaEvent.all_can_see_title || this.isFriendMode === false) {
+      return agendaEvent.title;
+    } else if (!agendaEvent.all_can_see_title) {
+      const members = agendaEvent.members_uid.concat(
+        agendaEvent.members_invited_uid
+      );
+      if (!members.includes(this.userSvc.userInfo?.uid!)) {
+        return 'Événement privé';
+      } else {
+        return agendaEvent.title;
+      }
+    }
+    {
+      return 'Événement privé';
+    }
+  }
 }
