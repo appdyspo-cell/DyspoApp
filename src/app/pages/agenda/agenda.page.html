@@ -35,25 +35,29 @@
 
 <ion-content class="bg_color">
   <div class="container">
-    <ion-chip *ngIf="!isFriendMode && my_info.with_kids" [outline]="true"
+    <ion-chip
+      *ngIf="!isFriendMode && my_info.with_kids"
+      [outline]="true"
+      [disabled]="true"
       ><div class="chip-evt bg-color-kid">&nbsp;</div>
       Kid(s)</ion-chip
     >
     <ion-chip
+      [disabled]="true"
       *ngIf="isFriendMode && agendaFriend?.userData?.with_kids"
       [outline]="true"
       ><div class="chip-evt bg-color-kid">&nbsp;</div>
       Kid(s)</ion-chip
     >
-    <ion-chip [outline]="true"
+    <ion-chip [outline]="true" [disabled]="true"
       ><div class="chip-evt bg-color-nokids">&nbsp;</div>
       Dyspo</ion-chip
     >
-    <ion-chip [outline]="true"
+    <ion-chip [outline]="true" [disabled]="true"
       ><div class="chip-evt bg-color-nodyspo">&nbsp;</div>
       Pas Dyspo</ion-chip
     >
-    <ion-chip [outline]="true"
+    <ion-chip [outline]="true" [disabled]="true"
       ><div class="chip-evt holidays">&nbsp;</div>
       Vacances</ion-chip
     >

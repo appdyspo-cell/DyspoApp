@@ -101,10 +101,7 @@
       <ion-label>{{ appContactGrouped.letter }}</ion-label>
     </ion-item-divider>
 
-    <ion-item
-      *ngFor="let contact of appContactGrouped.contacts; let j=index"
-      (click)="confirmFriendInvitation(contact)"
-    >
+    <ion-item *ngFor="let contact of appContactGrouped.contacts; let j=index">
       <div slot="start" class="avatar-container">
         <ion-thumbnail class="thumb" *ngIf="contact.avatar">
           <img src="{{contact.avatar}}" />

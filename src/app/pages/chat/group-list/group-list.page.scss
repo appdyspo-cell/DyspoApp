@@ -7,6 +7,10 @@ ion-header {
   }
 }
 
+ion-chip {
+  opacity: 1 !important;
+}
+
 ion-item::part(native) {
   background: transparent;
 }
