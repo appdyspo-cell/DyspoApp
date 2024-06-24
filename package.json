@@ -1,6 +1,6 @@
 {
   "name": "dyspo",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Romain VINCENT",
   "homepage": "https://ionicframework.com/",
   "scripts": {
@@ -29,6 +29,7 @@
     "@angular/platform-browser-dynamic": "^16.2.12",
     "@angular/router": "^16.2.12",
     "@capacitor-community/contacts": "^5.0.4",
+    "@capacitor-community/media": "^5.4.1",
     "@capacitor-firebase/app": "^5.2.0",
     "@capacitor-firebase/messaging": "^5.2.0",
     "@capacitor/android": "5.5.1",

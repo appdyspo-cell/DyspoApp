@@ -49,6 +49,7 @@
   <ion-list [hidden]="autocompleteItems.length === 0" class="ion-no-padding">
     <ion-item
       *ngFor="let contact of autocompleteItems; let i=index"
+      (click)="confirmFriendInvitation(contact)"
       lines="full"
     >
       <div slot="start" class="avatar-container">
@@ -71,7 +72,6 @@
 
       <ion-buttons slot="end" style="padding-right: 15px">
         <ion-button
-          (click)="confirmFriendInvitation(contact)"
           size="large"
           *ngIf="contact.is_member===true && !contact.is_my_friend"
         >
@@ -101,7 +101,10 @@
       <ion-label>{{ appContactGrouped.letter }}</ion-label>
     </ion-item-divider>
 
-    <ion-item *ngFor="let contact of appContactGrouped.contacts; let j=index">
+    <ion-item
+      *ngFor="let contact of appContactGrouped.contacts; let j=index"
+      (click)="confirmFriendInvitation(contact)"
+    >
       <div slot="start" class="avatar-container">
         <ion-thumbnail class="thumb" *ngIf="contact.avatar">
           <img src="{{contact.avatar}}" />

@@ -4,7 +4,6 @@ import {
   ActionSheetController,
   ModalController,
   NavController,
-  NavParams,
 } from '@ionic/angular';
 import {
   addHours,
@@ -255,13 +254,47 @@ export class AgendaPage implements AfterViewInit {
       this.selectedDateFormatted = this.utils.formatMonth(
         this.calendarMonthData.original.time
       );
+      // const prob = this.agendaEvents.find(
+      //   (elt) => elt.uid === 'agev_1712933342454'
+      // );
+      // console.log('Probleme with this event', prob);
+
       this.calendarMonthData.days.forEach((day) => {
         day.isEvent = false;
 
+        // Il ne faut pas faire ça, on se retrouve a 22h la veille
+        // console.log(
+        //   'Convert start date day time to ISO',
+        //   new Date(day.time).toISOString()
+        // );
+
+        let newDateCalendar = new Date(day.time);
+        newDateCalendar.setMinutes(
+          newDateCalendar.getMinutes() - newDateCalendar.getTimezoneOffset()
+        );
+        let newDateCalendarISO =
+          newDateCalendar.toISOString().split('.')[0] + 'Z';
+        // console.log('new Date du calendar', newDateCalendarISO);
+
         this.agendaEvents.forEach((agendaEvent) => {
+          //For Legacy compatibility
+          let newDateStartEvent = agendaEvent.start_date_ts;
+          let newDateEndEvent = agendaEvent.end_date_ts;
+          if (agendaEvent.ref_start_ISO && agendaEvent.ref_end_ISO) {
+            let newDateStartEventUTC =
+              agendaEvent!.ref_start_ISO!.slice(0, -6) + 'Z';
+            console.log('new Date Start du event', newDateStartEventUTC);
+            newDateStartEvent = parseISO(newDateStartEventUTC).getTime();
+
+            let newDateEndEventUTC =
+              agendaEvent!.ref_end_ISO!.slice(0, -6) + 'Z';
+            console.log('new Date End du event', newDateEndEventUTC);
+            newDateEndEvent = parseISO(newDateEndEventUTC).getTime();
+          }
+
           if (
-            agendaEvent.start_date_ts <= day.time &&
-            agendaEvent.end_date_ts >= day.time
+            newDateStartEvent <= newDateCalendar.getTime() &&
+            newDateEndEvent >= newDateCalendar.getTime()
           ) {
             day.isEvent = true;
             //Prevent doublons for long events
