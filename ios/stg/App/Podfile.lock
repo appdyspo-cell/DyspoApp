@@ -9,6 +9,9 @@ PODS:
     - Capacitor
   - CapacitorCommunityContacts (5.0.4):
     - Capacitor
+  - CapacitorCommunityMedia (5.4.1):
+    - Capacitor
+    - SDWebImage
   - CapacitorCordova (5.5.1)
   - CapacitorDevice (5.0.6):
     - Capacitor
@@ -81,6 +84,9 @@ PODS:
   - nanopb/decode (2.30909.1)
   - nanopb/encode (2.30909.1)
   - PromisesObjC (2.3.1)
+  - SDWebImage (5.18.10):
+    - SDWebImage/Core (= 5.18.10)
+  - SDWebImage/Core (5.18.10)
 
 DEPENDENCIES:
   - "Capacitor (from `../../../node_modules/@capacitor/ios`)"
@@ -88,6 +94,7 @@ DEPENDENCIES:
   - "CapacitorBrowser (from `../../../node_modules/@capacitor/browser`)"
   - "CapacitorCamera (from `../../../node_modules/@capacitor/camera`)"
   - "CapacitorCommunityContacts (from `../../../node_modules/@capacitor-community/contacts`)"
+  - "CapacitorCommunityMedia (from `../../../node_modules/@capacitor-community/media`)"
   - "CapacitorCordova (from `../../../node_modules/@capacitor/ios`)"
   - "CapacitorDevice (from `../../../node_modules/@capacitor/device`)"
   - CapacitorEmailComposer (from `../../../node_modules/capacitor-email-composer`)
@@ -111,6 +118,7 @@ SPEC REPOS:
     - GoogleUtilities
     - nanopb
     - PromisesObjC
+    - SDWebImage
 
 EXTERNAL SOURCES:
   Capacitor:
@@ -123,6 +131,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@capacitor/camera"
   CapacitorCommunityContacts:
     :path: "../../../node_modules/@capacitor-community/contacts"
+  CapacitorCommunityMedia:
+    :path: "../../../node_modules/@capacitor-community/media"
   CapacitorCordova:
     :path: "../../../node_modules/@capacitor/ios"
   CapacitorDevice:
@@ -154,6 +164,7 @@ SPEC CHECKSUMS:
   CapacitorBrowser: a6deae9e5bf87f62b62a753cff7992c5def9e771
   CapacitorCamera: 084b0b228bba7d00587910337b1c89e93b1d32ab
   CapacitorCommunityContacts: 45de2477f7dc6265d267677939a2c75465d2ed87
+  CapacitorCommunityMedia: 64352c5ccc6024116c37ec7cffc1376c268a9f84
   CapacitorCordova: e128cc7688c070ca0bfa439898a5f609da8dbcfe
   CapacitorDevice: 2c968f98a1ec4d22357418c1521e7ddc46c675e6
   CapacitorEmailComposer: 551949d4269197efc9f0d51a19c0d2d06e7fb452
@@ -174,7 +185,8 @@ SPEC CHECKSUMS:
   GoogleUtilities: 0759d1a57ebb953965c2dfe0ba4c82e95ccc2e34
   nanopb: d4d75c12cd1316f4a64e3c6963f879ecd4b5e0d5
   PromisesObjC: c50d2056b5253dadbd6c2bea79b0674bd5a52fa4
+  SDWebImage: fc8f2d48bbfd72ef39d70e981bd24a3f3be53fec
 
-PODFILE CHECKSUM: 2a4c71d6f74f172dec9f29a1dd1d81d4d3f2741e
+PODFILE CHECKSUM: 47ebf7cf234df9fcadfebcb2425a66382f6e9e87
 
 COCOAPODS: 1.13.0

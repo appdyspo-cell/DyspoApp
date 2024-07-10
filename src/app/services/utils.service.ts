@@ -108,6 +108,18 @@ export class UtilsService {
       .then((res) => res.present());
   }
 
+  showToastSuccessBottom(message: string) {
+    this.toast
+      .create({
+        message,
+        duration: 3500,
+        position: 'bottom',
+        color: 'success',
+        icon: 'checkmark-done-circle-outline',
+      })
+      .then((res) => res.present());
+  }
+
   showAlert(message: any) {
     this.alertCtrl
       .create({

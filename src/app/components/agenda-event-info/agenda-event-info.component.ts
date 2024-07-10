@@ -451,13 +451,13 @@ export class AgendaEventInfoComponent implements OnInit {
   }
 
   async openImage(image: string, event: any) {
-    // event?.stopPropagation();
-    // const modal = await this.modalCtrl.create({
-    //   component: DyspoViewerComponent,
-    //   componentProps: {
-    //     image: image,
-    //   },
-    // });
-    // modal.present();
+    event?.stopPropagation();
+    const modal = await this.modalCtrl.create({
+      component: DyspoViewerComponent,
+      componentProps: {
+        image: image,
+      },
+    });
+    modal.present();
   }
 }
