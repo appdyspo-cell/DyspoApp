@@ -1,0 +1,155 @@
+.main {
+  //height: 100vh;
+  display: flex;
+  padding: var(--ion-safe-area-top) 5px 0px 5px;
+  position: relative;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+ion-badge {
+  position: relative;
+  //right: -5px; /* Ajustez cette valeur pour positionner horizontalement */
+  font-size: 12px; /* Taille du texte du badge */
+  width: 20px; /* Largeur du badge */
+  height: 20px; /* Hauteur du badge */
+  border-radius: 50%; /* Pour crÃ©er un badge circulaire */
+  background-color: #7ce49c; /* Couleur de fond du badge */
+  color: white; /* Couleur du texte du badge */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-create-evt {
+  width: 111px;
+  height: 96px;
+
+  margin: 5px;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  &.create-dyspo {
+    background-image: url("../../../assets/newimg/creer_event_dyspo.png");
+  }
+
+  &.create-dyspo-with-kids {
+    background-image: url("../../../assets/newimg/creer_event_dyspo_wk.png");
+  }
+  &.create-perso {
+    background-image: url("../../../assets/newimg/creer_event_perso.png");
+  }
+}
+
+.dyspo-button {
+  width: 100%;
+  min-height: 160px;
+  text-align: center;
+}
+
+.dyspo-modal-btns-container {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.dyspo {
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: url("../../../assets/newimg/home_dyspo.png");
+}
+
+.no-dyspo {
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: url("../../../assets/newimg/home_pas_dyspo.png");
+}
+
+.dyspo-with-kids {
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: url("../../../assets/newimg/home_dyspo_wk.png");
+}
+
+.next-agenda-container {
+  //width: 300px; /* Définissez la largeur du conteneur */
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.next-agenda-content {
+  // min-width: 250px; /* Laissez la largeur automatique pour s'adapter aux éléments enfants */
+  //font-size: 0; /* Pour supprimer l'espacement entre les éléments */
+  margin-top: 10px;
+  // max-width: 350px;
+}
+
+.title-notif {
+  font-size: 1.13rem;
+  font-weight: bold;
+}
+
+.change-status-icon {
+  position: absolute;
+  top: 0; /* Placez le badge en haut */
+  right: 10px; /* Placez le badge à droite */
+  background-color: rgb(255, 255, 255); /* Couleur de fond du badge */
+  color: rgb(30, 30, 30); /* Couleur du texte du badge */
+  padding: 5px 8px; /* Ajoutez du rembourrage pour le badge */
+  border-radius: 50%; /* Pour créer un badge circulaire */
+  //  font-size: 14px; /* Taille du texte du badge */
+}
+
+.dyspo-btn-container {
+  width: 70%;
+  max-width: 270px;
+  display: flex;
+  justify-content: center;
+}
+
+.header-dot {
+  border-right: 8px solid;
+  height: 32px;
+  margin-right: 11px;
+  width: 1px;
+  color: var(--ion-color-primary);
+}
+
+.shape {
+  background-color: var(--ion-color-primary);
+  width: 100%;
+  height: 50px;
+  border-bottom-left-radius: 50%;
+  border-bottom-right-radius: 50%;
+}
+.header-ct {
+  background: var(--ion-color-primary);
+  padding: var(--ion-safe-area-top) 16px var(--ion-safe-area-bottom) 16px;
+  .header {
+    display: flex;
+    flex-direction: row;
+    overflow: scroll;
+    color: white;
+    .cat {
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      padding: 10px;
+      align-items: center;
+      color: white;
+
+      img {
+        color: white;
+        width: 40px;
+      }
+      ion-label {
+        font-size: 14px;
+      }
+    }
+  }
+}

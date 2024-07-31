@@ -1,62 +1,10 @@
 ion-header {
-  .banner {
-    padding-bottom: 24px;
-    padding-top: 10px;
-
-    h1 {
-      color: var(--primary);
-      font-size: 2.1rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      width: fit-content;
-      margin: 0 auto;
-      --animate-duration: 0.3s !important;
-
-      ion-icon {
-        font-size: 1rem;
-        position: relative;
-        right: -10px;
-      }
-    }
+  h1 {
+    margin: 0;
+    font-weight: 500;
+    letter-spacing: 0;
+    font-size: 1.525rem;
   }
-}
-
-.dyspo-button {
-  font-family: Atiba;
-  font-size: 36px;
-  padding: 16px;
-  width: 100%;
-  text-align: center;
-  border-radius: 50px;
-  position: relative;
-  overflow: hidden;
-
-  //border: 1px solid;
-}
-
-.dyspo-btns-container {
-  width: 100%;
-  position: relative;
-  overflow: hidden;
-}
-
-.dyspo {
-  background-color: var(--text-dyspo);
-  color: var(--white);
-  //border-color: var(--text-dyspo);
-}
-
-.no-dyspo {
-  background-color: var(--text-no-dyspo);
-  color: var(--white);
-  //color: var(--text-no-dyspo);
-}
-
-.dyspo-with-kids {
-  background-color: var(--text-dyspo-with-kids);
-  color: var(--white);
-  //color: var(--text-dyspo-with-kids);
 }
 
 h2 {
@@ -66,9 +14,24 @@ h2 {
   padding-bottom: 4px;
 }
 
+ion-footer {
+  box-shadow: none;
+}
+
 ion-item {
   --detail-icon-color: var(--ion-color-primary);
   --detail-icon-opacity: 1;
+  --background: transparent;
+  // border-bottom: 1px solid;
+  // border-color: var(--border-color);
+}
+
+ion-item::part(native) {
+  background: transparent;
+}
+
+ion-list {
+  background: var(--transparent) !important;
 }
 
 .iconmail {
@@ -86,24 +49,22 @@ ion-item {
   top: -5px;
 }
 
-ion-list {
-  //background: rgba(243, 245, 255, 0.08);
-}
 ion-card {
+  box-shadow: none !important;
   p {
     font-weight: 500;
     font-weight: bold;
   }
-  //background: var(--bg-color-secondary);
-  margin: 0 16px 10px 16px;
+  --background: var(--bg-color-secondary);
+  margin: 0 16px 10px 0px;
 }
 
-.ovelDivContentBottom {
+.ct-bottom {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  padding: 16px;
+  padding: 5px;
   .backgroundDiv {
     width: 50px;
     height: 50px;
@@ -131,11 +92,6 @@ ion-card.nomargin {
   margin: 0 0 0 10px;
 }
 
-ion-item {
-  --background: transparent;
-  --inner-border-width: 0 0 0 0;
-}
-
 .customIcon {
   margin-inline-end: 12px;
   font-weight: bolder;
@@ -147,18 +103,16 @@ ion-item {
   max-width: 152px;
 }
 
-.logout {
-  width: 100%;
-  font-weight: bold;
-}
-
 ion-img::part(image) {
   border-radius: 10px;
   box-shadow: 1px 1px 1px 1px transparent;
 }
 
 ion-list-header {
-  font-weight: bold;
+  h2 {
+    font-weight: 700;
+  }
+  border-top: 1px solid lightgray;
 }
 
 .excepTextSize {
@@ -189,6 +143,40 @@ ion-range {
   height: 100%;
   font-weight: bold;
 }
-ion-button {
-  font-weight: bold;
+
+.header-ct {
+  background: var(--ion-color-primary);
+  padding: 10px;
+  color: white;
+  .header {
+    display: flex;
+    flex-direction: row;
+    overflow: scroll;
+    color: white;
+    .cat {
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      padding: 10px;
+      align-items: center;
+      color: white;
+
+      img {
+        color: white;
+        width: 40px;
+      }
+      ion-label {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+.shape {
+  background-color: var(--ion-color-primary);
+  width: 100%;
+  height: 50px;
+  z-index: 100;
+  border-bottom-left-radius: 50%;
+  border-bottom-right-radius: 50%;
 }

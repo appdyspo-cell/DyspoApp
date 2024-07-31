@@ -1,0 +1,502 @@
+<!-- <ion-header class="ion-no-border"> </ion-header> -->
+<ion-content
+  [ngClass]="{
+    'bg-kids-img': agendaEvent.type === agendaEventType.KIDS,
+    'bg-nokids-img': agendaEvent.type === agendaEventType.NOKIDS,
+    'bg-free-img': agendaEvent.type === agendaEventType.FREE,
+    'bg-solo-img': agendaEvent.type === agendaEventType.SOLO,
+  }"
+>
+  <ion-toolbar style="padding-top: calc(var(--ion-safe-area-top) / 2)">
+    <ion-button
+      slot="start"
+      (click)="close()"
+      fill="clear"
+      size="large"
+      class="white-btn"
+    >
+      <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
+    </ion-button>
+    <ion-buttons *ngIf="!isInvitation" slot="end">
+      <ion-button
+        *ngIf="agendaEvent.is_multi && agendaEvent.members_uid.length > 1"
+        class="white-btn"
+        fill="clear"
+        size="large"
+        (click)="goToChat(agendaEvent, $event)"
+      >
+        <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+      </ion-button>
+      <ion-button
+        slot="end"
+        class="white-btn"
+        (click)="openPopoverMenu($event)"
+        fill="clear"
+        size="large"
+      >
+        <ion-icon slot="icon-only" name="ellipsis-vertical-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <div
+    [ngClass]="{
+      'bg-kids-secondary': agendaEvent.type === agendaEventType.KIDS,
+      'bg-nokids-secondary': agendaEvent.type === agendaEventType.NOKIDS,
+      'bg-free-secondary': agendaEvent.type === agendaEventType.FREE,
+      'bg-solo-secondary': agendaEvent.type === agendaEventType.SOLO,
+      'header-container': true,
+      
+    }"
+  >
+    <div style="padding: 8px">
+      <div class="admin-ct d-flex" *ngIf="isMulti">
+        <ion-thumbnail
+          slot="start"
+          [ngClass]="{
+            'thumb-kid-thick':
+              admin?.dyspoStatus === UserDyspoStatus.DYSPOWITHKIDS,
+            'thumb-nokids-thick': admin?.dyspoStatus === UserDyspoStatus.DYSPO,
+            'thumb-nodyspo-thick':
+              admin?.dyspoStatus === UserDyspoStatus.NODYSPO
+          }"
+        >
+          <img [defaultImage]="defaultAvatar" [lazyLoad]="admin?.avatarPath!" />
+        </ion-thumbnail>
+        <div>
+          <span style="font-weight: bold; font-size: 1.15rem">{{
+            admin?.uid !== userSvc.userInfo?.uid ? admin?.firstname : "Vous"
+          }}</span
+          ><br />
+          <span *ngIf="admin?.uid === userSvc.userInfo?.uid"
+            >proposez un événement</span
+          >
+          <span *ngIf="admin?.uid !== userSvc.userInfo?.uid"
+            >propose un événement</span
+          >
+          <br />
+          <div
+            [ngClass]="{
+              'label-bg-kids': agendaEvent.type === agendaEventType.KIDS,
+              'label-bg-nokids': agendaEvent.type === agendaEventType.NOKIDS,
+              'label-bg-free': agendaEvent.type === agendaEventType.FREE,
+              'label-bg-solo': agendaEvent.type === agendaEventType.SOLO,
+              'label-type': true
+            }"
+          >
+            {{ eventTypeLabel }}
+          </div>
+        </div>
+      </div>
+
+      <div
+        *ngIf="!isMulti"
+        style="
+          width: fit-content;
+          padding: 3px;
+          border-radius: 3px;
+          margin: auto;
+        "
+      >
+        <div class="label-bg-solo label-type">
+          {{ eventTypeLabel }}
+        </div>
+      </div>
+      <div
+        class="d-flex ion-padding ion-align-items-center ion-justify-content-center"
+      >
+        <div>
+          <div style="font-size: 1.2rem; font-weight: 600">
+            {{ display_date_1 }}
+          </div>
+          <div
+            *ngIf="display_date_2"
+            style="font-size: 1.2rem; font-weight: 600"
+          >
+            {{ display_date_2 }}
+          </div>
+          <div
+            *ngIf="isMulti"
+            class="ion-text-center"
+            style="font-size: 1.2rem; margin-right: 5px"
+          >
+            <span>{{
+              members_presence_confirmed.length +
+                members_presence_not_confirmed.length
+            }}</span>
+            <span
+              *ngIf="
+                members_presence_confirmed.length +
+                  members_presence_not_confirmed.length <=
+                1
+              "
+            >
+              participant</span
+            >
+            <span
+              *ngIf="
+                members_presence_confirmed.length +
+                  members_presence_not_confirmed.length >
+                1
+              "
+            >
+              participants</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Participants section-->
+
+    <div class="category_div" *ngIf="isMulti">
+      <div class="menu" *ngIf="!members_loaded">
+        <div class="item" *ngFor="let i of [1, 2, 3, 4, 5]">
+          <ion-thumbnail>
+            <ion-skeleton-text [animated]="true"></ion-skeleton-text>
+            <ion-icon></ion-icon>
+          </ion-thumbnail>
+          <ion-label
+            ><ion-skeleton-text
+              [animated]="true"
+              style="width: 30px"
+            ></ion-skeleton-text
+          ></ion-label>
+        </div>
+      </div>
+
+      <div class="menu" *ngIf="members_loaded">
+        <div
+          class="item animate__animated animate__fadeIn"
+          *ngFor="let member of members_presence_confirmed"
+        >
+          <ion-thumbnail
+            (click)="onSelectUser(member, $event)"
+            [ngClass]="{
+              'thumb-kid': member.dyspoStatus === UserDyspoStatus.DYSPOWITHKIDS,
+              'thumb-nokids': member.dyspoStatus === UserDyspoStatus.DYSPO,
+              'thumb-nodyspo': member.dyspoStatus === UserDyspoStatus.NODYSPO,
+              'thumb-dyspo-undefined':
+                member.dyspoStatus === UserDyspoStatus.UNDEFINED ||
+                !member.dyspoStatus
+            }"
+          >
+            <img src="{{ member.avatarPath }}" />
+            <!-- <ion-badge
+              *ngIf="member.agendaEvents!.length > 0"
+              name="warning-outline"
+              class="thumbnail-badge"
+              >{{ member.agendaEvents!.length }}</ion-badge
+            > -->
+            <div
+              *ngIf="member.agendaEvents!.length > 0"
+              name="warning-outline"
+              class="thumbnail-badge"
+            ></div>
+            <ion-icon
+              *ngIf="member.is_my_friend === false"
+              class="zmdi zmdi-plus invite-icon"
+            ></ion-icon>
+            <div
+              class="d-flex ion-align-items-center thumbnail-status animate__animated animate__zoomIn"
+            >
+              <ion-icon name="checkmark-outline"></ion-icon>
+            </div>
+          </ion-thumbnail>
+          <ion-label>{{ member.firstname }}</ion-label>
+        </div>
+        <div
+          class="item animate__animated animate__zoomIn"
+          *ngFor="let member of members_presence_not_confirmed"
+        >
+          <ion-thumbnail
+            (click)="onSelectUser(member, $event)"
+            [ngClass]="{
+              'thumb-kid': member.dyspoStatus === UserDyspoStatus.DYSPOWITHKIDS,
+              'thumb-nokids': member.dyspoStatus === UserDyspoStatus.DYSPO,
+              'thumb-nodyspo': member.dyspoStatus === UserDyspoStatus.NODYSPO,
+              'thumb-dyspo-undefined':
+                member.dyspoStatus === UserDyspoStatus.UNDEFINED ||
+                !member.dyspoStatus
+            }"
+          >
+            <img src="{{ member.avatarPath }}" />
+            <!-- <ion-badge
+              *ngIf="member.agendaEvents!.length > 0"
+              name="warning-outline"
+              class="thumbnail-badge"
+              >{{ member.agendaEvents!.length }}</ion-badge
+            > -->
+
+            <div
+              *ngIf="member.agendaEvents!.length > 0"
+              name="warning-outline"
+              class="thumbnail-badge"
+            ></div>
+            <ion-icon
+              (click)="invite(member)"
+              *ngIf="member.is_my_friend === false"
+              class="zmdi zmdi-plus end invite-icon"
+            ></ion-icon>
+            <div
+              class="d-flex ion-align-items-center thumbnail-status animate__animated animate__zoomIn"
+            >
+              <ion-icon name="help-outline"></ion-icon>
+            </div>
+          </ion-thumbnail>
+          <ion-label>{{ member.firstname }}</ion-label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    style="width: 100%; padding: 0px 5px"
+    class="body-inner d-flex ion-margin-top ion-margin-bottom ion-justify-content-center"
+  >
+    <div class="ion-margin-top ion-text-center" style="width: 100%">
+      <div
+        *ngIf="agendaEvent.avatar"
+        class="d-flex ion-justify-content-center"
+        (click)="openImage(agendaEvent.avatar, $event)"
+      >
+        <div
+          style="background-image: url('{{ agendaEvent.avatar }}');"
+          class="bg-event-avatar d-flex ion-justify-content-center ion-margin-bottom"
+        >
+          <!-- <ion-img src="{{ agendaEvent.avatar }}"></ion-img> -->
+        </div>
+      </div>
+
+      <span style="font-size: 1.3rem; font-weight: bold">{{
+        agendaEvent.title
+      }}</span>
+      <p *ngIf="agendaEvent.place_description !== ''" style="margin-top: 0px">
+        {{ agendaEvent.place_description }}
+      </p>
+
+      <div
+        *ngIf="isInvitation"
+        class="d-flex"
+        style="padding-bottom: 0px; justify-content: space-around"
+      >
+        <ion-button
+          (click)="acceptInvitation()"
+          class="dyspo-button no-margin"
+          mode="ios"
+          color="tertiary"
+          >dyspo!
+          <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon
+        ></ion-button>
+        <ion-button
+          (click)="declineInvitation()"
+          class="dyspo-button no-margin"
+          mode="ios"
+          color="tertiary"
+          >pas dyspo<ion-icon
+            slot="start"
+            name="close-circle-outline"
+          ></ion-icon
+        ></ion-button>
+        <ion-button
+          (click)="close()"
+          class="dyspo-button no-margin"
+          mode="ios"
+          color="tertiary"
+          >à voir<ion-icon slot="start" name="help-circle-outline"></ion-icon
+        ></ion-button>
+      </div>
+      <!-- My Status and Dyspo  -->
+      <div
+        *ngIf="isInvitation"
+        style="min-height: 65px"
+        class="d-flex ion-padding-top ion-justify-content-center"
+      >
+        <div
+          *ngIf="my_dyspoStatus_label !== '' || my_agendaEvents_label !== ''"
+          style="margin-right: 6px"
+        >
+          <ion-icon name="information-circle-outline" size="large"></ion-icon>
+        </div>
+        <div style="text-align: left">
+          {{ my_dyspoStatus_label }}<br />
+          {{ my_agendaEvents_label }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- <ion-toolbar>
+    <div
+      *ngIf="isInvitation"
+      class="d-flex"
+      style="padding-bottom: 32px; justify-content: space-around"
+    >
+      <ion-button
+        (click)="acceptInvitation()"
+        class="dyspo-button no-margin"
+        mode="ios"
+        color="tertiary"
+        >dyspo!
+        <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon
+      ></ion-button>
+      <ion-button
+        (click)="declineInvitation()"
+        class="dyspo-button no-margin"
+        mode="ios"
+        color="tertiary"
+        >pas dyspo<ion-icon slot="start" name="close-circle-outline"></ion-icon
+      ></ion-button>
+      <ion-button
+        (click)="close()"
+        class="dyspo-button no-margin"
+        mode="ios"
+        color="tertiary"
+        >à voir<ion-icon slot="start" name="help-circle-outline"></ion-icon
+      ></ion-button>
+    </div>
+  </ion-toolbar> -->
+
+  <ion-popover
+    #popovermenu
+    [isOpen]="isPopoverOpen"
+    (didDismiss)="isPopoverOpen = false"
+  >
+    <ng-template>
+      <ion-list>
+        <ion-item *ngIf="allowEdit" tappable (click)="editEvent()" lines="full">
+          <!-- <ion-icon name="create-outline" style="margin-right: 15px"></ion-icon> -->
+          <ion-text>Éditer l'événement</ion-text>
+        </ion-item>
+        <ion-item tappable (click)="quitEvent()" lines="none">
+          <ion-text>Supprimer l'événement</ion-text>
+        </ion-item>
+      </ion-list>
+    </ng-template>
+  </ion-popover>
+
+  <ion-popover
+    #popoverUserEvents
+    [isOpen]="isPopoverUserEventsOpen"
+    (didDismiss)="isPopoverUserEventsOpen = false"
+  >
+    <ng-template>
+      <div
+        class="popover-events-header"
+        (click)="invite(selectedUser!)"
+        *ngIf="
+          selectedUser!.uid !== userSvc.userInfo?.uid &&
+          selectedUserFriendStatus === FriendStatus.NOFRIEND
+        "
+      >
+        Demander en Ami
+      </div>
+      <div
+        class="popover-events-header"
+        *ngIf="selectedUserFriendStatus !== FriendStatus.NOFRIEND"
+      >
+        {{ selectedUserFriendStatusLabel }}
+      </div>
+      <ion-list *ngIf="selectedUserEvents && selectedUserEvents.length > 0">
+        <ion-note
+          style="
+            display: block;
+            width: 100%;
+            padding: 4px;
+            padding-top: 0px;
+            text-align: center;
+            font-size: 0.75em;
+            margin-bottom: 2px;
+          "
+          >Pas dyspo dans ces horaires:</ion-note
+        >
+        <div
+          *ngFor="let agEv of selectedUserEvents"
+          class="ion-justify-content-center;text-align:center"
+          style="width: 100%; display: flex; padding: 5px"
+        >
+          <ion-text
+            style="
+              font-size: 0.75rem;
+              width: 100%;
+              text-align: center;
+              color: var(--text-no-dyspo);
+            "
+            >{{ getOtherEventLabel(agEv) }}</ion-text
+          >
+        </div>
+      </ion-list>
+    </ng-template>
+  </ion-popover>
+
+  <ion-modal
+    [isOpen]="modalNewAdminOpened"
+    [initialBreakpoint]="0.4"
+    [breakpoints]="[0, 0.4, 1]"
+    (didDismiss)="modalNewAdminOpened = false"
+  >
+    <ng-template>
+      <ion-content class="ion-padding">
+        <div
+          class="d-flex ion-text-center ion-justify-content-center ion-padding"
+        >
+          <ion-text>Sélectionnez un nouvel admin</ion-text>
+        </div>
+        <ion-list lines="none">
+          <ion-item
+            (click)="confirmNewAdmin(candidate)"
+            *ngFor="let candidate of new_admin_candidates"
+            class="animated slideInRight delay_11"
+          >
+            <ion-thumbnail slot="start">
+              <img src="{{ candidate.avatarPath }}" />
+            </ion-thumbnail>
+
+            <div class="text-box">
+              {{ candidate.lastname }}
+              {{ candidate.firstname }}
+            </div>
+          </ion-item>
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>
+<!-- <ion-footer class="ion-no-border" *ngIf="isInvitation">
+  <ion-toolbar
+    [ngClass]="{
+      'bg-kids': agendaEvent.type === agendaEventType.KIDS,
+      'bg-nokids': agendaEvent.type === agendaEventType.NOKIDS,
+      'bg-free': agendaEvent.type === agendaEventType.FREE,
+     
+    }"
+  >
+    <div
+      class="d-flex ion-justify-content-center"
+      style="color: #eee; padding-bottom: var(--ion-safe-area-bottom)"
+    >
+      <ion-button
+        (click)="acceptInvitation()"
+        class="dyspo-button"
+        mode="ios"
+        fill="solid"
+        color="teriary"
+        >Dyspo <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon
+      ></ion-button>
+      <ion-button
+        (click)="declineInvitation()"
+        class="dyspo-button"
+        mode="ios"
+        fill="solid"
+        color="teriary"
+        >Pas dyspo <ion-icon slot="start" name="close-circle-outline"></ion-icon
+      ></ion-button>
+      <ion-button
+        (click)="close()"
+        class="dyspo-button"
+        mode="ios"
+        color="tertiary"
+        fill="solid"
+        >A Voir <ion-icon slot="start" name="help-circle-outline"></ion-icon
+      ></ion-button>
+    </div>
+  </ion-toolbar>
+</ion-footer> -->

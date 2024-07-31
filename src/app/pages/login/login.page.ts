@@ -1,16 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { MenuController, NavController } from '@ionic/angular';
+
 import { UtilsService } from 'src/app/services/utils.service';
-import { environment } from 'src/environments/environment';
+
 import Swal from 'sweetalert2';
 import { TranslateService } from '@ngx-translate/core';
-import { signInWithEmailAndPassword, Auth } from '@angular/fire/auth';
-import { Firestore } from '@angular/fire/firestore';
+
 import { AuthService } from 'src/app/services/auth.service';
 import { LoggerService } from 'src/app/services/logger.service';
-import { BiometryType, NativeBiometric } from 'capacitor-native-biometric';
-import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +15,7 @@ import { Capacitor } from '@capacitor/core';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
-  userInfo: any = { email: '', password: '123456' };
+  userInfo: any = { email: '', password: '' };
 
   langArr = [];
   lang = 'en';
@@ -28,20 +25,13 @@ export class LoginPage implements OnInit {
 
   constructor(
     private router: Router,
-    private menuCtrl: MenuController,
     private utils: UtilsService,
     public translate: TranslateService,
-    private auth: Auth,
-    private navController: NavController,
     private logger: LoggerService,
     private authService: AuthService
   ) {}
 
   ngOnInit() {}
-
-  ionViewDidEnter() {
-    this.menuCtrl.enable(false);
-  }
 
   signup() {
     this.router.navigateByUrl('/register');
@@ -63,30 +53,19 @@ export class LoginPage implements OnInit {
 
     try {
       const credentials = await this.authService.login(email, password);
-      if (!fromBiometric && Capacitor.getPlatform() !== 'web') {
-        // Save user's credentials
-        NativeBiometric.setCredentials({
-          username: email,
-          password: password,
-          server: environment.BIOMETRIC_KEY,
-        }).then(() => {
-          console.log('Credentials set');
-        });
-      }
 
       this.logger.logDebug('user logged');
       this.utils.hideLoader();
-      this.navController.navigateRoot('/tabs');
+      // this.navController.navigateRoot('/tabs');
       this.logger.logDebug(credentials);
       this.utils.hideLoader();
       return credentials;
     } catch (error: any) {
       this.utils.hideLoader();
+      console.log('Error login', error);
       this.utils.showFirebaseError(error);
       return null;
     }
-
-    return null;
   }
 
   async forgotPassword() {
@@ -99,30 +78,40 @@ export class LoginPage implements OnInit {
       inputPlaceholder: 'Entrez votre email',
     });
     if (email) {
-      this.authService.resetPw(email);
+      this.authService
+        .resetPw(email)
+        .then(() => {
+          console.log('Un email');
+          this.utils.showToastSuccess(
+            'Un email vous a été envoyé pour réinitialiser votre mot de passe'
+          );
+        })
+        .catch((err: any) => {
+          this.utils.showFirebaseError(err);
+        });
     }
   }
 
-  async biometricLogin() {
-    const result = await NativeBiometric.isAvailable();
+  // async biometricLogin() {
+  //   const result = await NativeBiometric.isAvailable();
 
-    if (!result.isAvailable) return;
+  //   if (!result.isAvailable) return;
 
-    const isFaceID = result.biometryType == BiometryType.FACE_ID;
+  //   const isFaceID = result.biometryType == BiometryType.FACE_ID;
 
-    const verified = await NativeBiometric.verifyIdentity({
-      reason: 'Empreinte digitale / Reconnaissance faciale',
-      title: 'Authentification',
-      negativeButtonText: 'Annuler',
-    })
-      .then(() => true)
-      .catch(() => false);
+  //   const verified = await NativeBiometric.verifyIdentity({
+  //     reason: 'Empreinte digitale / Reconnaissance faciale',
+  //     title: 'Authentification',
+  //     negativeButtonText: 'Annuler',
+  //   })
+  //     .then(() => true)
+  //     .catch(() => false);
 
-    const credentials = await NativeBiometric.getCredentials({
-      server: environment.BIOMETRIC_KEY,
-    });
-    if (credentials) {
-      this.login(credentials.username, credentials.password, true);
-    }
-  }
+  //   const credentials = await NativeBiometric.getCredentials({
+  //     server: environment.BIOMETRIC_KEY,
+  //   });
+  //   if (credentials) {
+  //     this.login(credentials.username, credentials.password, true);
+  //   }
+  // }
 }

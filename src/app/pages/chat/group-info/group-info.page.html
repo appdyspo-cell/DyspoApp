@@ -1,170 +1,176 @@
 <ion-header [translucent]="true">
-    <ion-toolbar>
-        <ion-buttons slot="start">
-            <ion-back-button text="" icon="chevron-back-outline"></ion-back-button>
-        </ion-buttons>
-        <ion-title>{{'group_info' | translate}}
-            <!-- <span class="ion-float-end" (click)="create_group_info()">{{'edit' | translate}}</span> -->
-        </ion-title>
-        <ion-buttons slot="end">
-            <ion-button (click)="create_group_info()">
-                {{'edit' | translate}}
-            </ion-button>
-        </ion-buttons>
-    </ion-toolbar>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button
+        text=""
+        icon="chevron-back-outline"
+        color="dark"
+      ></ion-back-button>
+    </ion-buttons>
+    <ion-title
+      >{{'group_info' | translate}}
+      <!-- <span class="ion-float-end" (click)="create_group_info()">{{'edit' | translate}}</span> -->
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="create_group_info()">
+        {{'edit' | translate}}
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content class="bg_color" [fullscreen]="true">
-    <div class="form">
-        <ion-list lines="none">
+  <div class="form">
+    <ion-list lines="none">
+      <ion-item class="profile">
+        <div class="item_inner">
+          <div
+            class="profile_img_box animated zoomIn delay_1"
+            (click)="profilepicture()"
+          >
+            <div class="profile_img">
+              <img src="assets/img/g5.png" />
+            </div>
+          </div>
+          <h1 class="ion-text-center">Charlie's Angels</h1>
+          <h4 class="ion-text-center">Every Problam can be solved</h4>
+        </div>
+      </ion-item>
 
-            <ion-item class="profile">
-                <div class="item_inner">
-                    <div class="profile_img_box animated zoomIn delay_1" (click)="profilepicture()">
-                        <div class="profile_img">
-                            <img src="assets/img/g5.png">
-                        </div>
-                    </div>
-                    <h1 class="ion-text-center">Charlie's Angels</h1>
-                    <h4 class="ion-text-center">Every Problam can be solved</h4>
-                </div>
-            </ion-item>
+      <ion-item class="media_shared">
+        <div class="item_inner">
+          <h4>{{'media_shared' | translate}}</h4>
+          <ion-row item-end class="animated slideInUp delay_1">
+            <ion-col>
+              <div class="img_box">
+                <img src="assets/img/m1.png" />
+              </div>
+            </ion-col>
+            <ion-col>
+              <div class="img_box">
+                <img src="assets/img/m2.png" />
+              </div>
+            </ion-col>
+            <ion-col>
+              <div class="img_box">
+                <img src="assets/img/m3.png" />
+              </div>
+            </ion-col>
+            <ion-col>
+              <div class="img_box">
+                <img src="assets/img/m4.png" />
+              </div>
+            </ion-col>
+            <ion-col>
+              <div class="img_box">
+                <img src="assets/img/m5.png" />
+              </div>
+            </ion-col>
+            <h6 class="ion-text-center">{{'view_all' | translate}}</h6>
+          </ion-row>
+        </div>
+      </ion-item>
 
-            <ion-item class="media_shared">
-                <div class="item_inner">
-                    <h4>{{'media_shared' | translate}}</h4>
-                    <ion-row item-end class="animated slideInUp delay_1">
-                        <ion-col>
-                            <div class="img_box">
-                                <img src="assets/img/m1.png">
-                            </div>
-                        </ion-col>
-                        <ion-col>
-                            <div class="img_box">
-                                <img src="assets/img/m2.png">
-                            </div>
-                        </ion-col>
-                        <ion-col>
-                            <div class="img_box">
-                                <img src="assets/img/m3.png">
-                            </div>
-                        </ion-col>
-                        <ion-col>
-                            <div class="img_box">
-                                <img src="assets/img/m4.png">
-                            </div>
-                        </ion-col>
-                        <ion-col>
-                            <div class="img_box">
-                                <img src="assets/img/m5.png">
-                            </div>
-                        </ion-col>
-                        <h6 class="ion-text-center">{{'view_all' | translate}}</h6>
-                    </ion-row>
-                </div>
-            </ion-item>
+      <ion-item class="item-toggle">
+        <ion-label>{{'mute_notification' | translate}}</ion-label>
+        <ion-toggle slot="end" checked="true"></ion-toggle>
+      </ion-item>
+    </ion-list>
+  </div>
+  <div class="members_in_group">
+    <h3>{{'members_in_group' | translate}} (06)</h3>
 
-            <ion-item class="item-toggle">
-                <ion-label>{{'mute_notification' | translate}}</ion-label>
-                <ion-toggle slot="end" checked="true"></ion-toggle>
-            </ion-item>
-        </ion-list>
-    </div>
-    <div class="members_in_group">
-        <h3>{{'members_in_group' | translate}} (06)</h3>
-
-        <ion-list lines="none" class="">
-            <ion-item class=" animated slideInRight delay_1">
-                <div class="item_inner d-flex">
-                    <div class="profile_img_box">
-                        <div class="profile_img">
-                            <img src="assets/img/1.png">
-                        </div>
-                    </div>
-                    <div class="text-box">
-                        <h2 class="d-flex"><span>Aditi Patel</span> </h2>
-                        <p class="d-flex"><span class="message">Travrlling with Nature</span></p>
-                    </div>
-                    <ion-icon class="zmdi zmdi-plus end"></ion-icon>
-                </div>
-            </ion-item>
-            <ion-item class=" animated slideInRight delay_2">
-                <div class="item_inner d-flex">
-                    <div class="profile_img_box">
-                        <div class="profile_img">
-                            <img src="assets/img/5.png">
-                        </div>
-                    </div>
-                    <div class="text-box">
-                        <h2 class="d-flex"><span>Ammy Drack</span></h2>
-                        <p class="d-flex"><span class="message">Feeling Awesome</span>
-                        </p>
-                    </div>
-                    <ion-icon class="zmdi zmdi-plus end"></ion-icon>
-                </div>
-            </ion-item>
-            <ion-item class=" animated slideInRight delay_3">
-                <div class="item_inner d-flex">
-                    <div class="profile_img_box">
-                        <div class="profile_img">
-                            <img src="assets/img/3.png">
-                        </div>
-                    </div>
-                    <div class="text-box">
-                        <h2 class="d-flex"><span>Andy Reslow</span> </h2>
-                        <p class="d-flex">
-                            <span class="message">Minding own business</span>
-                        </p>
-                    </div>
-                    <ion-icon class="zmdi zmdi-plus end"></ion-icon>
-                </div>
-            </ion-item>
-            <ion-item class="animated slideInRight delay_4">
-                <div class="item_inner d-flex">
-                    <div class="profile_img_box">
-                        <div class="profile_img">
-                            <img src="assets/img/2.png">
-                        </div>
-                    </div>
-                    <div class="text-box">
-                        <h2 class="d-flex"><span>Azler Hopson</span></h2>
-                        <p class="d-flex"><span class="message">Busy</span>
-                        </p>
-                    </div>
-                    <ion-icon class="zmdi zmdi-plus end"></ion-icon>
-                </div>
-
-            </ion-item>
-            <ion-item class=" animated slideInRight delay_5">
-                <div class="item_inner d-flex">
-                    <div class="profile_img_box">
-                        <div class="profile_img">
-                            <img src="assets/img/6.png">
-                        </div>
-                    </div>
-                    <div class="text-box">
-                        <h2 class="d-flex"><span>Andy Reslow</span> </h2>
-                        <p class="d-flex"><span class="message">About to reach New York</span>
-                        </p>
-                    </div>
-                    <ion-icon class="zmdi zmdi-plus end"></ion-icon>
-                </div>
-            </ion-item>
-            <ion-item class=" animated slideInRight delay_6">
-                <div class="item_inner d-flex">
-                    <div class="profile_img_box">
-                        <div class="profile_img">
-                            <img src="assets/img/8.png">
-                        </div>
-                    </div>
-                    <div class="text-box">
-                        <h2 class="d-flex"><span>Ammy Drack</span> </h2>
-                        <p class="d-flex"><span class="message">Gyming</span>
-                        </p>
-                    </div>
-                    <ion-icon class="zmdi zmdi-plus end"></ion-icon>
-                </div>
-            </ion-item>
-        </ion-list>
-    </div>
+    <ion-list lines="none" class="">
+      <ion-item class="animated slideInRight delay_1">
+        <div class="item_inner d-flex">
+          <div class="profile_img_box">
+            <div class="profile_img">
+              <img src="assets/img/1.png" />
+            </div>
+          </div>
+          <div class="text-box">
+            <h2 class="d-flex"><span>Aditi Patel</span></h2>
+            <p class="d-flex">
+              <span class="message">Travrlling with Nature</span>
+            </p>
+          </div>
+          <ion-icon class="zmdi zmdi-plus end"></ion-icon>
+        </div>
+      </ion-item>
+      <ion-item class="animated slideInRight delay_2">
+        <div class="item_inner d-flex">
+          <div class="profile_img_box">
+            <div class="profile_img">
+              <img src="assets/img/5.png" />
+            </div>
+          </div>
+          <div class="text-box">
+            <h2 class="d-flex"><span>Ammy Drack</span></h2>
+            <p class="d-flex"><span class="message">Feeling Awesome</span></p>
+          </div>
+          <ion-icon class="zmdi zmdi-plus end"></ion-icon>
+        </div>
+      </ion-item>
+      <ion-item class="animated slideInRight delay_3">
+        <div class="item_inner d-flex">
+          <div class="profile_img_box">
+            <div class="profile_img">
+              <img src="assets/img/3.png" />
+            </div>
+          </div>
+          <div class="text-box">
+            <h2 class="d-flex"><span>Andy Reslow</span></h2>
+            <p class="d-flex">
+              <span class="message">Minding own business</span>
+            </p>
+          </div>
+          <ion-icon class="zmdi zmdi-plus end"></ion-icon>
+        </div>
+      </ion-item>
+      <ion-item class="animated slideInRight delay_4">
+        <div class="item_inner d-flex">
+          <div class="profile_img_box">
+            <div class="profile_img">
+              <img src="assets/img/2.png" />
+            </div>
+          </div>
+          <div class="text-box">
+            <h2 class="d-flex"><span>Azler Hopson</span></h2>
+            <p class="d-flex"><span class="message">Busy</span></p>
+          </div>
+          <ion-icon class="zmdi zmdi-plus end"></ion-icon>
+        </div>
+      </ion-item>
+      <ion-item class="animated slideInRight delay_5">
+        <div class="item_inner d-flex">
+          <div class="profile_img_box">
+            <div class="profile_img">
+              <img src="assets/img/6.png" />
+            </div>
+          </div>
+          <div class="text-box">
+            <h2 class="d-flex"><span>Andy Reslow</span></h2>
+            <p class="d-flex">
+              <span class="message">About to reach New York</span>
+            </p>
+          </div>
+          <ion-icon class="zmdi zmdi-plus end"></ion-icon>
+        </div>
+      </ion-item>
+      <ion-item class="animated slideInRight delay_6">
+        <div class="item_inner d-flex">
+          <div class="profile_img_box">
+            <div class="profile_img">
+              <img src="assets/img/8.png" />
+            </div>
+          </div>
+          <div class="text-box">
+            <h2 class="d-flex"><span>Ammy Drack</span></h2>
+            <p class="d-flex"><span class="message">Gyming</span></p>
+          </div>
+          <ion-icon class="zmdi zmdi-plus end"></ion-icon>
+        </div>
+      </ion-item>
+    </ion-list>
+  </div>
 </ion-content>

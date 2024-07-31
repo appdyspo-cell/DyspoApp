@@ -1,16 +1,250 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Mon Status</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="bg_color">
+  <div class="main">
+    <div
+      button
+      (click)="openNotifications()"
+      *ngIf="nb_notifications > 0"
+      style="display: flex; align-items: center; height: 50px"
+    >
+      <ion-icon
+        class="icon-bell"
+        style="padding-right: 5px; font-size: 1.5rem"
+      ></ion-icon>
+      <ion-text style="padding-right: 5px; line-height: 1.2"
+        >Notifications</ion-text
+      >
+      <ion-badge>{{nb_notifications}}</ion-badge>
+    </div>
+    <ion-text style="padding-top: 30px">- Aujourd'hui -</ion-text>
+    <span style="font-size: 1.4em; font-weight: 600">{{todayFormatted}}</span>
+    <div
+      style="
+        margin-top: 32px;
+        margin-bottom: 20px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      "
+    >
+      <div button id="open-status-modal" class="dyspo-btn-container">
+        <div
+          class="dyspo-button ion-activatable animate__animated animate__fadeIn"
+          *ngIf="todayDyspo?.userDyspo === dyspoStatus.DYSPO"
+        >
+          <ion-img src="/assets/newimg/home_dyspo.png"></ion-img>
+          <!-- <ion-ripple-effect></ion-ripple-effect> -->
+        </div>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Mon Status</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  <ion-card>
-    <ion-card-header>Voici mon status</ion-card-header>
-  </ion-card>
+        <div
+          *ngIf="todayDyspo?.userDyspo === dyspoStatus.DYSPOWITHKIDS"
+          class="dyspo-button ion-activatable animate__animated animate__fadeIn"
+        >
+          <ion-img src="/assets/newimg/home_dyspo_wk.png"></ion-img>
+          <!-- <ion-ripple-effect></ion-ripple-effect> -->
+        </div>
+
+        <div
+          *ngIf="todayDyspo?.userDyspo === dyspoStatus.NODYSPO"
+          class="dyspo-button ion-activatable animate__animated animate__fadeIn"
+        >
+          <ion-img src="/assets/newimg/home_pas_dyspo.png"></ion-img>
+          <!-- <ion-ripple-effect></ion-ripple-effect> -->
+        </div>
+
+        <div
+          *ngIf="todayDyspo.userDyspo === dyspoStatus.UNDEFINED "
+          class="dyspo-button ion-activatable animate__animated animate__fadeIn"
+        >
+          <ion-img src="/assets/newimg/home_pas_dyspo.png"></ion-img>
+          <!-- <ion-ripple-effect></ion-ripple-effect> -->
+        </div>
+      </div>
+    </div>
+
+    <ion-text style="font-size: 0.85em"
+      >Créer un événement de groupe ou perso :</ion-text
+    >
+
+    <ion-row
+      class="ion-justify-content-center"
+      style="margin-bottom: 35px; margin-top: 10px"
+    >
+      <ion-col size="4">
+        <div (click)="openCreateEventDyspo()">
+          <ion-img src="../../../assets/newimg/creer_event_dyspo.png"></ion-img>
+        </div>
+      </ion-col>
+      <ion-col size="4">
+        <div (click)="openCreateEventDyspoWithKids()">
+          <ion-img
+            src="../../../assets/newimg/creer_event_dyspo_wk.png"
+          ></ion-img>
+        </div>
+      </ion-col>
+      <ion-col size="4">
+        <div (click)="openCreateEventPerso()">
+          <ion-img src="../../../assets/newimg/creer_event_perso.png"></ion-img>
+        </div>
+      </ion-col>
+    </ion-row>
+
+    <!-- <div
+      style="
+        display: flex;
+
+        margin-bottom: 35px;
+        justify-content: center;
+        padding: 10px;
+        width: 100%;
+        align-items: center;
+      "
+    >
+      <div
+        class="btn-create-evt create-dyspo"
+        (click)="openCreateEventDyspo()"
+      ></div>
+      <div
+        class="btn-create-evt create-dyspo-with-kids"
+        (click)="openCreateEventDyspoWithKids()"
+      ></div>
+      <div
+        class="btn-create-evt create-perso"
+        (click)="openCreateEventPerso()"
+      ></div>
+    </div> -->
+
+    <div
+      style="
+        display: flex;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 16px;
+      "
+    >
+      <div style="border: 1px solid lightgray; width: 100%; height: 2px"></div>
+
+      <div
+        style="
+          text-align: center;
+          font-size: 1.05em;
+          font-weight: 600;
+          min-width: 205px;
+          text-transform: uppercase;
+        "
+      >
+        événements à venir
+      </div>
+
+      <div style="border: 1px solid lightgray; width: 100%; height: 2px"></div>
+    </div>
+  </div>
+
+  <!-- <div
+    class="d-flex ion-justify-content-between ion-align-items-center ion-padding"
+    style="padding-bottom: 0px; padding-top: 0px"
+  ></div> -->
+
+  <ion-card-content style="padding-top: 0">
+    <div *ngIf="nextAgendaEvents.length === 0">Aucun événement planifié</div>
+    <div class="next-agenda-container">
+      <app-agenda-event-mini
+        *ngFor="let nextEvent of nextAgendaEvents"
+        class="animate__animated animate__fadeIn"
+        [agendaEvent]="nextEvent"
+        [isInvitation]="false"
+        (click)="openAgendaEventInfo(nextEvent)"
+      >
+      </app-agenda-event-mini>
+    </div>
+  </ion-card-content>
+  <!-- 
+  <div *ngIf="invitations.length > 0">
+    <ion-list-header>
+      <span style="margin-right: 8px"><h2>Invitations</h2></span>
+    </ion-list-header>
+
+    <ion-card-content>
+      <div class="next-agenda-container">
+        <div class="next-agenda-content">
+          <app-agenda-event-mini
+            *ngFor="let invit of invitations"
+            [agendaEvent]="invit"
+            [isInvitation]="true"
+            (click)="openInvitation(invit)"
+          >
+          </app-agenda-event-mini>
+        </div>
+      </div>
+    </ion-card-content>
+  </div>
+
+  <div *ngIf="friendsSuggested.length > 0">
+    <ion-list-header>
+      <span style="margin-right: 8px"><h2>Demande d'Amis</h2></span>
+    </ion-list-header>
+
+    <ion-card-content>
+      Vous avez
+      <span style="font-size: 1.3rem; font-weight: bold"
+        >{{friendsSuggested.length}}</span
+      >
+      demandes d'ami en attente
+    </ion-card-content>
+  </div> -->
+
+  <ion-modal
+    #statusmodal
+    trigger="open-status-modal"
+    (willDismiss)="onWillDismiss($event)"
+    [initialBreakpoint]="userSvc.userInfo?.with_kids? 0.5: 0.4"
+    [breakpoints]="userSvc.userInfo?.with_kids? [0, 0.5] : [0, 0.4]"
+  >
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <div style="text-align: center; width: 100%">
+            Changer mon statut du jour
+          </div>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding ion-margin">
+        <div class="dyspo-modal-btns-container">
+          <div
+            style="display: flex; justify-content: center"
+            button
+            (click)="updateStatus(dyspoStatus.DYSPO)"
+          >
+            <ion-img
+              style="width: 50%"
+              src="/assets/newimg/home_dyspo.png"
+            ></ion-img>
+            <ion-ripple-effect></ion-ripple-effect>
+          </div>
+          <div
+            *ngIf="userSvc.userInfo?.with_kids"
+            button
+            style="display: flex; justify-content: center"
+            (click)="updateStatus(dyspoStatus.DYSPOWITHKIDS)"
+          >
+            <ion-img
+              style="width: 50%"
+              src="/assets/newimg/home_dyspo_wk.png"
+            ></ion-img>
+            <!-- <ion-ripple-effect></ion-ripple-effect> -->
+          </div>
+          <div
+            button
+            style="display: flex; justify-content: center"
+            (click)="updateStatus(dyspoStatus.NODYSPO)"
+          >
+            <ion-img
+              style="width: 50%"
+              src="/assets/newimg/home_pas_dyspo.png"
+            ></ion-img>
+            <ion-ripple-effect></ion-ripple-effect>
+          </div>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

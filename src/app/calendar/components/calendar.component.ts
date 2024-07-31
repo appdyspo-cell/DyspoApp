@@ -27,6 +27,8 @@ import { AgendaService } from 'src/app/services/agenda.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import Swal, { SweetAlertResult } from 'sweetalert2';
 import { resolve } from 'dns';
+import { format, parseISO } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 export const ION_CAL_VALUE_ACCESSOR: Provider = {
   provide: NG_VALUE_ACCESSOR,
@@ -50,7 +52,6 @@ interface CompatibleIcons {
     <div class="title">
       <ng-template [ngIf]="_showMonthPicker" [ngIfElse]="title">
         <ion-button
-          type="button"
           fill="clear"
           class="switch-btn"
           [attr.aria-label]="
@@ -126,6 +127,8 @@ interface CompatibleIcons {
         (selectStart)="selectStart.emit($event)"
         (selectEnd)="selectEnd.emit($event)"
         (selectReadOnly)="selectReadOnly.emit($event)"
+        (onSwipedLeft)="onSwipedLeft($event)"
+        (onSwipedRight)="onSwipedRight($event)"
         [pickMode]="_d.pickMode"
         [color]="_d.color"
       >
@@ -150,13 +153,13 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
     showMonthPicker: true,
     monthPickerFormat: [
       'JAN',
-      'FEB',
+      'FEV',
       'MAR',
-      'APR',
-      'MAY',
+      'AVR',
+      'MAI',
       'JUN',
       'JUL',
-      'AUG',
+      'AOU',
       'SEP',
       'OCT',
       'NOV',
@@ -444,6 +447,36 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
     }
   }
 
+  async onSwipedLeft($event: any) {
+    if (this.agendaSvc.isModified) {
+      const canGo = await this.checkBeforeNavigate();
+      if (canGo) {
+        if (this.canNext()) {
+          this.nextMonth();
+        }
+      }
+    } else {
+      if (this.canNext()) {
+        this.nextMonth();
+      }
+    }
+  }
+
+  async onSwipedRight($event: any) {
+    if (this.agendaSvc.isModified) {
+      const canGo = await this.checkBeforeNavigate();
+      if (canGo) {
+        if (this.canBack()) {
+          this.backMonth();
+        }
+      }
+    } else {
+      if (this.canBack()) {
+        this.backMonth();
+      }
+    }
+  }
+
   _onChanged: Function = () => {};
 
   _onTouched: Function = () => {};
@@ -460,7 +493,10 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
 
   _monthFormat(date: number): string {
     // @ts-ignore
-    return moment(date).format(this._d.monthFormat.replace(/y/g, 'Y'));
+    const f = moment(date).format(this._d.monthFormat.replace(/y/g, 'Y'));
+
+    return format(date, 'MMMM yyyy', { locale: fr });
+    //return f;
   }
 
   private initOpt(): void {

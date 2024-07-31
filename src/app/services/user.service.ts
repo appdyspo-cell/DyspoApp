@@ -1,14 +1,21 @@
 import { Injectable } from '@angular/core';
-import { AppUser, UserDyspoStatus, UserStatus } from '../models/models';
 import {
+  AppDeviceContact,
+  AppUser,
+  AppUserWithEvents,
+  UserDyspoStatus,
+  UserStatus,
+} from '../models/models';
+import {
+  DocumentData,
   Firestore,
   collection,
   collectionSnapshots,
   doc,
   docData,
+  getDoc,
   getDocs,
   query,
-  setDoc,
   updateDoc,
   where,
 } from '@angular/fire/firestore';
@@ -21,52 +28,64 @@ import { LoggerService } from './logger.service';
   providedIn: 'root',
 })
 export class UserService {
-  private _userInfo: AppUser | undefined;
-  private _userInfoSubject = new BehaviorSubject<AppUser>(this.getEmptyUser());
+  private _appUserInfo: AppUser | undefined;
+  private _appUserInfoSubject = new BehaviorSubject<AppUser>(
+    this.getEmptyUser()
+  );
 
-  userInfoFirebaseObs$!: Observable<AppUser>;
-  userInfoObs$!: Observable<AppUser>;
-  userInfoSubscription: Subscription = new Subscription();
+  private docDataObs$: Observable<any> | undefined;
+  private docDataSubscribtion: Subscription = new Subscription();
+
+  //userInfoFirebaseObs$!: Observable<AppUser>;
+  appUserInfoObs$!: Observable<AppUser>;
+  appUserInfoSubscription: Subscription = new Subscription();
 
   constructor(
     private firestore: Firestore,
     private authSvc: AuthService,
     private logger: LoggerService
   ) {
-    this.userInfoObs$ = this._userInfoSubject.asObservable();
+    this.appUserInfoObs$ = this._appUserInfoSubject.asObservable();
   }
 
   get userInfo(): AppUser | undefined {
-    return this._userInfo;
+    return this._appUserInfo;
   }
   set userInfo(val: AppUser | undefined) {
-    this._userInfo = val;
+    this._appUserInfo = val;
   }
 
   public async subscribeUserInfo(uid: string) {
     return new Promise<AppUser>((resolve, reject) => {
-      if (this.userInfoSubscription) {
+      if (this.docDataSubscribtion) {
         console.log('Unsubscribe previous user');
-        this.userInfoSubscription.unsubscribe();
+        this.docDataSubscribtion.unsubscribe();
       }
       if (uid) {
         this.logger.logDebug('userSvc subscribe to ----- ', uid);
         const docRef = doc(this.firestore, 'users', uid);
-        this.userInfoObs$ = docData(docRef) as Observable<AppUser>;
-        this.userInfoSubscription = this.userInfoObs$.subscribe((appUser) => {
-          if (!appUser) {
-            reject('NOTFOUND');
-          } else {
-            appUser.uid = uid;
-            this.userInfo = { ...appUser };
-            this._userInfoSubject.next(this.userInfo);
-            //Si l'utilisateur a été effacé
-            if (appUser.status === UserStatus.DELETED) {
-              this.authSvc.logout();
+        this.docDataSubscribtion = docData(docRef).subscribe(
+          (firebaseUserDocData: any) => {
+            if (!firebaseUserDocData) {
+              console.error('User not found');
+              reject({ msg: 'Utilisateur non trouvé', error: true });
+            } else {
+              //Si l'utilisateur a été effacé ou banni
+              if (
+                firebaseUserDocData.status === UserStatus.DELETED ||
+                firebaseUserDocData.status === UserStatus.BANNED
+              ) {
+                this.authSvc.logout();
+                reject({ msg: 'Utilisateur banni', error: true });
+              } else {
+                firebaseUserDocData['uid'] = uid;
+                this.userInfo = { ...firebaseUserDocData };
+                this._appUserInfoSubject.next(this.userInfo!);
+                resolve(this.userInfo!);
+              }
             }
-            resolve(this.userInfo!);
           }
-        });
+        );
       } else {
         reject('NOUID');
       }
@@ -74,12 +93,10 @@ export class UserService {
   }
 
   public async unsubscribeUserInfo() {
-    return new Promise((resolve, reject) => {
-      if (this.userInfoSubscription) {
-        this.userInfoSubscription.unsubscribe();
-      }
-      this.userInfo = undefined;
-    });
+    if (this.docDataSubscribtion) {
+      this.docDataSubscribtion.unsubscribe();
+    }
+    this.userInfo = undefined;
   }
 
   async updateUser(appUser: AppUser) {
@@ -107,10 +124,13 @@ export class UserService {
         receiveEmail: false,
         receiveNotification: true,
         friendInvitation: true,
+        eventInvitation: true,
         actualiteDyspo: true,
         shareAgenda: true,
       },
       tagline: '',
+      geo_zone: 'zone_A',
+      with_kids: false,
     };
   }
 
@@ -133,5 +153,98 @@ export class UserService {
       });
       resolve(users);
     });
+  }
+
+  public async getUserInfos(
+    uids: string[],
+    withEvents = false
+  ): Promise<AppUserWithEvents[]> {
+    const appUsers: AppUserWithEvents[] = [];
+    for (let uid of uids) {
+      const docRef = doc(this.firestore, `users`, uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const result = docSnap.data() as AppUserWithEvents;
+        result.agendaEvents = [];
+        appUsers.push(result);
+      }
+    }
+    return appUsers;
+  }
+
+  public async getUserInfosExceptMe(
+    uids: string[]
+  ): Promise<AppUserWithEvents[]> {
+    const appUsers: AppUserWithEvents[] = [];
+    for (let uid of uids) {
+      if (uid !== this.userInfo?.uid) {
+        const docRef = doc(this.firestore, `users`, uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const result = docSnap.data() as AppUserWithEvents;
+          result.agendaEvents = [];
+          appUsers.push(result);
+        }
+      }
+    }
+    return appUsers;
+  }
+
+  async getUserInfosByPhone(number: string): Promise<AppUser | null> {
+    const collectionUserRef = collection(this.firestore, `users`);
+    const q = query(collectionUserRef, where('phoneNumber', '==', number));
+    const docFriendSnap = await getDocs(q);
+    if (!docFriendSnap.empty) {
+      const target = docFriendSnap.docs[0];
+      return target.data() as AppUser;
+    } else {
+      return null;
+    }
+  }
+
+  async hydrateAppContacts(appContacts: AppDeviceContact[]) {
+    const collectionUserRef = collection(this.firestore, `users`);
+    //const q = query(collectionUserRef, where('phoneNumber', '==', number));
+    const docFriendSnaps = await getDocs(collectionUserRef);
+    const allPhones: string[] = [];
+    const allUsers: AppUser[] = [];
+    docFriendSnaps.forEach((snap) => {
+      const user = snap.data() as AppUser;
+      if (user.phoneNumber) {
+        allUsers.push(user);
+      }
+    });
+    // docFriendSnaps.forEach((snap) => {
+    //   const user = snap.data() as AppUser;
+    //   if (user.phoneNumber) {
+    //     allPhones.push(user.phoneNumber);
+    //   }
+    // });
+    //  appContacts.map(appContact => {
+    //   return appContact.is_member = true
+    // })
+    appContacts.forEach((appContact) => {
+      const foundIndex = allUsers.findIndex((user) => {
+        return user.phoneNumber === '0' + appContact.phone_number;
+      });
+      if (foundIndex >= 0) {
+        appContact.uid = allUsers[foundIndex].uid;
+        appContact.avatar = allUsers[foundIndex].avatarPath;
+        appContact.is_member = true;
+      } else {
+        appContact.is_member = false;
+      }
+    });
+    console.log('Hydration OK');
+  }
+
+  async getMartinContacts() {
+    const docSnap = await getDoc(
+      doc(this.firestore, `log_debug_data/`, 'data_1708441773275')
+    );
+    if (docSnap.exists()) {
+      const contacts = docSnap.data();
+      return contacts;
+    } else return null;
   }
 }

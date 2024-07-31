@@ -1,0 +1,38 @@
+$colors: #a2b9bc, #6b5b95, #feb236, #d64161, #ff7b25, #b2ad7f, #878f99;
+
+ion-header {
+  h1 {
+    margin: 0;
+    font-weight: 500;
+    letter-spacing: 0;
+    font-size: 1.525rem;
+  }
+}
+.avatar {
+  color: #fff;
+  margin: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 100%;
+  width: 50px;
+  height: 50px;
+  font-weight: 600;
+  filter: brightness(120%);
+}
+
+.thumb {
+  height: 60px;
+  width: 60px;
+  --border-radius: 50%;
+  padding: 5px;
+}
+
+.search-list {
+  position: sticky;
+  z-index: 100000;
+  border-top: 1px solid #c8c8c8;
+  top: 0;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+}

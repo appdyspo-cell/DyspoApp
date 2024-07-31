@@ -1,0 +1,18 @@
+.letter-sidebar {
+  position: fixed;
+  top: 25%;
+  right: 0px;
+  padding: 0px;
+  z-index: 10000;
+}
+
+.letter-sidebar li {
+  list-style: none;
+  width: 40px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.letter-sidebar li a {
+  font-size: 14px;
+}

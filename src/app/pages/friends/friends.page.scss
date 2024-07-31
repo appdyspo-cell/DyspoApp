@@ -1,58 +1,190 @@
 ion-list {
-    padding-bottom: 0px;
+  padding-bottom: 0px;
+  background: transparent;
+}
+
+ion-item::part(native) {
+  --background: transparent;
+}
+
+ion-item {
+  &:last-child {
+    border: none;
+  }
+}
+
+ion-header {
+  // box-shadow: none !important;
+  h1 {
+    margin: 0;
+    font-weight: 500;
+    letter-spacing: 0;
+    font-size: 1.525rem;
+  }
+}
+
+.ion-page {
+  --background: none;
+  background-image: url("/assets/fd_ecran_principal.jpg");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.avatar-thumbnail {
+  height: 60px;
+  width: 60px;
+  --border-radius: 50%;
+  margin-right: 10px;
+  padding: 5px;
+  //border: 1px solid #fd6a58;
+}
+
+.friend-item {
+  //--padding-start: 0px;
+  //padding: 10px 0px;
+  //border-bottom: 1px solid lightgray;
+  ion-thumbnail {
+    height: 60px;
+    width: 60px;
+    --border-radius: 50%;
+    margin-right: 10px;
+    padding: 5px;
+    //border: 1px solid #fd6a58;
+  }
+  .content_button {
+    height: 30px;
+    width: 80px;
+    margin: 0px;
+    --border-radius: 30px;
+    color: #ffff;
+    font-size: 10px;
+  }
+  .content_follow_button {
+    height: 30px;
+    width: 80px;
+    margin: 0px;
+    --border-radius: 30px;
+    border-radius: 30px;
+    color: #fe4a7a;
+    font-size: 10px;
+    --background: #ffff;
+    border: 1px solid #fd6a58;
+  }
 }
 
 .empty-icon-circle {
-    border-radius: 50%;
-    padding: 20px;
-    margin-top: 5px;
-    margin-bottom: 25px;
-  }
-  .icon-large {
-    height: 180px;
-    width: 180px;
-  }
-  .icon-mid {
-    height: 100px;
-    width: 100px;
-  }
-  .icon-small {
-    height: 60px;
-    width: 60px;
-  }
-  .empty-icon-color {
-    background: #d6d9dd;
-    color: #fff;
-  }
-  
-  //
-  #container-suggestions {
-    text-align: center;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-  
-  #container-suggestions strong {
-    font-size: 20px;
-    line-height: 26px;
-  }
+  border-radius: 50%;
+  padding: 20px;
+  margin-top: 5px;
+  margin-bottom: 25px;
+}
+.icon-large {
+  height: 180px;
+  width: 180px;
+}
+.icon-mid {
+  height: 100px;
+  width: 100px;
+}
+.icon-small {
+  height: 60px;
+  width: 60px;
+}
+.empty-icon-color {
+  background: #d6d9dd;
+  color: #fff;
+}
 
-  #container-friends {
-    text-align: center;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
+//
+#container-suggestions {
+  text-align: center;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#container-suggestions strong {
+  font-size: 20px;
+  line-height: 26px;
+}
+
+#container-friends {
+  text-align: center;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#container-friends strong {
+  font-size: 20px;
+  line-height: 26px;
+}
+
+#container-friends-group {
+  text-align: center;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#container-friends-group strong {
+  font-size: 20px;
+  line-height: 26px;
+}
+
+.segment-badge {
+  position: absolute;
+  top: 5px; /* Ajustez cette valeur pour positionner verticalement */
+  right: 15px; /* Ajustez cette valeur pour positionner horizontalement */
+  font-size: 12px; /* Taille du texte du badge */
+  width: 20px; /* Largeur du badge */
+  height: 20px; /* Hauteur du badge */
+  border-radius: 50%; /* Pour créer un badge circulaire */
+  background: var(--text-no-dyspo); /* Couleur de fond du badge */
+  color: white; /* Couleur du texte du badge */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+ion-fab {
+  ion-fab-button {
+    --background: var(--primary);
+    width: 65px;
+    height: 65px;
+
+    ion-icon {
+      font-size: 1.9rem;
+    }
   }
-  
-  #container-friends strong {
-    font-size: 20px;
-    line-height: 26px;
-  }
-  
- 
-  
+}
+
+.shape {
+  background-color: var(--ion-color-primary);
+  width: 100%;
+  height: 50px;
+  z-index: 100;
+  border-bottom-left-radius: 50%;
+  border-bottom-right-radius: 50%;
+}
+
+app-alphabet-scroll {
+  z-index: 1000000000;
+}
+
+.black-button {
+  --color: var(--color);
+}
+
+ion-searchbar {
+  // padding: 0;
+  --box-shadow: none;
+  --background: transparent;
+}

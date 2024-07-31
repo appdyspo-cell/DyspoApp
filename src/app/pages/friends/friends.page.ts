@@ -1,8 +1,30 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
-import { AlertController, AnimationController } from '@ionic/angular';
+import { Preferences } from '@capacitor/preferences';
+import {
+  AlertController,
+  AnimationController,
+  IonItemGroup,
+  ModalController,
+  NavController,
+  Platform,
+} from '@ionic/angular';
 import { Observable, Subscription } from 'rxjs';
-import { AppUser, Friend, FriendStatus } from 'src/app/models/models';
+import { HelperComponent } from 'src/app/components/helper/helper.component';
+import {
+  AppDeviceContact,
+  AppUser,
+  Friend,
+  FriendGroup,
+  FriendStatus,
+  ShowHelper,
+} from 'src/app/models/models';
 import { FriendsService } from 'src/app/services/friends.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
@@ -13,19 +35,50 @@ import { UtilsService } from 'src/app/services/utils.service';
   styleUrls: ['./friends.page.scss'],
 })
 export class FriendsPage implements OnInit {
+  @ViewChildren(IonItemGroup, { read: ElementRef }) itemGroups!: QueryList<any>;
+  scroll = false;
+  showHelper = false;
+  showProfile(_t174: Friend, $event: MouseEvent) {
+    throw new Error('Method not implemented.');
+  }
+
+  scrollToLetter(letter: string) {
+    for (let i = 0; i < this.friendsAlpha.length; i++) {
+      const group = this.friendsAlpha[i];
+      if (group.letter == letter) {
+        const group = this.itemGroups.filter((element, index) => index === i);
+        if (group) {
+          const el: any = group[0];
+          el.nativeElement.scrollIntoView();
+        }
+        return;
+      }
+    }
+  }
+
+  openContacts() {
+    //this.navCtrl.navigateForward('device-contacts');
+    this.navCtrl.navigateForward('fix-contacts');
+  }
+
+  defaultImage = 'assets/logo.svg';
   selectSegment = 'friends';
   rate = 3;
   uid: any;
 
   friends$: Observable<Friend[]>;
+  friendGroups$: Observable<FriendGroup[]>;
 
   friends: Friend[] = [];
+  friendsAlpha: { letter: string; contacts: Friend[] }[] = [];
+  friendGroups: FriendGroup[] = [];
   friendsSuggested: Friend[] = [];
 
   inputSearch = '';
   autocompleteItems: AppUser[] = [];
   allOtherUsers: AppUser[] = [];
   friendsSubscrition: Subscription;
+  friendGroupsSubscrition: Subscription;
 
   constructor(
     public utils: UtilsService,
@@ -33,22 +86,60 @@ export class FriendsPage implements OnInit {
     public route: Router,
     private userSvc: UserService,
     public friendService: FriendsService,
-    public animationCtrl: AnimationController
+    public animationCtrl: AnimationController,
+    private navCtrl: NavController,
+    private modalCtrl: ModalController,
+    private platform: Platform
   ) {
     this.friends$ = this.friendService.friends$;
+    this.friendGroups$ = this.friendService.friendGroups$;
 
     this.friendsSubscrition = this.friends$.subscribe((friends) => {
-      console.log('Friends  ', friends);
       this.friends = friends.filter(
         (elt) => elt.friend_status === FriendStatus.FRIEND
       );
+      this.friendsAlpha = this.groupContactsByAlphabet(this.friends);
+
       this.friendsSuggested = friends.filter(
         (elt) => elt.friend_status === FriendStatus.SUGGESTED
       );
     });
+
+    this.friendGroupsSubscrition = this.friendGroups$.subscribe(
+      (friendGroups) => {
+        this.friendGroups = friendGroups;
+        console.log('Friend Groups  ', friendGroups);
+      }
+    );
+    const isFromNotif =
+      this.route.getCurrentNavigation()?.extras.state?.['isFromNotif'];
+    if (isFromNotif) {
+      this.selectSegment = 'suggestions';
+    }
   }
 
-  async ngOnInit() {}
+  async ngOnInit() {
+    // Bug Android. Authorization is not prompted at launch time. Init on Contacts page for Android
+    // if (this.platform.is('android')) {
+    //   this.friendService.initContacts();
+    // }
+    const { value } = await Preferences.get({ key: ShowHelper.FRIENDS });
+    if (!value) {
+      this.showHelper = true;
+      const modal = await this.modalCtrl.create({
+        component: HelperComponent,
+        componentProps: {
+          showHelper: ShowHelper.FRIENDS,
+        },
+      });
+      modal.present();
+
+      await Preferences.set({
+        key: ShowHelper.FRIENDS,
+        value: 'SHOWN',
+      });
+    }
+  }
 
   ngOnDestroy() {
     this.friendsSubscrition.unsubscribe();
@@ -91,6 +182,46 @@ export class FriendsPage implements OnInit {
       });
   }
 
+  declineFriendInvit(friend: Friend, i: number) {
+    const slidingItem = document.getElementById(
+      'slidingItemSuggested' + i
+    ) as any;
+    this.deleteFriend(friend, slidingItem);
+  }
+
+  promptDeleteFriendGroup(friendGroup: FriendGroup, i: number) {
+    this.alertCtrl
+      .create({
+        header: 'Suppression',
+        message: 'Etes-vous sur de vouloir supprimer ce groupe ?',
+
+        buttons: [
+          {
+            text: 'Annuler',
+            handler: (data: any) => {
+              console.log('Canceled', data);
+              const slidingItem = document.getElementById(
+                'slidingItemGroup' + i
+              ) as any;
+              slidingItem.close();
+            },
+          },
+          {
+            text: 'Oui',
+            handler: (data: any) => {
+              const slidingItem = document.getElementById(
+                'slidingItemGroup' + i
+              ) as any;
+              this.deleteFriendGroup(friendGroup, slidingItem);
+            },
+          },
+        ],
+      })
+      .then((res) => {
+        res.present();
+      });
+  }
+
   async deleteFriend(friend: Friend, listElement: any) {
     const animationDeleteItem = this.animationCtrl
       .create()
@@ -104,6 +235,22 @@ export class FriendsPage implements OnInit {
     animationDeleteItem.play();
     this.friendService.deleteFriend(friend, listElement);
     this.utils.showToast('Ami supprimé');
+  }
+
+  async deleteFriendGroup(friendGroup: FriendGroup, listElement: any) {
+    console.log('Delete group');
+    const animationDeleteItem = this.animationCtrl
+      .create()
+      .addElement(listElement)
+      .duration(600)
+      .iterations(1)
+      .fromTo('height', '100px', 0)
+      .fromTo('transform', 'translateX(0px)', 'translateX(-1050px)')
+      .fromTo('opacity', 1, 0);
+
+    animationDeleteItem.play();
+    this.friendService.deleteFriendGroup(friendGroup, listElement);
+    this.utils.showToast('Groupe supprimé');
   }
 
   goToChat(friend: AppUser | undefined, event: any) {
@@ -122,11 +269,33 @@ export class FriendsPage implements OnInit {
     }
   }
 
-  showProfile(friend: AppUser) {
+  showAgenda(friend: AppUser, event: any) {
+    event.stopPropagation();
     //this.utils.showModalPage(AmiFicheComponent, {friendListDoc: friend, userData: friend.userData});
+    const navigationExtras: NavigationExtras = {
+      state: {
+        friend,
+      },
+    };
+
+    this.navCtrl.navigateForward('agenda/friend', navigationExtras);
   }
 
-  async addFriend(friend: AppUser, index: number, event: any) {
+  showFriendGroup(friendGroup: FriendGroup, event: any) {
+    event.stopPropagation();
+    const navigationExtras: NavigationExtras = {
+      state: {
+        friendGroup,
+      },
+    };
+    this.navCtrl.navigateForward('create-group/edit', navigationExtras);
+  }
+
+  async openFriendGroupForm() {
+    this.navCtrl.navigateForward('create-group/new');
+  }
+
+  async confirmFriendInvitation(friend: AppUser, index: number, event: any) {
     event.stopPropagation();
     const slidingItem = document.getElementById('slidingItem' + index) as any;
     this.animateForward(document.querySelector('#add' + index), slidingItem);
@@ -158,8 +327,7 @@ export class FriendsPage implements OnInit {
 
     animation.onFinish(() => {
       animationDeleteItem.play();
-      this.utils.showToast('Ami ajouté');
-      console.log('Add friend ');
+      this.utils.showToastSuccess('Ami ajouté');
     });
   }
 
@@ -179,13 +347,47 @@ export class FriendsPage implements OnInit {
           user.firstname!.toUpperCase().indexOf(pattern.toUpperCase()) >= 0 ||
           user.lastname!.toUpperCase().indexOf(pattern.toUpperCase()) >= 0
       );
+      this.autocompleteItems.forEach((user) => {
+        user.is_my_friend = this.friendService.isMyFriend(user.uid);
+        console.log(user);
+      });
       console.log('Results ', this.autocompleteItems);
     }
   }
 
-  selectSearchResult(user: AppUser) {
+  inviteFriend(user: AppUser) {
     this.autocompleteItems = [];
     this.inputSearch = '';
     this.friendService.invite(user);
+  }
+
+  _groupContactsByAlphabet(contacts: Friend[]) {
+    return contacts.reduce((groups: any, contact) => {
+      const letter = contact.userData!.lastname!.charAt(0).toUpperCase();
+      groups[letter] = groups[letter] || [];
+      groups[letter].push(contact);
+      return groups;
+    }, {});
+  }
+
+  groupContactsByAlphabet(contacts: Friend[]) {
+    const groups: any = {};
+    contacts.forEach((contact) => {
+      const letter = contact.userData!.lastname!.charAt(0).toUpperCase();
+      groups[letter] = groups[letter] || [];
+      groups[letter].push(contact);
+    });
+    return Object.keys(groups).map((letter) => ({
+      letter,
+      contacts: groups[letter],
+    }));
+  }
+
+  getMembreLabel(nb: number) {
+    if (nb > 1) {
+      return nb + ' membres';
+    } else {
+      return nb + ' membre';
+    }
   }
 }

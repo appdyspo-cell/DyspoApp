@@ -1,36 +1,65 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Calendrier</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true" class="bg_color">
-  <ion-header collapse="condense">
-    <ion-toolbar style="--background: transparent">
-      <ion-title size="large">Calendrier</ion-title>
+<ion-header>
+  <ion-toolbar mode="md">
+    <ng-container *ngIf="!isFriendMode">
+      <ion-title> <h1>Calendrier</h1></ion-title>
       <ion-buttons slot="end">
         <ion-toggle
           labelPlacement="start"
+          color="primary"
           [enableOnOffLabels]="true"
           (ionChange)="onChangeMode($event)"
-          >Edit</ion-toggle
+          >Modifier</ion-toggle
         >
       </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
+    </ng-container>
+    <ng-container *ngIf="isFriendMode">
+      <ion-buttons slot="start">
+        <ion-back-button
+          color="dark"
+          text=""
+          icon="chevron-back-outline"
+        ></ion-back-button>
+      </ion-buttons>
 
+      <ion-title style="padding-left: 0">
+        <div class="d-flex">
+          <ion-thumbnail class="thumb-friend">
+            <ion-img src="{{agendaFriend?.userData?.avatarPath}}"></ion-img>
+          </ion-thumbnail>
+          <h1>{{agendaFriend?.userData?.firstname}}</h1>
+        </div></ion-title
+      >
+    </ng-container>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg_color">
   <div class="container">
-    <ion-chip [outline]="true"
-      ><div class="chip-evt bg-kid">&nbsp;</div>
-      Kids</ion-chip
+    <ion-chip
+      *ngIf="!isFriendMode && my_info.with_kids"
+      [outline]="true"
+      [disabled]="true"
+      ><div class="chip-evt bg-color-kid">&nbsp;</div>
+      Kid(s)</ion-chip
     >
-    <ion-chip [outline]="true"
-      ><div class="chip-evt bg-nokids">&nbsp;</div>
-      No Kids</ion-chip
+    <ion-chip
+      [disabled]="true"
+      *ngIf="isFriendMode && agendaFriend?.userData?.with_kids"
+      [outline]="true"
+      ><div class="chip-evt bg-color-kid">&nbsp;</div>
+      Kid(s)</ion-chip
     >
-    <ion-chip [outline]="true"
-      ><div class="chip-evt bg-nodyspo">&nbsp;</div>
-      No Dyspo</ion-chip
+    <ion-chip [outline]="true" [disabled]="true"
+      ><div class="chip-evt bg-color-nokids">&nbsp;</div>
+      Dyspo</ion-chip
+    >
+    <ion-chip [outline]="true" [disabled]="true"
+      ><div class="chip-evt bg-color-nodyspo">&nbsp;</div>
+      Pas Dyspo</ion-chip
+    >
+    <ion-chip [outline]="true" [disabled]="true"
+      ><div class="chip-evt holidays">&nbsp;</div>
+      Vacances</ion-chip
     >
   </div>
 
@@ -46,41 +75,132 @@
     [format]="'YYYY-MM-DD'"
     [readonly]="agendaMode === agendaModes.READONLY"
   ></ion-calendar>
-  <div *ngIf="agendaMode === agendaModes.READONLY">
-    <!-- <ion-list-header> {{selectedDateFormatted}} </ion-list-header> -->
+  <div *ngIf="agendaMode === agendaModes.READONLY" style="padding-top: 5px">
+    <!-- <ion-toolbar style="padding: 0px 6px; --background: transparent"> -->
+    <div
+      style="
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 8px;
+      "
+    >
+      <div
+        slot="start"
+        style="
+          display: flex;
+          align-items: center;
+          font-size: 1.2rem;
+          min-width: 150px;
+        "
+      >
+        <ion-icon
+          name="calendar-outline"
+          slot="start"
+          style="margin-right: 5px"
+        ></ion-icon>
+        <ion-text>{{selectedDateFormatted}}</ion-text>
+      </div>
+      <ion-button
+        *ngIf="!isFriendMode && selectedDateMs"
+        slot="end"
+        class="dyspo-button no-margin"
+        style="margin: 0px !important"
+        color="tertiary"
+        style="text-transform: none"
+        (click)="openCreateEvent()"
+      >
+        <ion-icon name="add-circle-outline" slot="start"></ion-icon
+        >nouveau</ion-button
+      >
+    </div>
 
-    <ion-list *ngIf="eventsForDate.length > 0">
+    <!-- </ion-toolbar> -->
+
+    <ion-list>
+      <ion-item
+        *ngIf="!eventsForDate || eventsForDate?.length === 0"
+        lines="full"
+      >
+        <ion-icon name="time-outline" slot="start"></ion-icon>
+        Pas d'événement prévu
+      </ion-item>
       <ion-item
         *ngFor="let agendaEvent of eventsForDate; let i=index "
-        type="button"
-        mode="ios"
-        (click)="updateEvent(agendaEvent)"
+        lines="full"
+        (click)="openEvent(agendaEvent)"
       >
-        <div slot="start">{{agendaEvent.startISO | dayDateFormat}}</div>
-        {{agendaEvent.title}}<br />
-        {{agendaEvent.start_time_formatted}} -
-        {{agendaEvent.end_time_formatted}}
-      </ion-item>
-    </ion-list>
-    <ion-list *ngIf="!eventsForDate || eventsForDate?.length === 0">
-      <ion-item>
-        <ion-icon name="time-outline" slot="start"></ion-icon>
-        Pas d'evenement prévu
+        <div
+          slot="start"
+          style="font-size: 1.05rem; font-weight: 600; margin: 0; width: 77px"
+        >
+          <div
+            *ngIf="agendaEvent.start_date_day_of_year === agendaEvent.end_date_day_of_year"
+          >
+            {{agendaEvent.startISO | dayDateFormat}}
+          </div>
+          <div
+            *ngIf="agendaEvent.start_date_day_of_year !== agendaEvent.end_date_day_of_year"
+          >
+            {{agendaEvent.startISO | dayDateFormat}} <br />
+            {{agendaEvent.endISO | dayDateFormat}}
+          </div>
+        </div>
+        <div>
+          <div>
+            {{(agendaEvent.all_can_see_title || isFriendMode === false) ?
+            agendaEvent.title : 'Événement privé'}}
+          </div>
+          <div
+            *ngIf="agendaEvent.start_date_day_of_year === agendaEvent.end_date_day_of_year"
+            style="font-size: 0.9rem"
+          >
+            <ion-text color="medium"
+              >{{agendaEvent.start_time_formatted}} -
+              {{agendaEvent.end_time_formatted}}</ion-text
+            >
+          </div>
+        </div>
+
+        <ion-buttons
+          slot="end"
+          *ngIf="isFriendMode === false && agendaEvent.is_multi && agendaEvent.members_uid.length > 1"
+        >
+          <ion-button color="primary" (click)="goToChat(agendaEvent, $event)">
+            <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-item>
     </ion-list>
   </div>
 
-  <div *ngIf="agendaMode === agendaModes.EDIT" class="ion-padding">
-    Vous êtes en mode édition
-    <ion-button *ngIf="agendaSvc.isModified" (click)="saveAgenda()">
-      Sauvegarder mon agenda
-    </ion-button>
+  <div
+    *ngIf="agendaMode === agendaModes.EDIT"
+    class="ion-padding ion-text-center d-flex"
+    style="flex-direction: column"
+  >
+    <ion-text> Vous êtes en mode modification </ion-text>
     <ion-button
       *ngIf="agendaSvc.isModified"
-      color="danger"
+      (click)="saveAgenda()"
+      mode="ios"
+      color="tertiary"
+      class="dyspo-button"
+      style="padding-top: 8px"
+    >
+      Sauvegarder mon agenda
+      <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+    </ion-button>
+
+    <ion-button
+      *ngIf="agendaSvc.isModified"
+      color="tertiary"
+      mode="ios"
+      class="dyspo-button"
       (click)="cancelAgenda()"
     >
       Annuler
+      <ion-icon name="close-circle-outline" slot="start"></ion-icon>
     </ion-button>
   </div>
   <!-- <ion-fab

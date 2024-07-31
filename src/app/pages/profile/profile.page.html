@@ -1,19 +1,19 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar mode="md">
     <ion-buttons slot="start">
-      <ion-back-button text=""></ion-back-button>
+      <ion-back-button
+        text=""
+        color="dark"
+        icon="chevron-back-outline"
+      ></ion-back-button>
     </ion-buttons>
-    <ion-title class="title-ios ion-text-capitalize">Profil</ion-title>
-    <!--<ion-button slot="end" mode="ios" class="pRelative" (click)="cartPage()">
-      <ion-icon slot="icon-only" name="cart"></ion-icon>
-      <span class="cartQuantity">{{cart.productQty}}</span>
-    </ion-button>-->
+    <ion-title style="padding-left: 0px"><h1>Profil</h1></ion-title>
 
-    <ion-buttons slot="end">
-      <ion-button (click)="logout()">
+    <!-- <ion-buttons slot="end">
+      <ion-button (click)="logout()" color="dark">
         <ion-icon name="log-out" slot="icon-only" color="primary"></ion-icon>
       </ion-button>
-    </ion-buttons>
+    </ion-buttons> -->
   </ion-toolbar>
   <ion-toolbar color="primary">
     <div class="userSection ion-padding-horizontal">
@@ -23,7 +23,7 @@
         tappable
         (click)="changeAvatar()"
       >
-        <div
+        <!-- <div
           style="
             position: absolute;
             right: -7px;
@@ -39,7 +39,7 @@
             color="primary"
             style="position: relative; top: 4px"
           ></ion-icon>
-        </div>
+        </div> -->
 
         <ion-avatar slot="start">
           <img [src]="user.avatarPath || defaultAvatar" />
@@ -56,13 +56,13 @@
     <p></p>
   </ion-toolbar>
 </ion-header>
-<ion-content class="ion-padding">
+<ion-content class="ion-padding bg_color">
   <div class="form" padding>
-    <ion-list class="f-list" lines="full">
+    <ion-list class="f-list" lines="none">
       <ion-item lines="none">
-        <ion-label mode="md" position="floating">Nom *</ion-label>
         <ion-input
-          mode="md"
+          label="Nom *"
+          labelPlacement="floating"
           type="name"
           minlength="3"
           maxlength="20"
@@ -76,9 +76,9 @@
         ></ion-input>
       </ion-item>
       <ion-item lines="none">
-        <ion-label mode="md" position="floating">Prénom *</ion-label>
         <ion-input
-          mode="md"
+          label="Prénom *"
+          labelPlacement="floating"
           minlength="3"
           maxlength="20"
           autocapitalize="words"
@@ -90,9 +90,9 @@
       </ion-item>
 
       <ion-item lines="none">
-        <ion-label mode="md" position="floating">Email *</ion-label>
         <ion-input
-          mode="md"
+          label="Email *"
+          labelPlacement="floating"
           type="text"
           minlength="3"
           maxlength="25"
@@ -103,12 +103,51 @@
       </ion-item>
 
       <ion-item lines="none">
+        <ion-input
+          [maskito]="phoneMask"
+          [maskitoElement]="maskPredicate"
+          label="Téléphone *"
+          labelPlacement="floating"
+          type="tel"
+          [(ngModel)]="user.phoneNumber"
+          autocomplete="off"
+          name="phoneNumber"
+          required="true"
+          placeholder="Entrez votre téléphone"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" style="padding-bottom: 0px">
+        <ion-select
+          label="Zone"
+          [(ngModel)]="user.geo_zone"
+          (ionChange)="getAcademies()"
+          placeholder="Sélectionnez une zone"
+        >
+          <ion-select-option value="zone_A">Zone A</ion-select-option>
+          <ion-select-option value="zone_B">Zone B</ion-select-option>
+          <ion-select-option value="zone_C">Zone C</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <div class="d-flex ion-align-items-center" style="margin-bottom: 30px">
+        <ion-note> {{academies}} </ion-note>
+      </div>
+
+      <ion-item>
+        <ion-text>J'ai des enfants </ion-text>
+        <ion-buttons slot="end">
+          <ion-checkbox [(ngModel)]="user.with_kids"> </ion-checkbox>
+        </ion-buttons>
+      </ion-item>
+
+      <ion-item lines="none">
         <ion-label mode="md" position="stacked">Mot de passe</ion-label>
 
         <ion-button slot="end" (click)="resetPw()"> Changer</ion-button>
       </ion-item>
 
-      <ion-item class="f-item" lines="none">
+      <!-- <ion-item class="f-item" lines="none">
         <ion-label mode="md" position="floating">Téléphone</ion-label>
         <ion-input
           mode="md"
@@ -126,25 +165,31 @@
           maxlength="100"
           placeholder="Décrivez vous en quelques mots..."
         ></ion-textarea>
-      </ion-item>
-
+      </ion-item> -->
+      <!-- 
       <ion-list>
         <ion-radio-group [(ngModel)]="user.gender">
           <ion-item>
-            <ion-label>Homme</ion-label>
-            <ion-radio value="M"></ion-radio>
+            <ion-radio value="M" labelPlacement="start">Homme</ion-radio>
           </ion-item>
           <ion-item>
-            <ion-label>Femme</ion-label>
-            <ion-radio value="F"></ion-radio>
+            <ion-radio value="F" labelPlacement="start">Femme</ion-radio>
           </ion-item>
         </ion-radio-group>
-      </ion-list>
+      </ion-list> -->
     </ion-list>
   </div>
+  <div class="d-flex ion-justify-content-center">
+    <ion-button
+      fill="solid"
+      (click)="save()"
+      mode="ios"
+      color="tertiary"
+      class="dyspo-button"
+      style="margin-left: 0px"
+      >Sauvegarder
+      <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+    </ion-button>
+  </div>
 </ion-content>
-<ion-footer class="bg_color">
-  <ion-button expand="block" (click)="save()"
-    >{{'SAVE' | translate}}</ion-button
-  >
-</ion-footer>
+<!-- <ion-footer class="ion-no-border"> </ion-footer> -->

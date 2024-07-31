@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import {
   Auth,
-  User,
   UserCredential,
   createUserWithEmailAndPassword,
   deleteUser,
@@ -9,44 +8,21 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from '@angular/fire/auth';
-import {
-  Firestore,
-  deleteDoc,
-  doc,
-  setDoc,
-  updateDoc,
-} from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, updateDoc } from '@angular/fire/firestore';
 import { UtilsService } from './utils.service';
-import { AppUser, UserStatus } from '../models/models';
-import Swal from 'sweetalert2';
-
-import { getApp } from '@angular/fire/app';
+import { AppUser, ShowHelper, UserStatus } from '../models/models';
 import { environment } from 'src/environments/environment';
-import { NativeBiometric } from 'capacitor-native-biometric';
+import { Preferences } from '@capacitor/preferences';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private BIOMETRIC_KEY = environment.BIOMETRIC_KEY;
-
   constructor(
     private afAuth: Auth,
     private firestore: Firestore,
     private utils: UtilsService
-  ) {
-    // Initialize Remote Config and get a reference to the service
-    // const remoteConfig = getRemoteConfig(getApp());
-    // console.log(remoteConfig);
-    // fetchAndActivate(remoteConfig)
-    //   .then(() => {
-    //     this.BIOMETRIC_KEY = getValue(remoteConfig, 'BIOMETRIC_KEY').asString();
-    //     console.log(this.BIOMETRIC_KEY);
-    //   })
-    //   .catch((err) => {
-    //     // ...
-    //   });
-  }
+  ) {}
 
   login(email: string, password: string): Promise<UserCredential> {
     return signInWithEmailAndPassword(this.afAuth, email, password);
@@ -63,19 +39,33 @@ export class AuthService {
         password
       );
       const ref = doc(this.firestore, `users/${credentials.user.uid}`);
+      userInfo.uid = credentials.user.uid;
       setDoc(ref, userInfo);
       return credentials;
     } catch (e) {
       this.utils.log(e);
+      this.utils.showFirebaseError(e);
       return null;
     }
   }
 
-  logout() {
+  async logout() {
+    await Preferences.remove({
+      key: ShowHelper.FRIENDS,
+    });
+    await Preferences.remove({
+      key: ShowHelper.AGENDA,
+    });
+    await Preferences.remove({
+      key: ShowHelper.CHATS,
+    });
+    await Preferences.remove({
+      key: ShowHelper.DASHBOARD,
+    });
     return signOut(this.afAuth);
   }
 
-  resetPw(email: string) {
+  resetPw(email: string): Promise<void> {
     return sendPasswordResetEmail(this.afAuth, email);
   }
 
@@ -88,7 +78,13 @@ export class AuthService {
       deleteUser(user)
         .then(() => {
           this.utils.log("L'utilisateur a été supprimé avec succès");
-          updateDoc(refUser, { status: UserStatus.DELETED });
+          updateDoc(refUser, {
+            status: UserStatus.DELETED,
+            firstname: 'Compte effacé',
+            lastname: 'Compte effacé',
+            avatarPath: environment.DEFAULT_AVATAR,
+            email: '',
+          });
         })
         .catch((error) => {
           this.utils.showFirebaseError(error);

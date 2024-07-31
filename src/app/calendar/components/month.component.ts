@@ -22,6 +22,7 @@ import * as Hammer from 'hammerjs';
 import $$ from 'dom7';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { UserDyspoStatus } from 'src/app/models/models';
+import { UserService } from 'src/app/services/user.service';
 
 export const MONTH_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -45,15 +46,21 @@ export const MONTH_VALUE_ACCESSOR: any = {
       #calendarmonth
       (panend)="onPanEnd($event)"
       (panmove)="onPanMove($event)"
+      (swipeleft)="onSwipeLeft($event)"
+      (swiperight)="onSwipeRight($event)"
     >
       <ng-template [ngIf]="!_isRange" [ngIfElse]="rangeBox">
         <div class="days-box">
           <ng-template ngFor let-day [ngForOf]="month.days || []">
-            <div class="days" style="position: relative;">
+            <div
+              class="days p-day"
+              style="position: relative;"
+              [id]="'divday-' + day.time"
+            >
               <ng-container *ngIf="day">
                 <button
                   type="button"
-                  [id]="'btn-day-' + day.time"
+                  [id]="'btnday-' + day.time"
                   [class]="'days-btn ' + day.cssClass"
                   [class.p-day]="true"
                   [class.today]="day.isToday"
@@ -65,6 +72,7 @@ export const MONTH_VALUE_ACCESSOR: any = {
                   [class.next-month-day]="day.isNextMonth"
                   [class.on-selected]="isSelected(day.time)"
                   [class.on-selected-pan]="isSelectedPan(day.time)"
+                  [ngClass]="getDyspoClass(day)"
                   [class.on-selected-dyspo-kids]="
                     day.userDyspo === userDyspoStatus.DYSPOWITHKIDS
                   "
@@ -74,6 +82,7 @@ export const MONTH_VALUE_ACCESSOR: any = {
                   [class.on-selected-no-dyspo]="
                     day.userDyspo === userDyspoStatus.NODYSPO
                   "
+                  [class.is-holidays]="day.isHolidays"
                   [disabled]="day.disable"
                   [attr.aria-label]="getDayLabel(day) | date : DAY_DATE_FORMAT"
                 >
@@ -89,8 +98,9 @@ export const MONTH_VALUE_ACCESSOR: any = {
                     {{ day.title }}
                   </p>
                   <small *ngIf="day.subTitle">{{ day?.subTitle }}</small>
+                  <!-- <ion-badge>2</ion-badge> -->
+                  <div *ngIf="day.isEvent" class="event-badge">&nbsp;</div>
                 </button>
-                <div *ngIf="day.isEvent" class="event-badge">&nbsp;</div>
               </ng-container>
             </div>
           </ng-template>
@@ -173,6 +183,11 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   @Output()
   public selectEnd: EventEmitter<CalendarDay> = new EventEmitter();
 
+  @Output()
+  public onSwipedLeft: EventEmitter<string> = new EventEmitter();
+  @Output()
+  public onSwipedRight: EventEmitter<string> = new EventEmitter();
+
   public _date: Array<CalendarDay | null> = [null, null];
   _isInit = false;
   public _onChanged!: Function;
@@ -193,8 +208,32 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   constructor(
     public ref: ChangeDetectorRef,
     private gestureCtrl: GestureController,
-    private actionSheetCtrl: ActionSheetController
+    private actionSheetCtrl: ActionSheetController,
+    public userSvc: UserService
   ) {}
+
+  getDyspoClass(
+    day: CalendarDay
+  ):
+    | string
+    | string[]
+    | Set<string>
+    | { [klass: string]: any }
+    | null
+    | undefined {
+    const classes:
+      | string
+      | string[]
+      | Set<string>
+      | { [klass: string]: any }
+      | null
+      | undefined = [];
+    if (day.isLastMonth || day.isNextMonth) {
+      classes.push('out-of-month');
+    }
+
+    return classes;
+  }
 
   onPanEnd(ev: any) {
     console.log('pan end');
@@ -211,6 +250,26 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
       this.startDayIndex = -1;
       this._selectedPanDays = [];
     }
+  }
+
+  onSwipeLeft(ev: any) {
+    console.log('swipe left');
+    if (!this.readonly) {
+      console.log('Edit Mode');
+
+      return;
+    }
+    this.onSwipedLeft.emit(ev);
+  }
+
+  onSwipeRight(ev: any) {
+    console.log('swipe right');
+    if (!this.readonly) {
+      console.log('Edit Mode');
+
+      return;
+    }
+    this.onSwipedRight.emit(ev);
   }
 
   onPanMove(ev: any) {
@@ -277,32 +336,34 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   }
 
   async presentAction() {
+    const buttons = [];
+    buttons.push({
+      text: 'Dyspo!',
+      cssClass: 'dyspo-sheet-dyspo',
+      data: {
+        action: UserDyspoStatus.DYSPO,
+      },
+    });
+    if (this.userSvc.userInfo?.with_kids) {
+      buttons.push({
+        text: 'Kid(s)',
+        cssClass: 'dyspo-sheet-dyspo-with-kids',
+        data: {
+          action: UserDyspoStatus.DYSPOWITHKIDS,
+        },
+      });
+    }
+    buttons.push({
+      text: 'Pas dyspo',
+      cssClass: 'dyspo-sheet-no-dyspo',
+      data: {
+        action: UserDyspoStatus.NODYSPO,
+      },
+    });
     const actionSheet = await this.actionSheetCtrl.create({
-      header: 'Dyspo',
+      header: 'Saisissez vos disponibilités',
       cssClass: 'dyspo-sheet',
-      buttons: [
-        {
-          text: 'Dyspo',
-          cssClass: 'dyspo-sheet-dyspo',
-          data: {
-            action: UserDyspoStatus.DYSPO,
-          },
-        },
-        {
-          text: 'Dyspo with Kid(s)',
-          cssClass: 'dyspo-sheet-dyspo-with-kids',
-          data: {
-            action: UserDyspoStatus.DYSPOWITHKIDS,
-          },
-        },
-        {
-          text: 'No Dyspo',
-          cssClass: 'dyspo-sheet-no-dyspo',
-          data: {
-            action: UserDyspoStatus.NODYSPO,
-          },
-        },
-      ],
+      buttons,
     });
 
     await actionSheet.present();
@@ -544,13 +605,29 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     //   this.change.emit((this._date as CalendarDay[]).filter((e) => e !== null));
     // }
     if (this.pickMode === pickModes.MULTI) {
-      if (item.userDyspo === UserDyspoStatus.DYSPO) {
-        item.userDyspo = UserDyspoStatus.DYSPOWITHKIDS;
-      } else if (item.userDyspo === UserDyspoStatus.DYSPOWITHKIDS) {
-        item.userDyspo = UserDyspoStatus.NODYSPO;
+      if (this.userSvc.userInfo?.with_kids) {
+        if (item.userDyspo === UserDyspoStatus.DYSPO) {
+          item.userDyspo = UserDyspoStatus.DYSPOWITHKIDS;
+        } else if (item.userDyspo === UserDyspoStatus.DYSPOWITHKIDS) {
+          item.userDyspo = UserDyspoStatus.NODYSPO;
+        } else if (item.userDyspo === UserDyspoStatus.NODYSPO) {
+          item.userDyspo = UserDyspoStatus.UNDEFINED;
+        } else {
+          item.userDyspo = UserDyspoStatus.DYSPO;
+        }
       } else {
-        item.userDyspo = UserDyspoStatus.DYSPO;
+        if (
+          item.userDyspo === UserDyspoStatus.DYSPO ||
+          item.userDyspo === UserDyspoStatus.DYSPOWITHKIDS
+        ) {
+          item.userDyspo = UserDyspoStatus.NODYSPO;
+        } else if (item.userDyspo === UserDyspoStatus.NODYSPO) {
+          item.userDyspo = UserDyspoStatus.UNDEFINED;
+        } else {
+          item.userDyspo = UserDyspoStatus.DYSPO;
+        }
       }
+
       this.change.emit([item]);
     }
   }
@@ -572,7 +649,7 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     console.log('longpress ', ev, day);
     this.longPressedDay = day;
 
-    await Haptics.vibrate();
+    //await Haptics.vibrate();
 
     // Slide mode
   }
@@ -583,11 +660,19 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   }
 
   getCalendarDayFromId(id: string): any {
+    console.log('get Calendar day from', id);
     if (Array.isArray(this.month.days)) {
-      const index = this.month.days.findIndex(
-        (el: CalendarDay) => 'day-' + el.time === id
-      );
+      let idCut = '';
+      if (id.startsWith('day-')) {
+        idCut = id.substring(id.lastIndexOf('-') + 1);
+      } else if (id.startsWith('btnday-') || id.startsWith('divday-')) {
+        idCut = id.substring(id.lastIndexOf('-') + 1);
+      }
+      const index = this.month.days.findIndex((el: CalendarDay) => {
+        return 'day-' + el.time === 'day-' + idCut;
+      });
       if (index >= 0) {
+        console.log();
         return {
           index,
           day: this.month.days[index],

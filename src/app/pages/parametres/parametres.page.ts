@@ -7,7 +7,7 @@ import {
   ModalController,
   NavController,
 } from '@ionic/angular';
-import { OverlayEventDetail } from '@ionic/core/components';
+
 import { Subscription } from 'rxjs';
 import {
   AppSettings,
@@ -21,8 +21,9 @@ import { UtilsService } from 'src/app/services/utils.service';
 import { environment } from 'src/environments/environment';
 import { EmailComposer } from 'capacitor-email-composer';
 import { LoggerService } from 'src/app/services/logger.service';
-import { UserStatusComponent } from 'src/app/components/user-status/user-status.component';
-import { UserCredential } from '@angular/fire/auth';
+
+import { NotificationService } from 'src/app/services/notification.service';
+import { Browser } from '@capacitor/browser';
 
 @Component({
   selector: 'app-parametres',
@@ -30,12 +31,10 @@ import { UserCredential } from '@angular/fire/auth';
   styleUrls: ['./parametres.page.scss'],
 })
 export class ParametresPage implements OnInit {
-  @ViewChild(IonModal) modal!: IonModal;
   dyspoStatus = UserDyspoStatus;
 
   presentingElement: any;
 
-  darkmode: boolean = false;
   ionRangeMin = 10;
   ionRangeMax = 1000;
   ionRangeStep = 10;
@@ -66,7 +65,7 @@ export class ParametresPage implements OnInit {
     receiveNotification: true,
     friendInvitation: true,
     actualiteDyspo: true,
-
+    eventInvitation: true,
     shareAgenda: true,
   };
   settingsBackup: AppSettings | undefined;
@@ -89,7 +88,7 @@ export class ParametresPage implements OnInit {
       receiveNotification: true,
       friendInvitation: true,
       actualiteDyspo: true,
-
+      eventInvitation: true,
       shareAgenda: true,
     },
     tagline: '',
@@ -102,6 +101,7 @@ export class ParametresPage implements OnInit {
     private authSvc: AuthService,
     private userSvc: UserService,
     private logger: LoggerService,
+    private notificationsSvc: NotificationService,
     private modalCtrl: ModalController,
     private utils: UtilsService
   ) {}
@@ -109,25 +109,8 @@ export class ParametresPage implements OnInit {
   ngOnInit() {
     this.presentingElement = document.querySelector('.ion-page');
     this.logger.logDebug('ngOnInit Parametres');
-    if (!localStorage.getItem('darkmode')) {
-      this.darkmode = false;
-    } else {
-      this.darkmode = true;
-    }
-    this.loadInfos();
-  }
 
-  toggleDarkMode(ev: any) {
-    this.logger.logDebug('toggle');
-    if (ev.detail.checked) {
-      this.darkmode = true;
-      document.body.classList.toggle('dark', true);
-      localStorage.setItem('darkmode', 'true');
-    } else {
-      this.darkmode = false;
-      document.body.classList.toggle('dark', false);
-      localStorage.removeItem('darkmode');
-    }
+    this.loadInfos();
   }
 
   ionViewWillEnter() {
@@ -171,8 +154,7 @@ export class ParametresPage implements OnInit {
 
   logout() {
     this.saveFilters = false;
-    //Non car ça declenche updateMyFilters() et donc getMatchProfiles()
-
+    this.notificationsSvc.deleteToken(this.userSvc.userInfo!.uid);
     this.authSvc.logout();
   }
 
@@ -203,54 +185,30 @@ export class ParametresPage implements OnInit {
   }
 
   async openMail() {
-    await EmailComposer.open({ to: [environment.dyspo_email] });
+    const canOpen = await EmailComposer.hasAccount();
+    if (canOpen.hasAccount) {
+      await EmailComposer.open({ to: [environment.dyspo_email] });
+    } else {
+      this.utils.showToastError(
+        'Vous devez configurer une messagerie sur cet appareil'
+      );
+    }
+  }
+
+  async openCGU() {
+    await Browser.open({
+      url: environment.cgu_url,
+    });
+  }
+
+  async openPrivacy() {
+    await Browser.open({
+      url: environment.privacy_url,
+    });
   }
 
   openBlockedUsers() {
     //this.logger.logDebug('Open');
     this.navCtrl.navigateForward('banned-users');
-  }
-
-  openStatus() {
-    this.modalCtrl
-      .create({
-        component: UserStatusComponent,
-        cssClass: 'transparent-modal',
-      })
-      .then((modal) => {
-        modal.present();
-      });
-  }
-
-  cancel() {
-    this.modal.dismiss(null, 'cancel');
-  }
-
-  confirm() {
-    //this.modal.dismiss(this.name, 'confirm');
-  }
-
-  updateStatus(dyspoStatus: UserDyspoStatus) {
-    this.modal.dismiss(dyspoStatus, 'confirm');
-  }
-
-  onWillDismiss(event: Event) {
-    const ev = event as CustomEvent<OverlayEventDetail<string>>;
-    if (ev.detail.role === 'confirm') {
-      if (ev.detail.data !== this.userInfo.dyspoStatus) {
-        //this.message = `Hello, ${ev.detail.data}!`;
-        console.log(`Update status, ${ev.detail.data}!`);
-        this.userInfo.dyspoStatus = ev.detail.data as UserDyspoStatus;
-        const userInfoClone = Object.assign({}, this.userInfo) as AppUser;
-        this.userSvc
-          .updateUser(userInfoClone)
-          .then(() => {
-            this.utils.showToastSuccess('Le status a été mis à jour');
-          })
-          .catch((err) => {
-            this.utils.showToastError(err);
-          });
-      }
-    }
   }
 }

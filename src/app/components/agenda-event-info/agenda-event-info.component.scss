@@ -1,0 +1,226 @@
+.bg-kids-img {
+  --background: none;
+  background-image: url("/assets/newimg/fd_ecran_event_kid.jpg");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.bg-nokids-img {
+  --background: none;
+  background-image: url("/assets/newimg/fd_ecran_event_nokid.jpg");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.bg-free-img {
+  --background: none;
+  background-image: url("/assets/newimg/fd_ecran_event_kidnokid.jpg");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.bg-solo-img {
+  --background: none;
+  background-image: url("/assets/newimg/fd_ecran_event_solo.jpg");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+ion-toolbar {
+  --background: transparent;
+}
+
+ion-button {
+  margin-left: 0px;
+}
+
+.white-btn {
+  --color: #eee;
+}
+
+.form-btn {
+  --background: #363636;
+}
+
+.header-container {
+  margin: 0px 5px 16px 5px;
+  ion-thumbnail {
+    height: 100px;
+    width: 100px;
+    --border-radius: 50%;
+    margin-right: 10px;
+    padding: 3px;
+  }
+  .admin {
+  }
+}
+
+.body-inner {
+  //color: #eee;
+}
+
+.category_div {
+  overflow: scroll;
+  display: flex;
+  flex-direction: row;
+  min-height: 82px;
+  padding: 0px 8px 8px 8px;
+  .menu {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    //justify-content: center;
+    .item {
+      border-radius: 50%;
+      background: transparent !important;
+      width: max-content;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      background: #f4f5f8;
+      ion-label {
+        font-size: 10px;
+      }
+      ion-thumbnail {
+        border-radius: 50%;
+        padding: 2px;
+        margin: 2px;
+        height: 60px;
+        width: 60px;
+        --background: transparent;
+        //border: 2px solid rgb(255, 95, 122);
+        position: relative;
+
+        .invite-icon {
+          background: var(--primary);
+          border-radius: 20px;
+          position: absolute;
+          bottom: -5px;
+          right: -5px;
+          color: white;
+          font-size: 20px;
+        }
+        img {
+          border-radius: 50%;
+        }
+
+        .thumbnail-status {
+          position: absolute;
+          top: 0px; /* Ajustez cette valeur pour positionner verticalement */
+          //right: -5px; /* Ajustez cette valeur pour positionner horizontalement */
+          font-size: 60px; /* Taille du texte du badge */
+          width: 100%;
+          height: 100%;
+
+          left: 0px;
+          text-align: center;
+          justify-content: center;
+          border-radius: 50%; /* Pour créer un badge circulaire */
+          // background-color: rgb(35, 176, 47); /* Couleur de fond du badge */
+          color: rgb(240, 240, 240); /* Couleur du texte du badge */
+          display: flex;
+          align-items: center;
+        }
+      }
+    }
+  }
+}
+
+ion-row {
+  ion-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .img {
+      height: 160px;
+      width: 160px;
+      border-radius: 20px;
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+  }
+}
+
+.bg-event-avatar {
+  overflow: hidden;
+  border-radius: 3px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  // min-width: 50%;
+  // max-width: 60%;
+  // min-height: 150px;
+  width: 189px;
+  height: 140px;
+  position: relative;
+  border: 2px solid rgb(255, 255, 255);
+  transform-origin: top left;
+
+  transform: rotate(-2deg); /* Ajustez l'angle de rotation selon vos besoins */
+
+  ion-img {
+    min-width: calc(100% + 30px);
+    min-height: 100%;
+    transform-origin: top left;
+    transform: rotate(2deg); /* Ajustez l'angle de rotation selon vos besoins */
+
+    position: absolute;
+    top: -20px;
+    left: -10px;
+  }
+}
+
+.container {
+  perspective: 1000px; /* Crée une perspective pour l'effet de perspective */
+}
+
+.skewed-div {
+  width: 300px; /* Ajustez la largeur selon vos besoins */
+  height: 200px; /* Ajustez la hauteur selon vos besoins */
+  background-color: #f0f0f0; /* Couleur de fond pour la div inclinée */
+  transform: rotate(-10deg); /* Inclinaison de la div */
+  display: flex;
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  margin: 50px; /* Marge pour séparer la div */
+}
+
+.skewed-div img {
+  transform: rotate(10deg); /* Inverse l'inclinaison de la div pour l'image */
+  width: calc(120%);
+  max-height: 100%;
+}
+
+.label-type {
+  width: fit-content;
+  border-radius: 3px;
+  padding: 3px 5px;
+  margin-top: 3px;
+}
+
+ion-item:last-child {
+  --inner-border-width: 0;
+}
+
+.thumbnail-badge {
+  position: absolute;
+  top: -2px; /* Ajustez cette valeur pour positionner verticalement */
+  right: -5px; /* Ajustez cette valeur pour positionner horizontalement */
+  font-size: 12px; /* Taille du texte du badge */
+  width: 9px; /* Largeur du badge */
+  height: 9px; /* Hauteur du badge */
+  border-radius: 8px; /* Pour créer un badge circulaire */
+  background: var(--text-no-dyspo); /* Couleur de fond du badge */
+  color: white; /* Couleur du texte du badge */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100000000;
+}

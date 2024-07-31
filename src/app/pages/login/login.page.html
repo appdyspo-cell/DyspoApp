@@ -5,23 +5,15 @@
     <ion-card class="ion-no-margin">
       <ion-card-content>
         <ion-row class="row">
-          <div class="fire-logo ion-text-center">
-            <img
-              #title
-              class="img-logo"
-              src="../../../assets/dyspo_black_logo.png"
-            />
-            <ion-text #title class="text-light">
-              <h1 class="ion-no-margin ion-margin-vertical ion-text-center">
-                DYSPO
-              </h1>
-            </ion-text>
+          <div class="dyspo-logo ion-text-center">
+            <img #title class="img-logo" src="../../../assets/logo_login.png" />
           </div>
         </ion-row>
         <ion-row class="ion-margin-top">
           <ion-col>
-            <ion-item class="roundedInput8px margin-bottom-10">
+            <ion-item class="roundedInput8px margin-bottom-10" lines="none">
               <div
+                slot="start"
                 style="
                   border-right: 1px solid;
                   border-color: rgb(155, 155, 155);
@@ -46,8 +38,9 @@
         </ion-row>
         <ion-row>
           <ion-col>
-            <ion-item class="roundedInput8px margin-bottom-10">
+            <ion-item class="roundedInput8px margin-bottom-10" lines="none">
               <div
+                slot="start"
                 style="
                   border-right: 1px solid;
                   border-color: rgb(155, 155, 155);
@@ -65,7 +58,7 @@
                 type="password"
                 placeholder="Mot de passe"
                 [(ngModel)]="userInfo.password"
-                class="ion-padding-start ion-padding-horizontal"
+                class="ion-padding-start"
                 clear-input="true"
               ></ion-input>
             </ion-item>
@@ -86,52 +79,52 @@
         </ion-row>
         <ion-row>
           <ion-col>
-            <ion-button
-              #btn1
-              [disabled]="disablePage"
-              shape="block"
-              (click)="submitLoginForm()"
-              color="undefined"
-              class="btn-transition"
-              ><strong style="color: #fff"
-                >{{ 'LOGIN' | translate }}</strong
-              ></ion-button
+            <div
+              style="width: 100%; display: flex"
+              class="ion-justify-content-center"
             >
+              <ion-button
+                #btn1
+                [disabled]="disablePage"
+                mode="ios"
+                (click)="submitLoginForm()"
+                color="tertiary"
+                class="dyspo-button"
+                >{{ 'LOGIN' | translate }}<ion-icon
+                  name="log-in-outline"
+                  slot="start"
+                ></ion-icon
+              ></ion-button>
+            </div>
           </ion-col>
         </ion-row>
-        <ion-row *ngIf="showBiometricLogin">
-          <ion-col>
-            <ion-button
-              expand="block"
-              (click)="biometricLogin()"
-              color="undefined"
-              class="btn-transition"
-              ><strong class="white"
-                >Authentification biométrique</strong
-              ></ion-button
-            >
-          </ion-col>
-        </ion-row>
+
         <p>&nbsp;</p>
         <ion-row>
           <ion-col>
-            <div class="ion-text-center text-light">
-              <h1>Pas encore de compte ?</h1>
+            <div class="ion-text-center text-light" style="font-size: 1.1rem">
+              Pas encore de compte ?
             </div>
           </ion-col>
         </ion-row>
 
         <ion-row>
           <ion-col>
-            <ion-button
-              expand="block"
-              (click)="signup()"
-              color="undefined"
-              class="btn-transition"
-              ><strong style="color: #fff"
-                >{{ 'REGISTER' | translate }}</strong
-              ></ion-button
+            <div
+              style="width: 100%; display: flex"
+              class="ion-justify-content-center"
             >
+              <ion-button
+                (click)="signup()"
+                color="tertiary"
+                class="dyspo-button"
+                mode="ios"
+                >{{ 'REGISTER' | translate }}<ion-icon
+                  name="person-outline"
+                  slot="start"
+                ></ion-icon
+              ></ion-button>
+            </div>
           </ion-col>
         </ion-row>
         <div class="line"></div>

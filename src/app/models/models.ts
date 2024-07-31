@@ -14,45 +14,81 @@ export interface AppUser {
   firstConnexion?: boolean;
   notificationToken?: string;
   isConnected?: boolean;
-  friendStatus?: string;
   friendListUid?: string;
   tagline?: string;
   avg_rates?: number;
   nb_rates?: number;
   created_at_ms?: number;
   is_phoneVerified?: boolean;
+  is_my_friend?: boolean;
+  geo_zone?: string;
+  with_kids?: boolean;
+}
+
+export interface AppDeviceContact {
+  uid: string | undefined;
+  display: string;
+  phone_number: string;
+  is_member: boolean | undefined;
+  is_my_friend: boolean | undefined;
+  initials: string | undefined;
+  avatar: string | undefined;
+  contactId: string;
 }
 
 export interface Friend extends AppUser {
   sinceDate?: number;
   requestDate?: number;
-  friend_status?: string;
+  friend_status?: FriendStatus;
   friend_uid?: string;
 
   userData?: AppUser;
+}
+
+export interface AppUserWithEvents extends AppUser {
+  agendaEvents?: AgendaEvent[];
+}
+
+export interface FriendGroup {
+  uid: string;
+  label: string;
+  avatarPath?: string;
+  sinceDate?: number;
+  status: FriendGroupStatus;
+  admin_uid: string;
+  members_uid: string[];
+  checked_friends?: CheckedFriends[];
+}
+
+export interface CheckedFriends {
+  friend: any;
+  isChecked: boolean;
+  isCheckedPending: boolean;
+  disable: boolean;
+  dyspo?: UserDyspoStatus;
+  agendaEvents: AgendaEvent[];
 }
 
 export interface AppSettings {
   receiveEmail: boolean;
   receiveNotification: boolean;
   friendInvitation: boolean;
+  eventInvitation: boolean;
   actualiteDyspo: boolean;
-  //biometricAuth: boolean;
   shareAgenda: boolean;
 }
 
 export interface Chatroom {
-  chatroomKey: string;
-  description: string;
+  uid?: string;
+  description?: string;
   count: number;
-  lastMessage: string;
+  lastMessageRead?: string;
+  //lastMessage: string;
   startMessageId: number;
   nextMessageId: number;
-  blocked?: boolean;
-  blockedBy?: string;
-  blockedTime?: string;
-  blockedTimeMs?: number;
+  quit_chatroom_at?: number;
   isArchived?: boolean;
+  isNotifications: boolean;
 }
 
 export interface AgendaEvent {
@@ -67,6 +103,52 @@ export interface AgendaEvent {
   end_date_formatted?: string;
   end_time_formatted?: string;
   place_id?: string;
+  place_description?: string;
+  avatar?: string;
+  members_uid: string[];
+  members_invited_uid: string[];
+  admin_uid: string;
+  all_can_edit: boolean;
+  all_can_see_title: boolean;
+  // day: number;
+  // month: number;
+  // year: number;
+  start_date_ts: number;
+  end_date_ts: number;
+  start_date_day_of_year: number;
+  end_date_day_of_year: number;
+  start_date_year: number;
+  end_date_year: number;
+  last_message?: ChatMessage;
+  is_multi: boolean;
+  recurrence: AgendaEventRecurrence;
+  recurrence_nb: string;
+  recurrence_end_ISO?: string;
+  parent_agenda_event_uid?: string;
+  ref_start_ISO?: string;
+  ref_end_ISO?: string;
+  [member_uid: string]:
+    | string
+    | number
+    | undefined
+    | string[]
+    | boolean
+    | ChatMessage
+    | Chatroom;
+}
+
+export interface UserAgendaEventsByDay {
+  uid: string;
+  agendaEvents: AgendaEvent[];
+  // day: number;
+  // month: number;
+  // year: number;
+}
+
+export interface FriendDyspo {
+  friend_uid: string;
+  friend_dyspo: UserDyspoStatus;
+  dyspo_date_ISO: string;
 }
 
 export interface CrudFBAction {
@@ -100,9 +182,99 @@ export interface DBUser {
   chatIds?: string[];
 }
 
+export interface Notif {
+  id?: string;
+  user_id: string;
+  title: string;
+  message: string;
+  subject: string;
+  data?: any;
+  avatarPath?: string;
+  create_at_ms: number;
+  create_at_ISO: string;
+  status: string;
+}
+
+export interface ChatMessage {
+  uid: string;
+  sender: string;
+  time: string;
+  time_ms: number;
+  message?: string;
+  image?: string;
+  video?: string;
+  map?: string;
+  read_by: string[];
+  date_ISO: string;
+  deleted_by: string[];
+  is_deleted?: boolean;
+}
+
+export interface WarnReport {
+  uid: string;
+  date_ms: number;
+  date_ISO: string;
+  date_formatted?: string;
+  from_user_id: string;
+  from_user_data?: AppUser;
+  report_text: string;
+  report_type: ReportType;
+}
+
+export interface WarnReportUser extends WarnReport {
+  report_user_data?: AppUser;
+  report_user_id: string;
+  result_user_status?: string;
+  report_type: ReportType.USER;
+}
+
+export interface WarnReportMsg extends WarnReport {
+  msg_uid: string;
+  msg_sender_uid: string;
+  msg_sender_data?: AppUser;
+  agenda_event_uid: string;
+  status: WarnReportMsgStatus;
+  result_user_status?: string;
+  result_msg_status?: string;
+  report_type: ReportType.MSG;
+}
+
+export interface WarnReportGroup extends WarnReport {
+  agenda_event_uid: string;
+  last_five_messages: string[];
+  members_uid: string[];
+  status: WarnReportGroupStatus;
+  result_user_status?: string;
+  result_group_status?: string;
+  report_type: ReportType.GROUP;
+}
+
+export interface HolidaysEvent {
+  uid: string;
+  start_date_formatted?: string;
+  start_date_ISO: string;
+  start_date_ts: number;
+  end_date_ISO: string;
+  end_date_formatted?: string;
+  end_date_ts: number;
+  geo_zone: string;
+}
+
+export enum ReportType {
+  USER = 'USER',
+  GROUP = 'GROUP',
+  MSG = 'MSG',
+}
+
+export enum DiscussionType {
+  ARCHIVE = 'ARCHIVE',
+  ACTIVE = 'ACTIVE',
+}
+
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
   DELETED = 'DELETED',
+  BANNED = 'BANNED',
 }
 
 export enum UserDyspoStatus {
@@ -121,6 +293,13 @@ export enum AgendaEventType {
   KIDS = 'KIDS',
   NOKIDS = 'NOKIDS',
   FREE = 'FREE',
+  SOLO = 'SOLO',
+}
+
+export enum AgendaEventRecurrence {
+  ONE = 'ONE',
+  DAILY = 'DAILY',
+  WEEKLY = 'WEEKLY',
 }
 
 export enum FriendStatus {
@@ -128,9 +307,37 @@ export enum FriendStatus {
   PENDING = 'PENDING',
   INVITED = 'INVITED',
   SUGGESTED = 'SUGGESTED',
+  NOFRIEND = 'NOFRIEND',
 }
 
-export enum NotifSubjects {
+export enum FriendGroupStatus {
+  ACTIVE = 'ACTIVE',
+  DELETED = 'DELETED',
+}
+
+export enum NotifSubject {
   MESSAGE = 'MESSAGE',
   INVITE = 'INVITE',
+  AGENDA_EVENT = 'AGENDA_EVENT',
+}
+
+export enum WarnReportMsgStatus {
+  CREATED = 'CREATED',
+  ARCHIVED = 'ARCHIVED',
+  USER_BANNED = 'USER_BANNED',
+  MSG_REMOVED = 'MSG_REMOVED',
+}
+
+export enum WarnReportGroupStatus {
+  CREATED = 'CREATED',
+  ARCHIVED = 'ARCHIVED',
+  USERS_BANNED = 'USERS_BANNED',
+  GROUP_REMOVED = 'GROUP_REMOVED',
+}
+
+export enum ShowHelper {
+  DASHBOARD = 'DASHBOARD',
+  FRIENDS = 'FRIENDS',
+  AGENDA = 'AGENDA',
+  CHATS = 'CHATS',
 }

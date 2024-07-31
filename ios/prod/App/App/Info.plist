@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>en</string>
+	<string>fr</string>
 	<key>CFBundleDisplayName</key>
-        <string>dyspo</string>
+	<string>dyspo!</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -20,8 +20,22 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>L'application vous permet d' ajouter une photo à votre profile et ajouter des pièces jointes à vos messages dans le chat</string>
+	<key>NSContactsUsageDescription</key>
+	<string>L'accès à vos contacts permet d'inviter vos amis à utiliser l'application. Ces données ne sont pas collectées sur nos serveurs.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>L'application souhaite accéder à votre galerie pour ajouter des pièces jointes à vos messages dans le chat</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>L'application souhaite accéder à votre galerie pour ajouter des pièces jointes à vos messages dans le chat</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

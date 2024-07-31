@@ -1,15 +1,19 @@
 import { Component } from '@angular/core';
 import { Auth, User, authState, user } from '@angular/fire/auth';
-import { MenuController, NavController } from '@ionic/angular';
+import { NavController, Platform } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
 import { UserService } from './services/user.service';
 import { LoggerService } from './services/logger.service';
 import { FriendsService } from './services/friends.service';
-import { TestService } from './test.service';
 import { ChatService } from './services/chat.service';
 import { AgendaService } from './services/agenda.service';
 import { NotificationService } from './services/notification.service';
+import { environment } from 'src/environments/environment';
+import { SplashScreen } from '@capacitor/splash-screen';
+import { App } from '@capacitor/app';
+import { UtilsService } from './services/utils.service';
+import { Contacts } from '@capacitor-community/contacts';
 
 @Component({
   selector: 'app-root',
@@ -24,39 +28,46 @@ export class AppComponent {
 
   constructor(
     private auth: Auth,
+    public platform: Platform,
     private translate: TranslateService,
     private navController: NavController,
-    private menuCtrl: MenuController,
+
     private userSvc: UserService,
     private logger: LoggerService,
     private friendsSvc: FriendsService,
     private agendaSvc: AgendaService,
     private chatSvc: ChatService,
-    private notificationSvc: NotificationService
+    private notificationSvc: NotificationService,
+    private utils: UtilsService
   ) {
+    const that = this;
+    // window.onerror = function (msg, url, lineNo, columnNo, error) {
+    //   that.logger.sendUncaughtError(
+    //     msg,
+    //     url,
+    //     lineNo,
+    //     columnNo,
+    //     error,
+    //     that.userSvc.userInfo?.uid
+    //   );
+    //   return false;
+    // };
     //Lang
-    this.translate.setDefaultLang('fr');
-    const preferredLang = localStorage.getItem('lang');
-    if (!preferredLang) {
-      this.translate.use('fr');
-    } else {
-      this.translate.use(preferredLang);
-    }
-    this.user$ = user(auth);
-    this.authState$ = authState(auth);
 
-    // this.userSubscription = this.user$.subscribe((aUser: User | null) => {
-    //   //handle user state changes here. Note, that user will be null if there is no currently logged in user.
-    //   console.log(aUser);
-    //   if (aUser) {
-    //     this.navController.navigateRoot('/tabs');
-    //   }
-    // });
+    this.translate.setDefaultLang('fr');
+    this.loadScripts();
+
+    this.translate.use('fr');
+
+    this.user$ = user(this.auth);
+    this.authState$ = authState(this.auth);
+
     this.authStateSubscription = this.authState$.subscribe(
       (aUser: User | null) => {
         //handle auth state changes here. Note, that user will be null if there is no currently logged in user.
-        this.logger.logDebug(aUser);
+
         if (aUser) {
+          this.logger.logDebug('authStateSubscription', aUser);
           // Init user svc
           this.userSvc
             .subscribeUserInfo(aUser.uid)
@@ -64,19 +75,25 @@ export class AppComponent {
               this.initAllServices(appUser.uid!);
               this.logger.logDebug('validateAuthState userInfo ---> ', appUser);
               this.navController.navigateRoot('/tabs');
-              //SplashScreen.hide();
+              setTimeout(() => {
+                SplashScreen.hide();
+              }, 800);
             })
             .catch((err) => {
               this.logger.logDebug('ERR validateAuthState ', err);
               this.navController.navigateRoot('/login');
-              //SplashScreen.hide();
+              this.utils.showToastError(err.msg);
+              SplashScreen.hide();
             });
         } else {
-          this.logger.logDebug('navigateRoot: Login');
+          setTimeout(() => {
+            SplashScreen.hide();
+          }, 800);
+          this.logger.logDebug(
+            'authStateSubscription NOUSER -> navigateRoot: Login'
+          );
           this.navController.navigateRoot('/login');
 
-          this.menuCtrl.enable(false);
-          localStorage.clear();
           this.killAllServices();
           this.userSvc.unsubscribeUserInfo();
         }
@@ -85,20 +102,42 @@ export class AppComponent {
   }
 
   ngOnDestroy() {
-    // when manually subscribing to an observable remember to unsubscribe in ngOnDestroy
     this.authStateSubscription.unsubscribe();
     //this.userSubscription.unsubscribe();
   }
 
-  initAllServices(uid: string) {
+  async initAllServices(uid: string) {
+    try {
+      await Contacts.requestPermissions();
+    } catch (err) {
+      console.log(err);
+    }
     this.friendsSvc.initService(uid);
     this.agendaSvc.initService(uid);
     this.chatSvc.initService(uid);
     this.notificationSvc.initService(uid);
-    // this.kdoSvc.initService(uid);
+
+    console.log('Init Contacts');
+    if (this.platform.is('ios') || this.platform.is('android')) {
+      this.friendsSvc.initContacts();
+    }
   }
 
   killAllServices() {
+    this.friendsSvc.unsubscribeAllAfterLogoutEvent();
+    this.agendaSvc.unsubscribeAllAfterLogoutEvent();
+    this.chatSvc.unsubscribeAllAfterLogoutEvent();
     //this.notifSvc.unsubscribeAllAfterLogoutEvent();
+  }
+
+  loadScripts() {
+    const node = document.createElement('script');
+    node.src =
+      'https://maps.googleapis.com/maps/api/js?key=' +
+      environment.googleMapsApiKey +
+      '&libraries=places&lang=fr-FR';
+    node.type = 'text/javascript';
+    node.async = false;
+    document.getElementsByTagName('head')[0].appendChild(node);
   }
 }

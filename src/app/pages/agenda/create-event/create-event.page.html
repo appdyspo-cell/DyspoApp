@@ -1,171 +1,246 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-buttons>
-      <ion-back-button slot="start" text=""></ion-back-button>
+  <ion-toolbar mode="md">
+    <ion-buttons slot="start">
+      <ion-back-button
+        color="dark"
+        text=""
+        icon="chevron-back-outline"
+      ></ion-back-button>
     </ion-buttons>
-    <!-- <ion-title>{{ pageTitle }}</ion-title> -->
-    <ion-buttons slot="end">
-      <ion-button
-        fill="outline"
-        shape="round"
-        [disabled]=""
-        (click)="createEvent()"
-      >
-        Enregistrer
-      </ion-button>
-    </ion-buttons>
+    <ion-title style="padding-left: 0px"><h1>{{ pageTitle }}</h1></ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-list>
-    <ion-list-header>Titre</ion-list-header>
-    <ion-item lines="none">
-      <ion-input
-        class="big-input"
-        [(ngModel)]="agendaEvent!.title"
-        placeholder="Saisissez un Titre"
-        required
-      ></ion-input>
-    </ion-item>
+<ion-content class="bg_color" [fullscreen]="true">
+  <div class="header-form-ct">
+    <div class="profile">
+      <div class="input-title">
+        <ion-input
+          maxlength="50"
+          autocapitalize="sentences"
+          [(ngModel)]="agendaEvent!.title"
+          placeholder="Saisissez un titre"
+          required
+        ></ion-input>
+      </div>
+    </div>
+  </div>
 
-    <!-- <div style="height: 50px; width: 100%"></div> -->
-    <ion-list-header>Quand?</ion-list-header>
+  <ion-card *ngIf="is_multi">
+    <div style="font-size: 1.12em; margin-left: 8px; color: rgb(0, 0, 0)">
+      <ion-select
+        aria-label="Type événement"
+        [(ngModel)]="agendaEvent!.type"
+        mode="md"
+        color="dark"
+      >
+        <ion-avatar
+          slot="start"
+          style="width: 40px; height: 40px; margin-right: 6px"
+        >
+          <ion-img [src]="getIconTypeEvent()"></ion-img>
+        </ion-avatar>
+        <ion-select-option [value]="agendaEventType.KIDS"
+          >Kid(s)</ion-select-option
+        >
+        <ion-select-option [value]="agendaEventType.NOKIDS"
+          >NoKid(s)</ion-select-option
+        >
+        <ion-select-option [value]="agendaEventType.FREE">
+          <span style="color: var(--text-dyspo-free)"
+            >Avec ou sans Kids</span
+          ></ion-select-option
+        >
+      </ion-select>
+    </div>
+  </ion-card>
 
-    <ion-item button="true" id="open-time-item" lines="none">
+  <ion-popover
+    #popover_time
+    mode="md"
+    trigger="open-time-item"
+    show-backdrop="false"
+    arrow="false"
+  >
+    <ng-template>
+      <ion-datetime
+        #datetime_starttime
+        presentation="date-time"
+        showDefaultButtons="true"
+        doneText="OK"
+        hour-cycle="h23"
+        locale="fr-FR"
+        [value]="agendaEvent?.startISO"
+        cancelText="Fermer"
+        [min]="min_time_ISO_start"
+        [preferWheel]="true"
+        [minuteValues]="minuteValues"
+        (ionChange)="onStartTimeChanged($event)"
+        ><span slot="time-label">Heure</span></ion-datetime
+      >
+    </ng-template>
+  </ion-popover>
+
+  <ion-popover
+    #popover_time
+    trigger="open-end-time-item"
+    show-backdrop="false"
+    mode="md"
+    arrow="false"
+  >
+    <ng-template>
+      <ion-datetime
+        presentation="date-time"
+        [preferWheel]="true"
+        showDefaultButtons="true"
+        doneText="OK"
+        hour-cycle="h23"
+        locale="fr-FR"
+        [value]="agendaEvent?.endISO"
+        [min]="min_time_ISO_end"
+        [max]="max_time_ISO_end"
+        [minuteValues]="minuteValues"
+        cancelText="Fermer"
+        (ionChange)="onEndTimeChanged($event)"
+      >
+        <span slot="time-label">Heure</span></ion-datetime
+      >
+    </ng-template>
+  </ion-popover>
+
+  <!-- <div style="height: 50px; width: 100%"></div> -->
+  <ion-card>
+    <ion-item
+      button="true"
+      detail="false"
+      id="open-time-item"
+      lines="none"
+      class="ion-no-padding"
+      style="padding-left: 7px"
+    >
       <ion-text slot="start">{{agendaEvent?.start_date_formatted}}</ion-text>
       <ion-text slot="end">{{agendaEvent?.start_time_formatted}}</ion-text>
-      <ion-popover
-        #popover_time
-        trigger="open-time-item"
-        show-backdrop="false"
-        size="cover"
-      >
-        <ng-template>
-          <ion-datetime
-            #datetime_starttime
-            presentation="date-time"
-            showDefaultButtons="true"
-            doneText="OK"
-            hour-cycle="h23"
-            locale="fr-FR"
-            [value]="agendaEvent?.startISO"
-            cancelText="Annuler"
-            [min]="min_time_ISO_start"
-            [preferWheel]="true"
-            (ionChange)="onStartTimeChanged($event)"
-            ><span slot="time-label">Heure</span></ion-datetime
-          >
-        </ng-template>
-      </ion-popover>
     </ion-item>
 
-    <ion-item button="true" id="open-end-time-item" lines="none">
+    <ion-item
+      button="true"
+      detail="false"
+      id="open-end-time-item"
+      lines="none"
+      class="ion-no-padding"
+      style="padding-left: 7px"
+    >
       <ion-text slot="start">{{agendaEvent?.end_date_formatted}}</ion-text>
       <ion-text slot="end">{{agendaEvent?.end_time_formatted}}</ion-text>
-
-      <ion-popover
-        #popover_time
-        trigger="open-end-time-item"
-        show-backdrop="false"
-        size="cover"
-      >
-        <ng-template>
-          <ion-datetime
-            presentation="date-time"
-            [preferWheel]="true"
-            showDefaultButtons="true"
-            doneText="OK"
-            hour-cycle="h23"
-            locale="fr-FR"
-            [value]="agendaEvent?.endISO"
-            [min]="min_time_ISO_end"
-            cancelText="Annuler"
-            (ionChange)="onEndTimeChanged($event)"
-          >
-            <span slot="time-label">Heure</span></ion-datetime
-          >
-        </ng-template>
-      </ion-popover>
     </ion-item>
+  </ion-card>
 
-    <ion-list>
-      <ion-radio-group [(ngModel)]="agendaEvent!.type">
-        <ion-item lines="none">
-          <ion-avatar slot="start">
-            <ion-img src="../../../../assets/dyspo-kid.png"></ion-img>
-          </ion-avatar>
-          <span style="color: var(--text-dyspo-with-kids)">Kids</span>
-
-          <ion-radio
-            slot="end"
-            class="ion-text-center"
-            [value]="agendaEventType.KIDS"
-          ></ion-radio>
+  <ion-card *ngIf="is_multi">
+    <ion-accordion-group>
+      <ion-accordion value="first">
+        <ion-item slot="header" color="light">
+          <ion-label> {{getNbMembers()}}</ion-label>
         </ion-item>
-        <ion-item lines="none">
-          <ion-avatar slot="start">
-            <ion-img src="../../../../assets/dyspo-nokid.png"></ion-img>
-          </ion-avatar>
-          <span style="color: var(--text-dyspo)">No Kids</span>
-
-          <ion-radio
-            slot="end"
-            class="ion-text-center"
-            [value]="agendaEventType.NOKIDS"
-          ></ion-radio>
-        </ion-item>
-
-        <ion-item lines="none">
-          <ion-avatar slot="start">
-            <ion-img src="../../../../assets/dyspo-free.png"></ion-img>
-          </ion-avatar>
-          <span style="color: var(--text-dyspo-free)">Au choix</span>
-
-          <ion-radio
-            slot="end"
-            class="ion-text-center"
-            [value]="agendaEventType.FREE"
-          ></ion-radio>
-        </ion-item>
-      </ion-radio-group>
-    </ion-list>
-    <ion-list-header>
-      <ion-label>Qui prévenir ?</ion-label>
-
-      <ion-button [routerLink]="['/friends-selection']">
-        <ion-icon name="people" slot="start"></ion-icon>Amis, Groupe</ion-button
-      >
-    </ion-list-header>
-
-    <ion-card>
-      <ion-list *ngIf="friends.length > 0">
-        <ion-item
-          *ngFor="let friend of friends ; let i = index;"
-          (click)="selectFriend(friend)"
-        >
-          <ion-avatar slot="start">
-            <!-- <img src="{{friend?.avatarPath}}" /> -->
-          </ion-avatar>
-
-          <div>
-            <ion-row class="ion-align-items-center">
-              <p class="ion-no-margin">NOM PRENOM</p>
+        <div slot="content">
+          <div style="max-height: 1200px; min-height: 275px; width: 100%">
+            <!-- <div style="padding: 4px 4px 0px 4px">{{getNbMembers()}}</div> -->
+            <ion-row class="friends-wrapper">
+              <div class="category_div">
+                <div class="menu">
+                  <div
+                    class="item animate__animated animate__fadeIn"
+                    *ngFor="let member of members"
+                  >
+                    <ion-thumbnail
+                      (click)="onSelectUser(member, $event)"
+                      [ngClass]="{
+                      'thumb-kid': member.dyspoStatus === UserDyspoStatus.DYSPOWITHKIDS,
+                      'thumb-nokids': member.dyspoStatus === UserDyspoStatus.DYSPO,
+                      'thumb-nodyspo': member.dyspoStatus === UserDyspoStatus.NODYSPO,
+                      'thumb-dyspo-undefined': member.dyspoStatus === UserDyspoStatus.UNDEFINED
+                    }"
+                    >
+                      <img src="{{ member.avatarPath }}" />
+                      <div
+                        *ngIf="member.agendaEvents!.length > 0"
+                        name="warning-outline"
+                        class="thumbnail-badge"
+                      ></div>
+                      <ion-icon
+                        *ngIf="member.is_my_friend === false"
+                        class="zmdi zmdi-plus end"
+                      ></ion-icon>
+                    </ion-thumbnail>
+                    <ion-label
+                      >{{ member.uid === uid ? 'Vous' : member.firstname
+                      }}</ion-label
+                    >
+                  </div>
+                </div>
+              </div>
             </ion-row>
-            <ion-row class="ion-align-items-center">
-              <p class="ion-no-margin">5</p>
-            </ion-row>
-            <!-- <ion-row class="ion-align-items-center">
-              <rating [rating]="rate" (ratingChange)="onRateChanged($event)">
-              </rating>            
-            </ion-row> -->
+            <app-friends-selector
+              [agendaEvent]="agendaEvent!"
+              [mode]="mode"
+              [startTime]="startTime"
+              [endTime]="endTime"
+              (friendSelected)="onFriendSelected($event)"
+              (groupSelected)="onGroupSelected($event)"
+            ></app-friends-selector>
           </div>
-        </ion-item>
-      </ion-list>
-    </ion-card>
+        </div>
+      </ion-accordion>
+    </ion-accordion-group>
+  </ion-card>
 
-    <ion-list-header>Lieu </ion-list-header>
+  <ion-card *ngIf="!is_multi && mode==='new'">
+    <ion-item lines="none">
+      <ion-select
+        label="Récurrence"
+        [(ngModel)]="agendaEvent!.recurrence"
+        (ionChange)="onRecurrenceChanged($event)"
+        placeholder="Récurrence"
+        cancelText="Fermer"
+      >
+        <ion-select-option [value]="AgendaEventRecurrence.ONE"
+          >1 fois</ion-select-option
+        >
+        <ion-select-option [value]="AgendaEventRecurrence.DAILY"
+          >Quotidienne</ion-select-option
+        >
+        <ion-select-option [value]="AgendaEventRecurrence.WEEKLY"
+          >Hebdomadaire</ion-select-option
+        >
+      </ion-select>
+    </ion-item>
+    <ion-item
+      lines="none"
+      *ngIf="agendaEvent?.recurrence !== AgendaEventRecurrence.ONE"
+    >
+      <ion-select
+        *ngIf="agendaEvent?.recurrence === AgendaEventRecurrence.WEEKLY"
+        label="Pendant"
+        [(ngModel)]="agendaEvent!.recurrence_nb"
+        placeholder="Pendant"
+      >
+        <ion-select-option *ngFor="let m of [1,2,3,4,5,6]" value="{{m}}"
+          >{{m}} mois</ion-select-option
+        >
+      </ion-select>
+      <ion-select
+        *ngIf="agendaEvent?.recurrence === AgendaEventRecurrence.DAILY"
+        label="Pendant"
+        [(ngModel)]="agendaEvent!.recurrence_nb"
+        placeholder="Pendant"
+      >
+        <ion-select-option *ngFor="let s of [1,2,3,4]" value="{{s}}"
+          >{{ getSemaineLabel(s)}}</ion-select-option
+        >
+      </ion-select>
+    </ion-item>
+  </ion-card>
 
+  <ion-card>
     <ion-searchbar
       [(ngModel)]="autocompletePlaceInput.input"
       (ngModelChange)="updateSearchResults()"
@@ -173,7 +248,10 @@
       (ionClear)="clearAutocomplete()"
     >
     </ion-searchbar>
-    <ion-list [hidden]="autocompletePlaces.length === 0">
+    <ion-list
+      class="ion-no-margin ion-no-padding"
+      [hidden]="autocompletePlaces.length === 0"
+    >
       <ion-item
         *ngFor="let place of autocompletePlaces"
         tappable
@@ -182,11 +260,109 @@
         {{ place.description }}
       </ion-item>
     </ion-list>
-  </ion-list>
-  <ion-list-header
-    ><ion-label>Photo</ion-label>
-    <ion-button
-      ><ion-icon name="camera" slot="start"></ion-icon>Ajouter</ion-button
+  </ion-card>
+
+  <ion-card *ngIf="is_multi">
+    <div style="padding-left: 5px; padding-bottom: 16px">
+      <ion-checkbox [(ngModel)]="allCanEdit" labelPlacement="end"
+        >Autoriser l'édition pour tout le monde</ion-checkbox
+      >
+    </div>
+  </ion-card>
+  <ion-card *ngIf="!is_multi">
+    <div style="padding-left: 5px; padding-bottom: 16px">
+      <ion-checkbox [(ngModel)]="allCanSeeTitle" labelPlacement="end"
+        >Afficher le titre pour tout le monde</ion-checkbox
+      >
+    </div>
+  </ion-card>
+
+  <div style="width: 100%">
+    <ion-text style="padding-left: 23px; font-size: 1.05rem">Photo</ion-text>
+
+    <div
+      *ngIf="agendaEvent?.avatar"
+      class="d-flex ion-justify-content-center"
+      (click)="takePhotoPrompt()"
     >
-  </ion-list-header>
+      <div
+        style="background-image: url('{{ agendaEvent?.avatar }}');"
+        class="bg-event-avatar d-flex ion-justify-content-center ion-margin-bottom"
+      ></div>
+    </div>
+  </div>
+
+  <div class="d-flex ion-justify-content-center">
+    <ion-button
+      [disabled]=""
+      class="dyspo-button"
+      fill="solid"
+      color="tertiary"
+      mode="ios"
+      (click)="saveOrUpdateEvent()"
+    >
+      Enregistrer l'événement
+      <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  <!-- <ion-toolbar class="footer">
+    <ion-buttons slot="end">
+      <ion-button [disabled]="" fill="solid" (click)="saveOrUpdateEvent()">
+        Enregistrer l'événement
+        <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar> -->
+
+  <ion-popover
+    #popoverUserEvents
+    [isOpen]="isPopoverUserEventsOpen"
+    (didDismiss)="isPopoverUserEventsOpen = false"
+  >
+    <ng-template>
+      <div
+        class="popover-events-header"
+        (click)="invite(selectedUser!)"
+        *ngIf="selectedUserFriendStatus === FriendStatus.NOFRIEND"
+      >
+        Demander en Ami
+      </div>
+      <div
+        class="popover-events-header"
+        *ngIf="selectedUserFriendStatus !== FriendStatus.NOFRIEND"
+      >
+        {{ selectedUserFriendStatusLabel }}
+      </div>
+      <ion-list *ngIf="selectedUserEvents && selectedUserEvents.length > 0">
+        <ion-note
+          style="
+            display: block;
+            margin-bottom: 2px;
+            width: 100%;
+            padding: 4px;
+            padding-top: 0px;
+            text-align: center;
+            font-size: 0.75em;
+          "
+          >Pas dyspo dans ces horaires:</ion-note
+        >
+        <div
+          *ngFor="let agEv of selectedUserEvents"
+          style="width: 100%; display: flex; padding: 5px"
+          class="ion-justify-content-center; text-align: center;"
+        >
+          <ion-text
+            style="
+              font-size: 0.75rem;
+              width: 100%;
+              text-align: center;
+              color: var(--text-no-dyspo);
+            "
+            >{{ getOtherEventLabel(agEv) }}</ion-text
+          >
+        </div>
+      </ion-list>
+    </ng-template>
+  </ion-popover>
 </ion-content>

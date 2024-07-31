@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1017972190269",
+    "project_id": "dyspo-2bb43",
+    "storage_bucket": "dyspo-2bb43.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1017972190269:android:49ac47e19a851822ae0e54",
+        "android_client_info": {
+          "package_name": "com.liaisongraphique.dyspo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_VeU0Ko5zW5vChXvBX0XB7NQZe8LQp6k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

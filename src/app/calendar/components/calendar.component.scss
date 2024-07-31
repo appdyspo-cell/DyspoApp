@@ -1,8 +1,12 @@
 :host {
-  padding: 10px 20px;
+  padding: 10px 8px;
   box-sizing: border-box;
   display: inline-block;
-  background-color: #fff;
+  // background-color: #fff;
+  background-image: url("/assets/fd_ecran_principal.jpg");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
   width: 100%;
 }
 
@@ -32,12 +36,14 @@
 
 :host .title .back {
   margin-left: -100%;
+  margin-top: 8px;
   left: -40px;
   width: 40px;
 }
 
 :host .title .forward {
   margin-left: -40px;
+  margin-top: 8px;
   right: -40px;
   width: 40px;
 }

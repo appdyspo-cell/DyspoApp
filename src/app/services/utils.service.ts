@@ -46,6 +46,12 @@ export class UtilsService {
       case 'auth/user-not-found':
         return "L'utilisateur n'existe pas";
         break;
+      case 'auth/invalid-login-credentials':
+        return 'Mauvais identifiant / mot de passe incorrect';
+        break;
+      case 'auth/invalid-credential':
+        return 'Mauvais identifiant / mot de passe incorrect';
+        break;
       case 'auth/invalid-email':
         return "L'email n'est pas valide";
         break;
@@ -63,6 +69,9 @@ export class UtilsService {
         break;
       case 'auth/too-many-requests':
         return "L'accès à ce compte a été temporairement désactivé en raison de nombreuses tentatives de connexion infructueuses. Vous pouvez le restaurer immédiatement en réinitialisant votre mot de passe ou vous pouvez réessayer plus tard";
+        break;
+      case 'auth/operation-not-allowed':
+        return "Impossible d'effectuer cette opération";
         break;
       default:
         return 'Erreur inconnue';
@@ -93,6 +102,18 @@ export class UtilsService {
         message,
         duration: 3500,
         position: 'top',
+        color: 'success',
+        icon: 'checkmark-done-circle-outline',
+      })
+      .then((res) => res.present());
+  }
+
+  showToastSuccessBottom(message: string) {
+    this.toast
+      .create({
+        message,
+        duration: 3500,
+        position: 'bottom',
         color: 'success',
         icon: 'checkmark-done-circle-outline',
       })
@@ -186,5 +207,14 @@ export class UtilsService {
 
   formatDate(dateMs: number) {
     return format(new Date(dateMs), 'iii dd MMM yyyy', { locale: fr });
+  }
+
+  formatTime(dateISO: string) {
+    return format(parseISO(dateISO), 'HH:mm');
+  }
+
+  formatMonth(dateMs: number) {
+    const month = format(new Date(dateMs), 'MMMM', { locale: fr });
+    return month.charAt(0).toUpperCase() + month.slice(1);
   }
 }

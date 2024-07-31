@@ -39,11 +39,13 @@
 :host .primary button.days-btn small,
 :host .primary .days .marked p,
 :host .primary .days .today p {
-  color: var(--ion-color-primary);
+  //color: var(--ion-color-primary);
 }
 
 :host .primary .days .today p {
-  font-weight: 700;
+  font-weight: 900;
+  font-size: 1.8em;
+  //color: #333 !important;
 }
 
 :host .primary .days .last-month-day p,
@@ -65,7 +67,11 @@
 }
 
 :host .on-selected-pan {
-  border: 2px solid var(--text-black);
+  border: 2px solid var(--text-black) !important;
+}
+
+.p-selected {
+  color: rgb(255, 255, 255) !important;
 }
 
 :host .on-selected-dyspo {
@@ -73,8 +79,8 @@
   color: #fff !important;
 }
 
-.p-selected {
-  color: rgb(255, 255, 255) !important;
+:host .out-of-month {
+  opacity: 0.3;
 }
 
 :host .on-selected-dyspo-kids {
@@ -87,14 +93,50 @@
   color: #fff !important;
 }
 
+:host .is-holidays {
+  border: 1px dashed #1f1f1f;
+  //font-style: italic;
+}
+
 :host .event-badge {
-  width: 10px;
-  height: 10px;
-  background-color: red;
-  position: absolute;
-  top: 5px;
-  border-radius: 5px;
+  //width: 10px;
+  //height: 10px;
+  background: var(--text-no-dyspo);
+  //position: absolute;
+  //border-radius: 5px;
   z-index: 15;
+
+  position: absolute;
+  top: -4px; /* Ajustez cette valeur pour positionner verticalement */
+  right: -3px; /* Ajustez cette valeur pour positionner horizontalement */
+  font-size: 12px; /* Taille du texte du badge */
+  width: 8px; /* Largeur du badge */
+  height: 8px; /* Hauteur du badge */
+  border-radius: 50%; /* Pour créer un badge circulaire */
+
+  color: white; /* Couleur du texte du badge */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+ion-badge {
+  position: absolute;
+  top: -5px; /* Ajustez cette valeur pour positionner verticalement */
+  right: -5px; /* Ajustez cette valeur pour positionner horizontalement */
+  font-size: 12px; /* Taille du texte du badge */
+  width: 20px; /* Largeur du badge */
+  height: 20px; /* Hauteur du badge */
+  border-radius: 50%; /* Pour créer un badge circulaire */
+  background: linear-gradient(
+    210deg,
+    var(--text-no-dyspo) 38%,
+    var(--text-no-dyspo-secondary)
+  );
+  color: white; /* Couleur du texte du badge */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 :host .primary .startSelection {

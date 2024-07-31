@@ -1,26 +1,45 @@
-.footer-md:before{
-    background: none;
-}
-.header-md:after{
-    background: none;
-}
-
 .userSection {
-    display: flex;
-    align-items: center;
-    position: relative;
-    top:10px;
-    // justify-content: space-between;
+  display: flex;
+  align-items: center;
+  position: relative;
+  top: 10px;
+  // justify-content: space-between;
 }
 
 .userDetail {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .userName {
-    font-size: 22px;
+  font-size: 22px;
 }
 
+ion-item::part(native) {
+  --background: transparent;
+}
 
+ion-item {
+  padding-bottom: 0;
+}
+
+ion-list {
+  background: transparent !important;
+}
+
+ion-footer {
+  box-shadow: none;
+  background: transparent;
+}
+
+ion-toolbar {
+  ion-title {
+    h1 {
+      margin: 0;
+      font-weight: 500;
+      letter-spacing: 0;
+      font-size: 1.525rem;
+    }
+  }
+}

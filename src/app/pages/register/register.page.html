@@ -1,85 +1,217 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button text="" icon="chevron-back-outline"></ion-back-button>
+      <ion-back-button
+        text=""
+        color="dark"
+        icon="chevron-back-outline"
+      ></ion-back-button>
     </ion-buttons>
     <ion-title>{{'REGISTER' | translate}}</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="bg_color">
+<ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">{{'REGISTER' | translate}}</ion-title>
     </ion-toolbar>
   </ion-header>
-  <div class="form">
- 
-  
-    <ion-list lines="none">
-     
+  <div class="form ion-padding">
+    <ion-list>
       <ion-item mode="md">
-        
-        <ion-input label="Nom *" labelPlacement="floating" mode="md" minlength="3" maxlength="20" required="true" autocomplete="off" autocapitalize="characters" type="name" [(ngModel)]="userInfo.lastname" name="lastname" placeholder="Entrez votre nom"></ion-input>
-        <ion-note *ngIf="errors['lastname']" class="note-error">Le Nom est obligatoire</ion-note>
+        <ion-input
+          label="Nom *"
+          labelPlacement="floating"
+          mode="md"
+          minlength="3"
+          maxlength="20"
+          required="true"
+          autocomplete="off"
+          autocapitalize="characters"
+          type="name"
+          [(ngModel)]="userInfo.lastname"
+          name="lastname"
+          placeholder="Entrez votre nom"
+        ></ion-input>
+        <ion-note *ngIf="errors['lastname']" class="note-error"
+          >Le Nom est obligatoire</ion-note
+        >
+      </ion-item>
+      <ion-item>
+        <ion-input
+          label="Prénom *"
+          labelPlacement="floating"
+          mode="md"
+          minlength="3"
+          maxlength="20"
+          type="text"
+          autocomplete="off"
+          autocapitalize="words"
+          required="true"
+          [(ngModel)]="userInfo.firstname"
+          name="firstname"
+          placeholder="Entrez votre prénom"
+        ></ion-input>
+        <ion-note *ngIf="errors['firstname']" class="note-error"
+          >Le Prénom est obligatoire</ion-note
+        >
+      </ion-item>
+
+      <ion-item>
+        <ion-input
+          mode="md"
+          label="Email *"
+          labelPlacement="floating"
+          type="email"
+          [(ngModel)]="userInfo.email"
+          autocomplete="off"
+          required="true"
+          name="email"
+          placeholder="Entrez votre email"
+        ></ion-input>
+        <ion-note *ngIf="errors['email']" class="note-error"
+          >L'email n'est pas valide</ion-note
+        >
+      </ion-item>
+
+      <ion-item>
+        <ion-input
+          label="Mot de passe *"
+          labelPlacement="floating"
+          minlength="6"
+          maxlength="10"
+          type="password"
+          autocomplete="off"
+          required="true"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="Entrez votre mot de passe"
+        ></ion-input>
+        <ion-note *ngIf="errors['password']" class="note-error"
+          >Le mot de passe doit comporter 6 caractères minimum</ion-note
+        >
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-select
+          label="Zone Géographique"
+          (ionChange)="getAcademies()"
+          [(ngModel)]="userInfo.geo_zone"
+          placeholder="Sélectionnez une zone"
+        >
+          <ion-select-option value="zone_A">Zone A</ion-select-option>
+          <ion-select-option value="zone_B">Zone B</ion-select-option>
+          <ion-select-option value="zone_C">Zone C</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <div class="d-flex ion-align-items-center">
+          <ion-note> {{academies}} </ion-note>
+        </div>
+      </ion-item>
+
+      <ion-item>
+        <ion-text>J'ai des enfants </ion-text>
+        <ion-buttons slot="end">
+          <ion-checkbox [(ngModel)]="userInfo.with_kids"> </ion-checkbox>
+        </ion-buttons>
+      </ion-item>
+
+      <ion-item>
+        <ion-input
+          [maskito]="phoneMask"
+          [maskitoElement]="maskPredicate"
+          label="Téléphone *"
+          labelPlacement="floating"
+          type="tel"
+          [(ngModel)]="userInfo.phoneNumber"
+          autocomplete="off"
+          name="phoneNumber"
+          required="true"
+          placeholder="Entrez votre téléphone"
+        ></ion-input>
+        <ion-note *ngIf="errors['phoneNumber']" class="note-error"
+          >Le téléphone n'est pas valide</ion-note
+        >
+      </ion-item>
+
+      <!-- <ion-item class="desc-inner" lines="none">
+        <ion-textarea
+          counter="true"
+          label="Description"
+          labelPlacement="floating"
+          [(ngModel)]="userInfo.tagline"
+          rows="3"
+          maxlength="100"
+          placeholder="Décrivez vous en quelques mots..."
+        ></ion-textarea>
+      </ion-item> -->
+
+      <!-- <ion-radio-group [(ngModel)]="userInfo.gender">
+        <ion-item>
+          <ion-radio labelPlacement="start" value="M">Homme</ion-radio>
+        </ion-item>
+        <ion-item>
+          <ion-radio labelPlacement="start" value="F">Femme</ion-radio>
+        </ion-item>
+      </ion-radio-group> -->
+
+      <ion-item lines="none">
+        <ion-checkbox
+          slot="start"
+          [(ngModel)]="isTermsChecked"
+          labelPlacement="end"
+        ></ion-checkbox>
+        <div class="d-flex">
+          <ion-text> J'ai lu et j'accepte les CGU de l'application </ion-text>
+
+          <ion-button (click)="gotoLegal()" slot="end" fill="clear">
+            <ion-icon
+              color="medium"
+              name="chevron-forward"
+              slot="icon-only"
+            ></ion-icon>
+          </ion-button>
+        </div>
       </ion-item>
       <ion-item lines="none">
-        <ion-input label="Prénom *" labelPlacement="floating" mode="md" minlength="3" maxlength="20" type="text" autocomplete="off" autocapitalize="words" required="true" [(ngModel)]="userInfo.firstname" name="firstname" placeholder="Entrez votre prénom"></ion-input>
-        <ion-note *ngIf="errors['firstname']" class="note-error">Le Prénom est obligatoire</ion-note>
-      </ion-item>
-  
-      <ion-item  lines="none">
-        <ion-input mode="md" label="Email *" labelPlacement="floating" type="email" [(ngModel)]="userInfo.email" autocomplete="off" required="true" name="email" placeholder="Entrez votre email"></ion-input>
-        <ion-note *ngIf="errors['email']" class="note-error">L'email n'est pas valide</ion-note>
-      </ion-item>
+        <ion-checkbox
+          slot="start"
+          [(ngModel)]="isPrivacyChecked"
+          labelPlacement="end"
+        ></ion-checkbox>
+        <div class="d-flex">
+          <ion-text>
+            J'ai lu et j'accepte la politique de confidentialité
+          </ion-text>
 
-      <ion-item  lines="none">
-        <ion-input label="Mot de passe *" labelPlacement="floating" minlength="6" maxlength="10" type="password" autocomplete="off" required="true" [(ngModel)]="password" name="password" placeholder="Entrez votre mot de passe"></ion-input>
-        <ion-note *ngIf="errors['password']" class="note-error">Le mot de passe doit comporter 6 caractères minimum</ion-note>
-      </ion-item>
-  
-      <ion-item  lines="none">
-        <ion-input label="Téléphone" labelPlacement="floating" type="tel" [(ngModel)]="userInfo.phoneNumber" autocomplete="off" name="phoneNumber" placeholder="Entrez votre téléphone"></ion-input>
-        <ion-note *ngIf="errors['phoneNumber']" class="note-error">Le téléphone n'est pas valide</ion-note>
-      </ion-item>
-      
-        <ion-item  class="desc-inner" lines="none">
-          <ion-textarea counter="true" label="Description" labelPlacement="floating" [(ngModel)]="userInfo.tagline" rows="3" maxlength="100" placeholder="Décrivez vous en quelques mots..."></ion-textarea>  
-        </ion-item>
-      
-  
-      
-      <ion-list>
-        <ion-radio-group [(ngModel)]="userInfo.gender">
-          <ion-item>
-            <ion-radio labelPlacement="start" value="M">Homme</ion-radio>
-          </ion-item>
-          <ion-item>
-            <ion-radio labelPlacement="start" value="F">Femme</ion-radio>
-          </ion-item>
-        </ion-radio-group>
-      </ion-list>
-
-    
-      <ion-item lines="none" class="ion-align-items-center">
-        <div slot="start">
-          <ion-checkbox  [(ngModel)]="isTermsChecked" labelPlacement="end" >J'ai lu et j'accepte les CGU de l'application</ion-checkbox>
+          <ion-button (click)="gotoPrivacy()" slot="end" fill="clear">
+            <ion-icon
+              color="medium"
+              name="chevron-forward"
+              slot="icon-only"
+            ></ion-icon>
+          </ion-button>
         </div>
-        
-       <ion-icon slot="end" color="medium" name="chevron-forward" (click)="gotoLegal()"></ion-icon>
-        
       </ion-item>
-      <ion-note *ngIf="errors['cgu']" class="note-error">Veuillez accepter les conditions générales d'utilisation</ion-note>
+      <ion-note *ngIf="errors['privacy']" class="note-error"
+        >Veuillez accepter la politique de confidentialité</ion-note
+      >
+      <br />
+      <ion-note *ngIf="errors['cgu']" class="note-error"
+        >Veuillez accepter les conditions générales d'utilisation</ion-note
+      >
     </ion-list>
-  
-
   </div>
-    <div>
-      <ion-button size="large" shape="block" (click)="checkBeforeRegister()">Inscription</ion-button>
-    </div>
-
-
+  <div class="ion-padding ion-justify-content-center d-flex">
+    <ion-button
+      class="dyspo-button"
+      mode="ios"
+      color="tertiary"
+      (click)="checkBeforeRegister()"
+      >Inscription<ion-icon name="person-outline" slot="start"></ion-icon
+    ></ion-button>
+  </div>
 </ion-content>
-
-
-

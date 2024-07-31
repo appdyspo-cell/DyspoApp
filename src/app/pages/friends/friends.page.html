@@ -1,28 +1,56 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Amis</ion-title>
+<ion-header>
+  <ion-toolbar mode="md">
+    <!-- <ion-thumbnail slot="start">
+          <ion-img
+            src="assets/friends.png"
+            class="animate__animated animate__fadeInLeft"
+          ></ion-img>
+        </ion-thumbnail> -->
+    <ion-title> <h1>Amis</h1></ion-title>
+    <ion-buttons slot="end" mode="ios">
+      <ion-button
+        fill="clear"
+        mode="ios"
+        class="black-button"
+        (click)="openContacts()"
+      >
+        Répertoire
+        <ion-icon name="reader-outline" slot="start"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Amis</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <ion-segment [(ngModel)]="selectSegment">
-    <ion-segment-button value="friends" class="segmentButton" color="light">
+<!-- <div class="shape"></div> -->
+<ion-content class="bg_color">
+  <ion-segment mode="md" [(ngModel)]="selectSegment" lines="none">
+    <ion-segment-button
+      mode="md"
+      value="friends"
+      style="text-transform: none !important"
+    >
       <ion-icon name="person"></ion-icon>
-      <ion-label>Mes amis</ion-label>
+      <ion-label> Amis </ion-label>
     </ion-segment-button>
-    <ion-segment-button value="suggestions" color="light">
+    <ion-segment-button
+      mode="md"
+      value="friendsgroup"
+      style="text-transform: none !important"
+    >
+      <ion-icon name="people"></ion-icon>
+      <ion-label> Groupes</ion-label>
+    </ion-segment-button>
+
+    <ion-segment-button
+      mode="md"
+      value="suggestions"
+      style="text-transform: none !important"
+    >
       <ion-icon name="person-add"></ion-icon>
-      <ion-label>Invitations</ion-label>
+      <ion-label> Invitations </ion-label>
       <ion-badge
         *ngIf="friendsSuggested.length>0"
         color="danger"
-        style="position: absolute; right: 15px"
+        class="segment-badge"
         >{{ friendsSuggested.length }}</ion-badge
       >
     </ion-segment-button>
@@ -33,41 +61,45 @@
       mode="ios"
       [(ngModel)]="inputSearch"
       (ngModelChange)="updateSearchResults()"
-      placeholder="Rechercher un membre Dyspo"
+      placeholder="Rechercher un membre dyspo!"
       (ionClear)="clearAutocomplete()"
       showCancelButton="never"
     ></ion-searchbar>
-    <ion-list [hidden]="autocompleteItems.length === 0">
-      <ion-item *ngFor="let user of autocompleteItems">
-        <ion-avatar slot="start">
-          <img src="{{user.avatarPath}}" />
-        </ion-avatar>
+    <ion-list [hidden]="autocompleteItems.length === 0" class="ion-no-padding">
+      <ion-item *ngFor="let user of autocompleteItems" lines="full">
+        <ion-thumbnail slot="start" class="avatar-thumbnail">
+          <img
+            [defaultImage]="defaultImage"
+            [lazyLoad]="user.avatarPath!"
+            class="crop_img fade-img"
+          />
+        </ion-thumbnail>
         <ion-label>
           <ion-row class="ion-align-items-center">
-            <p class="ion-no-margin">
-              {{user.lastname | uppercase}} {{user.firstname}}
-            </p>
+            {{user.lastname | uppercase}} {{user.firstname}}
           </ion-row>
         </ion-label>
-        <ion-button slot="end" (click)="selectSearchResult(user)">
-          <ion-icon name="person-add" slot="start"></ion-icon>
+        <ion-button
+          slot="end"
+          *ngIf="!user.is_my_friend"
+          size="small"
+          (click)="inviteFriend(user)"
+        >
           Inviter
         </ion-button>
       </ion-item>
     </ion-list>
-    <div id="container-friends" *ngIf="friends.length === 0">
-      <ion-icon
-        name="person-outline"
-        class="empty-icon-circle icon-large empty-icon-color"
-      ></ion-icon>
-      <br />
-      <strong class="capitalize">
+    <div *ngIf="friends.length === 0" class="ion-padding ion-text-center">
+      <strong>
         <ion-text style="color: rgb(100, 100, 100)"
           >Vous n'avez pas encore d'amis</ion-text
         >
       </strong>
     </div>
-    <ion-list *ngIf="friends.length > 0">
+    <ion-list
+      *ngIf="friends.length > 0 && autocompleteItems.length === 0"
+      class="ion-no-padding"
+    >
       <ion-item-sliding
         [id]="'slidingItem' + i"
         *ngFor="let friendListDoc of friends ; let i = index;"
@@ -80,99 +112,158 @@
             <ion-icon slot="icon-only" name="trash"></ion-icon>
           </ion-item-option>
         </ion-item-options>
-        <ion-item (click)="showProfile(friendListDoc)">
-          <ion-avatar slot="start">
-            <img src="{{friendListDoc.userData?.avatarPath}}" />
-          </ion-avatar>
+        <ion-item lines="full" class="friend-item">
+          <ion-thumbnail slot="start">
+            <img
+              [defaultImage]="defaultImage"
+              [lazyLoad]="friendListDoc.userData?.avatarPath!"
+              class="crop_img fade-img"
+            />
+          </ion-thumbnail>
+          <ion-label>
+            <ion-row class="ion-align-items-center">
+              {{friendListDoc.userData?.lastname | uppercase}}
+            </ion-row>
+            <ion-row class="ion-align-items-center">
+              {{friendListDoc.userData?.firstname}}
+            </ion-row>
+          </ion-label>
+
+          <ion-button
+            fill="clear"
+            slot="end"
+            color="dark"
+            (click)="showAgenda(friendListDoc, $event)"
+            class="animate__animated animate__fadeInRight"
+          >
+            <!-- <ion-img src="assets/agenda.png"></ion-img> -->
+            <ion-icon name="calendar-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-item>
+      </ion-item-sliding>
+    </ion-list>
+  </div>
+
+  <div *ngIf="selectSegment === 'friendsgroup'" class="ion-no-margin">
+    <div *ngIf="friendGroups.length === 0" class="ion-padding ion-text-center">
+      <strong>
+        <ion-text style="color: rgb(100, 100, 100)"
+          >Vous n'avez pas encore de groupe d'amis</ion-text
+        >
+      </strong>
+    </div>
+    <ion-list
+      *ngIf="friendGroups.length > 0"
+      class="ion-no-padding"
+      lines="full"
+    >
+      <ion-item-sliding
+        [id]="'slidingItemGroup' + i"
+        *ngFor="let friendGroup of friendGroups ; let i = index;"
+      >
+        <ion-item-options>
+          <ion-item-option
+            (click)="promptDeleteFriendGroup(friendGroup, i)"
+            color="danger"
+          >
+            <ion-icon slot="icon-only" name="trash"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+        <ion-item
+          (click)="showFriendGroup(friendGroup, $event)"
+          class="friend-item"
+        >
+          <ion-thumbnail slot="start">
+            <img src="{{friendGroup.avatarPath}}" />
+          </ion-thumbnail>
 
           <div>
             <ion-row class="ion-align-items-center">
-              <p class="ion-no-margin">
-                {{friendListDoc.userData?.lastname | uppercase}}
-                {{friendListDoc.userData?.firstname}}
-              </p>
+              {{friendGroup.label}}
             </ion-row>
             <ion-row class="ion-align-items-center">
-              <p class="ion-no-margin">5</p>
+              {{getMembreLabel(friendGroup.members_uid.length)}}
             </ion-row>
             <!-- <ion-row class="ion-align-items-center">
               <rating [rating]="rate" (ratingChange)="onRateChanged($event)">
               </rating>            
             </ion-row> -->
           </div>
-          <ion-buttons slot="end">
-            <ion-button
-              color="primary"
-              (click)="goToChat(friendListDoc.userData, $event)"
-            >
-              <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
-            </ion-button>
-          </ion-buttons>
         </ion-item>
       </ion-item-sliding>
     </ion-list>
   </div>
 
   <div *ngIf="selectSegment === 'suggestions'" class="ion-no-margin">
-    <div id="container-suggestions" *ngIf="friendsSuggested.length === 0">
-      <ion-icon
-        name="person-outline"
-        class="empty-icon-circle icon-large empty-icon-color"
-      ></ion-icon>
-      <br />
-      <strong class="capitalize">
+    <div
+      *ngIf="friendsSuggested.length === 0"
+      class="ion-padding ion-text-center"
+    >
+      <strong>
         <ion-text style="color: rgb(100, 100, 100)"
           >Vous n'avez pas d'invitations</ion-text
         >
       </strong>
     </div>
 
-    <ion-list *ngIf="friendsSuggested.length > 0">
+    <ion-list *ngIf="friendsSuggested.length > 0" class="ion-no-padding">
       <ion-item-sliding
-        [id]="'slidingItem' + i"
+        [id]="'slidingItemSuggested' + i"
         *ngFor="let friendSuggested of friendsSuggested; let i = index;"
       >
         <ion-item-options>
           <ion-item-option
-            (click)="promptDeleteFriend(friendSuggested,i)"
+            (click)="declineFriendInvit(friendSuggested,i)"
             color="danger"
           >
             <ion-icon slot="icon-only" name="trash"></ion-icon>
           </ion-item-option>
         </ion-item-options>
-        <ion-item (click)="showProfile(friendSuggested)">
-          <ion-avatar slot="start">
-            <img src="{{friendSuggested.userData?.avatarPath}}" />
-          </ion-avatar>
+        <ion-item
+          (click)="showProfile(friendSuggested, $event)"
+          lines="full"
+          class="friend-item"
+        >
+          <ion-thumbnail slot="start">
+            <img
+              [defaultImage]="defaultImage"
+              [lazyLoad]="friendSuggested.userData?.avatarPath!"
+              class="crop_img fade-img"
+            />
+          </ion-thumbnail>
 
           <ion-label>
             <ion-row class="ion-align-items-center">
-              <p class="ion-no-margin">
-                {{friendSuggested.userData?.lastname | uppercase}}
-                {{friendSuggested.firstname}}
-              </p>
+              {{friendSuggested.userData?.lastname | uppercase}}
             </ion-row>
             <ion-row class="ion-align-items-center">
-              <p class="ion-no-margin">4</p>
+              {{friendSuggested.userData?.firstname}}
             </ion-row>
           </ion-label>
-          <ion-buttons slot="end">
-            <ion-button
-              color="primary"
-              (click)="goToChat(friendSuggested, $event)"
-            >
-              <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
-            </ion-button>
-            <ion-button
-              color="primary"
-              size="small"
-              (click)="addFriend(friendSuggested, i, $event)"
-            >
-              <ion-icon [id]="'add'+i" name="person-add"></ion-icon>
-            </ion-button>
-          </ion-buttons>
+
+          <ion-button
+            slot="end"
+            fill="clear"
+            (click)="confirmFriendInvitation(friendSuggested, i, $event)"
+          >
+            <ion-icon
+              [id]="'add'+i"
+              name="person-add"
+              slot="icon-only"
+            ></ion-icon>
+          </ion-button>
         </ion-item>
       </ion-item-sliding>
     </ion-list>
   </div>
 </ion-content>
+<ion-fab
+  *ngIf="selectSegment === 'friendsgroup'"
+  slot="fixed"
+  horizontal="center"
+  vertical="bottom"
+>
+  <ion-fab-button (click)="openFriendGroupForm()">
+    <ion-icon class="zmdi zmdi-accounts-add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>

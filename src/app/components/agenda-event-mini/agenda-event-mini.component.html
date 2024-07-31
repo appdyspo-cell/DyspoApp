@@ -1,0 +1,125 @@
+<div class="agenda-event-container">
+  <!-- <ion-row style="border-bottom: 1px solid" class="ion-align-items-center">
+    <ion-col size="2" *ngIf="agendaEvent.is_multi">
+      <ion-avatar class="event-type-avatar">
+        <ion-img
+          *ngIf="agendaEvent.type === agendaEventType.KIDS"
+          src="../../../../assets/dyspo-kid.png"
+        ></ion-img>
+        <ion-img
+          *ngIf="agendaEvent.type === agendaEventType.NOKIDS"
+          src="../../../../assets/dyspo-nokid.png"
+        ></ion-img>
+        <ion-img
+          *ngIf="agendaEvent.type === agendaEventType.FREE"
+          src="../../../../assets/dyspo-free.png"
+        ></ion-img>
+      </ion-avatar>
+    </ion-col>
+    <ion-col
+      [size]="agendaEvent.is_multi ? 10 : 12"
+      style="margin-left: 0px !important"
+    >
+      <div
+        style="white-space: no-wrap; text-overflow: ellipsis; overflow: hidden"
+        class="ion-align-items-center title-notif"
+      >
+        {{ agendaEvent.title }}
+      </div></ion-col
+    ></ion-row
+  > -->
+  <div style="display: flex; width: auto; align-items: center">
+    <ion-thumbnail
+      class="event-avatar"
+      style="overflow: hidden; margin-right: 8px; margin-top: 3px"
+    >
+      <img src="{{ agendaEvent.avatar }}" />
+    </ion-thumbnail>
+
+    <div
+      style="
+        display: block;
+        justify-content: start;
+        text-align: left;
+        max-width: 245px;
+      "
+    >
+      <div style="font-weight: 600; width: auto">{{ agendaEvent.title }}</div>
+      <div
+        [ngClass]="{
+          'label-bg-kids': agendaEvent.type === agendaEventType.KIDS,
+          'label-bg-nokids': agendaEvent.type === agendaEventType.NOKIDS,
+          'label-bg-free': agendaEvent.type === agendaEventType.FREE,
+          'label-bg-solo': agendaEvent.type === agendaEventType.SOLO,
+          'label-type': true
+        }"
+      >
+        {{ eventTypeLabel }}
+      </div>
+      <div style="font-size: 0.8em">
+        {{ display_date_1 }} - {{ display_date_2 }}
+      </div>
+      <div
+        style="
+          font-size: 0.8em;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        "
+      >
+        {{ agendaEvent.place_description }}
+      </div>
+    </div>
+    <div
+      *ngIf="!isInvitation && agendaEvent.members_uid.length > 1"
+      style="min-width: 45px"
+      class="ion-align-items-center ion-text-center"
+    >
+      <ion-button
+        *ngIf="agendaEvent.members_uid.length > 1"
+        size="small"
+        fill="clear"
+        (click)="goToChat(agendaEvent, $event)"
+      >
+        <ion-icon
+          slot="icon-only"
+          name="chatbubble-ellipses-outline"
+        ></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- <ion-row class="ion-align-items-center">
+    <ion-col *ngIf="agendaEvent.avatar" size="3">
+      <ion-thumbnail
+        class="event-avatar"
+        style="border-radius: 5px; overflow: hidden"
+      >
+        <img src="{{ agendaEvent.avatar }}" />
+      </ion-thumbnail>
+    </ion-col>
+    <ion-col
+      [size]="isInvitation ? 9 : 7"
+      class="ion-align-items-center ion-text-center"
+    >
+      {{ display_date_1 }}<br />
+      <ion-text style="font-size: 0.85rem">{{ display_date_2 }} </ion-text>
+    </ion-col>
+    <ion-col
+      *ngIf="!isInvitation"
+      size="2"
+      class="ion-align-items-center ion-text-center"
+    >
+      <ion-button
+        *ngIf="agendaEvent.members_uid.length > 1"
+        size="small"
+        fill="clear"
+        (click)="goToChat(agendaEvent, $event)"
+      >
+        <ion-icon
+          slot="icon-only"
+          name="chatbubble-ellipses-outline"
+        ></ion-icon>
+      </ion-button> </ion-col
+  ></ion-row> -->
+</div>

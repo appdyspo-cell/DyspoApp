@@ -25,26 +25,9 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css"
     />
-
-    <script
-      async
-      src="https://maps.googleapis.com/maps/api/js?key={{environment.gcpAPIKey}}&libraries=places&lang=fr-FR"
-    ></script>
-    <script>
-      function loadGoogleMaps() {
-        var script = document.createElement("script");
-        script.src =
-          "https://maps.googleapis.com/maps/api/js?key=" +
-          "{{environment.googleMapsApiKey}}";
-        document.body.appendChild(script);
-      }
-    </script>
   </head>
 
   <body>
     <app-root></app-root>
-    <script>
-      loadGoogleMaps();
-    </script>
   </body>
 </html>

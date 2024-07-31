@@ -22,6 +22,11 @@ const routes: Routes = [
           ),
       },
       {
+        path: 'agenda/:dataMode',
+        loadChildren: () =>
+          import('../agenda/agenda.module').then((m) => m.AgendaPageModule),
+      },
+      {
         path: 'agenda',
         loadChildren: () =>
           import('../agenda/agenda.module').then((m) => m.AgendaPageModule),
@@ -59,14 +64,14 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/tabs/agenda',
+        redirectTo: '/tabs/user-status',
         pathMatch: 'full',
       },
     ],
   },
   {
     path: '',
-    redirectTo: '/tabs/agenda',
+    redirectTo: '/tabs/user-status',
     pathMatch: 'full',
   },
 ];

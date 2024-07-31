@@ -1,206 +1,191 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title
-      >{{'groups' | translate}}
-      <ion-icon class="ion-float-end zmdi zmdi-search ion-text-end"></ion-icon>
-    </ion-title>
+<!-- <ion-header class="ion-no-border">
+  <div class="header-ct">
+    <div class="header">
+      <ion-toolbar>
+        <ion-thumbnail slot="start">
+          <ion-img
+            src="assets/chatrooms.png"
+            class="animate__animated animate__fadeInLeft"
+          ></ion-img>
+        </ion-thumbnail>
+        <ion-title> <h1>{{ 'discussions' | translate }}</h1></ion-title>
+      </ion-toolbar>
+    </div>
+  </div>
+</ion-header> -->
+
+<ion-header>
+  <ion-toolbar mode="md">
+    <!-- <ion-thumbnail slot="start">
+      <ion-img
+        src="assets/chatrooms.png"
+        class="animate__animated animate__fadeInLeft"
+      ></ion-img>
+    </ion-thumbnail> -->
+    <ion-title> <h1>{{ 'discussions' | translate }}</h1></ion-title>
   </ion-toolbar>
 </ion-header>
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">{{'groups' | translate}}</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  <ion-list lines="none" class="">
-    <ion-item class="animated slideInRight delay_1" (click)="GroupChatting()">
-      <div class="item_inner d-flex">
-        <div class="profile_img_box">
-          <div class="profile_img">
-            <img src="assets/img/g5.png" />
-          </div>
-        </div>
-        <div class="text-box">
-          <h2 class="d-flex">
-            <span>Charlie's Angels</span> <small>2m</small>
-          </h2>
-          <p class="d-flex">
-            <span class="message">Luicy : Found Best place.</span>
-            <span class="end">2</span>
-          </p>
-        </div>
-      </div>
-    </ion-item>
-    <ion-item class="animated slideInRight delay_2" (click)="GroupChatting()">
-      <div class="item_inner d-flex">
-        <div class="profile_img_box">
-          <div class="profile_img">
-            <img src="assets/img/g8.png" />
-          </div>
-        </div>
-        <div class="text-box">
-          <h2 class="d-flex"><span>School Friends</span> <small>14m</small></h2>
-          <p class="d-flex">
-            <span class="message"
-              >Tanisha : That's a great news buddy, we.</span
-            >
-            <span class="end">1</span>
-          </p>
-        </div>
-      </div>
-    </ion-item>
-    <ion-item class="animated slideInRight delay_3" (click)="GroupChatting()">
-      <div class="item_inner d-flex">
-        <div class="profile_img_box">
-          <div class="profile_img">
-            <img src="assets/img/g3.png" />
-          </div>
-        </div>
-        <div class="text-box">
-          <h2 class="d-flex"><span>Fitness Groupr</span> <small>26m</small></h2>
-          <p class="d-flex">
-            <ion-icon class="ion-text-start zmdi zmdi-attachment"></ion-icon>
-            <span class="message">You shared a file. </span>
-          </p>
-        </div>
-      </div>
-    </ion-item>
-    <ion-item class="animated slideInRight delay_4" (click)="GroupChatting()">
-      <div class="item_inner d-flex">
-        <div class="profile_img_box">
-          <div class="profile_img">
-            <img src="assets/img/g7.png" />
-          </div>
-        </div>
-        <div class="text-box">
-          <h2 class="d-flex"><span>Smili Community</span> <small>2h</small></h2>
-          <p class="d-flex">
-            <span class="message">I will be there by 10:00 aunty.</span>
-          </p>
-        </div>
-      </div>
-    </ion-item>
-    <ion-item class="animated slideInRight delay_5" (click)="GroupChatting()">
-      <div class="item_inner d-flex">
-        <div class="profile_img_box">
-          <div class="profile_img">
-            <img src="assets/img/g2.png" />
-          </div>
-        </div>
-        <div class="text-box">
-          <h2 class="d-flex"><span>Smith Family</span> <small>2m</small></h2>
-          <p class="d-flex"><span class="message">Yes, I am Coming.</span></p>
-        </div>
-      </div>
-    </ion-item>
-    <ion-item class="animated slideInRight delay_6" (click)="GroupChatting()">
-      <div class="item_inner d-flex">
-        <div class="profile_img_box">
-          <div class="profile_img">
-            <img src="assets/img/g4.png" />
-          </div>
-        </div>
-        <div class="text-box">
-          <h2 class="d-flex"><span>Office Birds</span> <small>2m</small></h2>
-          <p class="d-flex">
-            <span class="message">You : LOL That was so funny, ken.</span>
-          </p>
-        </div>
-      </div>
-    </ion-item>
-    <ion-item class="animated slideInRight delay_7" (click)="GroupChatting()">
-      <div class="item_inner d-flex">
-        <div class="profile_img_box">
-          <div class="profile_img">
-            <img src="assets/img/g1.png" />
-          </div>
-        </div>
-        <div class="text-box">
-          <h2 class="d-flex">
-            <span>Manchester United fans</span> <small>14m</small>
-          </h2>
-          <p class="d-flex">
-            <span class="message">Peter : 8:00 pm At my place. Party on.</span>
-          </p>
-        </div>
-      </div>
-    </ion-item>
 
-    <ion-item class="animated slideInRight delay_8" (click)="GroupChatting()">
-      <div class="item_inner d-flex">
-        <div class="profile_img_box">
-          <div class="profile_img">
-            <img src="assets/img/g5.png" />
-          </div>
-        </div>
+<!-- <div class="shape"></div> -->
+<ion-content class="bg_color">
+  <div class="chip-container">
+    <ion-chip [outline]="true" [disabled]="true"
+      ><div class="chip-evt bg-color-kid">&nbsp;</div>
+      Kid(s)</ion-chip
+    >
+    <ion-chip [outline]="true" [disabled]="true"
+      ><div class="chip-evt bg-color-nokids">&nbsp;</div>
+      NoKid(s)</ion-chip
+    >
+    <ion-chip [outline]="true" [disabled]="true"
+      ><div class="chip-evt bg-color-free">&nbsp;</div>
+      Au choix</ion-chip
+    >
+  </div>
+  <ion-segment mode="md" [(ngModel)]="selectDiscussionsType" lines="none">
+    <ion-segment-button
+      mode="md"
+      value="{{discussionType.ACTIVE}}"
+      style="text-transform: none !important"
+    >
+      <!-- <ion-icon name="person"></ion-icon> -->
+      <ion-label> Actives </ion-label>
+    </ion-segment-button>
+    <ion-segment-button
+      mode="md"
+      value="{{discussionType.ARCHIVE}}"
+      style="text-transform: none !important"
+    >
+      <!-- <ion-icon name="people"></ion-icon> -->
+      <ion-label> Archives</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+  <div *ngIf="selectDiscussionsType === discussionType.ACTIVE">
+    <div *ngIf="agendaEvents.length === 0 && !isLoading">
+      <h3 style="text-align: center">Pas de discussions en cours</h3>
+    </div>
+    <ion-list lines="none">
+      <ion-item
+        button
+        *ngFor="let agendaEvent of agendaEvents; let i=index;"
+        [ngClass]="getDelayClass(i)"
+        detail="false"
+        class="animate__animated animate__slideInRight"
+        (click)="goToChat(agendaEvent, discussionType.ACTIVE, $event)"
+      >
+        <ion-thumbnail
+          slot="start"
+          [ngClass]="{
+            'thumb-event-kids': agendaEvent.type === agendaEventType.KIDS,
+            'thumb-event-nokids': agendaEvent.type === agendaEventType.NOKIDS,
+            'thumb-event-free': agendaEvent.type === agendaEventType.FREE}"
+        >
+          <img src="{{agendaEvent.avatar}}" />
+        </ion-thumbnail>
         <div class="text-box">
           <h2 class="d-flex">
-            <span>Charlie's Angels</span> <small>2m</small>
+            <span
+              [ngClass]="{
+              'color-kid': agendaEvent.type === agendaEventType.KIDS,
+              'color-nokids': agendaEvent.type === agendaEventType.NOKIDS,
+              'color-free': agendaEvent.type === agendaEventType.FREE}"
+              >{{agendaEvent.title}}</span
+            >
+
+            <ion-icon
+              *ngIf="chatrooms[agendaEvent.uid!] && !chatrooms[agendaEvent.uid!].isNotifications"
+              name="notifications-off-outline"
+              style="position: absolute; right: 12px"
+            ></ion-icon>
           </h2>
-          <p class="d-flex">
-            <span class="message">Luicy : Found Best place.</span>
-          </p>
-        </div>
-      </div>
-    </ion-item>
-    <ion-item class="animated slideInRight delay_9" (click)="GroupChatting()">
-      <div class="item_inner d-flex">
-        <div class="profile_img_box">
-          <div class="profile_img">
-            <img src="assets/img/g8.png" />
-          </div>
-        </div>
-        <div class="text-box">
-          <h2 class="d-flex"><span>School Friends</span> <small>14m</small></h2>
-          <p class="d-flex">
-            <span class="message"
-              >Tanisha : That's a great news buddy, we.</span
+          <p>
+            <ion-text style="font-size: 0.85rem"
+              >{{getLastMessageDate(agendaEvent)}}</ion-text
             >
           </p>
-        </div>
-      </div>
-    </ion-item>
-    <ion-item class="animated slideInRight delay_10" (click)="GroupChatting()">
-      <div class="item_inner d-flex">
-        <div class="profile_img_box">
-          <div class="profile_img">
-            <img src="assets/img/g3.png" />
-          </div>
-        </div>
-        <div class="text-box">
-          <h2 class="d-flex"><span>Fitness Groupr</span> <small>26m</small></h2>
           <p class="d-flex">
-            <ion-icon class="ion-text-start zmdi zmdi-attachment"></ion-icon>
-            <span class="message">You shared a file. </span>
+            <ion-icon
+              *ngIf="agendaEvent.last_message?.image && !agendaEvent.last_message?.deleted_by?.includes(my_uid)"
+              class="ion-text-start zmdi zmdi-attachment"
+            ></ion-icon>
+            <span
+              [ngClass]="{
+            'message': true,
+            'message-deleted': agendaEvent.last_message?.deleted_by?.includes(my_uid) ||agendaEvent.last_message?.is_deleted ,
+           
+          }"
+              >{{getLastMessageMessage(agendaEvent)}}</span
+            >
+
+            <ng-container
+              *ngIf="chatrooms[agendaEvent.uid!] && chatrooms[agendaEvent.uid!].count > 0"
+            >
+              <span class="end">{{chatrooms[agendaEvent.uid!].count}}</span>
+            </ng-container>
           </p>
         </div>
-      </div>
-    </ion-item>
-    <ion-item class="animated slideInRight delay_11" (click)="GroupChatting()">
-      <div class="item_inner d-flex">
-        <div class="profile_img_box">
-          <div class="profile_img">
-            <img src="assets/img/g7.png" />
-          </div>
-        </div>
+      </ion-item>
+    </ion-list>
+  </div>
+  <div *ngIf="selectDiscussionsType === discussionType.ARCHIVE">
+    <div *ngIf="agendaEventsArchived.length === 0 && !isLoading">
+      <h3 style="text-align: center">Pas de discussions archivées</h3>
+    </div>
+    <ion-list lines="none">
+      <ion-item
+        button
+        detail="false"
+        *ngFor="let agendaEvent of agendaEventsArchived; let i=index;"
+        [ngClass]="getDelayClass(i)"
+        class="animate__animated animate__slideInRight"
+        (click)="goToChat(agendaEvent, discussionType.ARCHIVE, $event)"
+      >
+        <ion-thumbnail
+          slot="start"
+          [ngClass]="{
+        'thumb-event-kids': agendaEvent.type === agendaEventType.KIDS,
+        'thumb-event-nokids': agendaEvent.type === agendaEventType.NOKIDS,
+        'thumb-event-free': agendaEvent.type === agendaEventType.FREE}"
+        >
+          <img src="{{agendaEvent.avatar}}" />
+        </ion-thumbnail>
         <div class="text-box">
-          <h2 class="d-flex"><span>Smili Community</span> <small>2h</small></h2>
+          <h2 class="d-flex">
+            <span
+              [ngClass]="{
+              'color-kid': agendaEvent.type === agendaEventType.KIDS,
+              'color-nokids': agendaEvent.type === agendaEventType.NOKIDS,
+              'color-free': agendaEvent.type === agendaEventType.FREE}"
+              >{{agendaEvent.title}}</span
+            >
+          </h2>
+          <p>
+            <ion-text style="font-size: 0.85rem"
+              >{{getLastMessageDate(agendaEvent)}}</ion-text
+            >
+          </p>
           <p class="d-flex">
-            <span class="message">I will be there by 10:00 aunty.</span>
+            <ion-icon
+              *ngIf="agendaEvent.last_message?.image && !agendaEvent.last_message?.deleted_by?.includes(my_uid)"
+              class="ion-text-start zmdi zmdi-attachment"
+            ></ion-icon>
+            <span
+              [ngClass]="{
+              'message': true,
+              'message-deleted': agendaEvent.last_message?.deleted_by?.includes(my_uid) || agendaEvent.last_message?.is_deleted,
+             
+            }"
+              >{{getLastMessageMessage(agendaEvent)}}</span
+            >
+
+            <ng-container
+              *ngIf="chatrooms[agendaEvent.uid!] && chatrooms[agendaEvent.uid!].count > 0"
+            >
+              <span class="end">{{chatrooms[agendaEvent.uid!].count}}</span>
+            </ng-container>
           </p>
         </div>
-      </div>
-    </ion-item>
-  </ion-list>
-  <ion-fab
-    class="animated zoomIn delay_4"
-    vertical="bottom"
-    horizontal="end"
-    slot="fixed"
-    (click)="create_group()"
-  >
-    <ion-fab-button>
-      <ion-icon class="zmdi zmdi-accounts-add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+      </ion-item>
+    </ion-list>
+  </div>
 </ion-content>

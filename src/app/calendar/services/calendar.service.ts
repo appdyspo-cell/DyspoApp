@@ -239,14 +239,16 @@ export class CalendarService {
           endOffsetIndex < days.length + (endOffsetIndex % 7);
           endOffsetIndex++
         ) {
-          const dayAfter = moment(days[endOffsetIndex - 1].time)
-            .clone()
-            .add(1, 'd');
-          days[endOffsetIndex] = this.createCalendarDay(
-            dayAfter.valueOf(),
-            opt,
-            thisMonth
-          );
+          if (days[endOffsetIndex - 1].time) {
+            const dayAfter = moment(days[endOffsetIndex - 1].time)
+              .clone()
+              .add(1, 'd');
+            days[endOffsetIndex] = this.createCalendarDay(
+              dayAfter.valueOf(),
+              opt,
+              thisMonth
+            );
+          }
         }
       }
     }

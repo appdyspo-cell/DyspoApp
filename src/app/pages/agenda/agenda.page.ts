@@ -1,15 +1,20 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { NavigationExtras } from '@angular/router';
-import { NavController } from '@ionic/angular';
+import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import {
+  ActionSheetController,
+  ModalController,
+  NavController,
+} from '@ionic/angular';
+import {
+  addHours,
   getDate,
   getMonth,
   getYear,
   isAfter,
   isBefore,
   isSameDay,
-  isSameMonth,
   parseISO,
+  setHours,
 } from 'date-fns';
 import { Observable, Subscription } from 'rxjs';
 import {
@@ -21,17 +26,26 @@ import { CalendarMode } from 'src/app/components/calendar';
 import {
   AgendaDyspoItem,
   AgendaEvent,
+  AppUser,
+  Friend,
+  HolidaysEvent,
+  ShowHelper,
   UserDyspoStatus,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
 import { UtilsService } from 'src/app/services/utils.service';
 
 import { cloneDeep } from 'lodash';
+import { AgendaEventInfoComponent } from 'src/app/components/agenda-event-info/agenda-event-info.component';
+import { UserService } from 'src/app/services/user.service';
+import { Preferences } from '@capacitor/preferences';
+import { HelperComponent } from 'src/app/components/helper/helper.component';
 
 export enum AgendaMode {
   SELECT,
   EDIT,
   READONLY,
+  FRIEND,
 }
 
 @Component({
@@ -41,6 +55,7 @@ export enum AgendaMode {
 })
 export class AgendaPage implements AfterViewInit {
   @ViewChild('mydiv') mydiv!: ElementRef;
+  agendaModeEnum = AgendaMode;
   calendar = {
     mode: 'month' as CalendarMode,
   };
@@ -55,56 +70,118 @@ export class AgendaPage implements AfterViewInit {
   eventsForDate: AgendaEvent[] = [];
   selectedDate: any;
 
-  agendaEvents$: Observable<AgendaEvent[]>;
+  agendaEvents$: Observable<AgendaEvent[]> | undefined;
   agendaEvents: AgendaEvent[] = [];
-  agendaEventsSubscription: Subscription;
+  agendaEventsSubscription: Subscription | undefined;
 
-  agendaDyspos$: Observable<{
-    action: 'MODIFIED' | 'ADDED' | 'REMOVED';
-    items: AgendaDyspoItem[];
-  }>;
   agendaDyspos: AgendaDyspoItem[] = [];
-  agendaDysposSubscription: Subscription;
+  agendaDysposSubscription: Subscription | undefined;
+
+  holidays: HolidaysEvent[] = [];
+  holidaysSubscription: Subscription | undefined;
 
   agendaMode: AgendaMode = AgendaMode.READONLY;
+  isFriendMode = false;
   selectedDateFormatted: any;
-  selectedDateMs: number;
+  selectedDateMs: number | undefined;
 
   agendaModes = AgendaMode;
   calendarMonthData!: CalendarMonth;
   originalCalendarMonthData!: CalendarMonth;
   isModified = false;
+  dataMode = '';
+  agendaFriend: Friend | undefined;
+  userSubscription: Subscription;
+  my_info!: AppUser;
+  showHelper = false;
 
   constructor(
     public agendaSvc: AgendaService,
-    private navCtrl: NavController,
-    private utils: UtilsService
+    public navCtrl: NavController,
+    private utils: UtilsService,
+    private modalCtrl: ModalController,
+    private actionSheetCtrl: ActionSheetController,
+    private activatedRoute: ActivatedRoute,
+    private router: Router,
+    public userSvc: UserService
   ) {
-    this.agendaEvents$ = this.agendaSvc.agendaEvents$;
-    this.agendaEventsSubscription = this.agendaSvc.agendaEvents$.subscribe(
-      (agendaEvents: AgendaEvent[]) => {
-        this.agendaEvents = agendaEvents;
-        this.tagCalendarEventsData();
-      }
-    );
+    this.userSubscription = this.userSvc.appUserInfoObs$.subscribe((user) => {
+      this.my_info = user;
 
-    this.agendaDyspos$ = this.agendaSvc.agendaDyspos$;
-    this.agendaDysposSubscription = this.agendaSvc.agendaDyspos$.subscribe(
-      (agendaDyspos) => {
-        console.log(agendaDyspos.action);
-        if (agendaDyspos.action === 'ADDED') {
-          this.agendaDyspos = agendaDyspos.items;
+      console.log('user subscription profile page', user);
+    });
+    this.activatedRoute.params.subscribe(async (params) => {
+      this.dataMode = params['dataMode'];
+      if (this.dataMode !== 'friend') {
+        this.agendaEvents$ = this.agendaSvc.agendaEvents$;
+        this.agendaEventsSubscription = this.agendaSvc.agendaEvents$.subscribe(
+          (agendaEvents: AgendaEvent[]) => {
+            console.log('Ag events', agendaEvents);
+            this.agendaEvents = agendaEvents;
+            this.tagCalendarEventsDataForMonth();
+          }
+        );
+
+        //this.agendaDyspos$ = this.agendaSvc.agendaDyspos$;
+        this.agendaDysposSubscription = this.agendaSvc.agendaDyspos$.subscribe(
+          (agendaDyspos) => {
+            console.log(agendaDyspos.action);
+            if (
+              agendaDyspos.action === 'ADDED' ||
+              agendaDyspos.action === 'MODIFIED'
+            ) {
+              this.agendaDyspos = agendaDyspos.items;
+              this.tagCalendarUserDyspoData();
+            }
+          }
+        );
+
+        // this.selectedDateMs = new Date().getTime();
+        // this.selectedDateFormatted = this.utils.formatDate(
+        //   new Date().getTime()
+        // );
+        // this.getAgendaEventsForDate(this.selectedDateMs);
+      } else if (this.dataMode === 'friend') {
+        // Check if shareAgenda is allowed
+
+        this.isFriendMode = true;
+        this.agendaFriend =
+          this.router.getCurrentNavigation()?.extras.state?.['friend'];
+        console.log('Friend Ag events');
+        const friendData = await this.agendaSvc.getUserAgendaEventsAndDyspos(
+          this.agendaFriend!.friend_uid!,
+          true
+        );
+        if (friendData.allowShare) {
+          this.agendaEvents = friendData.agendaEvents;
+          this.tagCalendarEventsDataForMonth();
+          this.agendaDyspos = friendData.dyspos;
           this.tagCalendarUserDyspoData();
+        } else {
+          this.utils.showAlert('Ne souhaite pas partager son calendrier');
         }
       }
-    );
 
-    this.selectedDateMs = new Date().getTime();
-    this.selectedDateFormatted = this.utils.formatDate(new Date().getTime());
+      this.holidaysSubscription = this.agendaSvc.holidays$.subscribe(
+        (holidays) => {
+          console.log(holidays.action);
+          this.holidays = holidays.items;
+          this.tagHolidays();
+        }
+      );
+    });
   }
 
   ngOnDestroy() {
-    this.agendaEventsSubscription.unsubscribe();
+    if (this.agendaEventsSubscription) {
+      this.agendaEventsSubscription.unsubscribe();
+    }
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
+    if (this.holidaysSubscription) {
+      this.holidaysSubscription.unsubscribe();
+    }
   }
 
   onChangeMode(ev: any) {
@@ -115,7 +192,23 @@ export class AgendaPage implements AfterViewInit {
     }
   }
 
-  ngAfterViewInit() {
+  async ngAfterViewInit() {
+    const { value } = await Preferences.get({ key: ShowHelper.AGENDA });
+    if (!value) {
+      this.showHelper = true;
+      const modal = await this.modalCtrl.create({
+        component: HelperComponent,
+        componentProps: {
+          showHelper: ShowHelper.AGENDA,
+        },
+      });
+      modal.present();
+
+      await Preferences.set({
+        key: ShowHelper.AGENDA,
+        value: 'SHOWN',
+      });
+    }
     this.optionsMulti = {
       pickMode: 'multi',
       showMonthPicker: true,
@@ -129,9 +222,7 @@ export class AgendaPage implements AfterViewInit {
     console.log('onChange', ev);
     this.agendaSvc.isModified = true;
   }
-  onItemSwipe(ev: any) {
-    console.log('Sxipe');
-  }
+
   onSelect(ev: any) {
     if (this.agendaMode === AgendaMode.READONLY) {
       console.log('Get events for Selected ', ev);
@@ -144,24 +235,75 @@ export class AgendaPage implements AfterViewInit {
 
   onCreateMonthEvent(calendarMonthData: CalendarMonth) {
     console.log('Month created !!!!', calendarMonthData);
+
     this.calendarMonthData = calendarMonthData;
     this.originalCalendarMonthData = cloneDeep(this.calendarMonthData);
     this.agendaSvc.isModified = false;
-    this.tagCalendarEventsData();
+    this.tagCalendarEventsDataForMonth();
     this.tagCalendarUserDyspoData();
+    this.tagHolidays();
   }
 
-  tagCalendarEventsData() {
+  tagCalendarEventsDataForMonth() {
     if (!this.calendarMonthData) {
       console.log('Can not tag calendar data');
     } else {
       this.eventsForDate = [];
+      this.selectedDate = undefined;
+      this.selectedDateMs = undefined;
+      this.selectedDateFormatted = this.utils.formatMonth(
+        this.calendarMonthData.original.time
+      );
+      // const prob = this.agendaEvents.find(
+      //   (elt) => elt.uid === 'agev_1712933342454'
+      // );
+      // console.log('Probleme with this event', prob);
+
       this.calendarMonthData.days.forEach((day) => {
+        day.isEvent = false;
+
+        // Il ne faut pas faire ça, on se retrouve a 22h la veille
+        // console.log(
+        //   'Convert start date day time to ISO',
+        //   new Date(day.time).toISOString()
+        // );
+
+        let newDateCalendar = new Date(day.time);
+        newDateCalendar.setMinutes(
+          newDateCalendar.getMinutes() - newDateCalendar.getTimezoneOffset()
+        );
+        let newDateCalendarISO =
+          newDateCalendar.toISOString().split('.')[0] + 'Z';
+        // console.log('new Date du calendar', newDateCalendarISO);
+
         this.agendaEvents.forEach((agendaEvent) => {
-          if (isSameDay(day.time, parseISO(agendaEvent.startISO))) {
+          //For Legacy compatibility
+          let newDateStartEvent = agendaEvent.start_date_ts;
+          let newDateEndEvent = agendaEvent.end_date_ts;
+          if (agendaEvent.ref_start_ISO && agendaEvent.ref_end_ISO) {
+            let newDateStartEventUTC =
+              agendaEvent!.ref_start_ISO!.slice(0, -6) + 'Z';
+            console.log('new Date Start du event', newDateStartEventUTC);
+            newDateStartEvent = parseISO(newDateStartEventUTC).getTime();
+
+            let newDateEndEventUTC =
+              agendaEvent!.ref_end_ISO!.slice(0, -6) + 'Z';
+            console.log('new Date End du event', newDateEndEventUTC);
+            newDateEndEvent = parseISO(newDateEndEventUTC).getTime();
+          }
+
+          if (
+            newDateStartEvent <= newDateCalendar.getTime() &&
+            newDateEndEvent >= newDateCalendar.getTime()
+          ) {
             day.isEvent = true;
-            this.eventsForDate.push(agendaEvent);
-            //day.subTitle = agendaEvent.title?.substring(0, 5);
+            //Prevent doublons for long events
+            const foundIndex = this.eventsForDate.findIndex((evForDate) => {
+              return evForDate.uid === agendaEvent.uid;
+            });
+            if (foundIndex < 0) {
+              this.eventsForDate.push(agendaEvent);
+            }
           }
         });
       });
@@ -179,13 +321,33 @@ export class AgendaPage implements AfterViewInit {
     }
   }
 
-  getAgendaEventsForCurrentMonth() {
+  tagHolidays() {
+    if (!this.calendarMonthData) {
+      console.log('Can not tag calendar holidays');
+    } else {
+      this.calendarMonthData.days.forEach((day) => {
+        day.isHolidays = false;
+
+        this.holidays.forEach((h) => {
+          if (
+            h.geo_zone === this.userSvc.userInfo?.geo_zone &&
+            h.start_date_ts <= day.time &&
+            h.end_date_ts >= day.time
+          ) {
+            day.isHolidays = true;
+          }
+        });
+      });
+    }
+  }
+
+  getAgendaEventsForDate(ts: number) {
     this.eventsForDate = [];
-    this.eventsForDate = this.agendaEvents.filter((elt: AgendaEvent) =>
-      isSameMonth(
-        this.calendarMonthData?.original.month,
-        parseISO(elt.startISO)
-      )
+    this.eventsForDate = this.agendaEvents.filter(
+      (elt: AgendaEvent) => {
+        return elt.start_date_ts <= ts && elt.end_date_ts >= ts;
+      }
+      //isSameDay(ev.time, parseISO(elt.startISO))
     );
     this.eventsForDate.sort((item1, item2) => {
       const date1 = parseISO(item1.startISO);
@@ -215,31 +377,102 @@ export class AgendaPage implements AfterViewInit {
   }
 
   onSelectReadOnly(ev: CalendarDay[]) {
+    // if (this.isFriendMode) {
+    //   return;
+    // }
     if (this.agendaMode === AgendaMode.READONLY) {
       console.log('Selected read only ', ev);
 
-      this.selectedDate = ev;
+      this.selectedDate = ev[0];
       this.selectedDateFormatted = this.utils.formatDate(ev[0].time);
       this.selectedDateMs = ev[0].time;
 
-      this.addEvent();
+      //this.openCreateEvent();
+      this.getAgendaEventsForDate(ev[0].time);
     }
   }
-  addEvent() {
-    const navigationExtras: NavigationExtras = {
-      state: {
-        tsDate: this.selectedDateMs,
+  async openCreateEvent() {
+    const todayMorning = setHours(new Date(), 0);
+    console.log();
+    if (isBefore(new Date(addHours(this.selectedDateMs!, 1)), todayMorning)) {
+      this.utils.showAlert(
+        'Vous ne pouvez pas créer un événement dans le passé'
+      );
+      return;
+    }
+
+    const buttons = [];
+    buttons.push({
+      text: 'Rendez-vous personnel',
+      // cssClass: 'dyspo-sheet-dyspo',
+      data: {
+        is_multi: false,
       },
-    };
-    this.navCtrl.navigateForward('/agenda/create-event/new', navigationExtras);
+    });
+
+    buttons.push({
+      text: 'Événement avec mes amis',
+      // cssClass: 'dyspo-sheet-dyspo-with-kids',
+      data: {
+        is_multi: true,
+      },
+    });
+
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: "Saisissez le type d'événement",
+      cssClass: 'dyspo-sheet',
+      buttons,
+    });
+
+    await actionSheet.present();
+
+    let result = await actionSheet.onDidDismiss();
+    if (result.data) {
+      const navigationExtras: NavigationExtras = {
+        state: {
+          tsDate: this.selectedDateMs,
+          is_multi: result.data.is_multi,
+        },
+      };
+      this.navCtrl.navigateForward(
+        '/agenda/me/create-event/new',
+        navigationExtras
+      );
+    }
   }
-  updateEvent(agendaEvent: AgendaEvent) {
+
+  updateEvent(agendaEvent: AgendaEvent, event: any) {
+    event.stopPropagation();
     const navigationExtras: NavigationExtras = {
       state: {
         agendaEvent,
       },
     };
-    this.navCtrl.navigateForward('/agenda/create-event/edit', navigationExtras);
+    this.navCtrl.navigateForward(
+      '/agenda/me/create-event/edit',
+      navigationExtras
+    );
+  }
+
+  async openEvent(agendaEvent: AgendaEvent) {
+    if (this.isFriendMode) {
+      return;
+    }
+    const modal = await this.modalCtrl.create({
+      component: AgendaEventInfoComponent,
+      componentProps: {
+        agendaEvent,
+        isInvitation: false,
+        isMulti: agendaEvent.is_multi,
+      },
+    });
+    modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+
+    console.log(data);
+    if (role === 'confirm') {
+    }
   }
 
   saveAgenda() {
@@ -251,7 +484,8 @@ export class AgendaPage implements AfterViewInit {
       if (
         day.userDyspo === UserDyspoStatus.DYSPO ||
         day.userDyspo === UserDyspoStatus.DYSPOWITHKIDS ||
-        day.userDyspo === UserDyspoStatus.NODYSPO
+        day.userDyspo === UserDyspoStatus.NODYSPO ||
+        day.userDyspo === UserDyspoStatus.UNDEFINED
       )
         agendaDyspoItems.push({
           time: day.time,
@@ -290,5 +524,39 @@ export class AgendaPage implements AfterViewInit {
     });
     this.tagCalendarUserDyspoData();
     this.agendaSvc.isModified = false;
+  }
+
+  goToChat(agendaEvent: AgendaEvent | undefined, event: any) {
+    event.stopPropagation();
+    console.log('goToChat', agendaEvent);
+
+    if (agendaEvent) {
+      const navigationExtras: NavigationExtras = {
+        state: {
+          agendaEvent,
+        },
+      };
+      this.navCtrl.navigateForward('/group-chatting', navigationExtras);
+      //this.route.navigate(['chat-home'], navigationExtras);
+    }
+  }
+
+  // To include for private multi event
+  displayEventTitle(agendaEvent: AgendaEvent) {
+    if (agendaEvent.all_can_see_title || this.isFriendMode === false) {
+      return agendaEvent.title;
+    } else if (!agendaEvent.all_can_see_title) {
+      const members = agendaEvent.members_uid.concat(
+        agendaEvent.members_invited_uid
+      );
+      if (!members.includes(this.userSvc.userInfo?.uid!)) {
+        return 'Événement privé';
+      } else {
+        return agendaEvent.title;
+      }
+    }
+    {
+      return 'Événement privé';
+    }
   }
 }

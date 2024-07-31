@@ -1,0 +1,16 @@
+ion-content {
+  --background: #000000dd;
+}
+
+ion-toolbar {
+  --background: transparent;
+}
+
+.img-ct {
+  height: calc(100% - 50px);
+  position: absolute;
+}
+
+ion-icon {
+  color: #fff;
+}

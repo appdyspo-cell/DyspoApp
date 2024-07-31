@@ -35,14 +35,7 @@ const routes: Routes = [
       import('./pages/friends/friends.module').then((m) => m.FriendsPageModule),
   },
   {
-    path: 'chat-home',
-    loadChildren: () =>
-      import('./pages/chat-home/chat-home.module').then(
-        (m) => m.ChatHomePageModule
-      ),
-  },
-  {
-    path: 'agenda',
+    path: 'agenda/:dataMode',
     loadChildren: () =>
       import('./pages/agenda/agenda.module').then((m) => m.AgendaPageModule),
   },
@@ -87,7 +80,7 @@ const routes: Routes = [
       ),
   },
   {
-    path: 'create-group',
+    path: 'create-group/:mode',
     loadChildren: () =>
       import('./pages/chat/create-group/create-group.module').then(
         (m) => m.CreateGroupPageModule
@@ -108,10 +101,24 @@ const routes: Routes = [
       ),
   },
   {
-    path: 'friends-selection',
+    path: 'device-contacts',
     loadChildren: () =>
-      import('./pages/friends-selection/friends-selection.module').then(
-        (m) => m.FriendsSelectionPageModule
+      import('./pages/device-contacts/device-contacts.module').then(
+        (m) => m.DeviceContactsPageModule
+      ),
+  },
+  {
+    path: 'notifications-list',
+    loadChildren: () =>
+      import('./pages/notifications-list/notifications-list.module').then(
+        (m) => m.NotificationsListPageModule
+      ),
+  },
+  {
+    path: 'fix-contacts',
+    loadChildren: () =>
+      import('./pages/fix-contacts/fix-contacts.module').then(
+        (m) => m.FixContactsPageModule
       ),
   },
 ];

@@ -1,66 +1,11 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Paramètres</ion-title>
+<ion-header>
+  <ion-toolbar mode="md">
+    <ion-title> <h1>Paramètres</h1></ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="bg_color" [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar style="--background: transparent">
-      <ion-title size="large">Paramètres</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <ion-list-header>
-    <h2>Mon Status</h2>
-  </ion-list-header>
-
-  <div
-    button
-    id="open-status-modal"
-    class="ion-padding"
-    style="background-color: transparent"
-  >
-    <!-- <ion-avatar slot="start">
-      <ion-img [src]="avatar"></ion-img>
-      </ion-avatar> -->
-    <div
-      class="dyspo-button dyspo ion-activatable"
-      *ngIf="userInfo?.dyspoStatus === dyspoStatus.DYSPO"
-    >
-      Dyspo
-      <ion-ripple-effect></ion-ripple-effect>
-    </div>
-
-    <div
-      *ngIf="userInfo?.dyspoStatus === dyspoStatus.DYSPOWITHKIDS"
-      class="dyspo-button dyspo-with-kids ion-activatable"
-    >
-      Dyspo With Kids
-      <ion-ripple-effect></ion-ripple-effect>
-    </div>
-
-    <div
-      *ngIf="userInfo?.dyspoStatus === dyspoStatus.NODYSPO"
-      class="dyspo-button no-dyspo ion-activatable"
-    >
-      No Dyspo
-      <ion-ripple-effect></ion-ripple-effect>
-    </div>
-
-    <div
-      *ngIf="!userInfo?.dyspoStatus"
-      class="dyspo-button no-dyspo ion-activatable"
-    >
-      Dyspo ?
-      <ion-ripple-effect></ion-ripple-effect>
-    </div>
-
-    <!-- <ion-icon slot="end" name="chevron-forward-outline" style="color: var(--ion-color-primary)"></ion-icon>
-       -->
-  </div>
-
-  <ion-list-header>
+<ion-content class="bg_color">
+  <ion-list-header style="border-top: 0px">
     <h2>Mon Profil</h2>
   </ion-list-header>
 
@@ -68,9 +13,9 @@
     <ion-item
       type="button"
       mode="ios"
+      lines="none"
       routerLink="/tabs/parametres/profile"
       routerDirection="forward"
-      style="padding-top: 3px"
     >
       <!-- <ion-avatar slot="start">
       <ion-img [src]="avatar"></ion-img>
@@ -90,39 +35,46 @@
     <h2>Notifications</h2>
   </ion-list-header>
   <ion-card>
-    <ion-list>
+    <ion-list lines="none" class="ion-no-padding">
       <div *ngIf="appSettings">
-        <ion-item>
+        <ion-item lines="none">
           <ion-toggle
             color="primary"
-            [(ngModel)]="appSettings.receiveNotification"
+            [(ngModel)]="appSettings!.receiveNotification"
             slot="end"
           ></ion-toggle>
-          <ion-label> Nouveau message reçu </ion-label>
+          <ion-label>
+            Nouveau message reçu
+            <p class="ion-text-wrap">
+              Lorsqu'un utilisateur envoie un message dans une discussion
+            </p></ion-label
+          >
+        </ion-item>
+      </div>
+
+      <div>
+        <ion-item lines="none">
+          <ion-toggle
+            color="primary"
+            [(ngModel)]="appSettings!.friendInvitation"
+            slot="end"
+          ></ion-toggle>
+          <ion-label> Demande en ami </ion-label>
+        </ion-item>
+      </div>
+
+      <div>
+        <ion-item lines="none">
+          <ion-toggle
+            color="primary"
+            [(ngModel)]="appSettings!.eventInvitation"
+            slot="end"
+          ></ion-toggle>
+          <ion-label> Invitation à un événement </ion-label>
         </ion-item>
       </div>
 
       <!-- <div *ngIf="appSettings">
-        <ion-item>
-          <ion-toggle
-            color="primary"
-            [(ngModel)]="appSettings.actualiteDyspo"
-            slot="end"
-          ></ion-toggle>
-          <ion-label> Actualités </ion-label>
-        </ion-item>
-      </div> -->
-
-      <!-- <div>
-        <ion-item>
-          <ion-toggle color="primary" [(ngModel)]="appSettings.friendInvitation" slot="end" ></ion-toggle>
-          <ion-label>           
-            Demande en ami
-          </ion-label>
-        </ion-item>
-      </div> -->
-
-      <div *ngIf="appSettings">
         <ion-item>
           <ion-toggle
             color="primary"
@@ -137,13 +89,13 @@
             </p>
           </ion-label>
         </ion-item>
-      </div>
+      </div> -->
     </ion-list>
   </ion-card>
   <div *ngIf="appSettings">
-    <ion-list-header>Réglages</ion-list-header>
+    <ion-list-header><h2>Réglages</h2></ion-list-header>
     <ion-card>
-      <ion-list>
+      <ion-list lines="none" class="ion-no-padding">
         <div>
           <ion-item>
             <ion-toggle
@@ -151,8 +103,8 @@
               [(ngModel)]="appSettings.shareAgenda"
               slot="end"
             ></ion-toggle>
-            <ion-label>
-              <ion-text class="ion-text-capitalize">Agenda</ion-text>
+            <ion-label
+              ><ion-text class="ion-text-capitalize">Agenda</ion-text>
               <p class="ion-text-wrap">
                 Autoriser les autres membres à avoir accès à mes disponibilités
               </p>
@@ -162,150 +114,67 @@
       </ion-list>
     </ion-card>
   </div>
-  <!--
-  <ion-list-header>
-    <h2>Apparence</h2>
-  </ion-list-header>
-  <ion-card>
-    <ion-list>
-      <div>
-        <ion-item>
-          <ion-toggle
-            color="primary"
-            (ionChange)="toggleDarkMode($event)"
-            [(ngModel)]="darkmode"
-            >Mode Sombre</ion-toggle
-          >
-        </ion-item>
-      </div> 
-    </ion-list>
-  </ion-card>-->
 
   <ion-list-header>
     <h2>Mentions Légales</h2>
   </ion-list-header>
 
   <ion-card>
-    <ion-item tappable (click)="openMail()">
+    <ion-item tappable (click)="openMail()" lines="none">
       <ion-label class="ion-text-wrap">
         <ion-icon name="mail" class="iconmail" color="primary"></ion-icon>
         <ion-text class="contacttext">Contactez-nous</ion-text>
       </ion-label>
     </ion-item>
-    <ion-item
+    <!-- <ion-item
       [routerDirection]="'forward'"
       [routerLink]="['/cgu']"
       routerLinkActive="active-item"
       lines="none"
-    >
+    > -->
+    <ion-item tappable (click)="openCGU()" lines="none">
       <ion-label class="ion-text-wrap text">
         <ion-icon
           name="information-circle"
           class="iconmail"
           color="primary"
         ></ion-icon>
-        <ion-text class="contacttext">A propos de nous</ion-text>
+        <ion-text class="contacttext"
+          >Conditions générales d'utilisation</ion-text
+        >
+      </ion-label>
+    </ion-item>
+    <ion-item tappable (click)="openPrivacy()" lines="none">
+      <ion-label class="ion-text-wrap text">
+        <ion-icon name="man" class="iconmail" color="primary"></ion-icon>
+        <ion-text class="contacttext">Politique de confidentialité</ion-text>
       </ion-label>
     </ion-item>
   </ion-card>
 
-  <!--<ion-card>
-    <ion-item>
-      <ion-button fill="clear" expand="full" class="logout" color="dark" (click)="logout()">Déconnexion</ion-button>
-    </ion-item>
-  </ion-card>-->
-  <div class="ovelDivContentBottom">
-    <ion-img src="../../assets/dyspo_black_logo.png" class="logo"></ion-img>
-    <ion-footer>
-      <ion-button
-        fill="solid"
-        expand="full"
-        class="logout ion-text-capitalize"
-        color="danger"
-        (click)="deleteAccount()"
-        >Supprimer mon compte
-      </ion-button>
-      <ion-button
-        fill="solid"
-        expand="full"
-        class="logout ion-text-capitalize"
-        color="danger"
-        (click)="logout()"
-        >Deconnexion
-      </ion-button>
-    </ion-footer>
-    <p class="excepTextSize">Version 0.0.1</p>
+  <div class="ct-bottom">
+    <ion-img
+      src="../../assets/newimg/logo_picto_cgv.png"
+      class="logo"
+    ></ion-img>
+    <p class="excepTextSize">Version 1.0.1</p>
+    <ion-button
+      class="dyspo-button"
+      color="tertiary"
+      mode="ios"
+      (click)="logout()"
+    >
+      <ion-icon name="log-out-outline" slot="start"></ion-icon>
+      Déconnexion
+    </ion-button>
+    <ion-button
+      mode="ios"
+      class="dyspo-button"
+      color="danger"
+      (click)="deleteAccount()"
+    >
+      <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+      Supprimer mon compte
+    </ion-button>
   </div>
-
-  <ion-modal
-    #statusmodal
-    trigger="open-status-modal"
-    (willDismiss)="onWillDismiss($event)"
-    [initialBreakpoint]="0.5"
-    [breakpoints]="[0, 0.5]"
-  >
-    <ng-template>
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>Changer mon Status</ion-title>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content class="ion-padding ion-margin">
-        <div class="dyspo-btns-container">
-          <!-- <ion-button
-          shape="round"
-          size="large"
-          color="success"
-          style="margin-bottom: 16px; font-family: Dyspo"
-          expand="full"
-          (click)="updateStatus(dyspoStatus.DYSPO)"
-          >Dyspo</ion-button
-        >
-        <ion-button
-          shape="round"
-          size="large"
-          color="secondary"
-          expand="full"
-          style="margin-bottom: 16px; font-family: Dyspo"
-          (click)="updateStatus(dyspoStatus.DYSPOWITHKIDS)"
-          >Dyspo with kids</ion-button
-        >
-        <ion-button
-          shape="round"
-          size="large"
-          color="warning"
-          expand="full"
-          style="margin-bottom: 16px; font-family: Dyspo"
-          (click)="updateStatus(dyspoStatus.NODYSPO)"
-          >No Dyspo</ion-button
-        > -->
-
-          <div
-            button
-            class="dyspo-button dyspo ion-activatable margin-bottom"
-            (click)="updateStatus(dyspoStatus.DYSPO)"
-          >
-            Dyspo
-            <ion-ripple-effect></ion-ripple-effect>
-          </div>
-          <div
-            button
-            class="dyspo-button dyspo-with-kids ion-activatable margin-bottom"
-            (click)="updateStatus(dyspoStatus.DYSPOWITHKIDS)"
-          >
-            Dyspo With Kids
-            <ion-ripple-effect></ion-ripple-effect>
-          </div>
-          <div
-            button
-            class="dyspo-button no-dyspo ion-activatable"
-            (click)="updateStatus(dyspoStatus.NODYSPO)"
-          >
-            No Dyspo
-            <ion-ripple-effect></ion-ripple-effect>
-          </div>
-        </div>
-      </ion-content>
-    </ng-template>
-  </ion-modal>
 </ion-content>

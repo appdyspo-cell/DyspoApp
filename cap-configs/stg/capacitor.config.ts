@@ -4,14 +4,19 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.rovincent.dyspo.staging',
-  appName: 'dyspo',
+  appName: 'Dyspo! stg',
   webDir: 'www',
   server: {
     androidScheme: 'https',
   },
   plugins: {
     FirebaseMessaging: {
-      presentationOptions: ['badge', 'sound', 'alert'],
+      presentationOptions: ['sound'],
+    },
+
+    SplashScreen: {
+      launchShowDuration: 5000,
+      launchAutoHide: false,
     },
   },
   ios: {
@@ -21,6 +26,7 @@ const config: CapacitorConfig = {
   },
   android: {
     path: 'android/stg',
+    webContentsDebuggingEnabled: true,
   },
 };
 
