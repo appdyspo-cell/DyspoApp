@@ -5,6 +5,9 @@ project(':capacitor-android').projectDir = new File('../../node_modules/@capacit
 include ':capacitor-community-contacts'
 project(':capacitor-community-contacts').projectDir = new File('../../node_modules/@capacitor-community/contacts/android')
 
+include ':capacitor-community-media'
+project(':capacitor-community-media').projectDir = new File('../../node_modules/@capacitor-community/media/android')
+
 include ':capacitor-firebase-app'
 project(':capacitor-firebase-app').projectDir = new File('../../node_modules/@capacitor-firebase/app/android')
 
