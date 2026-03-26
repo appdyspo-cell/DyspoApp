@@ -28,7 +28,7 @@
     "@angular/platform-browser": "^16.2.12",
     "@angular/platform-browser-dynamic": "^16.2.12",
     "@angular/router": "^16.2.12",
-    "@capacitor-community/contacts": "^5.0.5",
+    "@capacitor-community/contacts": "^6.1.1",
     "@capacitor-community/media": "^6.0.0",
     "@capacitor-firebase/app": "^6.0.0",
     "@capacitor-firebase/messaging": "^6.0.0",
