@@ -3,10 +3,10 @@ import { CalendarMonth } from '../calendar.model';
 import { defaults } from '../config';
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
-  selector: 'ion-calendar-month-picker',
-  styleUrls: ['./month-picker.component.scss'],
-  template: `
+    // eslint-disable-next-line @angular-eslint/component-selector
+    selector: 'ion-calendar-month-picker',
+    styleUrls: ['./month-picker.component.scss'],
+    template: `
     <div [class]="'month-picker ' + color">
       <div
         class="month-packer-item"
@@ -18,6 +18,7 @@ import { defaults } from '../config';
       </div>
     </div>
   `,
+    standalone: false
 })
 export class MonthPickerComponent {
   @Input()

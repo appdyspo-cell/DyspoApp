@@ -8,9 +8,10 @@ import { AgendaEvent } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
 
 @Component({
-  selector: 'app-notifications-list',
-  templateUrl: './notifications-list.page.html',
-  styleUrls: ['./notifications-list.page.scss'],
+    selector: 'app-notifications-list',
+    templateUrl: './notifications-list.page.html',
+    styleUrls: ['./notifications-list.page.scss'],
+    standalone: false
 })
 export class NotificationsListPage implements OnInit {
   invitations: AgendaEvent[] = [];

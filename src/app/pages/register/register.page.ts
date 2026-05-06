@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { Browser } from '@capacitor/browser';
 import { NavController } from '@ionic/angular';
 import { MaskitoElementPredicateAsync, MaskitoOptions } from '@maskito/core';
-import { TranslateService } from '@ngx-translate/core';
-import { AppUser, UserStatus } from 'src/app/models/models';
+import { AppUser } from 'src/app/models/models';
+import { AgendaService } from 'src/app/services/agenda.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
@@ -21,14 +20,18 @@ declare interface RegisterErrors {
 }
 
 @Component({
-  selector: 'app-register',
-  templateUrl: './register.page.html',
-  styleUrls: ['./register.page.scss'],
+    selector: 'app-register',
+    templateUrl: './register.page.html',
+    styleUrls: ['./register.page.scss'],
+    standalone: false
 })
 export class RegisterPage implements OnInit {
   isTermsChecked = false;
   isPrivacyChecked = false;
   academies = '';
+
+  readonly weekDays = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+  custodyDays: boolean[] = new Array(14).fill(false);
   readonly maskPredicate: MaskitoElementPredicateAsync = async (el) =>
     (el as HTMLIonInputElement).getInputElement();
 
@@ -66,7 +69,8 @@ export class RegisterPage implements OnInit {
     private authSvc: AuthService,
     private utils: UtilsService,
     private navCtrl: NavController,
-    private userSvc: UserService
+    private userSvc: UserService,
+    private agendaSvc: AgendaService
   ) {
     this.userInfo = this.userSvc.getEmptyUser();
     this.getAcademies();
@@ -121,14 +125,26 @@ export class RegisterPage implements OnInit {
     }
   }
 
+  toggleCustodyDay(index: number) {
+    this.custodyDays[index] = !this.custodyDays[index];
+  }
+
   async register() {
     this.utils.showLoader();
 
-    let chiffresTrouves = this.userInfo.phoneNumber?.match(/[0-9]/g);
+    const chiffresTrouves = this.userInfo.phoneNumber?.match(/[0-9]/g);
     if (chiffresTrouves) {
       this.userInfo.phoneNumber = chiffresTrouves.join('');
-      const user = await this.authSvc.register(this.userInfo, this.password);
-      console.log('register user', user);
+      if (this.userInfo.with_kids) {
+        this.userInfo.custody_schedule = [...this.custodyDays];
+      }
+      const credentials = await this.authSvc.register(this.userInfo, this.password);
+      if (credentials && this.userInfo.with_kids) {
+        await this.agendaSvc.applyCustodySchedule(
+          credentials.user.uid,
+          this.custodyDays
+        );
+      }
       this.utils.hideLoader();
     } else {
       this.utils.hideLoader();

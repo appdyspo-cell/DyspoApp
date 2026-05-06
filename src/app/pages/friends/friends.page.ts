@@ -17,6 +17,7 @@ import {
 } from '@ionic/angular';
 import { Observable, Subscription } from 'rxjs';
 import { HelperComponent } from 'src/app/components/helper/helper.component';
+import { FriendProfileComponent } from 'src/app/components/friend-profile/friend-profile.component';
 import {
   AppDeviceContact,
   AppUser,
@@ -30,16 +31,34 @@ import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
 
 @Component({
-  selector: 'app-friends',
-  templateUrl: './friends.page.html',
-  styleUrls: ['./friends.page.scss'],
+    selector: 'app-friends',
+    templateUrl: './friends.page.html',
+    styleUrls: ['./friends.page.scss'],
+    standalone: false
 })
 export class FriendsPage implements OnInit {
   @ViewChildren(IonItemGroup, { read: ElementRef }) itemGroups!: QueryList<any>;
   scroll = false;
   showHelper = false;
-  showProfile(_t174: Friend, $event: MouseEvent) {
-    throw new Error('Method not implemented.');
+  async showProfile(friend: Friend, $event: MouseEvent) {
+    $event.stopPropagation();
+    const modal = await this.modalCtrl.create({
+      component: FriendProfileComponent,
+      componentProps: { user: friend.userData },
+      breakpoints: [0, 0.5, 0.85],
+      initialBreakpoint: 0.5,
+    });
+    await modal.present();
+  }
+
+  async openFriendProfile(user: AppUser) {
+    const modal = await this.modalCtrl.create({
+      component: FriendProfileComponent,
+      componentProps: { user },
+      breakpoints: [0, 0.5, 0.85],
+      initialBreakpoint: 0.5,
+    });
+    await modal.present();
   }
 
   scrollToLetter(letter: string) {

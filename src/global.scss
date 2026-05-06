@@ -1,147 +1,531 @@
-/*
- * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
- */
+/* ═══════════════════════════════════════════════════════════════
+   DYSPO — Global Styles
+   ═══════════════════════════════════════════════════════════════ */
 
-/* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";
-
-/* Basic CSS for apps built with Ionic */
 @import "@ionic/angular/css/normalize.css";
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
-
-/* Optional CSS utils that can be commented out */
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 @import "~animate.css/animate.min.css";
-
-@import "swiper/scss";
-@import "@ionic/angular/css/ionic-swiper";
-
+@import "swiper/swiper.css";
 @import "./assets/webfonts/simple-line-icons.css";
-
 @import "@sweetalert2/themes/bootstrap-4/bootstrap-4.scss";
 
-:root {
-  --white: #fff;
-  --primary: #46a2c2;
-  --bg-color: #f3f4f8;
-  --bg-color-dark: #93a9d8;
-  --gray: #d5d5d5;
-  --transparent: rgba(0, 0, 0, 0);
-  --text-dark: #bdbdbe;
-  --text-black: #444444;
-  --text-light: #8e8e8e;
-  --text-light2: #464646;
-  --text-no-dyspo: #f95812;
-  --text-no-dyspo-secondary: #a36437;
-  --text-dyspo-with-kids: #48a1c3;
-  --text-dyspo: #7ae198;
-  --text-dyspo-free: #ac3e61;
-  --text-dyspo-solo: #f95812;
-  --text-dyspo-with-kids-secondary: #9eb7c0;
-  --text-dyspo-secondary: #aeddbc;
-  --text-dyspo-free-secondary: #a98892;
-  --text-dyspo-solo-secondary: #f4c7b3;
+// ── 1. Reset & base ────────────────────────────────────────────────────────────
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+ion-app {
+  background: var(--d-surface-0);
+}
+
+// Page background — propre, sans image de fond
+.bg_color {
+  --background: var(--d-surface-0);
+}
+
+// ── 2. Typographie ─────────────────────────────────────────────────────────────
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--ion-font-family);
+  color: var(--d-text-primary);
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  margin: 0;
+}
+
+p {
+  color: var(--d-text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+// ── 3. Transitions globales ────────────────────────────────────────────────────
+
+ion-button,
+ion-item,
+ion-card,
+ion-chip,
+ion-toggle,
+ion-checkbox,
+ion-badge,
+ion-avatar img,
+.day-bubble,
+.wa-star,
+.filter-chip-active {
+  transition: var(--d-transition-base);
+}
+
+// ── 4. Navigation — Header ─────────────────────────────────────────────────────
+
+ion-header {
+  &::after { display: none; } // Supprime la bordure Ionic par défaut
+
+  ion-toolbar {
+    --background: var(--d-surface-1);
+    --color: var(--d-text-primary);
+    --border-width: 0;
+    --padding-start: var(--d-space-4);
+    --padding-end: var(--d-space-4);
+    box-shadow: var(--d-shadow-xs);
+  }
+
+  ion-title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--d-text-primary);
+  }
+
+  ion-back-button {
+    --color: var(--d-brand);
+    --icon-font-size: 22px;
+  }
+}
+
+// Headers colorés (chat WhatsApp)
+ion-header ion-toolbar[color="primary"] {
+  --background: var(--ion-color-primary);
+  --color: #fff;
+  ion-title { color: #fff; }
+}
+
+// ── 5. Cards ──────────────────────────────────────────────────────────────────
+
+ion-card {
+  border-radius: var(--d-radius-lg) !important;
+  box-shadow: var(--d-shadow-sm) !important;
+  --background: var(--d-surface-1);
+  margin: 0 var(--d-space-4) var(--d-space-3);
+  overflow: hidden;
+}
+
+ion-card-header {
+  padding: var(--d-space-4) var(--d-space-4) var(--d-space-2);
+}
+
+ion-card-content {
+  padding: var(--d-space-2) var(--d-space-4) var(--d-space-4);
+}
+
+// ── 6. Items / Listes ─────────────────────────────────────────────────────────
+
+ion-item {
+  --background: transparent;
+  --background-activated: rgba(70, 162, 194, 0.06);
+  --background-focused: rgba(70, 162, 194, 0.06);
+  --ripple-color: rgba(70, 162, 194, 0.12);
+  --inner-border-width: 0 0 1px 0;
+  --border-color: var(--d-surface-3);
+  --min-height: 52px;
+  font-size: 15px;
+
+  ion-label {
+    font-size: 15px;
+    color: var(--d-text-primary);
+
+    p {
+      font-size: 13px;
+      color: var(--d-text-tertiary);
+      margin-top: 2px;
+    }
+  }
+}
+
+ion-list {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+ion-list-header {
+  --background: transparent;
+  padding-bottom: var(--d-space-2);
+
+  h2 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--d-text-tertiary);
+    margin: 0;
+  }
+}
+
+// ── 7. Boutons ────────────────────────────────────────────────────────────────
+
+ion-button {
+  --border-radius: var(--d-radius-md);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.1px;
+  text-transform: none;
+  height: 48px;
+  transition: transform var(--d-duration-fast) var(--d-ease),
+              opacity var(--d-duration-fast) var(--d-ease);
+
+  &:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+  }
+}
+
+// Bouton primaire Dyspo (CTA principal)
+.dyspo-button {
+  --border-radius: var(--d-radius-md);
+  --box-shadow: none;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.2px;
+  text-transform: none;
+  height: 50px;
+  margin: var(--d-space-2) var(--d-space-4);
+
+  &[color="tertiary"] {
+    --background: var(--d-text-primary);
+    --background-activated: #2e3240;
+    --background-focused: #2e3240;
+  }
+
+  &[expand="block"] {
+    margin: var(--d-space-2) 0;
+  }
+}
+
+// ── 8. Inputs & Formulaires ───────────────────────────────────────────────────
+
+.styledInput,
+.roundedInput8px,
+.roundedInput12px,
+.roundedInput25px {
+  --background: var(--d-surface-2);
+  --border-color: var(--d-surface-3);
+  --border-width: 1px;
+  --border-style: solid;
+  --highlight-color-focused: var(--d-brand);
+  --highlight-height: 0;
+  --padding-start: var(--d-space-4);
+  --padding-end: var(--d-space-4);
+  border-radius: var(--d-radius-md);
+  margin-bottom: var(--d-space-3);
+  transition: box-shadow var(--d-duration-fast) var(--d-ease);
+
+  &.item-has-focus {
+    --border-color: var(--d-brand);
+    box-shadow: 0 0 0 3px rgba(70, 162, 194, 0.15);
+  }
+}
+
+.roundedInput8px  { --border-radius: var(--d-radius-sm); }
+.roundedInput12px { --border-radius: var(--d-radius-md); }
+.roundedInput25px { --border-radius: var(--d-radius-pill); }
+
+ion-searchbar {
+  --background: var(--d-surface-2);
+  --border-radius: var(--d-radius-md);
+  --box-shadow: none;
+  --placeholder-color: var(--d-text-tertiary);
+  --icon-color: var(--d-text-tertiary);
+  --color: var(--d-text-primary);
+  --cancel-button-color: var(--d-brand);
+  padding: 0;
+  font-size: 15px;
+}
+
+ion-select {
+  --placeholder-color: var(--d-text-tertiary);
+  --highlight-color-focused: var(--d-brand);
+  font-size: 15px;
+}
+
+ion-textarea {
+  --background: var(--d-surface-2);
+  --border-radius: var(--d-radius-md);
+  font-size: 15px;
+}
+
+// ── 9. Toggles & Checkboxes ───────────────────────────────────────────────────
+
+ion-toggle {
+  --track-background: var(--d-surface-3);
+  --track-background-checked: var(--d-brand);
+  --handle-background: #fff;
+  --handle-box-shadow: var(--d-shadow-sm);
+}
+
+ion-checkbox {
+  --border-color: var(--d-surface-3);
+  --border-color-checked: var(--d-brand);
+  --background-checked: var(--d-brand);
+  --border-radius: var(--d-radius-xs);
+}
+
+// ── 10. Badges ────────────────────────────────────────────────────────────────
+
+ion-badge {
+  border-radius: var(--d-radius-pill);
+  font-weight: 700;
+  font-size: 11px;
+  padding: 3px 7px;
+}
+
+// ── 11. Chips ────────────────────────────────────────────────────────────────
+
+ion-chip {
+  border-radius: var(--d-radius-pill);
+  font-size: 13px;
+  font-weight: 600;
+  height: 34px;
+  margin: 0 var(--d-space-1) 0 0;
+  border: none;
+  background: var(--d-surface-2);
+  color: var(--d-text-secondary);
+  transition: var(--d-transition-fast);
+
+  &:active { transform: scale(0.95); }
+
+  ion-icon { font-size: 14px; margin-right: var(--d-space-1); }
+}
+
+.chip-evt {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: var(--d-space-1);
+  flex-shrink: 0;
+}
+
+.chip-container {
+  display: flex;
+  align-items: center;
+  gap: var(--d-space-2);
+  padding: var(--d-space-3) var(--d-space-4);
+}
+
+// ── 12. Modals ────────────────────────────────────────────────────────────────
+
+ion-modal {
+  --background: transparent;
+  --width: 100%;
+  --height: 100%;
+  --border-radius: 0;
 }
 
 .transparent-modal {
-  --background: rgba(44, 39, 45, 0.2);
+  --background: rgba(26, 29, 35, 0.35);
+  &::part(content) { backdrop-filter: blur(16px); }
+}
+
+// Modal sheet style (bottom drawer)
+.modal-sheet {
+  --border-radius: var(--d-radius-xl) var(--d-radius-xl) 0 0;
+  --background: var(--d-surface-1);
+}
+
+// ── 13. Action Sheet ──────────────────────────────────────────────────────────
+
+ion-action-sheet {
+  --background: var(--d-surface-1);
+  --button-background: var(--d-surface-1);
+  --button-color: var(--d-text-primary);
+  --border-radius: var(--d-radius-xl) var(--d-radius-xl) 0 0;
+
+  .action-sheet-button {
+    font-size: 16px;
+    font-weight: 500;
+    --button-background-activated: var(--d-surface-2);
+  }
+
+  .action-sheet-cancel .action-sheet-button-inner {
+    color: var(--d-no-dyspo);
+    font-weight: 700;
+  }
+}
+
+// ── 14. Alerts ────────────────────────────────────────────────────────────────
+
+ion-alert {
+  --background: var(--d-surface-1);
+  --border-radius: var(--d-radius-xl);
+  --box-shadow: var(--d-shadow-xl);
+
+  .alert-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--d-text-primary);
+  }
+
+  .alert-message {
+    font-size: 14px;
+    color: var(--d-text-secondary);
+    line-height: 1.5;
+  }
+
+  .alert-button {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--d-brand);
+    text-transform: none;
+
+    &.alert-button-role-destructive {
+      color: var(--d-no-dyspo);
+    }
+  }
+}
+
+.help-alert .alert-message {
+  white-space: pre-line;
+  text-align: left;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+// ── 15. Avatars ────────────────────────────────────────────────────────────────
+
+ion-avatar {
+  --border-radius: 50%;
+
+  img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// ── 16. Popovers ──────────────────────────────────────────────────────────────
+
+ion-popover {
+  --background: var(--d-surface-1);
+  --border-radius: var(--d-radius-lg);
+  --box-shadow: var(--d-shadow-lg);
+  --width: 280px;
 
   &::part(content) {
-    backdrop-filter: blur(12px);
+    border-radius: var(--d-radius-lg);
+    overflow: hidden;
   }
 }
 
-// ion-action-sheet.dyspo-sheet .action-sheet-group {
-//   background: var(--bg-color);
-// }
+// ── 17. Couleurs sémantiques (border / bg helpers) ────────────────────────────
 
-// .bg_color {
-//   --background: radial-gradient(circle, var(--bg-color), var(--bg-color-dark));
-// }
+.thumb-kid          { border: 3px solid var(--d-dyspo-kids); }
+.thumb-nokids       { border: 3px solid var(--d-dyspo); }
+.thumb-nodyspo      { border: 3px solid var(--d-no-dyspo); }
+.thumb-dyspo-undefined { border: 3px solid var(--d-surface-3); }
+.thumb-kid-thick    { border: 5px solid var(--d-dyspo-kids); }
+.thumb-nokids-thick { border: 5px solid var(--d-dyspo); }
+.thumb-nodyspo-thick{ border: 5px solid var(--d-no-dyspo); }
 
-.bg_color {
-  --background: none;
-  background-image: url("./assets/fd_ecran_principal.jpg");
-  background-position: center bottom;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
+.thumb-event-kids   { border: 3px solid var(--d-dyspo-kids); }
+.thumb-event-nokids { border: 3px solid var(--d-dyspo); }
+.thumb-event-free   { border: 3px solid var(--d-free); }
 
-.margin-bottom {
-  margin-bottom: 16px;
-}
+.bg-nokids   { --background: var(--d-dyspo);      color: var(--d-text-primary); }
+.bg-kids     { --background: var(--d-dyspo-kids);  color: #fff; }
+.bg-nodyspo  { --background: var(--d-no-dyspo);    color: #fff; }
+.bg-free     { --background: var(--d-free);        color: #fff; }
 
-.text-no-dyspo ion-footer {
-  &::before {
-    display: none;
-  }
-}
+.bg-color-nokids  { background-color: var(--d-dyspo); }
+.bg-color-kid     { background-color: var(--d-dyspo-kids); }
+.bg-color-nodyspo { background-color: var(--d-no-dyspo); }
+.bg-color-free    { background-color: var(--d-free); }
 
-.popover-events-header {
-  width: 100%;
-  text-align: center;
-  padding: 8px;
-  border-bottom: 1px solid lightgray;
-}
+.color-nokids  { color: var(--d-dyspo-dark); }
+.color-kid     { color: var(--d-dyspo-kids-dark); }
+.color-nodyspo { color: var(--d-no-dyspo); }
+.color-free    { color: var(--d-free); }
 
-ion-item {
-  --ripple-color: var(--bg-color);
-}
+.label-bg-kids   { background: var(--d-dyspo-kids);  color: #fff; border-radius: var(--d-radius-sm); }
+.label-bg-nokids { background: var(--d-dyspo);        color: var(--d-text-primary); border-radius: var(--d-radius-sm); }
+.label-bg-free   { background: var(--d-free);         color: #fff; border-radius: var(--d-radius-sm); }
+.label-bg-solo   { background: var(--d-no-dyspo);     color: #fff; border-radius: var(--d-radius-sm); }
 
+.bg-kids-secondary    { background: var(--d-dyspo-kids-light); }
+.bg-nokids-secondary  { background: var(--d-dyspo-light); }
+.bg-free-secondary    { background: var(--d-free-light); }
+.bg-solo-secondary    { background: var(--d-no-dyspo-light); }
+
+// ── 18. Animations ────────────────────────────────────────────────────────────
+
+// Remplacement du système d'animation par délai d'animate.css
+// par des animations custom plus légères et cohérentes
 .animated {
-  &.delay_0 {
-    animation-duration: 200ms;
-  }
-  &.delay_1 {
-    animation-duration: 250ms;
-  }
-  &.delay_2 {
-    animation-duration: 300ms;
-  }
-  &.delay_3 {
-    animation-duration: 350ms;
-  }
-  &.delay_4 {
-    animation-duration: 400ms;
-  }
-  &.delay_5 {
-    animation-duration: 450ms;
-  }
-  &.delay_6 {
-    animation-duration: 500ms;
-  }
-  &.delay_7 {
-    animation-duration: 550ms;
-  }
-  &.delay_8 {
-    animation-duration: 600ms;
-  }
-  &.delay_9 {
-    animation-duration: 650ms;
-  }
-  &.delay_10 {
-    animation-duration: 700ms;
-  }
-  &.delay_11 {
-    animation-duration: 750ms;
-  }
-  &.delay_12 {
-    animation-duration: 800ms;
+  animation-fill-mode: both;
+
+  @for $i from 0 through 12 {
+    &.delay_#{$i} {
+      animation-duration: 300ms;
+      animation-delay: #{$i * 30}ms;
+    }
   }
 }
+
+// Fade in standard
+@keyframes d-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.d-fade-in {
+  animation: d-fade-in var(--d-duration-base) var(--d-ease-out) both;
+}
+
+// Scale in (pour cartes, modals)
+@keyframes d-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.d-scale-in {
+  animation: d-scale-in var(--d-duration-base) var(--d-spring) both;
+}
+
+// Slide up (pour bottom sheets)
+@keyframes d-slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+// ── 19. Skeleton Loading ──────────────────────────────────────────────────────
+
+@keyframes d-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--d-surface-2) 25%,
+    var(--d-surface-3) 50%,
+    var(--d-surface-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: d-shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--d-radius-sm);
+
+  &.skeleton-text {
+    height: 14px;
+    border-radius: var(--d-radius-pill);
+    margin-bottom: var(--d-space-2);
+  }
+  &.skeleton-title { height: 20px; width: 60%; }
+  &.skeleton-avatar {
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  &.skeleton-circle { border-radius: 50%; }
+}
+
+// ── 20. Utilitaires ───────────────────────────────────────────────────────────
 
 .d-flex {
   display: flex !important;
@@ -150,330 +534,61 @@ ion-item {
   .end {
     margin-left: auto !important;
     margin-right: 0 !important;
-    display: block;
   }
 }
 
-.center_img {
-  position: relative;
-  overflow: hidden;
-  img {
-    &.crop_img {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      bottom: 0;
-      left: -50% !important;
-      right: -50% !important;
-      margin: auto;
-    }
-  }
+.margin-bottom { margin-bottom: var(--d-space-4); }
+
+// Image lazy loading
+.fade-img {
+  transition: opacity 0.4s var(--d-ease-out);
+  opacity: 0;
+}
+.fade-img.ng-lazyloaded { opacity: 1; }
+
+// Ombre box
+.box-1 { box-shadow: var(--d-shadow-md); }
+
+// Typography helpers
+.text-primary   { color: var(--d-text-primary) !important; }
+.text-secondary { color: var(--d-text-secondary) !important; }
+.text-tertiary  { color: var(--d-text-tertiary) !important; }
+.text-brand     { color: var(--d-brand) !important; }
+.text-dyspo     { color: var(--d-dyspo-dark) !important; }
+.text-kids      { color: var(--d-dyspo-kids-dark) !important; }
+.text-nodyspo   { color: var(--d-no-dyspo) !important; }
+
+.fw-regular { font-weight: 400; }
+.fw-medium  { font-weight: 600; }
+.fw-bold    { font-weight: 700; }
+
+.font-brand {
+  font-family: "Dyspo", var(--ion-font-family);
 }
 
-.button {
-  &.btn {
-    width: 100%;
-    font-size: 1rem;
-    font-weight: 400;
-    letter-spacing: 0px !important;
-    height: 45px;
-    --background: var(--primary);
-    text-transform: none;
-    color: var(--white);
-    --border-radius: 0px;
-    margin: 0;
-    --box-shadow: none;
-    ion-icon {
-      font-size: 1.4rem;
-    }
-    &:hover:not(.disable-hover) {
-      --background: var(--primary);
-    }
-    &.button-outline {
-      --background: var(--transparent);
-      color: var(--white);
-      --border-color: var(--primary);
-      --border-width: 1px;
-      &:hover:not(.disable-hover) {
-        --background: var(--transparent);
-      }
-    }
-    &.button-round {
-      --border-radius: 50px !important;
-    }
-  }
+// ── 21. Icônes Dyspo (Simple Line Icons — rétrocompat) ────────────────────────
+
+.icon-android { font-size: 22px; }
+
+// ── 22. Divers — Action sheet legacy ──────────────────────────────────────────
+
+.dyspo-sheet-dyspo          { font-size: 1.1rem; color: var(--d-dyspo); }
+.dyspo-sheet-dyspo-with-kids{ font-size: 1.1rem; color: var(--d-dyspo-kids); }
+.dyspo-sheet-no-dyspo       { font-size: 1.1rem; color: var(--d-no-dyspo); }
+
+// ── 23. Pop-over events header ────────────────────────────────────────────────
+
+.popover-events-header {
+  width: 100%;
+  text-align: center;
+  padding: var(--d-space-3) var(--d-space-4);
+  border-bottom: 1px solid var(--d-surface-3);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--d-text-primary);
 }
 
-.form {
-  display: block;
-  overflow: hidden;
-  position: relative;
-  margin: 0 auto;
-  width: calc(100% - 0px);
-  ion-list {
-    background: var(--transparent) !important;
-    margin: 0;
-    padding: 0;
-  }
-  ion-item {
-    padding: 0px 0px 8px 0px;
-    width: calc(100% - 0px);
-    min-height: unset !important;
-    box-shadow: none !important;
-    margin: 0 auto;
-    --background: var(--transparent);
-    //background: var(--white);
-    align-items: center;
-    --inner-padding-end: 0px;
-    --inner-min-height: unset !important;
-    --padding-start: 0;
-    --highligh-color-focused: var(--transparent) !important;
-    box-shadow: none !important;
-    ion-label.label-stacked {
-      color: var(--text-light) !important;
-      margin: 0;
-      font-size: 0.8rem;
-      letter-spacing: 0;
-      font-weight: 400;
-      margin-bottom: 3px;
-      max-width: 100% !important;
-      width: 100% !important;
-      display: block;
-      flex: unset;
-      transform: unset !important;
-    }
-    ion-textarea,
-    ion-input {
-      line-height: 25px;
-      margin-top: 0px;
-      --padding: 0 !important;
-      font-size: 1rem !important;
-      font-weight: 500 !important;
-      letter-spacing: 0.5px;
-      --padding-start: 0 !important;
-      --padding-end: 0 !important;
-      --padding-top: 0 !important;
-      --padding-bottom: 0px !important;
-      color: var(--text-black);
-      --placeholder-color: var(--text-light) !important;
-      --placeholder-opacity: 1;
-      --placeholder-font-weight: 400 !important;
-      position: relative;
-      //	top: 4px;
-      flex: unset !important;
-      input {
-        --padding: var(--no-padding);
-        &.native-input {
-          --padding: var(--no-padding);
-        }
-      }
-    }
-    &.item-select {
-      ion-label.label-stacked {
-        margin-bottom: 5px;
-      }
-      ion-select {
-        padding: 0;
-        font-size: 1rem !important;
-        font-weight: 500 !important;
-      }
-    }
-  }
-  ion-row {
-    margin: 0 -5px;
-  }
-}
-
-// app-voicecall,
-// app-group-chatting,
-// app-chatting {
-//   &.ion-page {
-//     background: url(assets/img/bg.png);
-//     background-size: cover;
-//     background-repeat: no-repeat;
-//   }
-// }
-
-.thumb-kid {
-  border: 3px solid var(--text-dyspo-with-kids);
-}
-.thumb-nokids {
-  border: 3px solid var(--text-dyspo);
-}
-.thumb-nodyspo {
-  border: 3px solid var(--text-no-dyspo);
-}
-.thumb-dyspo-undefined {
-  border: 3px solid #e6e6e6;
-}
-
-.thumb-kid-thick {
-  border: 5px solid var(--text-dyspo-with-kids);
-}
-.thumb-nokids-thick {
-  border: 5px solid var(--text-dyspo);
-}
-.thumb-nodyspo-thick {
-  border: 5px solid var(--text-no-dyspo);
-}
-
-.thumb-event-kids {
-  border: 3px solid var(--text-dyspo-with-kids);
-}
-.thumb-event-nokids {
-  border: 3px solid var(--text-dyspo);
-}
-.thumb-event-free {
-  border: 3px solid var(--text-dyspo-free);
-}
-
-.bg-nokids {
-  --background: var(--text-dyspo);
-  color: var(--white);
-}
-
-.bg-kids {
-  --background: var(--text-dyspo-with-kids);
-  color: var(--white);
-}
-
-.bg-nodyspo {
-  --background: var(--text-no-dyspo);
-  color: var(--white);
-}
-
-.bg-free {
-  --background: var(--text-dyspo-free);
-  color: var(--white);
-}
-
-.bg-color-nokids {
-  background-color: var(--text-dyspo);
-}
-
-.bg-color-kid {
-  background-color: var(--text-dyspo-with-kids);
-}
-
-.bg-color-nodyspo {
-  background-color: var(--text-no-dyspo);
-}
-
-.bg-color-free {
-  background-color: var(--text-dyspo-free);
-}
-
-.color-nokids {
-  color: var(--text-dyspo);
-}
-
-.color-kid {
-  color: var(--text-dyspo-with-kids);
-}
-
-.color-nodyspo {
-  color: var(--text-no-dyspo);
-}
-
-.color-free {
-  color: var(--text-dyspo-free);
-}
-
-.label-bg-kids {
-  background-color: var(--text-dyspo-with-kids);
-  color: var(--white);
-}
-
-.label-bg-nokids {
-  background-color: var(--text-dyspo);
-  color: var(--white);
-}
-
-.label-bg-free {
-  background-color: var(--text-dyspo-free);
-  color: var(--white);
-}
-
-.label-bg-solo {
-  background-color: var(--text-dyspo-solo);
-  color: var(--white);
-}
-
-.bg-kids-secondary {
-  //background-color: var(--text-dyspo-with-kids-secondary);
-  background-color: rgb(255 255 255 / 75%);
-}
-
-.bg-nokids-secondary {
-  // background-color: var(--text-dyspo-secondary);
-  background-color: rgb(255 255 255 / 75%);
-}
-
-.bg-free-secondary {
-  //background-color: var(--text-dyspo-free-secondary);
-  background-color: rgb(255 255 255 / 75%);
-}
-
-.bg-solo-secondary {
-  // background-color: var(--text-dyspo-solo-secondary);
-  background-color: rgb(255 255 255 / 75%);
-}
-
-ion-modal {
-  --background: rgba(0, 0, 0, 0) !important;
-  --width: 100%;
-  --height: 100%;
-}
-
-.dyspo-sheet-dyspo {
-  font-family: "Dyspo";
-  font-size: 1.2rem;
-  color: var(--text-dyspo) !important;
-}
-
-.dyspo-sheet-dyspo-with-kids {
-  font-family: "Dyspo";
-  font-size: 1.2rem;
-  color: var(--text-dyspo-with-kids) !important;
-}
-
-.dyspo-sheet-no-dyspo {
-  font-family: "Dyspo";
-  font-size: 1.2rem;
-  color: var(--text-no-dyspo) !important;
-}
-
-.action-sheet-wrapper {
-  --background: var(--transparent);
-  .action-sheet-group {
-    background: var(--white);
-    border-radius: 5px 5px 0px 0px;
-    width: calc(100% - 15px);
-    margin: 0 auto;
-    .action-sheet-button {
-      padding: 0 !important;
-      .action-sheet-button-inner {
-        justify-content: unset;
-        text-align: center;
-        display: block;
-        line-height: 50px !important;
-      }
-    }
-    &.action-sheet-group-cancel {
-      background: var(--primary) !important;
-      border-radius: 0px 0px 5px 5px;
-      margin-bottom: 7.5px;
-      .action-sheet-button {
-        color: var(--text-black);
-        font-weight: 400;
-        text-align: center !important;
-        display: block;
-        background: var(--primary);
-      }
-    }
-  }
-}
+// ── 24. RTL support (conservé) ────────────────────────────────────────────────
 
 ion-app[dir="rtl"] {
   ion-header ion-toolbar ion-title {
@@ -484,201 +599,50 @@ ion-app[dir="rtl"] {
     margin-left: 0 !important;
     margin-right: auto !important;
   }
-  app-call-logs,
-  app-create-group,
-  app-new-chat,
-  app-group-list,
-  app-chat-list {
-    ion-list ion-item {
-      .item_inner .profile_img_box {
-        margin-right: 0 !important;
-        margin-left: 17px !important;
-        &::after {
-          right: unset !important;
-          left: 0;
-        }
-      }
-      &::after {
-        right: unset !important;
-        left: 0;
-      }
-    }
-  }
-  app-new-chat ion-row ion-col ion-list ion-item {
-    padding-left: 18px !important;
-    padding-right: 0 !important;
-  }
-  app-create-group ion-footer .scroll_container .profile_img_box {
-    &:first-child {
-      margin-left: 7px !important;
-      margin-right: 20px !important;
-    }
-    &:last-child {
-      margin-right: 7px !important;
-      margin-left: 20px !important;
-    }
-  }
-  app-group-info
-    .members_in_group
-    ion-list
-    ion-item
-    .item_inner
-    .profile_img_box {
-    margin-right: 0 !important;
-    margin-left: 17px !important;
-  }
-  app-videocall ion-footer {
-    padding-right: 0 !important;
-    padding-left: 14px !important;
-  }
-  app-chatting,
-  app-group-chatting {
-    .chat_container .chat-box {
-      &.received {
-        margin-left: auto !important;
-        margin-right: 0 !important;
-        p {
-          text-align: left !important;
-        }
-        .chat .chat_detail {
-          padding-right: 7px !important;
-          padding-left: 20px !important;
-          .profile_img {
-            margin-right: 0 !important;
-            margin-left: 15px !important;
-          }
-          .text {
-            text-align: right !important;
-          }
-        }
-      }
-      &.send {
-        margin-right: auto !important;
-        margin-left: 0 !important;
-        p {
-          text-align: right !important;
-        }
-        .chat .chat_detail {
-          padding-left: 7px !important;
-          padding-right: 20px !important;
-          .profile_img {
-            margin-left: 0 !important;
-            margin-right: 15px !important;
-          }
-          .text {
-            text-align: left !important;
-          }
-        }
-      }
-    }
-  }
-  app-chatting
-    .chat_container
-    .chat-box.contact
-    .chat
-    .chat_detail
-    .text
-    .icon_box
-    ion-icon.zmdi-account-add::after {
-    right: unset !important;
-    left: 0;
-  }
-  app-more {
-    .buy_this_app {
-      right: unset !important;
-      left: 10px !important;
-    }
-  }
   ion-header ion-toolbar ion-buttons ion-back-button {
     transform: rotate(180deg);
   }
+}
 
-  ion-button.btn.button-block {
-    --border-radius: 6px !important;
+// ── 25. Dyspo image viewer modal ──────────────────────────────────────────────
+
+.dyspo-viewer-modal {
+  --background: #000;
+  --backdrop-opacity: 0.92;
+
+  &::part(content) {
+    border-radius: 0;
+    background: #000;
   }
 }
 
-.fade-img {
-  transition: opacity 1s;
-  opacity: 0;
-}
+// ── 26. Empty states ──────────────────────────────────────────────────────────
 
-.fade-img.ng-lazyloaded {
-  opacity: 1;
-}
-
-.box-1 {
-  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
-}
-
-.styledInput {
-  --border-color: #eee;
-  --border-width: 1px;
-  --box-shadow: 0px #eee;
-  --highlight-height: 0;
-  --background: #f8f9fa;
-
-  margin-bottom: 5px;
-}
-
-.roundedInput8px {
-  @extend .styledInput;
-  --border-radius: 8px;
-}
-.roundedInput12px {
-  @extend .styledInput;
-  --border-radius: 12px;
-}
-.roundedInput25px {
-  @extend .styledInput;
-  --border-radius: 25px;
-}
-
-ion-chip {
-  border: none;
-  margin-right: 8px;
-}
-
-.chip-evt {
-  width: 15px;
-  height: 15px;
-  border-radius: 10px;
-  margin-right: 3px;
-}
-
-.chip-container {
+.empty-state {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-}
+  padding: var(--d-space-16) var(--d-space-8);
+  text-align: center;
 
-.dyspo-button {
-  font-size: 1.13em;
-  margin: 7px;
-  --border-radius: 7px;
-  &.no-margin {
-    margin: 0px;
+  ion-icon, .empty-icon {
+    font-size: 52px;
+    color: var(--d-surface-3);
+    margin-bottom: var(--d-space-4);
+  }
+
+  h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--d-text-secondary);
+    margin-bottom: var(--d-space-2);
+  }
+
+  p {
+    font-size: 14px;
+    color: var(--d-text-tertiary);
+    max-width: 240px;
+    line-height: 1.5;
   }
 }
-
-.thin-alert-radio {
-  padding-inline-start: 33px;
-}
-
-.alert-radio-label.sc-ion-alert-md {
-  padding-inline-start: 33px !important;
-}
-
-.title-tuto {
-  font-size: 1.3rem;
-  font-weight: 900;
-  margin-top: 12px;
-}
-
-// .modal-fullscreen .modal-wrapper {
-//   position: absolute;
-//   top: 0;
-//   left: 0;
-//   display: block;
-//   width: 100%;
-//   height: 100%;
-// }

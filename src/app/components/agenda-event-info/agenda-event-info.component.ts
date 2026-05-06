@@ -32,9 +32,10 @@ import Swal from 'sweetalert2';
 import { DyspoViewerComponent } from '../dyspo-viewer/dyspo-viewer.component';
 
 @Component({
-  selector: 'app-agenda-event-info',
-  templateUrl: './agenda-event-info.component.html',
-  styleUrls: ['./agenda-event-info.component.scss'],
+    selector: 'app-agenda-event-info',
+    templateUrl: './agenda-event-info.component.html',
+    styleUrls: ['./agenda-event-info.component.scss'],
+    standalone: false
 })
 export class AgendaEventInfoComponent implements OnInit {
   @Output() outevt = new EventEmitter<string>();
@@ -435,6 +436,21 @@ export class AgendaEventInfoComponent implements OnInit {
     }
   }
 
+  async viewFriendCalendar() {
+    this.isPopoverUserEventsOpen = false;
+    await this.close();
+    const navigationExtras: NavigationExtras = {
+      state: {
+        friend: {
+          uid: this.selectedUser!.uid,
+          friend_uid: this.selectedUser!.uid,
+          userData: this.selectedUser,
+        },
+      },
+    };
+    this.navCtrl.navigateForward('agenda/friend', navigationExtras);
+  }
+
   async goToChat(agendaEvent: AgendaEvent | undefined, event: any) {
     event.stopPropagation();
     console.log('goToChat', agendaEvent);
@@ -454,9 +470,9 @@ export class AgendaEventInfoComponent implements OnInit {
     event?.stopPropagation();
     const modal = await this.modalCtrl.create({
       component: DyspoViewerComponent,
-      componentProps: {
-        image: image,
-      },
+      componentProps: { image },
+      cssClass: 'dyspo-viewer-modal',
+      animated: true,
     });
     modal.present();
   }

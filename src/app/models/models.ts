@@ -23,6 +23,7 @@ export interface AppUser {
   is_my_friend?: boolean;
   geo_zone?: string;
   with_kids?: boolean;
+  custody_schedule?: boolean[];
 }
 
 export interface AppDeviceContact {
@@ -208,6 +209,7 @@ export interface ChatMessage {
   date_ISO: string;
   deleted_by: string[];
   is_deleted?: boolean;
+  likes?: string[];
 }
 
 export interface WarnReport {

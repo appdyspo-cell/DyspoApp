@@ -1,288 +1,238 @@
-<ion-header>
-  <ion-toolbar *ngIf="!msgSelected" mode="md">
+<ion-header class="ion-no-border wa-header">
+  <!-- Default Toolbar -->
+  <ion-toolbar *ngIf="!msgSelected" mode="md" color="primary">
     <ion-buttons slot="start">
-      <ion-back-button
-        color="dark"
-        text=""
-        icon="chevron-back-outline"
-      ></ion-back-button>
+      <ion-back-button color="light" text="" icon="arrow-back-outline"></ion-back-button>
+      <ion-avatar class="wa-header-avatar" (click)="openEvent()">
+        <img [src]="agendaEvent.avatar || 'assets/default-avatar.png'" />
+      </ion-avatar>
     </ion-buttons>
+    
     <ion-title (click)="openEvent()" mode="md">
-      <div class="profile d-flex">
-        <div *ngIf="agendaEvent.avatar">
-          <ion-thumbnail
-            class="thumb-avatar-event"
-            [ngClass]="{
-            'thumb-event-kids': agendaEvent.type === AgendaEventType.KIDS,
-            'thumb-event-nokids': agendaEvent.type === AgendaEventType.NOKIDS,
-            'thumb-event-free': agendaEvent.type === AgendaEventType.FREE}"
-          >
-            <img src="{{agendaEvent.avatar}}" />
-          </ion-thumbnail>
-        </div>
-        <div class="title-container">
-          <h2><b>{{agendaEvent.title}}</b></h2>
-          <div>
-            <h3>{{ display_date_1 }}</h3>
-          </div>
-          <div *ngIf="display_date_2"><h3>{{ display_date_2 }}</h3></div>
-        </div>
+      <div class="wa-header-info">
+        <h2 class="wa-header-title">{{agendaEvent.title}}</h2>
+        <p class="wa-header-subtitle">
+          {{ display_date_1 }}
+          <span *ngIf="display_date_2"> • {{ display_date_2 }}</span>
+        </p>
       </div>
     </ion-title>
+
     <ion-buttons slot="end">
-      <ion-button (click)="openMenu($event)">
-        <ion-icon slot="icon-only" name="ellipsis-vertical" color="dark">
-        </ion-icon>
+      <ion-button color="light" (click)="addToCalendar()">
+        <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
+      </ion-button>
+      <ion-button color="light">
+        <ion-icon slot="icon-only" name="videocam"></ion-icon>
+      </ion-button>
+      <ion-button color="light">
+        <ion-icon slot="icon-only" name="call"></ion-icon>
+      </ion-button>
+      <ion-button color="light" (click)="openMenu($event)">
+        <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
-  <ion-toolbar *ngIf="msgSelected">
+
+  <!-- Selection Toolbar -->
+  <ion-toolbar *ngIf="msgSelected" mode="md" color="primary">
     <ion-buttons slot="start">
-      <ion-button (click)="msgSelected = undefined">
-        <ion-icon slot="icon-only" name="close-outline" color="dark">
-        </ion-icon>
+      <ion-button (click)="msgSelected = undefined" color="light">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
       </ion-button>
+      <ion-label color="light" style="margin-left: 10px; font-weight: 500;">1</ion-label>
     </ion-buttons>
 
     <ion-buttons slot="end">
-      <ion-button (click)="deleteMsg($event)">
-        <ion-icon slot="icon-only" name="trash-outline" color="dark">
-        </ion-icon>
+      <ion-button (click)="deleteMsg($event)" color="light">
+        <ion-icon slot="icon-only" name="trash"></ion-icon>
       </ion-button>
-      <ion-button
-        *ngIf="msgSelected.sender !== my_uid"
-        (click)="reportMsg($event)"
-      >
-        <ion-icon slot="icon-only" name="warning-outline" color="dark">
-        </ion-icon>
+      <ion-button *ngIf="msgSelected.sender !== my_uid" (click)="reportMsg($event)" color="light">
+        <ion-icon slot="icon-only" name="warning"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
-  <div class="category_div">
-    <div class="menu">
-      <div class="item" *ngFor="let member of member_infos">
-        <ion-thumbnail
-          (click)="onSelectUser(member, $event)"
-          [ngClass]="{
-          'thumb-kid': member.dyspoStatus === UserDyspoStatus.DYSPOWITHKIDS,
-          'thumb-nokids': member.dyspoStatus === UserDyspoStatus.DYSPO,
-          'thumb-nodyspo': member.dyspoStatus === UserDyspoStatus.NODYSPO,
-          'thumb-dyspo-undefined':
-                member.dyspoStatus === UserDyspoStatus.UNDEFINED,
-          'animate__animated animate__zoomIn': true
-        }"
-        >
-          <img src="{{ member.avatarPath }}" />
-          <!-- <ion-badge
-          *ngIf="member.agendaEvents!.length > 0"
-          name="warning-outline"
-          color="danger"
-          class="thumbnail-badge"
-          >{{ member.agendaEvents!.length }}</ion-badge
-        > -->
-          <ion-icon
-            *ngIf="member.is_my_friend === false"
-            class="zmdi zmdi-plus end"
-          ></ion-icon>
-        </ion-thumbnail>
 
-        <ion-label>{{ member.firstname }}</ion-label>
+  <!-- Horizontal Members List -->
+  <div class="wa-members-bar">
+    <div class="wa-members-scroll">
+      <div class="wa-member-item" *ngFor="let member of member_infos">
+        <div class="wa-member-avatar-wrapper" (click)="onSelectUser(member, $event)">
+          <ion-avatar class="wa-member-avatar"
+            [ngClass]="{
+              'status-kids': member.dyspoStatus === UserDyspoStatus.DYSPOWITHKIDS,
+              'status-nokids': member.dyspoStatus === UserDyspoStatus.DYSPO,
+              'status-nodyspo': member.dyspoStatus === UserDyspoStatus.NODYSPO,
+              'status-undefined': member.dyspoStatus === UserDyspoStatus.UNDEFINED
+            }"
+          >
+            <img [src]="member.avatarPath || defaultAvatar" />
+          </ion-avatar>
+          <ion-icon *ngIf="member.is_my_friend === false" name="add-circle" class="wa-add-icon"></ion-icon>
+        </div>
+        <ion-label class="wa-member-name">{{ member.firstname }}</ion-label>
       </div>
     </div>
   </div>
 </ion-header>
 
-<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
-  <div class="chat_container d-flex" #msgScrollableContainer>
-    <div *ngIf="loading" class="d-flex ion-justify-content-center">
-      <ion-spinner
-        color="light"
-        style="width: 40px; height: 40px"
-      ></ion-spinner>
+<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true" class="wa-chat-content">
+  <div class="wa-chat-container" #msgScrollableContainer>
+    <!-- Loading Spinner -->
+    <div *ngIf="loading" class="wa-loading">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
     </div>
 
-    <div
-      class="d-flex"
-      *ngFor="let msg of msgList; let i = index; "
-      id="{{msg.uid}}"
-      (click)="onMsgSelected(msg)"
-    >
-      <div
-        *ngIf="msg.sender !== my_uid && !msg.is_deleted && !msg.deleted_by?.includes(my_uid)"
-        class="chat-box d-flex received"
+    <!-- Messages List -->
+    <ng-container *ngFor="let msg of msgList; let i = index;">
+      <div 
+        class="wa-message-row" 
+        [ngClass]="msg.sender === my_uid ? 'wa-sent' : 'wa-received'"
+        *ngIf="!msg.is_deleted && !msg.deleted_by?.includes(my_uid)"
+        (click)="handleMessageClick(msg)"
+        id="{{msg.uid}}"
       >
-        <div class="chat">
-          <div
-            [ngClass]="{'chat_detail': true, 'msg-selected':msgSelected === msg}"
-          >
-            <div style="width: 35px">
-              <ion-thumbnail class="avatar-thumbnail-received">
-                <img
-                  class="animate__animated animated__fadeIn"
-                  *ngIf="member_infos_obj[msg.sender]"
-                  [defaultImage]="defaultAvatar"
-                  [lazyLoad]="member_infos_obj[msg.sender].avatarPath!"
-                />
-                <img
-                  *ngIf="!member_infos_obj[msg.sender]"
-                  [src]="defaultAvatar"
-                />
-              </ion-thumbnail>
-            </div>
-
-            <!-- <div class="profile_img center_img">
-              <img
-                class="animate__animated animated__fadeIn"
-                *ngIf="member_infos_obj[msg.sender]"
-                [defaultImage]="defaultAvatar"
-                [lazyLoad]="member_infos_obj[msg.sender].avatarPath!"
-                class="crop_img"
-              />
-              <img
-                *ngIf="!member_infos_obj[msg.sender]"
-                [src]="defaultAvatar"
-                class="crop_img"
-              />
-            </div> -->
-            <div class="text">
-              <h6>{{member_infos_obj[msg.sender]?.firstname}}</h6>
-              {{msg.message}}
-            </div>
+        <div class="wa-bubble-wrapper" [ngClass]="{'wa-selected': msgSelected === msg}">
+          
+          <!-- Quick Reactions (WhatsApp style) -->
+          <div class="wa-quick-reactions" *ngIf="msgSelected === msg">
+            <span *ngFor="let rx of ['👍','❤️','😂','😮','😢','🙏']" 
+                  class="wa-qr-item"
+                  (click)="addReaction(msg, rx, $event)">
+              {{ rx }}
+            </span>
           </div>
 
-          <div
-            class="attachment"
-            *ngIf="msg.image"
-            (click)="openImage(msg, $event)"
-          >
-            <img src="{{msg.image}}" />
-          </div>
-        </div>
-        <p>{{msg.date_ISO | dateChatFormat}}</p>
-      </div>
+          <!-- Triangle (Tail) -->
+          <div class="wa-bubble-tail"></div>
+          
+          <div class="wa-bubble">
+            <!-- Sender Name for Groups -->
+            <h6 class="wa-sender-name" *ngIf="msg.sender !== my_uid" [style.color]="getSenderColor(msg.sender)">
+              {{member_infos_obj[msg.sender]?.firstname}}
+            </h6>
 
-      <div
-        *ngIf="msg.sender === my_uid && !msg.is_deleted && !msg.deleted_by?.includes(my_uid)"
-        class="chat-box d-flex send"
-      >
-        <p>{{msg.date_ISO | dateChatFormat}}</p>
-        <div class="chat">
-          <div
-            [ngClass]="{'chat_detail': true, 'ion-justify-content-end': true, 'msg-selected':msgSelected === msg}"
-          >
-            <div class="text">
-              <h6>Vous</h6>
-              {{msg.message}}
+            <!-- Attachment Image -->
+            <div class="wa-message-image" *ngIf="msg.image" (click)="openImage(msg, $event)">
+              <img [src]="msg.image" />
             </div>
-            <!-- <div class="profile_img center_img">
-              <img src="{{my_avatar}}" class="crop_img" />
-            </div> -->
 
-            <div style="min-width: 35px">
-              <ion-thumbnail class="avatar-thumbnail-sender">
-                <img src="{{my_avatar}}" />
-              </ion-thumbnail>
+            <!-- Message Text and Meta -->
+            <div class="wa-message-content">
+              <span class="wa-text">{{msg.message}}</span>
+              <div class="wa-message-meta">
+                <span class="wa-time">{{msg.date_ISO | date: 'HH:mm'}}</span>
+                <ion-icon 
+                  *ngIf="msg.sender === my_uid" 
+                  [name]="(msg.read_by?.length || 0) > 0 ? 'checkmark-done-outline' : 'checkmark-outline'" 
+                  class="wa-ticks"
+                  [ngClass]="{'wa-read': (msg.read_by?.length || 0) > 0}"
+                ></ion-icon>
+              </div>
             </div>
-          </div>
-          <div
-            *ngIf="msg.image"
-            class="attachment"
-            (click)="openImage(msg, $event)"
-          >
-            <img src="{{msg.image}}" />
+
+            <!-- Message Likes (Heart) -->
+            <div class="wa-message-likes" *ngIf="(msg.likes?.length || 0) > 0">
+              <div class="wa-heart-icon">❤️</div>
+              <span class="wa-likes-count" *ngIf="(msg.likes?.length || 0) > 1">{{msg.likes?.length}}</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div *ngIf="pendingAttachment" class="chat-box d-flex send">
-      <p>Maintenant</p>
-      <div class="chat">
-        <div class="chat_detail ion-justify-content-end">
-          <div class="text">
-            <h6>Vous</h6>
-            {{getUserInputAttachment()}}
-          </div>
+    </ng-container>
 
-          <div style="min-width: 35px">
-            <ion-thumbnail class="avatar-thumbnail-sender">
-              <img src="{{my_avatar}}" />
-            </ion-thumbnail>
+    <!-- Pending Attachment -->
+    <div class="wa-message-row wa-sent" *ngIf="pendingAttachment">
+      <div class="wa-bubble-wrapper">
+        <div class="wa-bubble-tail"></div>
+        <div class="wa-bubble">
+          <div class="wa-message-image">
+            <img [src]="pendingAttachment" />
           </div>
-        </div>
-        <div class="attachment">
-          <img src="{{pendingAttachment}}" />
+          <div class="wa-message-content">
+            <span class="wa-text">{{getUserInputAttachment()}}</span>
+            <div class="wa-message-meta">
+              <span class="wa-time">Envoi...</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </ion-content>
 
-<ion-footer class="ion-no-border ion-no-padding">
-  <div
-    class="bg-theme d-flex"
-    [ngClass]="viewType === '' ? 'option':'option active'"
-  >
-    <ion-icon class="zmdi zmdi-image" (click)="openGallery()"></ion-icon>
-    <ion-icon class="zmdi zmdi-camera" (click)="takePhoto()"></ion-icon>
-    <ion-icon class="zmdi zmdi-close" (click)="setViewType('')"></ion-icon>
+<ion-footer class="ion-no-border wa-footer">
+  <!-- Emoji Picker -->
+  <div class="wa-emoji-picker" *ngIf="showEmojiPicker">
+    <div class="wa-emoji-categories">
+      <div 
+        *ngFor="let cat of emojiCategories" 
+        class="wa-emoji-cat-btn"
+        [ngClass]="{'active': selectedEmojiCategory === cat.label}"
+        (click)="selectedEmojiCategory = cat.label"
+      >
+        <ion-icon [name]="cat.icon"></ion-icon>
+      </div>
+    </div>
+    <div class="wa-emoji-scroll-area">
+      <div *ngFor="let cat of emojiCategories">
+        <div *ngIf="selectedEmojiCategory === cat.label" class="wa-emoji-grid">
+          <span class="wa-emoji-item" *ngFor="let emoji of cat.emojis" (click)="addEmoji(emoji)">{{emoji}}</span>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <ion-toolbar style="--background: #fff">
-    <div slot="start">
-      <ion-button fill="clear" (click)="setViewType('active')">
-        <ion-icon
-          color="medium"
-          name="attach-outline"
-          slot="icon-only"
-        ></ion-icon>
-      </ion-button>
+  <!-- Options Menu (Photos/Camera) -->
+  <div class="wa-options-container" [ngClass]="{'wa-options-active': viewType !== ''}">
+    <div class="wa-options-inner">
+      <div class="wa-option-item" (click)="openGallery()">
+        <div class="wa-option-icon bg-purple"><ion-icon name="images"></ion-icon></div>
+        <ion-label>Galerie</ion-label>
+      </div>
+      <div class="wa-option-item" (click)="takePhoto()">
+        <div class="wa-option-icon bg-pink"><ion-icon name="camera"></ion-icon></div>
+        <ion-label>Caméra</ion-label>
+      </div>
+      <div class="wa-option-item" (click)="setViewType('')">
+        <div class="wa-option-icon bg-gray"><ion-icon name="close"></ion-icon></div>
+        <ion-label>Fermer</ion-label>
+      </div>
     </div>
-    <ion-item lines="none" class="ion-no-padding">
-      <ion-textarea
-        type="text"
-        spellcheck="true"
-        autocapitalize="sentences"
-        [autoGrow]="true"
-        rows="1"
-        [(ngModel)]="userInput"
-        (ionFocus)="onMsgInputFocused()"
-        [placeholder]="getInputPlaceholder()"
-        style="--padding-top: 12px; --padding-bottom: 8px"
-      ></ion-textarea>
-    </ion-item>
+  </div>
 
-    <ion-button slot="end" fill="clear" (click)="sendMsg()">
-      <ion-icon name="send" color="medium" slot="icon-only"> </ion-icon>
+  <ion-toolbar mode="md" class="wa-input-toolbar">
+    <div class="wa-input-container">
+      <!-- Input Area -->
+      <div class="wa-input-wrapper">
+        <ion-button fill="clear" class="wa-emoji-btn" (click)="toggleEmojiPicker()">
+          <ion-icon slot="icon-only" [name]="showEmojiPicker ? 'keyboard-outline' : 'happy-outline'"></ion-icon>
+        </ion-button>
+        
+        <ion-textarea
+          class="wa-textarea"
+          [autoGrow]="true"
+          rows="1"
+          [(ngModel)]="userInput"
+          (ionFocus)="onMsgInputFocused()"
+          [placeholder]="getInputPlaceholder()"
+        ></ion-textarea>
+        
+        <ion-button fill="clear" (click)="setViewType('active')" class="wa-attach-btn">
+          <ion-icon slot="icon-only" name="attach-outline" [style.transform]="'rotate(45deg)'"></ion-icon>
+        </ion-button>
+        
+        <ion-button fill="clear" class="wa-camera-btn" (click)="takePhoto()">
+          <ion-icon slot="icon-only" name="camera"></ion-icon>
+        </ion-button>
+      </div>
 
-      <!-- <ion-icon class="zmdi zmdi-mic ion-text-end"></ion-icon> -->
-    </ion-button>
+      <!-- Send Button -->
+      <div class="wa-send-btn-container">
+        <ion-fab-button size="small" class="wa-send-btn" (click)="sendMsg()">
+          <ion-icon name="send"></ion-icon>
+        </ion-fab-button>
+      </div>
+    </div>
   </ion-toolbar>
 </ion-footer>
-
-<!-- <ion-popover trigger="popover-button" [dismissOnSelect]="true">
-  <ng-template>
-    <ion-content>
-      <ion-list>
-        <ion-item [button]="true" [detail]="false">Option 1</ion-item>
-        <ion-item [button]="true" [detail]="false">Option 2</ion-item>
-        <ion-item [button]="true" id="nested-trigger">More options...</ion-item>
-
-        <ion-popover
-          trigger="nested-trigger"
-          [dismissOnSelect]="true"
-          side="end"
-        >
-          <ng-template>
-            <ion-content>
-              <ion-list>
-                <ion-item [button]="true" [detail]="false"
-                  >Nested option</ion-item
-                >
-              </ion-list>
-            </ion-content>
-          </ng-template>
-        </ion-popover>
-      </ion-list>
-    </ion-content>
-  </ng-template>
-</ion-popover> -->

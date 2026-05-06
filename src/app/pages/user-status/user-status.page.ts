@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
   ActionSheetController,
   IonModal,
@@ -46,16 +46,30 @@ import { PictureComponent } from 'src/app/components/picture/picture.component';
 import { HelperComponent } from 'src/app/components/helper/helper.component';
 
 @Component({
-  selector: 'app-user-status',
-  templateUrl: './user-status.page.html',
-  styleUrls: ['./user-status.page.scss'],
+    selector: 'app-user-status',
+    templateUrl: './user-status.page.html',
+    styleUrls: ['./user-status.page.scss'],
+    standalone: false
 })
-export class UserStatusPage implements OnInit {
+export class UserStatusPage implements OnInit, OnDestroy {
   @ViewChild(IonModal) modal!: IonModal;
   userInfo: AppUser | undefined;
   dyspoStatus = UserDyspoStatus;
   nextAgendaEvents: AgendaEvent[] = [];
   notifications: Notif[] = [];
+
+  // ── CTA animated phrases ──────────────────────────────────────────────────
+  readonly ctaPhrases = [
+    'Invitez vos amis à vous retrouver 👋',
+    'Créez un événement de groupe 🎉',
+    'Planifiez une sortie entre amis 📅',
+    'Partagez un moment en famille 🏡',
+    'Organisez votre prochaine aventure ✨',
+  ];
+  ctaPhrase   = this.ctaPhrases[0];
+  ctaVisible  = true;
+  private ctaPhraseIndex = 0;
+  private ctaInterval?: ReturnType<typeof setInterval>;
 
   invitations: AgendaEvent[] = [];
   friendsSuggested: Friend[] = [];
@@ -193,6 +207,15 @@ export class UserStatusPage implements OnInit {
   }
 
   async ngOnInit() {
+    this.ctaInterval = setInterval(() => {
+      this.ctaVisible = false;
+      setTimeout(() => {
+        this.ctaPhraseIndex = (this.ctaPhraseIndex + 1) % this.ctaPhrases.length;
+        this.ctaPhrase = this.ctaPhrases[this.ctaPhraseIndex];
+        this.ctaVisible = true;
+      }, 380);
+    }, 3200);
+
     const { value } = await Preferences.get({ key: ShowHelper.DASHBOARD });
     if (!value) {
       this.showHelper = true;
@@ -209,6 +232,10 @@ export class UserStatusPage implements OnInit {
         value: 'SHOWN',
       });
     }
+  }
+
+  ngOnDestroy() {
+    if (this.ctaInterval) clearInterval(this.ctaInterval);
   }
 
   cancel() {

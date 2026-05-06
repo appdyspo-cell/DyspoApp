@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
@@ -20,5 +20,6 @@ import { LazyLoadImageModule } from 'ng-lazyload-image';
     GroupListPageRoutingModule,
   ],
   declarations: [GroupListPage],
+  schemas: [NO_ERRORS_SCHEMA],
 })
 export class GroupListPageModule {}

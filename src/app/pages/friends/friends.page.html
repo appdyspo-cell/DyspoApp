@@ -66,7 +66,7 @@
       showCancelButton="never"
     ></ion-searchbar>
     <ion-list [hidden]="autocompleteItems.length === 0" class="ion-no-padding">
-      <ion-item *ngFor="let user of autocompleteItems" lines="full">
+      <ion-item *ngFor="let user of autocompleteItems" lines="full" (click)="openFriendProfile(user)" button detail="false">
         <ion-thumbnail slot="start" class="avatar-thumbnail">
           <img
             [defaultImage]="defaultImage"
@@ -83,9 +83,18 @@
           slot="end"
           *ngIf="!user.is_my_friend"
           size="small"
-          (click)="inviteFriend(user)"
+          (click)="inviteFriend(user); $event.stopPropagation()"
         >
           Inviter
+        </ion-button>
+        <ion-button
+          *ngIf="user.is_my_friend"
+          fill="clear"
+          slot="end"
+          color="dark"
+          (click)="showAgenda(user, $event)"
+        >
+          <ion-icon name="calendar-outline" slot="icon-only"></ion-icon>
         </ion-button>
       </ion-item>
     </ion-list>

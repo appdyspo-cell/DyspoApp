@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -17,6 +17,7 @@ import { CreateGroupInfoPage } from './create-group-info.page';
 	TranslateModule,   
     CreateGroupInfoPageRoutingModule
   ],
-  declarations: [CreateGroupInfoPage]
+  declarations: [CreateGroupInfoPage],
+  schemas: [NO_ERRORS_SCHEMA],
 })
 export class CreateGroupInfoPageModule {}

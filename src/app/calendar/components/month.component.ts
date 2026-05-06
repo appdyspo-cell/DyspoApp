@@ -31,16 +31,16 @@ export const MONTH_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
-  selector: 'ion-calendar-month',
-  providers: [MONTH_VALUE_ACCESSOR],
-  styleUrls: ['./month.component.scss'],
-  // tslint:disable-next-line:use-host-property-decorator
-  // eslint-disable-next-line @angular-eslint/no-host-metadata-property
-  host: {
-    '[class.component-mode]': 'componentMode',
-  },
-  template: `
+    // eslint-disable-next-line @angular-eslint/component-selector
+    selector: 'ion-calendar-month',
+    providers: [MONTH_VALUE_ACCESSOR],
+    styleUrls: ['./month.component.scss'],
+    // tslint:disable-next-line:use-host-property-decorator
+    // eslint-disable-next-line @angular-eslint/no-host-metadata-property
+    host: {
+        '[class.component-mode]': 'componentMode',
+    },
+    template: `
     <div
       [class]="color"
       #calendarmonth
@@ -149,6 +149,7 @@ export const MONTH_VALUE_ACCESSOR: any = {
       </ng-template>
     </div>
   `,
+    standalone: false
 })
 export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   //@ViewChild('calendarmonth', { static: true }) myElement!: ElementRef;
@@ -167,7 +168,11 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   public readonly = false;
   @Input()
   public color?: string = defaults.COLOR;
+  @Input()
+  public filterDyspo: string | null = null;
 
+  @Output()
+  public longPressDay = new EventEmitter<CalendarDay>();
   @Output()
   // eslint-disable-next-line @angular-eslint/no-output-native
   public change: EventEmitter<CalendarDay[]> = new EventEmitter();
@@ -212,24 +217,16 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     public userSvc: UserService
   ) {}
 
-  getDyspoClass(
-    day: CalendarDay
-  ):
-    | string
-    | string[]
-    | Set<string>
-    | { [klass: string]: any }
-    | null
-    | undefined {
-    const classes:
-      | string
-      | string[]
-      | Set<string>
-      | { [klass: string]: any }
-      | null
-      | undefined = [];
-    if (day.isLastMonth || day.isNextMonth) {
-      classes.push('out-of-month');
+  getDyspoClass(day: CalendarDay): { [klass: string]: boolean } {
+    const classes: { [klass: string]: boolean } = {};
+    classes['out-of-month'] = !!(day.isLastMonth || day.isNextMonth);
+
+    if (this.filterDyspo && !day.isLastMonth && !day.isNextMonth) {
+      if (this.filterDyspo === 'holidays') {
+        classes['filter-dimmed'] = !day.isHolidays;
+      } else {
+        classes['filter-dimmed'] = day.userDyspo !== this.filterDyspo;
+      }
     }
 
     return classes;
@@ -646,12 +643,10 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   }
 
   async onLongPress(ev: any, day: CalendarDay) {
-    console.log('longpress ', ev, day);
-    this.longPressedDay = day;
-
-    //await Haptics.vibrate();
-
-    // Slide mode
+    if (this.readonly && !day.isLastMonth && !day.isNextMonth) {
+      await Haptics.impact({ style: ImpactStyle.Heavy });
+      this.longPressDay.emit(day);
+    }
   }
   onPan(ev: any) {
     console.log('pan ', ev);

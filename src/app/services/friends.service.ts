@@ -433,7 +433,7 @@ export class FriendsService {
 
   async updateFriendGroup(friendGroup: FriendGroup) {
     const uid = this.userSvc.userInfo?.uid || 'unknown';
-    const friendGroupClone: any = { ...friendGroup };
+    const friendGroupClone: Partial<FriendGroup> = { ...friendGroup };
     //delete appUserClone.id;
     const ref = doc(
       this.firestore,
@@ -525,7 +525,7 @@ export class FriendsService {
   }
 
   groupContactsByAlphabet(contacts: AppDeviceContact[]) {
-    const groups: any = {};
+    const groups: Record<string, AppDeviceContact[]> = {};
     contacts.forEach((contact) => {
       const letter = contact.display.charAt(0).toUpperCase();
       groups[letter] = groups[letter] || [];

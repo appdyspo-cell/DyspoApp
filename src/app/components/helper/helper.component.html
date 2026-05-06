@@ -1,43 +1,46 @@
 <ion-content (click)="dismiss()">
-  <div class="img_box center_img">
-    <div
-      style="
-        justify-content: space-between;
-        border-bottom: 1px solid var(--text-dyspo);
-      "
-      class="d-flex"
-    >
-      <div style="display: flex; align-items: center">
-        <ion-icon
-          name="information-circle-outline"
-          style="color: var(--text-dyspo); font-size: 36px; margin-right: 5px"
-        ></ion-icon>
-        <ion-text
-          style="
-            color: var(--text-dyspo);
-            font-size: 1.6rem;
-            position: relative;
-            top: -2px;
-          "
-          >Tuto dyspo!</ion-text
-        >
-      </div>
-      <div>
-        <ion-button
-          slot="start"
-          (click)="close()"
-          fill="clear"
-          style="position: relative; right: -16px"
-          class="white-btn"
-        >
-          <ion-icon
-            slot="icon-only"
-            name="close-circle-outline"
-            style="color: var(--text-dyspo); font-size: 36px"
-          ></ion-icon>
+  <div class="helper-backdrop">
+    <div class="helper-card" (click)="$event.stopPropagation()">
+
+      <!-- En-tête -->
+      <div class="helper-header">
+        <div class="helper-header-icon">
+          <ion-icon [name]="content.icon"></ion-icon>
+        </div>
+        <div class="helper-header-text">
+          <div class="helper-title">{{ content.title }}</div>
+          <div class="helper-subtitle">{{ content.subtitle }}</div>
+        </div>
+        <ion-button fill="clear" class="helper-close" (click)="dismiss()">
+          <ion-icon slot="icon-only" name="close-outline"></ion-icon>
         </ion-button>
       </div>
+
+      <!-- Conseils -->
+      <div class="helper-tips">
+        <div class="tip-row" *ngFor="let tip of content.tips">
+          <div class="tip-icon-wrap">
+            <ion-icon [name]="tip.icon"></ion-icon>
+          </div>
+          <div class="tip-body">
+            <div class="tip-title">{{ tip.title }}</div>
+            <div class="tip-desc">{{ tip.description }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bouton fermer -->
+      <div class="helper-footer">
+        <ion-button
+          expand="block"
+          color="tertiary"
+          class="dyspo-button"
+          (click)="dismiss()"
+        >
+          J'ai compris
+        </ion-button>
+      </div>
+
     </div>
-    <div [innerHTML]="text" style="text-align: center"></div>
   </div>
 </ion-content>

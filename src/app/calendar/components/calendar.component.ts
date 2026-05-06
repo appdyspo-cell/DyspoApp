@@ -44,11 +44,11 @@ interface CompatibleIcons {
 }
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
-  selector: 'ion-calendar',
-  providers: [ION_CAL_VALUE_ACCESSOR],
-  styleUrls: ['./calendar.component.scss'],
-  template: `
+    // eslint-disable-next-line @angular-eslint/component-selector
+    selector: 'ion-calendar',
+    providers: [ION_CAL_VALUE_ACCESSOR],
+    styleUrls: ['./calendar.component.scss'],
+    template: `
     <div class="title">
       <ng-template [ngIf]="_showMonthPicker" [ngIfElse]="title">
         <ion-button
@@ -117,22 +117,26 @@ interface CompatibleIcons {
       >
       </ion-calendar-week>
 
-      <ion-calendar-month
-        [componentMode]="true"
-        [(ngModel)]="_calendarMonthValue"
-        [month]="monthOpt"
-        [readonly]="readonly"
-        (change)="onChanged($event)"
-        (select)="select.emit($event)"
-        (selectStart)="selectStart.emit($event)"
-        (selectEnd)="selectEnd.emit($event)"
-        (selectReadOnly)="selectReadOnly.emit($event)"
-        (onSwipedLeft)="onSwipedLeft($event)"
-        (onSwipedRight)="onSwipedRight($event)"
-        [pickMode]="_d.pickMode"
-        [color]="_d.color"
-      >
-      </ion-calendar-month>
+      <div [class]="'month-slide-wrapper ' + slideClass">
+        <ion-calendar-month
+          [componentMode]="true"
+          [(ngModel)]="_calendarMonthValue"
+          [month]="monthOpt"
+          [readonly]="readonly"
+          [filterDyspo]="filterDyspo"
+          (change)="onChanged($event)"
+          (select)="select.emit($event)"
+          (selectStart)="selectStart.emit($event)"
+          (selectEnd)="selectEnd.emit($event)"
+          (selectReadOnly)="selectReadOnly.emit($event)"
+          (onSwipedLeft)="onSwipedLeft($event)"
+          (onSwipedRight)="onSwipedRight($event)"
+          (longPressDay)="longPressDay.emit($event)"
+          [pickMode]="_d.pickMode"
+          [color]="_d.color"
+        >
+        </ion-calendar-month>
+      </div>
     </ng-template>
 
     <ng-template #monthPicker>
@@ -145,6 +149,7 @@ interface CompatibleIcons {
       </ion-calendar-month-picker>
     </ng-template>
   `,
+    standalone: false
 })
 export class CalendarComponent implements ControlValueAccessor, OnInit {
   _d!: InternalCalendarModalOptions;
@@ -188,6 +193,7 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
   }
 
   public monthOpt!: CalendarMonth;
+  public slideClass = '';
 
   @Input()
   public format: string = defaults.DATE_FORMAT;
@@ -195,6 +201,8 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
   public type: CalendarComponentTypeProperty = 'string';
   @Input()
   public readonly = false;
+  @Input()
+  public filterDyspo: string | null = null;
   @Output()
   // eslint-disable-next-line @angular-eslint/no-output-native
   public change: EventEmitter<CalendarComponentPayloadTypes> =
@@ -213,6 +221,8 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
   public selectReadOnly: EventEmitter<CalendarDay[]> = new EventEmitter();
   @Output()
   public createMonthEvent: EventEmitter<CalendarMonth> = new EventEmitter();
+  @Output()
+  public longPressDay: EventEmitter<CalendarDay> = new EventEmitter();
 
   @Input()
   set options(value: CalendarComponentOptions) {
@@ -372,6 +382,8 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
       newMonth: this.calSvc.multiFormat(nextTime),
     });
     this.monthOpt = this.createMonth(nextTime);
+    this.slideClass = 'slide-from-right';
+    setTimeout(() => { this.slideClass = ''; }, 350);
   }
 
   canNext(): boolean {
@@ -390,6 +402,8 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
       newMonth: this.calSvc.multiFormat(backTime),
     });
     this.monthOpt = this.createMonth(backTime);
+    this.slideClass = 'slide-from-left';
+    setTimeout(() => { this.slideClass = ''; }, 350);
   }
 
   canBack(): boolean {
@@ -400,6 +414,7 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
   }
 
   monthOnSelect(month: number): void {
+    const isForward = month > moment(this.monthOpt.original.time).month();
     this._view = 'days';
     const newMonth = moment(this.monthOpt.original.time).month(month).valueOf();
     this.monthChange.emit({
@@ -407,6 +422,8 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
       newMonth: this.calSvc.multiFormat(newMonth),
     });
     this.monthOpt = this.createMonth(newMonth);
+    this.slideClass = isForward ? 'slide-from-right' : 'slide-from-left';
+    setTimeout(() => { this.slideClass = ''; }, 350);
   }
 
   onChanged($event: CalendarDay[]): void {

@@ -1,104 +1,219 @@
+// ── Header ────────────────────────────────────────────────────────────────────
+
 ion-header {
   h1 {
     margin: 0;
-    font-weight: 500;
-    letter-spacing: 0;
-    font-size: 1.525rem;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    color: var(--d-text-primary);
+  }
+
+  ion-toggle {
+    font-size: 13px;
+    font-weight: 600;
   }
 }
+
+// Mode ami — avatar + prénom dans le header
+.thumb-friend {
+  width: 34px;
+  height: 34px;
+  --border-radius: 50%;
+  margin-right: var(--d-space-2);
+  border: 2px solid var(--d-brand);
+  border-radius: 50%;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+// ── Légende des couleurs ───────────────────────────────────────────────────────
 
 .container {
   display: flex;
-  justify-content: center;
-}
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--d-space-1);
+  padding: var(--d-space-3) var(--d-space-4) var(--d-space-2);
+  background: var(--d-surface-1);
 
-ion-list {
-  background: transparent;
-  ion-item {
-    --background: transparent;
-    &:last-child {
-      border: none;
-      --inner-border-width: 0;
-    }
-    &:last-of-type {
-      border: none;
+  ion-chip {
+    height: 28px;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 1 !important;
+    background: var(--d-surface-2);
+    color: var(--d-text-secondary);
+    border: none;
+    padding: 0 var(--d-space-3);
+    cursor: pointer;
+    transition: background var(--d-duration-fast) var(--d-ease),
+                transform var(--d-duration-fast) var(--d-ease);
+
+    &:active { transform: scale(0.93); }
+
+    &.chip-active {
+      background: var(--d-brand) !important;
+      color: #fff !important;
     }
   }
-}
-
-ion-chip {
-  border: none;
-  padding: 0;
-  opacity: 1 !important;
-}
-
-ion-calendar {
-  position: sticky;
-  z-index: 100000;
-  // border-top: 1px solid #c8c8c8;
-  top: 0;
-  // box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
-  //   rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
 }
 
 .holidays {
-  border: 1px dashed #2c2c2c;
+  border: 1.5px dashed var(--d-text-tertiary);
 }
 
-.shape {
-  background-color: var(--ion-color-primary);
-  width: 100%;
-  height: 50px;
-  border-bottom-left-radius: 50%;
-  border-bottom-right-radius: 50%;
-}
-.header-ct {
-  background: var(--ion-color-primary);
-  padding: var(--ion-safe-area-top) 16px var(--ion-safe-area-bottom) 16px;
-  color: white;
-  .header {
-    display: flex;
-    flex-direction: row;
-    overflow: scroll;
-    color: white;
-    .cat {
-      display: flex;
-      flex-direction: column;
-      text-align: center;
-      padding: 10px;
-      align-items: center;
-      color: white;
+// ── Calendrier sticky ─────────────────────────────────────────────────────────
 
-      img {
-        color: white;
-        width: 40px;
-      }
-      ion-label {
-        font-size: 14px;
-      }
+ion-calendar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--d-surface-1);
+  box-shadow: var(--d-shadow-xs);
+}
+
+// ── Barre date + bouton nouveau ───────────────────────────────────────────────
+
+.agenda-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--d-space-3) var(--d-space-4);
+  background: var(--d-surface-0);
+}
+
+.agenda-date-label {
+  display: flex;
+  align-items: center;
+  gap: var(--d-space-2);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--d-text-primary);
+
+  ion-icon {
+    font-size: 18px;
+    color: var(--d-brand);
+  }
+}
+
+// Remplacement des inline styles du bouton "nouveau"
+ion-button.btn-new-event {
+  --border-radius: var(--d-radius-pill);
+  --background: var(--d-text-primary);
+  --background-activated: var(--d-brand);
+  font-size: 13px;
+  font-weight: 700;
+  height: 36px;
+  letter-spacing: 0.2px;
+  text-transform: none;
+  margin: 0;
+  transition: transform var(--d-duration-fast) var(--d-spring),
+              background var(--d-duration-fast) var(--d-ease);
+
+  &:active { transform: scale(0.94); }
+
+  ion-icon { font-size: 16px; }
+}
+
+// ── Liste d'événements ────────────────────────────────────────────────────────
+
+ion-list {
+  background: transparent;
+  padding: 0 var(--d-space-4) var(--d-space-12);
+
+  ion-item {
+    --background: var(--d-surface-1);
+    --border-radius: var(--d-radius-md);
+    --padding-start: var(--d-space-3);
+    --inner-padding-end: var(--d-space-3);
+    --inner-border-width: 0;
+    --min-height: 64px;
+    margin-bottom: var(--d-space-2);
+    border-radius: var(--d-radius-md);
+    box-shadow: var(--d-shadow-xs);
+    transition: box-shadow var(--d-duration-fast) var(--d-ease),
+                transform var(--d-duration-fast) var(--d-ease);
+
+    &:active {
+      box-shadow: none;
+      transform: scale(0.99);
+    }
+
+    &:last-child {
+      --inner-border-width: 0;
     }
   }
 }
 
-// ion-toggle::part(label) {
-//   color: white;
-// }
+// Heure dans le slot "start"
+.event-time-slot {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--d-text-secondary);
+  width: 52px;
+  text-align: center;
+  line-height: 1.3;
+}
 
-.thumbnail-friend {
-  ion-thumbnail {
-    height: 60px;
-    width: 60px;
-    --border-radius: 50%;
-    margin-right: 10px;
-    padding: 5px;
-    //border: 1px solid #fd6a58;
+// Titre & heure de l'événement
+.event-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--d-text-primary);
+  margin-bottom: 2px;
+}
+
+.event-time-range {
+  font-size: 12px;
+  color: var(--d-text-tertiary);
+}
+
+// Bulle "En commun"
+.common-event-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--d-space-1);
+  background: #7c3aed;
+  color: #fff;
+  border-radius: var(--d-radius-pill);
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+
+  ion-icon { font-size: 13px; }
+}
+
+// ── Mode édition ──────────────────────────────────────────────────────────────
+
+.edit-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--d-space-3);
+  padding: var(--d-space-4);
+  background: var(--d-surface-0);
+
+  .edit-hint {
+    font-size: 13px;
+    color: var(--d-text-tertiary);
+    text-align: center;
   }
 }
 
-.thumb-friend {
-  height: 60px;
-  width: 60px;
-  --border-radius: 50%;
-  margin-right: 5px;
-  padding: 5px;
+// ── FAB ────────────────────────────────────────────────────────────────────────
+
+ion-fab-button {
+  --background: var(--d-brand);
+  --background-activated: var(--d-brand-dark);
+  --box-shadow: var(--d-shadow-md);
+  --border-radius: var(--d-radius-lg);
+  width: 52px;
+  height: 52px;
+  transition: transform var(--d-duration-fast) var(--d-spring);
+
+  &:active { transform: scale(0.92); }
+
+  ion-icon { font-size: 22px; }
 }

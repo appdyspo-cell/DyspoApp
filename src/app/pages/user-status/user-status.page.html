@@ -61,9 +61,10 @@
       </div>
     </div>
 
-    <ion-text style="font-size: 0.85em"
-      >Créer un événement de groupe ou perso :</ion-text
-    >
+    <div class="cta-invite">
+      <p class="cta-label">Planifiez votre prochain moment</p>
+      <p class="cta-phrase" [class.cta-visible]="ctaVisible">{{ ctaPhrase }}</p>
+    </div>
 
     <ion-row
       class="ion-justify-content-center"

@@ -2,16 +2,17 @@ import { Component, Input } from '@angular/core';
 import { defaults } from '../config';
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
-  selector: 'ion-calendar-week',
-  styleUrls: ['./calendar-week.component.scss'],
-  template: `
+    // eslint-disable-next-line @angular-eslint/component-selector
+    selector: 'ion-calendar-week',
+    styleUrls: ['./calendar-week.component.scss'],
+    template: `
     <ion-toolbar [class]="'week-toolbar ' + color" no-border-top>
       <ul [class]="'week-title ' + color">
         <li *ngFor="let w of _displayWeekArray">{{ w }}</li>
       </ul>
     </ion-toolbar>
   `,
+    standalone: false
 })
 export class CalendarWeekComponent {
   _weekArray: string[] = defaults.WEEKS_FORMAT;

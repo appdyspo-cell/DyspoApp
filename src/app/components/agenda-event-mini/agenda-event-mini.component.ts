@@ -7,9 +7,10 @@ import { format, isSameDay, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 @Component({
-  selector: 'app-agenda-event-mini',
-  templateUrl: './agenda-event-mini.component.html',
-  styleUrls: ['./agenda-event-mini.component.scss'],
+    selector: 'app-agenda-event-mini',
+    templateUrl: './agenda-event-mini.component.html',
+    styleUrls: ['./agenda-event-mini.component.scss'],
+    standalone: false
 })
 export class AgendaEventMiniComponent implements OnInit {
   @Output() outevt = new EventEmitter<string>();

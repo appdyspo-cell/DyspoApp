@@ -10,9 +10,10 @@ import { AuthService } from 'src/app/services/auth.service';
 import { LoggerService } from 'src/app/services/logger.service';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.page.html',
-  styleUrls: ['./login.page.scss'],
+    selector: 'app-login',
+    templateUrl: './login.page.html',
+    styleUrls: ['./login.page.scss'],
+    standalone: false
 })
 export class LoginPage implements OnInit {
   userInfo: any = { email: '', password: '' };
@@ -49,7 +50,6 @@ export class LoginPage implements OnInit {
   async login(email: string, password: string, fromBiometric = false) {
     this.utils.showLoader();
     this.logger.logDebug('Login with ', email);
-    this.logger.logDebug('Login with ', password);
 
     try {
       const credentials = await this.authService.login(email, password);

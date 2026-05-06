@@ -116,7 +116,7 @@ export class ChatService {
           console.log('Chat Svc messageSubject MODIFIED', msgFetched.message);
           this.messagesSubject.next({
             action: 'MODIFIED',
-            messages: this.messages,
+            messages: [...this.messages],
           });
         }
         if (change.type === 'added' && foundIndex < 0) {
@@ -124,7 +124,7 @@ export class ChatService {
           console.log('Chat Svc messageSubject ADDED', msgFetched.message);
           this.messagesSubject.next({
             action: 'ADDED',
-            messages: this.messages,
+            messages: [...this.messages],
           });
         }
         if (change.type === 'removed') {
@@ -137,7 +137,7 @@ export class ChatService {
             this.messages.splice(foundIndex, 1);
             this.messagesSubject.next({
               action: 'REMOVED',
-              messages: this.messages,
+              messages: [...this.messages],
             });
           }
         }
@@ -185,7 +185,7 @@ export class ChatService {
               const chatroom = agendaFetched['user_' + member_uid] as Chatroom;
               const newCount = chatroom.count + 1;
 
-              const updateObject: any = {};
+              const updateObject: Record<string, any> = {};
               updateObject['user_' + member_uid + '.count'] = newCount;
 
               transaction.update(agendaDocRef, updateObject);
@@ -221,7 +221,7 @@ export class ChatService {
 
         //agenda fetched-> Write values
         const agendaFetched = agendaDoc.data() as AgendaEvent;
-        const updateObject: any = {};
+        const updateObject: Record<string, any> = {};
 
         if (agendaFetched['user_' + this.uid]) {
           updateObject['user_' + this.uid + '.count'] = 0;
@@ -269,7 +269,7 @@ export class ChatService {
 
         //agenda fetched-> Write values
         const agendaFetched = agendaDoc.data() as AgendaEvent;
-        const updateObject: any = {};
+        const updateObject: Record<string, any> = {};
 
         if (agendaFetched['user_' + this.uid]) {
           updateObject['user_' + this.uid + '.isNotifications'] =
@@ -303,7 +303,7 @@ export class ChatService {
 
         //agenda fetched-> Write values
         const agendaFetched = agendaDoc.data() as AgendaEvent;
-        const updateObject: any = {};
+        const updateObject: Record<string, any> = {};
 
         if (agendaFetched['user_' + this.uid]) {
           updateObject['user_' + this.uid + '.count'] = 0;
@@ -608,7 +608,7 @@ export class ChatService {
               agendaEventFetched.last_message?.deleted_by || [];
             if (!agenda_event_message_deleted_by.includes(this.uid)) {
               agenda_event_message_deleted_by.push(this.uid);
-              const updateObject: any = {};
+              const updateObject: Record<string, any> = {};
               updateObject['last_message.deleted_by'] =
                 agenda_event_message_deleted_by;
               updateObject['last_message.is_deleted'] = true;
@@ -630,7 +630,7 @@ export class ChatService {
               agendaEventFetched.last_message!.deleted_by || [];
             if (!event_deleted_by.includes(this.uid)) {
               event_deleted_by.push(this.uid);
-              const updateObject: any = {};
+              const updateObject: Record<string, any> = {};
               updateObject['last_message.deleted_by'] = event_deleted_by;
 
               transaction.update(agendaEventRef, updateObject);
@@ -641,6 +641,34 @@ export class ChatService {
       console.log('Transaction successfully committed!');
     } catch (e: any) {
       this.loggerSvc.sendLog(e, 'deleteMsg', this.uid);
+    }
+  }
+
+  async likeMessage(message: ChatMessage, agendaEvent: AgendaEvent) {
+    if (!this.uid) return;
+
+    try {
+      const messageDocRef = doc(
+        this.firestore,
+        `agenda_events/${agendaEvent.uid}/messages_list`,
+        message.uid
+      );
+
+      const likes = message.likes || [];
+      const foundIndex = likes.indexOf(this.uid);
+
+      if (foundIndex > -1) {
+        // Unlike
+        likes.splice(foundIndex, 1);
+      } else {
+        // Like
+        likes.push(this.uid);
+      }
+
+      await updateDoc(messageDocRef, { likes: likes });
+      console.log('Message like toggled');
+    } catch (e: any) {
+      this.loggerSvc.sendError(e, 'likeMessage', this.uid);
     }
   }
 

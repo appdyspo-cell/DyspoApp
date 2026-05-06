@@ -119,6 +119,28 @@
         </ion-buttons>
       </ion-item>
 
+      <div *ngIf="userInfo.with_kids" class="custody-section">
+        <ion-label class="custody-label">
+          Jours de garde <ion-text color="medium">(sur 2 semaines)</ion-text>
+        </ion-label>
+        <div class="custody-week">
+          <div
+            *ngFor="let day of weekDays; let i = index"
+            class="day-bubble"
+            [class.selected]="custodyDays[i]"
+            (click)="toggleCustodyDay(i)"
+          >{{ day }}</div>
+        </div>
+        <div class="custody-week">
+          <div
+            *ngFor="let day of weekDays; let i = index"
+            class="day-bubble"
+            [class.selected]="custodyDays[i + 7]"
+            (click)="toggleCustodyDay(i + 7)"
+          >{{ day }}</div>
+        </div>
+      </div>
+
       <ion-item>
         <ion-input
           [maskito]="phoneMask"

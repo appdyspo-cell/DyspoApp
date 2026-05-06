@@ -11,7 +11,6 @@ import { UtilsService } from './utils.service';
 import { ActionSheetController } from '@ionic/angular';
 import { Media, MediaSaveOptions } from '@capacitor-community/media';
 import { Capacitor } from '@capacitor/core';
-import { throwError } from 'rxjs';
 
 export interface TakePhotoOptions {
   filename: string;
@@ -168,4 +167,5 @@ export class MediaService {
 
     await Media.savePhoto(opts);
   }
+
 }

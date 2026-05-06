@@ -20,9 +20,10 @@ interface CheckedFriends {
 }
 
 @Component({
-  selector: 'app-create-group',
-  templateUrl: './create-group.page.html',
-  styleUrls: ['./create-group.page.scss'],
+    selector: 'app-create-group',
+    templateUrl: './create-group.page.html',
+    styleUrls: ['./create-group.page.scss'],
+    standalone: false
 })
 export class CreateGroupPage implements OnInit {
   friends: Friend[] = [];

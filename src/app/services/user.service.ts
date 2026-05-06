@@ -101,7 +101,7 @@ export class UserService {
 
   async updateUser(appUser: AppUser) {
     this.logger.logDebug('Update User');
-    const appUserClone: any = { ...appUser };
+    const appUserClone: Partial<AppUser> = { ...appUser };
     //delete appUserClone.id;
     const ref = doc(this.firestore, `users/${appUser.uid}`);
     updateDoc(ref, appUserClone);
@@ -159,15 +159,21 @@ export class UserService {
     uids: string[],
     withEvents = false
   ): Promise<AppUserWithEvents[]> {
+    if (!uids || uids.length === 0) return [];
     const appUsers: AppUserWithEvents[] = [];
-    for (let uid of uids) {
-      const docRef = doc(this.firestore, `users`, uid);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
+    const chunks = [];
+    for (let i = 0; i < uids.length; i += 10) {
+      chunks.push(uids.slice(i, i + 10));
+    }
+    
+    for (const chunk of chunks) {
+      const q = query(collection(this.firestore, 'users'), where('uid', 'in', chunk));
+      const querySnapshots = await getDocs(q);
+      querySnapshots.forEach((docSnap) => {
         const result = docSnap.data() as AppUserWithEvents;
         result.agendaEvents = [];
         appUsers.push(result);
-      }
+      });
     }
     return appUsers;
   }
@@ -175,17 +181,25 @@ export class UserService {
   public async getUserInfosExceptMe(
     uids: string[]
   ): Promise<AppUserWithEvents[]> {
+    if (!uids || uids.length === 0) return [];
+    
+    const filteredUids = uids.filter(uid => uid !== this.userInfo?.uid);
+    if (filteredUids.length === 0) return [];
+
     const appUsers: AppUserWithEvents[] = [];
-    for (let uid of uids) {
-      if (uid !== this.userInfo?.uid) {
-        const docRef = doc(this.firestore, `users`, uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const result = docSnap.data() as AppUserWithEvents;
-          result.agendaEvents = [];
-          appUsers.push(result);
-        }
-      }
+    const chunks = [];
+    for (let i = 0; i < filteredUids.length; i += 10) {
+      chunks.push(filteredUids.slice(i, i + 10));
+    }
+    
+    for (const chunk of chunks) {
+      const q = query(collection(this.firestore, 'users'), where('uid', 'in', chunk));
+      const querySnapshots = await getDocs(q);
+      querySnapshots.forEach((docSnap) => {
+        const result = docSnap.data() as AppUserWithEvents;
+        result.agendaEvents = [];
+        appUsers.push(result);
+      });
     }
     return appUsers;
   }

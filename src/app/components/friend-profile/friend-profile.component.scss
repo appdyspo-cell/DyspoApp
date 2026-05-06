@@ -1,0 +1,56 @@
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 16px;
+  text-align: center;
+}
+
+.profile-avatar {
+  width: 90px;
+  height: 90px;
+  margin-bottom: 12px;
+
+  img {
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid var(--ion-color-primary);
+  }
+}
+
+.profile-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: var(--ion-text-color);
+}
+
+.profile-tagline {
+  font-size: 0.9rem;
+  color: var(--ion-color-medium);
+  margin: 0;
+}
+
+.info-list {
+  margin-top: 16px;
+  border-radius: 12px;
+  overflow: hidden;
+
+  ion-item {
+    --padding-start: 16px;
+    --inner-padding-end: 16px;
+    --min-height: 56px;
+
+    ion-label {
+      p {
+        font-size: 0.75rem;
+        color: var(--ion-color-medium);
+      }
+      h3 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-top: 2px;
+      }
+    }
+  }
+}

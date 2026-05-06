@@ -11,9 +11,10 @@ import { GestureController } from '@ionic/angular';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 @Component({
-  selector: 'app-alphabet-scroll',
-  templateUrl: './alphabet-scroll.component.html',
-  styleUrls: ['./alphabet-scroll.component.scss'],
+    selector: 'app-alphabet-scroll',
+    templateUrl: './alphabet-scroll.component.html',
+    styleUrls: ['./alphabet-scroll.component.scss'],
+    standalone: false
 })
 export class AlphabetScrollComponent implements OnInit, AfterViewInit {
   letters: string[] = [];

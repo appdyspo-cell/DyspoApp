@@ -28,9 +28,10 @@ import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 @Component({
-  selector: 'app-friends-selector',
-  templateUrl: './friends-selector.component.html',
-  styleUrls: ['./friends-selector.component.scss'],
+    selector: 'app-friends-selector',
+    templateUrl: './friends-selector.component.html',
+    styleUrls: ['./friends-selector.component.scss'],
+    standalone: false
 })
 export class FriendsSelectorComponent implements OnInit {
   selectedFriend: CheckedFriends | undefined;
@@ -62,7 +63,7 @@ export class FriendsSelectorComponent implements OnInit {
   level = 0;
   friendsAlreadyInvited!: string[];
   isInit = false;
-  dispalyByDyspo = false;
+  dispalyByDyspo = true;
   checkedFriendsDyspo: CheckedFriends[] = [];
   checkedFriendsNoDyspo: CheckedFriends[] = [];
   checkedFriendsDyspoWithKids: CheckedFriends[] = [];
@@ -125,71 +126,63 @@ export class FriendsSelectorComponent implements OnInit {
     });
   }
 
-  fillCheckedFriends(fromChanges = false) {
-    return new Promise(async (resolve, reject) => {
-      const friendsToCheck = this.agendaEvent.members_uid.concat(
-        this.agendaEvent.members_invited_uid
-      );
+  async fillCheckedFriends(fromChanges = false) {
+    const friendsToCheck = this.agendaEvent.members_uid.concat(
+      this.agendaEvent.members_invited_uid
+    );
 
-      for (let friend of this.friends) {
-        // Dyspos
-        const dyspo = (
-          await this.agendaSvc.getDyspos([friend.friend_uid!], this.agendaEvent)
-        )[0];
+    const friendUids = this.friends.map((f) => f.friend_uid!);
+    
+    // Fetch all dyspos at once
+    let allDyspos: FriendDyspo[] = [];
+    if (friendUids.length > 0) {
+      allDyspos = await this.agendaSvc.getDyspos(friendUids, this.agendaEvent);
+    }
+    const dyspoMap = new Map<string, UserDyspoStatus>();
+    allDyspos.forEach((d) => dyspoMap.set(d.friend_uid, d.friend_dyspo));
 
-        // Fetch events of members
-        const events = await this.agendaSvc.getUserAgendaEvents(
-          friend.friend_uid!,
-          this.agendaEvent
-        );
+    // Fetch all events in parallel
+    const fetchEventsPromises = this.friends.map((friend) =>
+      this.agendaSvc.getUserAgendaEvents(friend.friend_uid!, this.agendaEvent)
+    );
+    const allEvents = await Promise.all(fetchEventsPromises);
 
-        const dyspoStatus = dyspo.friend_dyspo;
-        if (friendsToCheck.includes(friend.friend_uid!)) {
-          this.checkedFriends.push({
-            friend,
-            isChecked: true,
-            isCheckedPending: false,
-            disable: this.friendsAlreadyInvited.includes(friend.friend_uid!),
-            dyspo: dyspoStatus,
-            agendaEvents: events.agendaEvents,
-          });
-        } else {
-          this.checkedFriends.push({
-            friend,
-            isChecked: false,
-            isCheckedPending: false,
-            disable: false,
-            dyspo: dyspoStatus,
-            agendaEvents: events.agendaEvents,
-          });
-        }
-      }
+    this.friends.forEach((friend, index) => {
+      const dyspoStatus = dyspoMap.get(friend.friend_uid!) || UserDyspoStatus.UNDEFINED;
+      const events = allEvents[index];
 
-      // Sort by dyspo
-      this.checkedFriendsDyspo = this.checkedFriends.filter((checkedFriend) => {
-        return checkedFriend.dyspo === UserDyspoStatus.DYSPO;
+      this.checkedFriends.push({
+        friend,
+        isChecked: friendsToCheck.includes(friend.friend_uid!),
+        isCheckedPending: false,
+        disable: this.friendsAlreadyInvited.includes(friend.friend_uid!),
+        dyspo: dyspoStatus,
+        agendaEvents: events.agendaEvents,
       });
-
-      this.checkedFriendsNoDyspo = this.checkedFriends.filter(
-        (checkedFriend) => {
-          return checkedFriend.dyspo === UserDyspoStatus.NODYSPO;
-        }
-      );
-
-      this.checkedFriendsDyspoWithKids = this.checkedFriends.filter(
-        (checkedFriend) => {
-          return checkedFriend.dyspo === UserDyspoStatus.DYSPOWITHKIDS;
-        }
-      );
-
-      this.checkedFriendsDyspoUndefined = this.checkedFriends.filter(
-        (checkedFriend) => {
-          return checkedFriend.dyspo === UserDyspoStatus.UNDEFINED;
-        }
-      );
-
-      resolve(this.checkedFriends);
     });
+
+    // Sort by dyspo
+    this.checkedFriendsDyspo = this.checkedFriends.filter((checkedFriend) => {
+      return checkedFriend.dyspo === UserDyspoStatus.DYSPO;
+    });
+
+    this.checkedFriendsNoDyspo = this.checkedFriends.filter((checkedFriend) => {
+      return checkedFriend.dyspo === UserDyspoStatus.NODYSPO;
+    });
+
+    this.checkedFriendsDyspoWithKids = this.checkedFriends.filter(
+      (checkedFriend) => {
+        return checkedFriend.dyspo === UserDyspoStatus.DYSPOWITHKIDS;
+      }
+    );
+
+    this.checkedFriendsDyspoUndefined = this.checkedFriends.filter(
+      (checkedFriend) => {
+        return checkedFriend.dyspo === UserDyspoStatus.UNDEFINED;
+      }
+    );
+
+    return this.checkedFriends;
   }
 
   segmentChanged(ev: any) {
@@ -286,5 +279,15 @@ export class FriendsSelectorComponent implements OnInit {
 
   groupFriendsByDyspo() {
     this.dispalyByDyspo = !this.dispalyByDyspo;
+  }
+
+  inviteBySMS() {
+    const eventName = this.agendaEvent?.title ? `"${this.agendaEvent.title}"` : "un événement";
+    const dateStr = this.agendaEvent?.start_date_formatted || "";
+    const timeStr = this.agendaEvent?.start_time_formatted || "";
+    const message = `Salut ! Je t'invite à ${eventName} le ${dateStr} à ${timeStr} sur l'application Dyspo. Télécharge l'app pour nous rejoindre : https://dyspo.app`;
+    
+    // Ouvre l'application SMS native avec le message pré-rempli
+    window.open(`sms:?body=${encodeURIComponent(message)}`, '_system');
   }
 }

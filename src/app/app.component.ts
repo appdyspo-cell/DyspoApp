@@ -16,9 +16,10 @@ import { UtilsService } from './services/utils.service';
 import { Contacts } from '@capacitor-community/contacts';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: 'app.component.html',
-  styleUrls: ['app.component.scss'],
+    selector: 'app-root',
+    templateUrl: 'app.component.html',
+    styleUrls: ['app.component.scss'],
+    standalone: false
 })
 export class AppComponent {
   //userSubscription: Subscription;

@@ -37,29 +37,50 @@
   <div class="container">
     <ion-chip
       *ngIf="!isFriendMode && my_info.with_kids"
-      [outline]="true"
-      [disabled]="true"
+      [outline]="activeFilter !== 'DYSPOWITHKIDS'"
+      [class.chip-active]="activeFilter === 'DYSPOWITHKIDS'"
+      (click)="toggleFilter('DYSPOWITHKIDS')"
       ><div class="chip-evt bg-color-kid">&nbsp;</div>
       Kid(s)</ion-chip
     >
     <ion-chip
-      [disabled]="true"
       *ngIf="isFriendMode && agendaFriend?.userData?.with_kids"
-      [outline]="true"
+      [outline]="activeFilter !== 'DYSPOWITHKIDS'"
+      [class.chip-active]="activeFilter === 'DYSPOWITHKIDS'"
+      (click)="toggleFilter('DYSPOWITHKIDS')"
       ><div class="chip-evt bg-color-kid">&nbsp;</div>
       Kid(s)</ion-chip
     >
-    <ion-chip [outline]="true" [disabled]="true"
+    <ion-chip
+      [outline]="activeFilter !== 'DYSPO'"
+      [class.chip-active]="activeFilter === 'DYSPO'"
+      (click)="toggleFilter('DYSPO')"
       ><div class="chip-evt bg-color-nokids">&nbsp;</div>
       Dyspo</ion-chip
     >
-    <ion-chip [outline]="true" [disabled]="true"
+    <ion-chip
+      [outline]="activeFilter !== 'NODYSPO'"
+      [class.chip-active]="activeFilter === 'NODYSPO'"
+      (click)="toggleFilter('NODYSPO')"
       ><div class="chip-evt bg-color-nodyspo">&nbsp;</div>
       Pas Dyspo</ion-chip
     >
-    <ion-chip [outline]="true" [disabled]="true"
+    <ion-chip
+      [outline]="activeFilter !== 'holidays'"
+      [class.chip-active]="activeFilter === 'holidays'"
+      (click)="toggleFilter('holidays')"
       ><div class="chip-evt holidays">&nbsp;</div>
       Vacances</ion-chip
+    >
+    <ion-chip
+      *ngIf="isFriendMode"
+      [outline]="!showCommonDatesOnly"
+      [class.chip-active]="showCommonDatesOnly"
+      color="tertiary"
+      (click)="toggleCommonDates()"
+      >
+      <ion-icon name="people-outline" style="margin-right:4px"></ion-icon>
+      Dates communes</ion-chip
     >
   </div>
 
@@ -70,10 +91,12 @@
     (select)="onSelect($event)"
     (selectReadOnly)="onSelectReadOnly($event)"
     (createMonthEvent)="onCreateMonthEvent($event)"
+    (longPressDay)="onLongPressDay($event)"
     [type]="type"
     [options]="optionsMulti"
     [format]="'YYYY-MM-DD'"
     [readonly]="agendaMode === agendaModes.READONLY"
+    [filterDyspo]="activeFilter"
   ></ion-calendar>
   <div *ngIf="agendaMode === agendaModes.READONLY" style="padding-top: 5px">
     <!-- <ion-toolbar style="padding: 0px 6px; --background: transparent"> -->
@@ -162,14 +185,27 @@
           </div>
         </div>
 
-        <ion-buttons
-          slot="end"
-          *ngIf="isFriendMode === false && agendaEvent.is_multi && agendaEvent.members_uid.length > 1"
-        >
-          <ion-button color="primary" (click)="goToChat(agendaEvent, $event)">
+        <ion-buttons slot="end" *ngIf="isFriendMode === false">
+          <ion-button
+            *ngIf="agendaEvent.is_multi && agendaEvent.members_uid.length > 1"
+            color="primary"
+            (click)="goToChat(agendaEvent, $event)"
+          >
             <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
           </ion-button>
+          <ion-button color="medium" (click)="addToCalendar(agendaEvent, $event)">
+            <ion-icon name="calendar-outline"></ion-icon>
+          </ion-button>
         </ion-buttons>
+
+        <div
+          slot="end"
+          *ngIf="isFriendMode && isCommonEvent(agendaEvent)"
+          class="common-event-badge"
+        >
+          <ion-icon name="people"></ion-icon>
+          En commun
+        </div>
       </ion-item>
     </ion-list>
   </div>
@@ -203,14 +239,13 @@
       <ion-icon name="close-circle-outline" slot="start"></ion-icon>
     </ion-button>
   </div>
-  <!-- <ion-fab
-    *ngIf="agendaMode === agendaModes.READONLY"
+  <ion-fab
     slot="fixed"
     horizontal="end"
     vertical="bottom"
   >
-    <ion-fab-button (click)="addEvent()">
-      <ion-icon name="add"></ion-icon>
+    <ion-fab-button color="tertiary" size="small" (click)="openHelp()">
+      <ion-icon name="help-outline"></ion-icon>
     </ion-fab-button>
-  </ion-fab> -->
+  </ion-fab>
 </ion-content>

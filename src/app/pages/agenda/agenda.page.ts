@@ -33,6 +33,7 @@ import {
   UserDyspoStatus,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
+import { CalendarService } from 'src/app/services/calendar.service';
 import { UtilsService } from 'src/app/services/utils.service';
 
 import { cloneDeep } from 'lodash';
@@ -49,9 +50,10 @@ export enum AgendaMode {
 }
 
 @Component({
-  selector: 'app-agenda',
-  templateUrl: './agenda.page.html',
-  styleUrls: ['./agenda.page.scss'],
+    selector: 'app-agenda',
+    templateUrl: './agenda.page.html',
+    styleUrls: ['./agenda.page.scss'],
+    standalone: false
 })
 export class AgendaPage implements AfterViewInit {
   @ViewChild('mydiv') mydiv!: ElementRef;
@@ -95,12 +97,17 @@ export class AgendaPage implements AfterViewInit {
   my_info!: AppUser;
   showHelper = false;
 
+  activeFilter: string | null = null;
+  myDysposForCommon: AgendaDyspoItem[] = [];
+  showCommonDatesOnly = false;
+
   constructor(
     public agendaSvc: AgendaService,
     public navCtrl: NavController,
     private utils: UtilsService,
     private modalCtrl: ModalController,
     private actionSheetCtrl: ActionSheetController,
+    private calendarSvc: CalendarService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
     public userSvc: UserService
@@ -147,9 +154,14 @@ export class AgendaPage implements AfterViewInit {
         this.isFriendMode = true;
         this.agendaFriend =
           this.router.getCurrentNavigation()?.extras.state?.['friend'];
-        console.log('Friend Ag events');
+        console.log('Friend Ag events', this.agendaFriend);
+        const friendUid = this.agendaFriend?.friend_uid || this.agendaFriend?.uid;
+        if (!friendUid) {
+          this.utils.showToastError('Utilisateur introuvable');
+          return;
+        }
         const friendData = await this.agendaSvc.getUserAgendaEventsAndDyspos(
-          this.agendaFriend!.friend_uid!,
+          friendUid,
           true
         );
         if (friendData.allowShare) {
@@ -157,6 +169,11 @@ export class AgendaPage implements AfterViewInit {
           this.tagCalendarEventsDataForMonth();
           this.agendaDyspos = friendData.dyspos;
           this.tagCalendarUserDyspoData();
+          // Load own dyspos for common-dates feature
+          const myData = await this.agendaSvc.getUserAgendaEventsAndDyspos(
+            this.userSvc.userInfo!.uid, false
+          );
+          this.myDysposForCommon = myData.dyspos;
         } else {
           this.utils.showAlert('Ne souhaite pas partager son calendrier');
         }
@@ -242,6 +259,7 @@ export class AgendaPage implements AfterViewInit {
     this.tagCalendarEventsDataForMonth();
     this.tagCalendarUserDyspoData();
     this.tagHolidays();
+    if (this.isFriendMode) this.tagCommonDates();
   }
 
   tagCalendarEventsDataForMonth() {
@@ -272,9 +290,6 @@ export class AgendaPage implements AfterViewInit {
         newDateCalendar.setMinutes(
           newDateCalendar.getMinutes() - newDateCalendar.getTimezoneOffset()
         );
-        let newDateCalendarISO =
-          newDateCalendar.toISOString().split('.')[0] + 'Z';
-        // console.log('new Date du calendar', newDateCalendarISO);
 
         this.agendaEvents.forEach((agendaEvent) => {
           //For Legacy compatibility
@@ -526,6 +541,15 @@ export class AgendaPage implements AfterViewInit {
     this.agendaSvc.isModified = false;
   }
 
+  isCommonEvent(agendaEvent: AgendaEvent): boolean {
+    return !!this.my_info?.uid && agendaEvent.members_uid.includes(this.my_info.uid);
+  }
+
+  addToCalendar(agendaEvent: AgendaEvent, event: Event) {
+    event.stopPropagation();
+    this.calendarSvc.promptAddToCalendar(agendaEvent);
+  }
+
   goToChat(agendaEvent: AgendaEvent | undefined, event: any) {
     event.stopPropagation();
     console.log('goToChat', agendaEvent);
@@ -539,6 +563,14 @@ export class AgendaPage implements AfterViewInit {
       this.navCtrl.navigateForward('/group-chatting', navigationExtras);
       //this.route.navigate(['chat-home'], navigationExtras);
     }
+  }
+
+  async openHelp() {
+    const modal = await this.modalCtrl.create({
+      component: HelperComponent,
+      componentProps: { showHelper: ShowHelper.AGENDA },
+    });
+    modal.present();
   }
 
   // To include for private multi event
@@ -558,5 +590,46 @@ export class AgendaPage implements AfterViewInit {
     {
       return 'Événement privé';
     }
+  }
+
+  toggleFilter(filter: string) {
+    if (this.showCommonDatesOnly) {
+      this.showCommonDatesOnly = false;
+      this.tagCommonDates();
+    }
+    this.activeFilter = this.activeFilter === filter ? null : filter;
+  }
+
+  async onLongPressDay(day: CalendarDay) {
+    if (this.isFriendMode) return;
+    this.selectedDateMs = day.time;
+    this.selectedDate = day;
+    this.selectedDateFormatted = this.utils.formatDate(day.time);
+    await this.openCreateEvent();
+  }
+
+  toggleCommonDates() {
+    this.showCommonDatesOnly = !this.showCommonDatesOnly;
+    this.activeFilter = null;
+    this.tagCommonDates();
+  }
+
+  tagCommonDates() {
+    if (!this.calendarMonthData) return;
+    this.calendarMonthData.days.forEach((day) => {
+      day.cssClass = (day.cssClass || '').replace(/\bfilter-dimmed\b/g, '').trim();
+      if (this.showCommonDatesOnly && !day.isLastMonth && !day.isNextMonth) {
+        const myDyspo = this.myDysposForCommon.find((d) => isSameDay(d.time, day.time));
+        const meAvailable =
+          myDyspo?.userDyspo === UserDyspoStatus.DYSPO ||
+          myDyspo?.userDyspo === UserDyspoStatus.DYSPOWITHKIDS;
+        const friendAvailable =
+          day.userDyspo === UserDyspoStatus.DYSPO ||
+          day.userDyspo === UserDyspoStatus.DYSPOWITHKIDS;
+        if (!meAvailable || !friendAvailable) {
+          day.cssClass = ((day.cssClass || '') + ' filter-dimmed').trim();
+        }
+      }
+    });
   }
 }

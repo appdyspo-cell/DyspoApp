@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FriendsSelectorComponent } from 'src/app/components/friends/friends-selector.component';
 import { IonicModule } from '@ionic/angular';
@@ -12,11 +12,11 @@ import { ChatMenuComponent } from 'src/app/components/chat-menu/chat-menu.compon
 import { DyspoViewerComponent } from 'src/app/components/dyspo-viewer/dyspo-viewer.component';
 
 import { NgxPanZoomModule } from 'ngx-panzoom';
-import { SwiperModule } from 'swiper/angular';
 import { ReportComponent } from 'src/app/components/report/report.component';
 
 import { AlphabetScrollComponent } from 'src/app/components/alphabet-scroll/alphabet-scroll.component';
 import { HelperComponent } from 'src/app/components/helper/helper.component';
+import { FriendProfileComponent } from 'src/app/components/friend-profile/friend-profile.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +29,7 @@ import { HelperComponent } from 'src/app/components/helper/helper.component';
     ReportComponent,
     AlphabetScrollComponent,
     HelperComponent,
+    FriendProfileComponent,
   ],
   imports: [
     CommonModule,
@@ -36,7 +37,6 @@ import { HelperComponent } from 'src/app/components/helper/helper.component';
     FormsModule,
     LazyLoadImageModule,
     NgxPanZoomModule,
-    SwiperModule,
   ],
   exports: [
     FriendsSelectorComponent,
@@ -48,6 +48,8 @@ import { HelperComponent } from 'src/app/components/helper/helper.component';
     ReportComponent,
     AlphabetScrollComponent,
     HelperComponent,
+    FriendProfileComponent,
   ],
+  schemas: [NO_ERRORS_SCHEMA],
 })
 export class SharedModule {}

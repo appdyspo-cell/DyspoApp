@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 
 @Component({
-  selector: 'app-picture',
-  templateUrl: './picture.component.html',
-  styleUrls: ['./picture.component.scss'],
+    selector: 'app-picture',
+    templateUrl: './picture.component.html',
+    styleUrls: ['./picture.component.scss'],
+    standalone: false
 })
 export class PictureComponent implements OnInit {
   constructor(private modalController: ModalController) {}

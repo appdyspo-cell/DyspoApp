@@ -83,6 +83,11 @@
   opacity: 0.3;
 }
 
+:host .filter-dimmed {
+  opacity: 0.18;
+  pointer-events: none;
+}
+
 :host .on-selected-dyspo-kids {
   background-color: var(--text-dyspo-with-kids) !important;
   color: #fff !important;

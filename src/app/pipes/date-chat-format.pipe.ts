@@ -3,7 +3,8 @@ import { format, parseISO } from 'date-fns';
 import fr from 'date-fns/locale/fr';
 
 @Pipe({
-  name: 'dateChatFormat',
+    name: 'dateChatFormat',
+    standalone: false
 })
 export class DateChatFormatPipe implements PipeTransform {
   transform(dateISO: string): string {

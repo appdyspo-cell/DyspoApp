@@ -1,191 +1,175 @@
-<!-- <ion-header class="ion-no-border">
-  <div class="header-ct">
-    <div class="header">
-      <ion-toolbar>
-        <ion-thumbnail slot="start">
-          <ion-img
-            src="assets/chatrooms.png"
-            class="animate__animated animate__fadeInLeft"
-          ></ion-img>
-        </ion-thumbnail>
-        <ion-title> <h1>{{ 'discussions' | translate }}</h1></ion-title>
-      </ion-toolbar>
-    </div>
-  </div>
-</ion-header> -->
-
-<ion-header>
-  <ion-toolbar mode="md">
-    <!-- <ion-thumbnail slot="start">
-      <ion-img
-        src="assets/chatrooms.png"
-        class="animate__animated animate__fadeInLeft"
-      ></ion-img>
-    </ion-thumbnail> -->
-    <ion-title> <h1>{{ 'discussions' | translate }}</h1></ion-title>
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary" mode="md">
+    <ion-title>
+      <span style="font-weight: 500; font-size: 20px;">{{ 'discussions' | translate }}</span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon name="search-outline"></ion-icon>
+      </ion-button>
+      <ion-button>
+        <ion-icon name="ellipsis-vertical"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar color="primary" mode="md" class="segment-toolbar">
+    <ion-segment mode="md" [(ngModel)]="selectDiscussionsType" value="active">
+      <ion-segment-button value="{{discussionType.ACTIVE}}">
+        <ion-label style="font-weight: 600;">ACTIVES</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="{{discussionType.ARCHIVE}}">
+        <ion-label style="font-weight: 600;">ARCHIVES</ion-label>
+      </ion-segment-button>
+    </ion-segment>
   </ion-toolbar>
 </ion-header>
 
-<!-- <div class="shape"></div> -->
-<ion-content class="bg_color">
-  <div class="chip-container">
-    <ion-chip [outline]="true" [disabled]="true"
-      ><div class="chip-evt bg-color-kid">&nbsp;</div>
-      Kid(s)</ion-chip
-    >
-    <ion-chip [outline]="true" [disabled]="true"
-      ><div class="chip-evt bg-color-nokids">&nbsp;</div>
-      NoKid(s)</ion-chip
-    >
-    <ion-chip [outline]="true" [disabled]="true"
-      ><div class="chip-evt bg-color-free">&nbsp;</div>
-      Au choix</ion-chip
-    >
+<ion-content class="wa-content">
+
+  <!-- Filtres (contextuels à l'onglet sélectionné) -->
+  <div class="filter-bar">
+    <ion-chip mode="md" [class.filter-chip-active]="currentFilter === 'all'" (click)="setFilter('all')">
+      <ion-label>Tous</ion-label>
+    </ion-chip>
+    <ion-chip mode="md" [class.filter-chip-active]="currentFilter === 'unread'" (click)="setFilter('unread')">
+      <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+      <ion-label>Non lus</ion-label>
+    </ion-chip>
+    <ion-chip mode="md" [class.filter-chip-active]="currentFilter === 'recent'" (click)="setFilter('recent')">
+      <ion-icon name="time-outline"></ion-icon>
+      <ion-label>Récents</ion-label>
+    </ion-chip>
+    <ion-chip mode="md" [class.filter-chip-active]="currentFilter === 'favorites'" (click)="setFilter('favorites')">
+      <ion-icon name="star-outline"></ion-icon>
+      <ion-label>Favoris</ion-label>
+    </ion-chip>
   </div>
-  <ion-segment mode="md" [(ngModel)]="selectDiscussionsType" lines="none">
-    <ion-segment-button
-      mode="md"
-      value="{{discussionType.ACTIVE}}"
-      style="text-transform: none !important"
-    >
-      <!-- <ion-icon name="person"></ion-icon> -->
-      <ion-label> Actives </ion-label>
-    </ion-segment-button>
-    <ion-segment-button
-      mode="md"
-      value="{{discussionType.ARCHIVE}}"
-      style="text-transform: none !important"
-    >
-      <!-- <ion-icon name="people"></ion-icon> -->
-      <ion-label> Archives</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+
+  <!-- Onglet ACTIVES -->
   <div *ngIf="selectDiscussionsType === discussionType.ACTIVE">
-    <div *ngIf="agendaEvents.length === 0 && !isLoading">
-      <h3 style="text-align: center">Pas de discussions en cours</h3>
+    <div *ngIf="filteredActive.length === 0 && !isLoading" class="empty-state">
+      <p>Pas de discussions en cours</p>
     </div>
-    <ion-list lines="none">
+    <ion-list class="wa-list" lines="none">
       <ion-item
         button
-        *ngFor="let agendaEvent of agendaEvents; let i=index;"
-        [ngClass]="getDelayClass(i)"
         detail="false"
-        class="animate__animated animate__slideInRight"
+        *ngFor="let agendaEvent of filteredActive; let i=index;"
         (click)="goToChat(agendaEvent, discussionType.ACTIVE, $event)"
+        class="wa-item animate__animated animate__fadeIn"
+        [class.wa-item-pinned]="isFavorite(agendaEvent.uid!)"
       >
-        <ion-thumbnail
-          slot="start"
+        <ion-avatar slot="start" class="wa-avatar"
           [ngClass]="{
-            'thumb-event-kids': agendaEvent.type === agendaEventType.KIDS,
-            'thumb-event-nokids': agendaEvent.type === agendaEventType.NOKIDS,
-            'thumb-event-free': agendaEvent.type === agendaEventType.FREE}"
-        >
-          <img src="{{agendaEvent.avatar}}" />
-        </ion-thumbnail>
-        <div class="text-box">
-          <h2 class="d-flex">
-            <span
-              [ngClass]="{
-              'color-kid': agendaEvent.type === agendaEventType.KIDS,
-              'color-nokids': agendaEvent.type === agendaEventType.NOKIDS,
-              'color-free': agendaEvent.type === agendaEventType.FREE}"
-              >{{agendaEvent.title}}</span
-            >
-
-            <ion-icon
-              *ngIf="chatrooms[agendaEvent.uid!] && !chatrooms[agendaEvent.uid!].isNotifications"
-              name="notifications-off-outline"
-              style="position: absolute; right: 12px"
-            ></ion-icon>
-          </h2>
-          <p>
-            <ion-text style="font-size: 0.85rem"
-              >{{getLastMessageDate(agendaEvent)}}</ion-text
-            >
-          </p>
-          <p class="d-flex">
-            <ion-icon
-              *ngIf="agendaEvent.last_message?.image && !agendaEvent.last_message?.deleted_by?.includes(my_uid)"
-              class="ion-text-start zmdi zmdi-attachment"
-            ></ion-icon>
-            <span
-              [ngClass]="{
-            'message': true,
-            'message-deleted': agendaEvent.last_message?.deleted_by?.includes(my_uid) ||agendaEvent.last_message?.is_deleted ,
-           
+            'border-kids': agendaEvent.type === agendaEventType.KIDS,
+            'border-nokids': agendaEvent.type === agendaEventType.NOKIDS,
+            'border-free': agendaEvent.type === agendaEventType.FREE
           }"
-              >{{getLastMessageMessage(agendaEvent)}}</span
-            >
+        >
+          <img [src]="agendaEvent.avatar || 'assets/default-avatar.png'" />
+        </ion-avatar>
 
-            <ng-container
-              *ngIf="chatrooms[agendaEvent.uid!] && chatrooms[agendaEvent.uid!].count > 0"
-            >
-              <span class="end">{{chatrooms[agendaEvent.uid!].count}}</span>
-            </ng-container>
-          </p>
+        <div class="wa-item-inner">
+          <div class="wa-item-header">
+            <h2 class="wa-title">{{agendaEvent.title}}</h2>
+            <div class="wa-header-right">
+              <span class="wa-time" [ngClass]="{'wa-time-unread': (chatrooms[agendaEvent.uid!]?.count || 0) > 0}">
+                {{getLastMessageDate(agendaEvent)}}
+              </span>
+              <ion-icon
+                class="wa-star"
+                [name]="isFavorite(agendaEvent.uid!) ? 'star' : 'star-outline'"
+                [class.wa-star-active]="isFavorite(agendaEvent.uid!)"
+                (click)="toggleFavorite(agendaEvent.uid!, $event)"
+              ></ion-icon>
+            </div>
+          </div>
+
+          <div class="wa-item-footer">
+            <p class="wa-message" [ngClass]="{'message-deleted': agendaEvent.last_message?.deleted_by?.includes(my_uid) || agendaEvent.last_message?.is_deleted}">
+              <ion-icon
+                *ngIf="agendaEvent.last_message?.image && !agendaEvent.last_message?.deleted_by?.includes(my_uid)"
+                name="image" class="wa-attachment-icon"
+              ></ion-icon>
+              {{getLastMessageMessage(agendaEvent)}}
+            </p>
+            <div class="wa-badges">
+              <ion-icon
+                *ngIf="chatrooms[agendaEvent.uid!] && !chatrooms[agendaEvent.uid!].isNotifications"
+                name="volume-mute" class="wa-mute-icon"
+              ></ion-icon>
+              <ion-badge color="success" class="wa-unread-badge" *ngIf="(chatrooms[agendaEvent.uid!]?.count || 0) > 0">
+                {{chatrooms[agendaEvent.uid!].count}}
+              </ion-badge>
+            </div>
+          </div>
         </div>
       </ion-item>
     </ion-list>
   </div>
+
+  <!-- Onglet ARCHIVES -->
   <div *ngIf="selectDiscussionsType === discussionType.ARCHIVE">
-    <div *ngIf="agendaEventsArchived.length === 0 && !isLoading">
-      <h3 style="text-align: center">Pas de discussions archivées</h3>
+    <div *ngIf="filteredArchived.length === 0 && !isLoading" class="empty-state">
+      <ion-icon name="archive-outline" class="empty-icon"></ion-icon>
+      <p>Pas de discussions archivées</p>
     </div>
-    <ion-list lines="none">
+    <ion-list class="wa-list" lines="none">
       <ion-item
         button
         detail="false"
-        *ngFor="let agendaEvent of agendaEventsArchived; let i=index;"
-        [ngClass]="getDelayClass(i)"
-        class="animate__animated animate__slideInRight"
+        *ngFor="let agendaEvent of filteredArchived; let i=index;"
         (click)="goToChat(agendaEvent, discussionType.ARCHIVE, $event)"
+        class="wa-item animate__animated animate__fadeIn"
+        [class.wa-item-pinned]="isFavorite(agendaEvent.uid!)"
       >
-        <ion-thumbnail
-          slot="start"
+        <ion-avatar slot="start" class="wa-avatar"
           [ngClass]="{
-        'thumb-event-kids': agendaEvent.type === agendaEventType.KIDS,
-        'thumb-event-nokids': agendaEvent.type === agendaEventType.NOKIDS,
-        'thumb-event-free': agendaEvent.type === agendaEventType.FREE}"
+            'border-kids': agendaEvent.type === agendaEventType.KIDS,
+            'border-nokids': agendaEvent.type === agendaEventType.NOKIDS,
+            'border-free': agendaEvent.type === agendaEventType.FREE
+          }"
         >
-          <img src="{{agendaEvent.avatar}}" />
-        </ion-thumbnail>
-        <div class="text-box">
-          <h2 class="d-flex">
-            <span
-              [ngClass]="{
-              'color-kid': agendaEvent.type === agendaEventType.KIDS,
-              'color-nokids': agendaEvent.type === agendaEventType.NOKIDS,
-              'color-free': agendaEvent.type === agendaEventType.FREE}"
-              >{{agendaEvent.title}}</span
-            >
-          </h2>
-          <p>
-            <ion-text style="font-size: 0.85rem"
-              >{{getLastMessageDate(agendaEvent)}}</ion-text
-            >
-          </p>
-          <p class="d-flex">
-            <ion-icon
-              *ngIf="agendaEvent.last_message?.image && !agendaEvent.last_message?.deleted_by?.includes(my_uid)"
-              class="ion-text-start zmdi zmdi-attachment"
-            ></ion-icon>
-            <span
-              [ngClass]="{
-              'message': true,
-              'message-deleted': agendaEvent.last_message?.deleted_by?.includes(my_uid) || agendaEvent.last_message?.is_deleted,
-             
-            }"
-              >{{getLastMessageMessage(agendaEvent)}}</span
-            >
+          <img [src]="agendaEvent.avatar || 'assets/default-avatar.png'" />
+        </ion-avatar>
 
-            <ng-container
-              *ngIf="chatrooms[agendaEvent.uid!] && chatrooms[agendaEvent.uid!].count > 0"
-            >
-              <span class="end">{{chatrooms[agendaEvent.uid!].count}}</span>
-            </ng-container>
-          </p>
+        <div class="wa-item-inner">
+          <div class="wa-item-header">
+            <h2 class="wa-title">{{agendaEvent.title}}</h2>
+            <div class="wa-header-right">
+              <span class="wa-time" [ngClass]="{'wa-time-unread': (chatrooms[agendaEvent.uid!]?.count || 0) > 0}">
+                {{getLastMessageDate(agendaEvent)}}
+              </span>
+              <ion-icon
+                class="wa-star"
+                [name]="isFavorite(agendaEvent.uid!) ? 'star' : 'star-outline'"
+                [class.wa-star-active]="isFavorite(agendaEvent.uid!)"
+                (click)="toggleFavorite(agendaEvent.uid!, $event)"
+              ></ion-icon>
+            </div>
+          </div>
+
+          <div class="wa-item-footer">
+            <p class="wa-message" [ngClass]="{'message-deleted': agendaEvent.last_message?.deleted_by?.includes(my_uid) || agendaEvent.last_message?.is_deleted}">
+              <ion-icon
+                *ngIf="agendaEvent.last_message?.image && !agendaEvent.last_message?.deleted_by?.includes(my_uid)"
+                name="image" class="wa-attachment-icon"
+              ></ion-icon>
+              {{getLastMessageMessage(agendaEvent)}}
+            </p>
+            <div class="wa-badges">
+              <ion-icon
+                *ngIf="chatrooms[agendaEvent.uid!] && !chatrooms[agendaEvent.uid!].isNotifications"
+                name="volume-mute" class="wa-mute-icon"
+              ></ion-icon>
+              <ion-badge color="success" class="wa-unread-badge" *ngIf="(chatrooms[agendaEvent.uid!]?.count || 0) > 0">
+                {{chatrooms[agendaEvent.uid!].count}}
+              </ion-badge>
+            </div>
+          </div>
         </div>
       </ion-item>
     </ion-list>
   </div>
+
 </ion-content>

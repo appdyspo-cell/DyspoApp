@@ -244,22 +244,28 @@
     <ion-searchbar
       [(ngModel)]="autocompletePlaceInput.input"
       (ngModelChange)="updateSearchResults()"
-      placeholder="Entrez une adresse"
+      placeholder="Rechercher un lieu ou une adresse"
       (ionClear)="clearAutocomplete()"
-    >
-    </ion-searchbar>
-    <ion-list
-      class="ion-no-margin ion-no-padding"
-      [hidden]="autocompletePlaces.length === 0"
-    >
-      <ion-item
+      animated="true"
+    ></ion-searchbar>
+    <div class="place-searching" *ngIf="isSearching">
+      <ion-spinner name="dots"></ion-spinner>
+    </div>
+    <div class="place-dropdown" *ngIf="autocompletePlaces.length > 0">
+      <div
+        class="place-item"
         *ngFor="let place of autocompletePlaces"
-        tappable
         (click)="selectSearchResult(place)"
       >
-        {{ place.description }}
-      </ion-item>
-    </ion-list>
+        <div class="place-icon">
+          <ion-icon name="location-outline"></ion-icon>
+        </div>
+        <div class="place-info">
+          <div class="place-main">{{ place.structured_formatting.main_text }}</div>
+          <div class="place-secondary">{{ place.structured_formatting.secondary_text }}</div>
+        </div>
+      </div>
+    </div>
   </ion-card>
 
   <ion-card *ngIf="is_multi">

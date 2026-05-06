@@ -10,7 +10,7 @@ export const environment = {
     'https://firebasestorage.googleapis.com/v0/b/dyspo-stg.appspot.com/o/avatarsStorage%2Fuser.jpg?alt=media&token=fa867680-e743-4648-8385-210c8da4eff4',
   DEFAULT_AVATAR_GROUP: './assets/img/user.jpg',
   dyspo_email: 'contact@adjaotraxx.fr',
-  BIOMETRIC_KEY: 'dyspo_123456',
+  BIOMETRIC_KEY: 'com.rovincent.dyspo.staging',
   firebaseConfig: {
     apiKey: 'AIzaSyB2Juhy49t_9N4d-aGfhcuQmC-o4ulvrwg',
     authDomain: 'dyspo-stg.firebaseapp.com',

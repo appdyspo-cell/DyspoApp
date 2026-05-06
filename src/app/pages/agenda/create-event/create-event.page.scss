@@ -1,32 +1,49 @@
+// ── Header ────────────────────────────────────────────────────────────────────
+
 ion-toolbar {
-  ion-title {
-    h1 {
-      margin: 0;
-      font-weight: 500;
-      letter-spacing: 0;
-      font-size: 1.525rem;
-    }
+  ion-title h1 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--d-text-primary);
   }
 }
 
-.footer {
-  --background: none;
-  position: absolute;
-  bottom: 0px;
-}
+// ── Cards ─────────────────────────────────────────────────────────────────────
 
 ion-card {
-  box-shadow: none;
-  --background: var(--bg-color-secondary);
-  margin: 0 16px 10px 16px;
+  --background: var(--d-surface-1);
+  border-radius: var(--d-radius-lg) !important;
+  box-shadow: var(--d-shadow-sm) !important;
+  margin: 0 var(--d-space-4) var(--d-space-3);
 }
+
+// ── Form items ────────────────────────────────────────────────────────────────
+
+ion-item {
+  --background: transparent;
+
+  &:last-child {
+    --inner-border-width: 0;
+  }
+}
+
+ion-item::part(native) {
+  --background: transparent;
+}
+
+ion-list-header {
+  --border-width: 0 0 1px 0;
+  --border-color: var(--d-surface-3);
+}
+
+// ── Status radio buttons ──────────────────────────────────────────────────────
 
 ion-radio::part(container) {
   width: 30px;
   height: 30px;
-
-  border-radius: 18px;
-  border: 2px solid #ddd;
+  border-radius: 50%;
+  border: 2px solid var(--d-surface-3);
 }
 
 ion-radio::part(mark) {
@@ -37,105 +54,84 @@ ion-radio::part(mark) {
 }
 
 ion-radio.radio-checked::part(container) {
-  background: var(--ion-color-primary);
+  background: var(--d-brand);
   border-color: transparent;
 }
 
 ion-radio.radio-checked::part(mark) {
   width: 6px;
   height: 10px;
-
-  border-width: 0px 2px 2px 0px;
+  border-width: 0 2px 2px 0;
   border-style: solid;
   border-color: #fff;
-
   transform: rotate(45deg);
 }
 
-.kids {
-  background-color: var(--text-dyspo-with-kids);
-  color: var(--white);
-  //border-color: var(--text-dyspo);
-}
+// Status color badges (used on radio labels)
+.kids  { background-color: var(--d-dyspo-kids); color: #fff; }
+.nokids { background-color: var(--d-dyspo); color: #fff; }
+.free  { background-color: var(--d-free); color: #fff; }
 
-.nokids {
-  background-color: var(--text-dyspo);
-  color: var(--white);
-  //color: var(--text-no-dyspo);
-}
-
-.free {
-  background-color: var(--text-dyspo-free);
-  color: var(--white);
-}
-
-.big-input {
-  font-size: 30px;
-}
-
-ion-list-header {
-  --border-width: 0 0 2px 0;
-  --border-color: #878787;
-}
+// ── Title input ───────────────────────────────────────────────────────────────
 
 .input-title {
-  padding: 10px 0px;
+  padding: var(--d-space-3) 0;
 
   ion-input {
-    font-size: 1.8rem !important;
+    font-size: 1.6rem !important;
+    font-weight: 700;
+    color: var(--d-text-primary);
   }
 }
 
-.header-form-ct {
-  padding: 13px 23px;
-  margin-bottom: 4px;
+.big-input { font-size: 30px; }
 
-  .item_inner {
-    width: 100%;
-  }
+// ── Friends selector header ───────────────────────────────────────────────────
+
+.header-form-ct {
+  padding: var(--d-space-3) var(--d-space-4);
+  margin-bottom: var(--d-space-1);
+
+  .item_inner { width: 100%; }
 
   .profile {
-    //padding: 6px 13px;
-
     h1 {
-      margin: 0;
-      font-weight: 600;
-      letter-spacing: 0;
-      font-size: 1.2rem;
-      margin-bottom: 7px;
+      margin: 0 0 var(--d-space-2);
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--d-text-primary);
     }
 
     h4 {
-      color: var(--text-light);
-      font-size: 0.95rem;
-      padding-bottom: 16px;
+      color: var(--d-text-tertiary);
+      font-size: 0.9rem;
+      padding-bottom: var(--d-space-4);
       font-weight: 400;
       margin: 0;
     }
 
     .profile_img_box {
       max-width: 100%;
-      margin: 23px auto;
-      margin-bottom: 22px;
+      margin: var(--d-space-6) auto var(--d-space-5);
       position: relative;
       overflow: hidden;
+
       img {
         position: absolute;
         width: 100%;
         height: 100%;
-        left: -50% !important;
-        right: -50% !important;
+        left: 0;
         top: 0;
         bottom: 0;
-        left: 0;
         margin: auto;
       }
+
       .profile_img {
         width: 100%;
         height: 120px;
         position: relative;
         overflow: hidden;
-        border-radius: 5px;
+        border-radius: var(--d-radius-md);
       }
 
       ion-icon {
@@ -148,67 +144,36 @@ ion-list-header {
         position: absolute;
         top: 0;
         right: 6px;
-      }
-    }
-  }
-
-  &.media_shared {
-    h4 {
-      margin: 0;
-      color: var(--text-dark);
-      font-weight: 400;
-      font-size: 0.85rem;
-      margin-bottom: 9px;
-    }
-
-    ion-row {
-      position: relative;
-      margin: 0 -3px !important;
-
-      ion-col {
-        padding: 0 1px;
-      }
-
-      h6 {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 82px;
-        right: 0;
-        bottom: 0;
-        height: 26px;
-        border-radius: 50px;
-        line-height: 26px;
-        margin: auto;
-        background: var(--primary);
-        color: var(--white);
-        font-size: 0.76rem;
-        font-weight: 400;
+        color: var(--d-brand);
       }
     }
   }
 
   &.item-toggle {
-    padding: 6px 15px;
+    padding: var(--d-space-2) var(--d-space-4);
 
     ion-label {
       margin: 0;
       font-size: 0.95rem;
-      font-weight: 500;
-      letter-spacing: 0;
+      font-weight: 600;
+      color: var(--d-text-primary);
     }
   }
 }
 
+// ── Friends thumbnail row ─────────────────────────────────────────────────────
+
 .category_div {
-  overflow: scroll;
+  overflow-x: auto;
   display: flex;
   flex-direction: row;
-  padding: 5px 5px 5px 0px;
+  padding: var(--d-space-1) var(--d-space-1) var(--d-space-1) 0;
+
   .menu {
     width: 100%;
     display: flex;
     flex-direction: row;
+
     .item {
       border-radius: 50%;
       background: transparent !important;
@@ -217,10 +182,9 @@ ion-list-header {
       flex-direction: column;
       align-items: center;
       text-align: center;
-      background: #f4f5f8;
-      ion-label {
-        font-size: 10px;
-      }
+
+      ion-label { font-size: 10px; color: var(--d-text-secondary); }
+
       ion-thumbnail {
         border-radius: 50%;
         padding: 2px;
@@ -228,21 +192,19 @@ ion-list-header {
         height: 60px;
         width: 60px;
         --background: transparent;
-        //border: 2px solid rgb(255, 95, 122);
         position: relative;
 
         ion-icon {
-          background: var(--primary);
+          background: var(--d-brand);
           border-radius: 20px;
           position: absolute;
           bottom: -5px;
           right: -5px;
-          color: white;
+          color: #fff;
           font-size: 20px;
         }
-        img {
-          border-radius: 50%;
-        }
+
+        img { border-radius: 50%; }
       }
     }
   }
@@ -250,77 +212,131 @@ ion-list-header {
 
 .friends-wrapper {
   height: 80px;
-  padding: 5px 10px 0px 10px;
+  padding: var(--d-space-1) var(--d-space-3) 0;
 }
 
-ion-item:last-child {
-  --inner-border-width: 0;
+// ── Thumbnail badge ───────────────────────────────────────────────────────────
+
+.thumbnail-badge {
+  position: absolute;
+  top: -2px;
+  right: -5px;
+  font-size: 12px;
+  width: 9px;
+  height: 9px;
+  border-radius: 8px;
+  background: var(--d-no-dyspo);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
 }
 
-ion-item::part(native) {
-  --background: transparent;
+// ── Event photo ───────────────────────────────────────────────────────────────
+
+.bg-event-avatar {
+  overflow: hidden;
+  border-radius: var(--d-radius-xs);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  width: 189px;
+  height: 140px;
+  position: relative;
+  border: 2px solid var(--d-surface-1);
+  transform-origin: top left;
+  transform: rotate(-2deg);
+
+  ion-img {
+    min-width: calc(100% + 30px);
+    min-height: 100%;
+    transform-origin: top left;
+    transform: rotate(2deg);
+    position: absolute;
+    top: -20px;
+    left: -10px;
+  }
 }
+
+// ── Place autocomplete dropdown ───────────────────────────────────────────────
 
 ion-searchbar {
   padding: 0;
   --box-shadow: none;
   --background: transparent;
+  --color: var(--d-text-primary);
+  --placeholder-color: var(--d-text-tertiary);
 }
 
+.place-dropdown {
+  border-radius: 0 0 var(--d-radius-md) var(--d-radius-md);
+  overflow: hidden;
+  margin: 0 4px var(--d-space-2);
+  box-shadow: var(--d-shadow-md);
+  background: var(--d-surface-1);
+}
+
+.place-item {
+  display: flex;
+  align-items: center;
+  gap: var(--d-space-3);
+  padding: 11px var(--d-space-4);
+  border-bottom: 1px solid var(--d-surface-2);
+  cursor: pointer;
+
+  &:last-child { border-bottom: none; }
+  &:active { background: var(--d-surface-2); }
+}
+
+.place-icon {
+  color: var(--d-text-tertiary);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+
+  ion-icon { font-size: 20px; }
+}
+
+.place-info { flex: 1; min-width: 0; }
+
+.place-main {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--d-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.place-secondary {
+  font-size: 12px;
+  color: var(--d-text-tertiary);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.place-searching {
+  display: flex;
+  justify-content: center;
+  padding: var(--d-space-3);
+}
+
+// ── Misc ──────────────────────────────────────────────────────────────────────
+
 ion-select {
-  --highlight-color-focused: #101010;
-  --ripple-color: #532f2f;
+  --highlight-color-focused: var(--d-brand);
+  --ripple-color: var(--d-brand-light);
 }
 
 ion-popover {
   --width: 350px;
 }
 
-ion-popover::part(content) {
-  //background-color: rgb(6, 14, 106);
-}
-
-.thumbnail-badge {
+.footer {
+  --background: none;
   position: absolute;
-  top: -2px; /* Ajustez cette valeur pour positionner verticalement */
-  right: -5px; /* Ajustez cette valeur pour positionner horizontalement */
-  font-size: 12px; /* Taille du texte du badge */
-  width: 9px; /* Largeur du badge */
-  height: 9px; /* Hauteur du badge */
-  border-radius: 8px; /* Pour créer un badge circulaire */
-  background: var(--text-no-dyspo); /* Couleur de fond du badge */
-  color: white; /* Couleur du texte du badge */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100000000;
-}
-
-.bg-event-avatar {
-  overflow: hidden;
-  border-radius: 3px;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  // min-width: 50%;
-  // max-width: 60%;
-  // min-height: 150px;
-  width: 189px;
-  height: 140px;
-  position: relative;
-  border: 2px solid rgb(255, 255, 255);
-  transform-origin: top left;
-
-  transform: rotate(-2deg); /* Ajustez l'angle de rotation selon vos besoins */
-
-  ion-img {
-    min-width: calc(100% + 30px);
-    min-height: 100%;
-    transform-origin: top left;
-    transform: rotate(2deg); /* Ajustez l'angle de rotation selon vos besoins */
-
-    position: absolute;
-    top: -20px;
-    left: -10px;
-  }
+  bottom: 0;
 }

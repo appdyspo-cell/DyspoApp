@@ -4,9 +4,10 @@ import { ModalController } from '@ionic/angular';
 import { PictureComponent } from 'src/app/components/picture/picture.component';
 
 @Component({
-  selector: 'app-group-info',
-  templateUrl: './group-info.page.html',
-  styleUrls: ['./group-info.page.scss'],
+    selector: 'app-group-info',
+    templateUrl: './group-info.page.html',
+    styleUrls: ['./group-info.page.scss'],
+    standalone: false
 })
 export class GroupInfoPage implements OnInit {
   constructor(

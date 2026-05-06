@@ -1,53 +1,40 @@
-<ion-tabs *ngIf="!isIos">
-  <ion-tab-bar slot="bottom" mode="md">
-    <ion-tab-button tab="user-status">
-      <ion-icon aria-hidden="true" class="icon-ghost icon-android"></ion-icon>
-      <ion-label>Statut</ion-label>
-    </ion-tab-button>
-    <ion-tab-button tab="agenda">
-      <ion-icon
-        aria-hidden="true"
-        class="icon-calendar icon-android"
-      ></ion-icon>
-      <ion-label>Calendrier</ion-label>
-    </ion-tab-button>
-    <ion-tab-button tab="friends">
-      <ion-icon aria-hidden="true" class="icon-users icon-android"></ion-icon>
-      <ion-label>Amis</ion-label>
-    </ion-tab-button>
-    <ion-tab-button tab="group-list">
-      <ion-icon aria-hidden="true" class="icon-speech icon-android"></ion-icon>
-      <ion-label>Discussions</ion-label>
-    </ion-tab-button>
-    <ion-tab-button tab="parametres">
-      <ion-icon class="icon-equalizer icon-android"></ion-icon>
-      <ion-label>Mon Compte</ion-label>
-    </ion-tab-button>
-  </ion-tab-bar>
-</ion-tabs>
+<ion-tabs>
+  <ion-tab-bar slot="bottom" class="dyspo-tab-bar">
 
-<ion-tabs *ngIf="isIos">
-  <ion-tab-bar slot="bottom" mode="ios" style="min-height: 65px">
-    <ion-tab-button tab="user-status">
-      <ion-icon aria-hidden="true" class="icon-ghost"></ion-icon>
+    <ion-tab-button tab="user-status" class="dyspo-tab-btn">
+      <ion-icon class="tab-icon tab-icon-off" name="radio-button-off-outline"></ion-icon>
+      <ion-icon class="tab-icon tab-icon-on"  name="radio-button-on"></ion-icon>
       <ion-label>Statut</ion-label>
     </ion-tab-button>
-    <ion-tab-button tab="agenda">
-      <ion-icon aria-hidden="true" class="icon-calendar"></ion-icon>
+
+    <ion-tab-button tab="agenda" class="dyspo-tab-btn">
+      <ion-icon class="tab-icon tab-icon-off" name="calendar-outline"></ion-icon>
+      <ion-icon class="tab-icon tab-icon-on"  name="calendar"></ion-icon>
       <ion-label>Calendrier</ion-label>
     </ion-tab-button>
-    <ion-tab-button tab="friends">
-      <ion-icon aria-hidden="true" class="icon-users"></ion-icon>
+
+    <ion-tab-button tab="friends" class="dyspo-tab-btn">
+      <ion-icon class="tab-icon tab-icon-off" name="people-outline"></ion-icon>
+      <ion-icon class="tab-icon tab-icon-on"  name="people"></ion-icon>
       <ion-label>Amis</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="group-list">
-      <ion-icon aria-hidden="true" class="icon-speech"></ion-icon>
+    <ion-tab-button tab="group-list" class="dyspo-tab-btn">
+      <div class="tab-chat-wrap">
+        <ion-icon class="tab-icon tab-icon-off" name="chatbubbles-outline"></ion-icon>
+        <ion-icon class="tab-icon tab-icon-on"  name="chatbubbles"></ion-icon>
+        <div class="tab-unread-dot" *ngIf="unreadMessagesCount > 0">
+          {{ unreadMessagesCount > 9 ? '9+' : unreadMessagesCount }}
+        </div>
+      </div>
       <ion-label>Discussions</ion-label>
     </ion-tab-button>
-    <ion-tab-button tab="parametres">
-      <ion-icon class="icon-equalizer"></ion-icon>
-      <ion-label>Mon Compte</ion-label>
+
+    <ion-tab-button tab="parametres" class="dyspo-tab-btn">
+      <ion-icon class="tab-icon tab-icon-off" name="person-outline"></ion-icon>
+      <ion-icon class="tab-icon tab-icon-on"  name="person"></ion-icon>
+      <ion-label>Compte</ion-label>
     </ion-tab-button>
+
   </ion-tab-bar>
 </ion-tabs>

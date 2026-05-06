@@ -1,32 +1,24 @@
-<ion-content [fullscreen]="true" scrollY="false">
-  <ion-toolbar style="margin-top: var(--ion-safe-area-top)">
-    <ion-buttons slot="start">
-      <ion-button fill="clear" (click)="close()">
-        <ion-icon name="close" slot="icon-only"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-button fill="clear" (click)="saveToGallery()">
-        <ion-icon name="download-outline" slot="icon-only"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-  <!-- <lib-ngx-image-zoom
-    class="animate__animated animate__fadeIn"
-    [fullImage]="url"
-  ></lib-ngx-image-zoom> -->
-  <div
-    style="
-      position: absolute;
-      top: calc(var(--ion-safe-area-top) + 50px);
-      bottom: 0;
-      left: 0;
-      right: 0;
-    "
-  >
-    <pan-zoom [config]="panZoomConfig">
-      <div style="position: relative">
-        <img [src]="image" />
+<ion-content [fullscreen]="true" scrollY="false" class="viewer-content">
+  <!-- Floating controls -->
+  <div class="viewer-controls">
+    <ion-button fill="clear" class="ctrl-btn" (click)="close()">
+      <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+    </ion-button>
+    <ion-button fill="clear" class="ctrl-btn" (click)="saveToGallery()">
+      <ion-icon slot="icon-only" name="download-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  <!-- Pan-zoom image -->
+  <div class="viewer-panzoom">
+    <pan-zoom
+      [keepInBounds]="panZoomKeepInBounds"
+      [scalePerZoomLevel]="panZoomScalePerZoomLevel"
+      [zoomLevels]="panZoomZoomLevels"
+      [zoomOnDoubleClick]="panZoomZoomOnDoubleClick"
+    >
+      <div class="viewer-img-wrapper">
+        <img [src]="image" class="viewer-img" />
       </div>
     </pan-zoom>
   </div>

@@ -111,9 +111,83 @@
             </ion-label>
           </ion-item>
         </div>
+
+        <!-- Enfants & planning de garde -->
+        <div>
+          <ion-item lines="none">
+            <ion-toggle
+              color="primary"
+              [(ngModel)]="userInfo.with_kids"
+              slot="end"
+            ></ion-toggle>
+            <ion-label>
+              J'ai des enfants
+              <p class="ion-text-wrap">Définir vos jours de garde</p>
+            </ion-label>
+          </ion-item>
+
+          <div *ngIf="userInfo?.with_kids" class="custody-section">
+            <ion-label class="custody-label">
+              Semaine 1 &amp; 2 — jours de garde
+              <ion-text color="medium"> (appuyez pour sélectionner)</ion-text>
+            </ion-label>
+
+            <!-- Semaine 1 -->
+            <div class="custody-week-label">Semaine 1</div>
+            <div class="custody-week">
+              <div
+                *ngFor="let day of weekDays; let i = index"
+                class="day-bubble"
+                [class.selected]="custodyDays[i]"
+                (click)="toggleCustodyDay(i)"
+              >{{ day }}</div>
+            </div>
+
+            <!-- Semaine 2 -->
+            <div class="custody-week-label">Semaine 2</div>
+            <div class="custody-week">
+              <div
+                *ngFor="let day of weekDays; let i = index"
+                class="day-bubble"
+                [class.selected]="custodyDays[i + 7]"
+                (click)="toggleCustodyDay(i + 7)"
+              >{{ day }}</div>
+            </div>
+
+            <div class="custody-legend">
+              <span class="legend-dot dot-blue"></span> Avec enfants
+              <span class="legend-dot dot-green"></span> Sans enfants (libre)
+            </div>
+
+            <ion-button
+              expand="block"
+              class="dyspo-button"
+              color="tertiary"
+              (click)="saveCustodySchedule()"
+              [disabled]="isSavingSchedule"
+            >
+              <ion-spinner *ngIf="isSavingSchedule" name="dots" slot="start"></ion-spinner>
+              {{ isSavingSchedule ? 'Enregistrement…' : 'Appliquer au calendrier' }}
+            </ion-button>
+          </div>
+        </div>
+
       </ion-list>
     </ion-card>
   </div>
+
+  <ion-list-header>
+    <h2>Aide & Tutoriel</h2>
+  </ion-list-header>
+
+  <ion-card>
+    <ion-item tappable (click)="openTutorial()" lines="none">
+      <ion-label class="ion-text-wrap text">
+        <ion-icon name="help-circle" class="iconmail" color="primary"></ion-icon>
+        <ion-text class="contacttext">Voir le tutoriel Dyspo</ion-text>
+      </ion-label>
+    </ion-item>
+  </ion-card>
 
   <ion-list-header>
     <h2>Mentions Légales</h2>

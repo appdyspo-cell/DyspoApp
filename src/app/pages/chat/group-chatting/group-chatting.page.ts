@@ -34,6 +34,7 @@ import {
   AgendaEventType,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
+import { CalendarService } from 'src/app/services/calendar.service';
 import { ChatService, GetMessagesResult } from 'src/app/services/chat.service';
 import { FriendsService } from 'src/app/services/friends.service';
 import { MediaService } from 'src/app/services/media.service';
@@ -49,9 +50,10 @@ import { fr } from 'date-fns/locale';
 import { QueryDocumentSnapshot, DocumentData } from '@angular/fire/firestore';
 import { UserInfoMenuComponent } from 'src/app/components/user-info-menu/user-info-menu.component';
 @Component({
-  selector: 'app-group-chatting',
-  templateUrl: './group-chatting.page.html',
-  styleUrls: ['./group-chatting.page.scss'],
+    selector: 'app-group-chatting',
+    templateUrl: './group-chatting.page.html',
+    styleUrls: ['./group-chatting.page.scss'],
+    standalone: false
 })
 export class GroupChattingPage implements OnInit, OnDestroy {
   UserDyspoStatus = UserDyspoStatus;
@@ -87,6 +89,49 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   firstVisibleMessageDoc:
     | QueryDocumentSnapshot<DocumentData, DocumentData>
     | undefined;
+  
+  principalEmojis = ['😂', '😍', '🤔', '👍', '❤️', '😊', '😭', '👏', '🔥', '🎉', '😎', '🙏', '💯', '✨'];
+  emojiCategories = [
+    {
+      label: 'Smileys',
+      icon: 'happy-outline',
+      emojis: ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢', '🤮', '🤧', '🥵', '🥶', '😷', '🤒', '🤕', '🤑', '🤠', '😈', '👿', '👹', '👺', '🤡', '💩', '👻', '💀', '☠️', '👽', '👾', '🤖', '🎃', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾']
+    },
+    {
+      label: 'Gestes',
+      icon: 'hand-left-outline',
+      emojis: ['👋', '🤚', '🖐', '✋', '🖖', '👌', '🤏', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '👍', '👎', '✊', '👊', '🤛', '🤜', '👏', '🙌', '👐', '🤲', '🤝', '🙏', '✍️', '💅', '🤳', '💪', '🦾', '🦵', '🦿', '🦶', '👂', '🦻', '👃', '🧠', '🦷', '🦴', '👀', '👁', '👅', '👄', '💋', '🩸']
+    },
+    {
+      label: 'Cœurs',
+      icon: 'heart-outline',
+      emojis: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟']
+    },
+    {
+      label: 'Animaux',
+      icon: 'paw-outline',
+      emojis: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐽', '🐸', '🐵', '🙈', '🙉', '🙊', '🐒', '🐔', '🐧', '🐦', '🐤', '🐣', '🐥', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🕷', '🕸', '🦂', '🐢', '🐍', '🦎', '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', '🦀', '🐡', '🐠', '🐟', '🐬', '🐳', '🐋', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🐐', '🦌', '🐕', '🐩', '🦮', '🐕‍🦺', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿', '🦔']
+    },
+    {
+      label: 'Nourriture',
+      icon: 'fast-food-outline',
+      emojis: ['🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌽', '🥕', '🧄', '🧅', '🥔', '🍠', '🥐', '🥯', '🍞', '🥖', '🥨', '🧀', '🥚', '🍳', '🧈', '🥞', '🧇', '🥓', '🥩', '🍗', '🍖', '🦴', '🌭', '🍔', '🍟', '🍕', '🥪', '🥙', '🧆', '🌮', '🌯', '🥗', '🥘', '🥫', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🥟', '🦪', '🍤', '🍙', '🍚', '🍘', '🍥', '🥠', '🥮', '🍢', '🍡', '🍧', '🍨', '🍦', '🥧', '🧁', '🍰', '🎂', '🍮', '🍭', '🍬', '🍫', '🍿', '🍩', '🍪', '🌰', '🥜', '🍯', '🥛', '🍼', '☕️', '🍵', '🥤', '🍶', '🍺', '🍻', '🥂', '🍷', '🥃', '🍸', '🍹', '🧉', '🍾', '🧊']
+    },
+    {
+      label: 'Activités',
+      icon: 'football-outline',
+      emojis: ['⚽️', '🏀', '🏈', '⚾️', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🥅', '⛳️', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🛹', '🛷', '⛸', '🥌', '🎿', '⛷', '🏂', '🏋️‍♀️', '🤼‍♂️', '🤸‍♀️', '⛹️‍♂️', '🤺', '🤾‍♀️', '🏌️‍♂️', '🏇', '🧘‍♀️', '🏄‍♂️', '🏊‍♂️', '🤽‍♂️', '🚣‍♂️', '🧗‍♀️', '🚵‍♂️', '🚴‍♂️', '🏆', '🥇', '🥈', '🥉', '🏅', '🎖', '🏵', '🎫', '🎟', '🎭', '🎨', '🎬', '🎤', '🎧', '🎼', '🎹', '🥁', '🎷', '🎺', '🎸', '🪕', '🎻', '🎲', '♟', '🎯', '🎳', '🎮', '🎰', '🧩']
+    },
+    {
+      label: 'Voyage',
+      icon: 'car-outline',
+      emojis: ['🚗', '🚕', '🚙', '🚌', '🚎', '🏎', '🚓', '🚑', '🚒', '🚐', '🚚', '🚛', '🚜', '🛵', '🏍', '🛺', '🚲', '🛴', '🛹', '🚏', '🛣', '🛤', '⛽️', '🚨', '🚥', '🚦', '🛑', '🚧', '⚓️', '⛵️', '🛶', '🚤', '🛳', '⛴', '🛥', '🚢', '✈️', '🛩', '🛫', '🛬', '🪂', '💺', '🚁', '🚟', '🚠', '🚡', '🛰', '🚀', '🛸', '🪐', '🌠', '🌌', '⛱', '🎆', '🎇', '🎑', '🏙', '🌆', '🌅', '🌇', '🌃', '🌉', '🌁']
+    }
+  ];
+  selectedEmojiCategory = 'Smileys';
+  showEmojiPicker = false;
+  lastClickTime = 0;
+  lastClickedMsgUid = '';
 
   constructor(
     private navCtrl: NavController,
@@ -101,7 +146,8 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     private modalCtrl: ModalController,
     private utils: UtilsService,
     private notificationsSvc: NotificationService,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private calendarSvc: CalendarService
   ) {
     this.agendaEvent =
       this.router.getCurrentNavigation()?.extras.state?.['agendaEvent'];
@@ -561,6 +607,10 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     // const { data, role } = await modal.onWillDismiss();
   }
 
+  addToCalendar() {
+    this.calendarSvc.promptAddToCalendar(this.agendaEvent);
+  }
+
   async openEvent() {
     const modal = await this.modalCtrl.create({
       component: AgendaEventInfoComponent,
@@ -612,5 +662,60 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   onMsgInputFocused() {
     console.log('on focus');
     this.setViewType('');
+  }
+
+  getSenderColor(senderId: string): string {
+    const colors = [
+      '#e542a3',
+      '#9141ac',
+      '#1f7aec',
+      '#209308',
+      '#ff8f2c',
+      '#ffb900',
+      '#6366f1',
+      '#ec4899',
+    ];
+    let hash = 0;
+    if (senderId) {
+      for (let i = 0; i < senderId.length; i++) {
+        hash = senderId.charCodeAt(i) + ((hash << 5) - hash);
+      }
+    }
+    const index = Math.abs(hash) % colors.length;
+    return colors[index];
+  }
+
+  toggleEmojiPicker() {
+    this.showEmojiPicker = !this.showEmojiPicker;
+  }
+
+  addEmoji(emoji: string) {
+    this.userInput += emoji;
+  }
+
+  handleMessageClick(msg: ChatMessage) {
+    const now = Date.now();
+    if (this.lastClickedMsgUid === msg.uid && now - this.lastClickTime < 300) {
+      // Double click detected
+      this.toggleLike(msg);
+      this.lastClickTime = 0; // reset
+      this.lastClickedMsgUid = '';
+    } else {
+      this.lastClickTime = now;
+      this.lastClickedMsgUid = msg.uid;
+      this.onMsgSelected(msg);
+    }
+  }
+
+  toggleLike(msg: ChatMessage) {
+    this.chatSvc.likeMessage(msg, this.agendaEvent);
+  }
+
+  addReaction(msg: ChatMessage, emoji: string, event: Event) {
+    event.stopPropagation();
+    // Note: Le backend Dyspo actuel supporte un tableau de likes (string[]).
+    // Nous lions l'émoji cliqué à cette mécanique pour ne pas briser la DB.
+    this.toggleLike(msg);
+    this.msgSelected = undefined;
   }
 }

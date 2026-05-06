@@ -2,74 +2,139 @@ import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { ShowHelper } from 'src/app/models/models';
 
+export interface HelperTip {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+export interface HelperContent {
+  icon: string;
+  title: string;
+  subtitle: string;
+  tips: HelperTip[];
+}
+
+const HELPER_CONTENTS: Record<ShowHelper, HelperContent> = {
+  [ShowHelper.DASHBOARD]: {
+    icon: 'home-outline',
+    title: 'Bienvenue sur dyspo !',
+    subtitle: 'Votre calendrier social',
+    tips: [
+      {
+        icon: 'radio-button-on-outline',
+        title: 'Statut du jour',
+        description: 'Changez votre disponibilité d\'un simple appui sur le statut affiché en haut de l\'écran.',
+      },
+      {
+        icon: 'calendar-outline',
+        title: 'Événements à venir',
+        description: 'Consultez d\'un coup d\'œil vos prochains événements personnels et de groupe.',
+      },
+      {
+        icon: 'add-circle-outline',
+        title: 'Créer un événement',
+        description: 'Créez facilement un rendez-vous personnel ou invitez vos amis à un événement commun.',
+      },
+      {
+        icon: 'notifications-outline',
+        title: 'Invitations',
+        description: 'Recevez une notification quand vous êtes invité à un événement et validez ou déclinez votre présence.',
+      },
+    ],
+  },
+  [ShowHelper.AGENDA]: {
+    icon: 'calendar-outline',
+    title: 'Votre calendrier',
+    subtitle: 'Disponibilités et événements',
+    tips: [
+      {
+        icon: 'finger-print-outline',
+        title: 'Consulter un jour',
+        description: 'Appuyez sur une date pour afficher les événements du jour dans la liste en dessous.',
+      },
+      {
+        icon: 'add-circle-outline',
+        title: 'Créer un événement',
+        description: 'Sélectionnez une date future puis appuyez sur « + nouveau ». Choisissez entre rendez-vous personnel ou événement avec vos amis.',
+      },
+      {
+        icon: 'create-outline',
+        title: 'Modifier vos disponibilités',
+        description: 'Activez le toggle « Modifier » en haut à droite.\n1 appui → Dyspo\n2 appuis → Dyspo avec kid(s)\n3 appuis → Pas dyspo\n4 appuis → réinitialisé\nTouchez plusieurs jours d\'affilée puis appuyez sur « Sauvegarder ».',
+      },
+      {
+        icon: 'chatbubbles-outline',
+        title: 'Chat de groupe',
+        description: 'Sur les événements à plusieurs, l\'icône bulle ouvre directement la conversation du groupe.',
+      },
+    ],
+  },
+  [ShowHelper.FRIENDS]: {
+    icon: 'people-outline',
+    title: 'Vos amis',
+    subtitle: 'Gérez votre réseau',
+    tips: [
+      {
+        icon: 'search-outline',
+        title: 'Trouver des amis',
+        description: 'Recherchez un contact déjà présent sur dyspo ! ou importez directement depuis votre répertoire téléphonique.',
+      },
+      {
+        icon: 'people-circle-outline',
+        title: 'Groupes d\'amis',
+        description: 'Organisez vos contacts en groupes : famille, parents d\'école, collègues… pour retrouver rapidement les bonnes personnes.',
+      },
+      {
+        icon: 'person-add-outline',
+        title: 'Demandes en attente',
+        description: 'Acceptez ou déclinez les demandes d\'amis reçues directement depuis cette page.',
+      },
+      {
+        icon: 'calendar-outline',
+        title: 'Calendrier d\'un ami',
+        description: 'Consultez les disponibilités d\'un ami en appuyant sur l\'icône calendrier à côté de son nom.',
+      },
+    ],
+  },
+  [ShowHelper.CHATS]: {
+    icon: 'chatbubbles-outline',
+    title: 'Discussions',
+    subtitle: 'Vos conversations de groupe',
+    tips: [
+      {
+        icon: 'flash-outline',
+        title: 'Ouverture automatique',
+        description: 'Chaque événement de groupe crée automatiquement une conversation dédiée accessible ici.',
+      },
+      {
+        icon: 'color-palette-outline',
+        title: 'Couleurs par type',
+        description: 'Chaque couleur correspond à un type d\'événement : Kid(s), NoKid(s) ou libre, pour repérer d\'un coup d\'œil vos discussions.',
+      },
+      {
+        icon: 'archive-outline',
+        title: 'Archives',
+        description: 'Une fois l\'événement passé, la discussion bascule automatiquement dans les archives pour garder votre liste propre.',
+      },
+    ],
+  },
+};
+
 @Component({
-  selector: 'app-helper',
-  templateUrl: './helper.component.html',
-  styleUrls: ['./helper.component.scss'],
+    selector: 'app-helper',
+    templateUrl: './helper.component.html',
+    styleUrls: ['./helper.component.scss'],
+    standalone: false
 })
 export class HelperComponent implements OnInit {
   showHelper!: ShowHelper;
-  text = '';
+  content!: HelperContent;
 
   constructor(private modalController: ModalController) {}
 
-  close() {
-    this.modalController.dismiss();
-  }
-
   ngOnInit() {
-    switch (this.showHelper) {
-      case ShowHelper.DASHBOARD:
-        this.text = `<i><h2 class="title-tuto">Bienvenue sur dyspo! ton calendrier social...</h2></p> 
-
-        <p>Une app permettant de rester en contact avec son réseau d’amis, sa famille, etc.. et de proposer des moments de rencontres durant son temps libre.</p>
-
-        <p>Créez facilement un événement de groupe ou un événement personnel.</p>
-
-        <p>Changez votre statut du jour en cliquant dessus.</p>
-
-        <p>Consultez d’un coup d’oeil les prochains événements à venir.</p>
-
-        <p>Les notifications permettent de voir les événements auxquels vous avez été convié afin de valider ou non votre présence.</p></i>`;
-        break;
-      case ShowHelper.AGENDA:
-        this.text = `<i><h2 class="title-tuto">Première connexion à votre calendrier</h2>
-  
-      
-        <p>La petite pastille orange à côté d’une date prévient qu’il y a un événement de groupe ou perso ce jour là.</p>
-        
-        <p>Cliquez sur une date pour en savoir + ou pour y créer un événement.</p>
-        
-        <p>Vous pouvez visualiser d’un coup d’oeil les vacances associées à votre zone (si vous avez renseigné votre zone lors de la création).</p>
-        
-        <p><u>En mode édition (en haut à droite) :</u></p>
-        
-        <p>Vous pouvez changer de statut en cliquant sur une date (une fois dyspo!, 2 fois dyspo avec kid(s) et 3 fois si pas dyspo du tout).</p>
-        
-        <p>Sélectionnez plusieurs jours d’un coup et attribuez le statut en une seule fois directement.</p></i>`;
-        break;
-      case ShowHelper.FRIENDS:
-        this.text = `<i><h2 class="title-tuto">Première connexion à vos amis</h2>
-
-        <p>Recherchez un contact déjà présent sur dyspo! ou dans votre répertoire.</p>
-        
-        <p>Organisez vos groupes comme vous le souhaitez, faites des groupes d’amis, de parents d’école, avec les membres de votre famille, etc...</p>
-        
-        <p>Acceptez les demandes d’amis en cours.</p>
-        
-        <p>Visualisez les calendriers de vos amis en cliquant sur le picto calendrier associé à leurs comptes.</p></i>
-        `;
-        break;
-      case ShowHelper.CHATS:
-        this.text = `<i><h2 class="title-tuto">Première connexion aux discussions</h2>
-
-        <p>Vous retrouverez ici les conversations ouvertes automatiquement pour les événements de groupe.</p>
-        
-        <p>Une couleur par type d’événement Kid(s), NoKid(s) ou au choix.</p>
-        
-        <p>Une fois l’événement passé, la discussion associée basculera automatiquement dans les archives.</p></i>`;
-        break;
-    }
+    this.content = HELPER_CONTENTS[this.showHelper];
   }
 
   dismiss() {

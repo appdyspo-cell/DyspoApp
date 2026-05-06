@@ -297,14 +297,32 @@ export class AgendaService {
         days: addPeriod,
       });
 
+      // Limite stricte de la récurrence à 1 an maximum pour protéger la base de données
+      const maxEndDate = add(parseISO(agendaEvent.startISO), { years: 1 });
+      let chosenEndDate = parseISO(agendaEvent.recurrence_end_ISO!);
+      if (isBefore(maxEndDate, chosenEndDate)) {
+        chosenEndDate = maxEndDate;
+      }
+
       let cloneIsBeforeRecEndDate = isBefore(
         nextCloneDateStart,
-        parseISO(agendaEvent.recurrence_end_ISO!)
+        chosenEndDate
       );
 
       let recId = new Date().getTime();
+      let operationsCount = 1; // 1 correspond à l'événement original déjà mis dans le batch
+      let batches = [batch];
+      let currentBatchIndex = 0;
+
       while (cloneIsBeforeRecEndDate) {
         recId++;
+        
+        // Limite Firestore : 500 opérations par batch. On crée un nouveau batch à 490.
+        if (operationsCount >= 490) {
+          batches.push(writeBatch(this.firestore));
+          currentBatchIndex++;
+          operationsCount = 0;
+        }
         const agendaClone = cloneDeep(agendaEvent);
         agendaClone.uid = 'agev_rec_' + recId;
         docRef = doc(this.firestore, `agenda_events/`, agendaClone.uid!);
@@ -362,8 +380,8 @@ export class AgendaService {
         agendaClone.end_time_formatted = this.utils.formatTime(
           agendaClone.endISO
         );
-        console.log('Save rec event ', agendaClone);
-        batch.set(docRef, agendaClone);
+        batches[currentBatchIndex].set(docRef, agendaClone);
+        operationsCount++;
 
         nextCloneDateStart = add(parseISO(agendaClone.startISO), {
           days: addPeriod,
@@ -373,11 +391,14 @@ export class AgendaService {
         });
         cloneIsBeforeRecEndDate = isBefore(
           nextCloneDateStart,
-          parseISO(agendaEvent.recurrence_end_ISO!)
+          chosenEndDate
         );
       }
 
-      await batch.commit();
+      // Exécution de tous les batches séquenciellement
+      for (const b of batches) {
+        await b.commit();
+      }
     }
     //NON RECURRENT
     else {
@@ -433,7 +454,7 @@ export class AgendaService {
   }
 
   public updateOrCreateDyspo(agendaDyspo: AgendaDyspoItem) {
-    const agendaDyspoClone: any = { ...agendaDyspo };
+    const agendaDyspoClone: Partial<AgendaDyspoItem> = { ...agendaDyspo };
     const ref = doc(
       this.firestore,
       `agenda_dyspos/${this.uid}/dyspo_list`,
@@ -542,6 +563,7 @@ export class AgendaService {
     uids: string[],
     agendaEvent: AgendaEvent
   ): Promise<FriendDyspo[]> {
+    if (!uids || uids.length === 0) return [];
     const dateToCheck = new Date(agendaEvent.startISO);
     const agenda_dyspo_uid =
       getYear(dateToCheck) +
@@ -549,30 +571,34 @@ export class AgendaService {
       getMonth(dateToCheck) +
       '_' +
       getDate(dateToCheck);
-    const dyspos: FriendDyspo[] = [];
-    for (let uid of uids) {
+    
+    const fetchPromises = uids.map(async (uid) => {
       const docRef = doc(
         this.firestore,
         `agenda_dyspos/${uid}/dyspo_list`,
         agenda_dyspo_uid
       );
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        //console.log('Document data:', docSnap.data());
-        const agendaDyspo = docSnap.data() as AgendaDyspoItem;
-        dyspos.push({
-          friend_dyspo: agendaDyspo.userDyspo,
-          friend_uid: uid,
-          dyspo_date_ISO: agendaEvent.startISO,
-        });
-      } else {
-        dyspos.push({
-          friend_dyspo: UserDyspoStatus.UNDEFINED,
-          friend_uid: uid,
-          dyspo_date_ISO: agendaEvent.startISO,
-        });
+      try {
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const agendaDyspo = docSnap.data() as AgendaDyspoItem;
+          return {
+            friend_dyspo: agendaDyspo.userDyspo,
+            friend_uid: uid,
+            dyspo_date_ISO: agendaEvent.startISO,
+          } as FriendDyspo;
+        }
+      } catch (e) {
+        // Ignore error and fallback to UNDEFINED
       }
-    }
+      return {
+        friend_dyspo: UserDyspoStatus.UNDEFINED,
+        friend_uid: uid,
+        dyspo_date_ISO: agendaEvent.startISO,
+      } as FriendDyspo;
+    });
+
+    const dyspos = await Promise.all(fetchPromises);
     return dyspos;
   }
 
@@ -675,6 +701,54 @@ export class AgendaService {
       dyspos,
       allowShare,
     };
+  }
+
+  async applyCustodySchedule(uid: string, custodyDays: boolean[]): Promise<void> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const jsDay = today.getDay(); // 0=dim, 1=lun … 6=sam
+    const daysToMonday = jsDay === 0 ? -6 : 1 - jsDay;
+    const refMonday = new Date(today);
+    refMonday.setDate(today.getDate() + daysToMonday);
+
+    const endDate = addMonths(refMonday, 12);
+
+    // Firestore batch limit = 500 ops. 12 months ≈ 365 days — safe in one batch.
+    const batch = writeBatch(this.firestore);
+    const currentDate = new Date(refMonday);
+
+    while (currentDate < endDate) {
+      const daysDiff = Math.round(
+        (currentDate.getTime() - refMonday.getTime()) / 86400000
+      );
+      const cycleIndex = daysDiff % 14;
+      const y = getYear(currentDate);
+      const m = getMonth(currentDate);
+      const d = getDate(currentDate);
+
+      // Custody day → DYSPOWITHKIDS (blue), free day → DYSPO (green)
+      const status = custodyDays[cycleIndex]
+        ? UserDyspoStatus.DYSPOWITHKIDS
+        : UserDyspoStatus.DYSPO;
+
+      const ref = doc(
+        this.firestore,
+        `agenda_dyspos/${uid}/dyspo_list`,
+        `${y}_${m}_${d}`
+      );
+      batch.set(ref, {
+        time: currentDate.getTime(),
+        userDyspo: status,
+        day: d,
+        month: m,
+        year: y,
+      } as AgendaDyspoItem);
+
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    await batch.commit();
   }
 
   unsubscribeAllAfterLogoutEvent() {

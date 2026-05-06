@@ -11,8 +11,6 @@ import {
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CalendarService } from './calendar.service';
-import SwiperCore from 'swiper';
-import { IonicSlides } from '@ionic/angular';
 import {
   IEvent,
   CalendarMode,
@@ -32,11 +30,10 @@ import {
   ITimeSelected,
 } from './calendar.interface';
 
-SwiperCore.use([IonicSlides]);
 
 @Component({
-  selector: 'calendar',
-  template: `
+    selector: 'calendar',
+    template: `
     <ng-template
       #monthviewDefaultDisplayEventTemplate
       let-view="view"
@@ -314,8 +311,8 @@ SwiperCore.use([IonicSlides]);
       </dayview>
     </div>
   `,
-  styles: [
-    `
+    styles: [
+        `
       :host > div {
         height: 100%;
       }
@@ -358,8 +355,9 @@ SwiperCore.use([IonicSlides]);
         }
       }
     `,
-  ],
-  providers: [CalendarService],
+    ],
+    providers: [CalendarService],
+    standalone: false
 })
 export class CalendarComponent implements OnInit {
   @Input()

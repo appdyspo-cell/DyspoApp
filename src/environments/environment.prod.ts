@@ -15,7 +15,7 @@ export const environment = {
   DEFAULT_AVATAR_FB_PATH:
     'https://firebasestorage.googleapis.com/v0/b/dyspo-2bb43.appspot.com/o/avatarsStorage%2Fuser.jpg?alt=media&token=cd181d82-5b72-4392-bc2b-cecd8d3e6788',
   dyspo_email: 'appdyspo@gmail.com',
-  BIOMETRIC_KEY: 'dyspo_123456',
+  BIOMETRIC_KEY: 'com.liaisongraphique.dyspo',
   googleMapsApiKey: 'AIzaSyAnLbmH1fibqkFZ2nG3c4qgeNy1UQ4aG-8',
   firebase_avatar_storage_path: 'avatarsStorage/',
   firebase_avatar_group_storage_path: 'avatarGroupsStorage/',

@@ -22,6 +22,13 @@
   </ion-segment-button>
 </ion-segment>
 
+<div *ngIf="selectSegment === friendSelectionType.FRIENDS" class="ion-padding-horizontal ion-padding-top">
+  <ion-button expand="block" fill="outline" color="primary" (click)="inviteBySMS()">
+    <ion-icon name="chatbubble-ellipses-outline" slot="start"></ion-icon>
+    Inviter par SMS
+  </ion-button>
+</div>
+
 <div
   *ngIf="selectSegment === friendSelectionType.FRIENDS && !dispalyByDyspo"
   class="ion-no-margin"

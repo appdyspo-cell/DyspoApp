@@ -11,9 +11,10 @@ import { Chatroom, WarnReportGroup } from 'src/app/models/models';
 import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-chat-menu',
-  templateUrl: './chat-menu.component.html',
-  styleUrls: ['./chat-menu.component.scss'],
+    selector: 'app-chat-menu',
+    templateUrl: './chat-menu.component.html',
+    styleUrls: ['./chat-menu.component.scss'],
+    standalone: false
 })
 export class ChatMenuComponent implements OnInit {
   @Input() friend_id!: string;

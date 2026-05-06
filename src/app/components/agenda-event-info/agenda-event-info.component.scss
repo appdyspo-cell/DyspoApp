@@ -209,6 +209,15 @@ ion-item:last-child {
   --inner-border-width: 0;
 }
 
+.popover-calendar-btn {
+  color: var(--ion-color-primary);
+  font-weight: 700;
+  border-top: 1px solid var(--d-surface-3);
+  cursor: pointer;
+
+  &:active { opacity: 0.7; }
+}
+
 .thumbnail-badge {
   position: absolute;
   top: -2px; /* Ajustez cette valeur pour positionner verticalement */

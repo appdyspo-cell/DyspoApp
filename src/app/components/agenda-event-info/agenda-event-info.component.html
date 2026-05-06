@@ -395,6 +395,14 @@
       >
         {{ selectedUserFriendStatusLabel }}
       </div>
+      <div
+        class="popover-events-header popover-calendar-btn"
+        (click)="viewFriendCalendar()"
+        *ngIf="selectedUser?.uid !== userSvc.userInfo?.uid"
+      >
+        <ion-icon name="calendar-outline" style="margin-right:6px;vertical-align:middle"></ion-icon>
+        Voir son calendrier
+      </div>
       <ion-list *ngIf="selectedUserEvents && selectedUserEvents.length > 0">
         <ion-note
           style="

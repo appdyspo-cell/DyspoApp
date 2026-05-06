@@ -1,14 +1,92 @@
-.icon-android {
-  padding: 1px;
+// ── Tab Bar Dyspo ─────────────────────────────────────────────────────────────
+
+.dyspo-tab-bar {
+  --background: var(--d-surface-1);
+  --border: none;
+  height: 62px;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  box-shadow: 0 -1px 0 var(--d-surface-3), 0 -4px 16px rgba(26, 29, 35, 0.06);
+  border-top: none;
 }
 
-ion-tab-bar {
-  --border: 0px;
-  --background: white;
-}
+.dyspo-tab-btn {
+  --color:         var(--d-text-tertiary);
+  --color-selected: var(--d-brand);
+  --padding-top: 10px;
+  --padding-bottom: 8px;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
 
-ion-tab-button {
+  // Indicateur actif — ligne en haut de l'onglet
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) scaleX(0);
+    width: 24px;
+    height: 2.5px;
+    background: var(--d-brand);
+    border-radius: 0 0 var(--d-radius-pill) var(--d-radius-pill);
+    transition: transform var(--d-duration-base) var(--d-spring);
+  }
+
+  &.tab-selected::before {
+    transform: translateX(-50%) scaleX(1);
+  }
+
+  // Icônes — on / off
+  .tab-icon-on  { display: none; }
+  .tab-icon-off { display: block; }
+
+  &.tab-selected {
+    .tab-icon-on  { display: block; }
+    .tab-icon-off { display: none; }
+  }
+
+  ion-icon {
+    font-size: 24px;
+    margin: 0;
+    transition: transform var(--d-duration-base) var(--d-spring);
+  }
+
+  &.tab-selected ion-icon {
+    transform: scale(1.08);
+  }
+
   ion-label {
-    font-size: 0.6rem;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: none;
+    margin: 0;
+  }
+}
+
+// Badge de messages non lus
+.tab-chat-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .tab-unread-dot {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    background: var(--d-no-dyspo);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 2px solid var(--d-surface-1);
+    animation: d-scale-in 200ms var(--d-spring) both;
   }
 }

@@ -16,9 +16,10 @@ import { UtilsService } from 'src/app/services/utils.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: 'app-device-contacts',
-  templateUrl: './device-contacts.page.html',
-  styleUrls: ['./device-contacts.page.scss'],
+    selector: 'app-device-contacts',
+    templateUrl: './device-contacts.page.html',
+    styleUrls: ['./device-contacts.page.scss'],
+    standalone: false
 })
 export class DeviceContactsPage implements OnInit {
   @ViewChildren(IonItemGroup, { read: ElementRef }) itemGroups!: QueryList<any>;

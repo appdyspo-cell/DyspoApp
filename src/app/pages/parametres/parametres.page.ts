@@ -15,6 +15,7 @@ import {
   UserDyspoStatus,
   UserStatus,
 } from 'src/app/models/models';
+import { AgendaService } from 'src/app/services/agenda.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
@@ -26,12 +27,17 @@ import { NotificationService } from 'src/app/services/notification.service';
 import { Browser } from '@capacitor/browser';
 
 @Component({
-  selector: 'app-parametres',
-  templateUrl: './parametres.page.html',
-  styleUrls: ['./parametres.page.scss'],
+    selector: 'app-parametres',
+    templateUrl: './parametres.page.html',
+    styleUrls: ['./parametres.page.scss'],
+    standalone: false
 })
 export class ParametresPage implements OnInit {
   dyspoStatus = UserDyspoStatus;
+
+  readonly weekDays = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+  custodyDays: boolean[] = new Array(14).fill(false);
+  isSavingSchedule = false;
 
   presentingElement: any;
 
@@ -103,7 +109,8 @@ export class ParametresPage implements OnInit {
     private logger: LoggerService,
     private notificationsSvc: NotificationService,
     private modalCtrl: ModalController,
-    private utils: UtilsService
+    private utils: UtilsService,
+    private agendaSvc: AgendaService
   ) {}
 
   ngOnInit() {
@@ -124,12 +131,36 @@ export class ParametresPage implements OnInit {
   loadInfos() {
     console.log('loadINFOS');
     this.userInfo = Object.assign({}, this.userSvc.userInfo);
-    //Real time appSettings changed
     this.appSettings = this.userSvc.userInfo?.appSettings;
     this.avatar = this.userSvc.userInfo?.avatarPath;
     this.settingsBackup = this.appSettings
       ? JSON.parse(JSON.stringify(this.appSettings))
-      : undefined; //Clone event to check for modifications before leaving
+      : undefined;
+
+    if (this.userInfo?.custody_schedule?.length === 14) {
+      this.custodyDays = [...this.userInfo.custody_schedule];
+    } else {
+      this.custodyDays = new Array(14).fill(false);
+    }
+  }
+
+  toggleCustodyDay(index: number) {
+    this.custodyDays[index] = !this.custodyDays[index];
+  }
+
+  async saveCustodySchedule() {
+    this.isSavingSchedule = true;
+    try {
+      this.userInfo.custody_schedule = [...this.custodyDays];
+      await this.userSvc.updateUser(Object.assign({}, this.userInfo));
+      await this.agendaSvc.applyCustodySchedule(
+        this.userSvc.userInfo!.uid,
+        this.custodyDays
+      );
+      this.utils.showToastSuccess('Planning de garde appliqué au calendrier !');
+    } finally {
+      this.isSavingSchedule = false;
+    }
   }
 
   goBack() {
@@ -204,6 +235,12 @@ export class ParametresPage implements OnInit {
   async openPrivacy() {
     await Browser.open({
       url: environment.privacy_url,
+    });
+  }
+
+  async openTutorial() {
+    await Browser.open({
+      url: 'https://www.dyspo.app/',
     });
   }
 

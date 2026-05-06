@@ -1,5 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { NavController, SelectChangeEventDetail } from '@ionic/angular';
 import { IonSelectCustomEvent } from '@ionic/core';
 
@@ -55,11 +57,12 @@ export enum FriendSelectionType {
   GROUP = 'Groupe',
 }
 @Component({
-  selector: 'app-create-event',
-  templateUrl: './create-event.page.html',
-  styleUrls: ['./create-event.page.scss'],
+    selector: 'app-create-event',
+    templateUrl: './create-event.page.html',
+    styleUrls: ['./create-event.page.scss'],
+    standalone: false
 })
-export class CreateEventPage implements OnInit {
+export class CreateEventPage implements OnInit, OnDestroy {
   @ViewChild('popoverUserEvents') popoverUserEvents: any;
   UserDyspoStatus = UserDyspoStatus;
   FriendStatus = FriendStatus;
@@ -102,6 +105,10 @@ export class CreateEventPage implements OnInit {
   is_multi = false;
   new_members: string[] = [];
 
+  isSearching = false;
+  private searchSubject = new Subject<string>();
+  private searchSubscription?: Subscription;
+
   constructor(
     private navCtrl: NavController,
     private activatedRoute: ActivatedRoute,
@@ -112,12 +119,17 @@ export class CreateEventPage implements OnInit {
     private utils: UtilsService,
     private friendsSvc: FriendsService,
     private notificationsSvc: NotificationService,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private zone: NgZone
   ) {
     this.uid = this.userSvc.userInfo?.uid!;
     this.GoogleAutocompleteSvc = new google.maps.places.AutocompleteService();
     this.autocompletePlaceInput = { input: '' };
     this.autocompletePlaces = [];
+    this.searchSubscription = this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(input => this.fetchPredictions(input));
     this.activatedRoute.params.subscribe((params) => {
       this.mode = params['mode'];
       console.log('Create ev');
@@ -332,12 +344,30 @@ export class CreateEventPage implements OnInit {
       )
     );
 
-    for (let member of this.members) {
-      await this.hydrateMemberDysposAndEvents(member);
-    }
+    const memberUids = this.members.map(m => m.uid);
+    if(memberUids.length === 0) return;
+
+    // Fetch dyspos in one bulk call instead of individually per member
+    const allDyspos = await this.agendaSvc.getDyspos(memberUids, this.agendaEvent!);
+    const dyspoMap = new Map<string, UserDyspoStatus>();
+    allDyspos.forEach(d => dyspoMap.set(d.friend_uid, d.friend_dyspo));
+
+    // Parallelize members events fetching
+    const promises = this.members.map(async (member) => {
+      member.is_my_friend = this.friendsSvc.isMyFriend(member.uid);
+      member.dyspoStatus = dyspoMap.get(member.uid) || UserDyspoStatus.UNDEFINED;
+      const events = await this.agendaSvc.getUserAgendaEvents(member.uid, this.agendaEvent!);
+      member.agendaEvents = events.agendaEvents;
+    });
+
+    await Promise.all(promises);
   }
 
   ngOnInit() {}
+
+  ngOnDestroy() {
+    this.searchSubscription?.unsubscribe();
+  }
 
   saveOrUpdateEvent() {
     try {
@@ -514,23 +544,24 @@ export class CreateEventPage implements OnInit {
     this.agendaEvent!.place_id = '';
   }
 
-  //AUTOCOMPLETE, SIMPLY LOAD THE PLACE USING GOOGLE PREDICTIONS AND RETURNING THE ARRAY.
   updateSearchResults() {
-    if (this.autocompletePlaceInput.input == '') {
+    const input = this.autocompletePlaceInput.input;
+    if (!input) {
       this.autocompletePlaces = [];
       return;
     }
+    this.isSearching = true;
+    this.searchSubject.next(input);
+  }
+
+  private fetchPredictions(input: string) {
     this.GoogleAutocompleteSvc.getPlacePredictions(
-      { input: this.autocompletePlaceInput.input },
-      (predictions, status) => {
-        this.autocompletePlaces = [];
-        //this.zone.run(() => {
-        if (predictions) {
-          predictions.forEach((prediction) => {
-            this.autocompletePlaces.push(prediction);
-          });
-        }
-        //});
+      { input, types: ['geocode', 'establishment'] },
+      (predictions) => {
+        this.zone.run(() => {
+          this.isSearching = false;
+          this.autocompletePlaces = predictions ?? [];
+        });
       }
     );
   }

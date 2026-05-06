@@ -3,7 +3,8 @@ import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 @Pipe({
-  name: 'dayDateFormat',
+    name: 'dayDateFormat',
+    standalone: false
 })
 export class DayNumberFormatPipe implements PipeTransform {
   transform(dateISO: string): string {

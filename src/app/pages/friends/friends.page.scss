@@ -1,190 +1,209 @@
-ion-list {
-  padding-bottom: 0px;
-  background: transparent;
-}
-
-ion-item::part(native) {
-  --background: transparent;
-}
-
-ion-item {
-  &:last-child {
-    border: none;
-  }
-}
+// ── Header ────────────────────────────────────────────────────────────────────
 
 ion-header {
-  // box-shadow: none !important;
   h1 {
     margin: 0;
-    font-weight: 500;
-    letter-spacing: 0;
-    font-size: 1.525rem;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    color: var(--d-text-primary);
   }
 }
 
-.ion-page {
-  --background: none;
-  background-image: url("/assets/fd_ecran_principal.jpg");
-  background-position: center top;
-  background-repeat: no-repeat;
-  background-size: cover;
+.btn-repertoire {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--d-text-secondary);
+  --color: var(--d-text-secondary);
+
+  ion-icon { font-size: 17px; }
 }
 
-.avatar-thumbnail {
-  height: 60px;
-  width: 60px;
-  --border-radius: 50%;
-  margin-right: 10px;
-  padding: 5px;
-  //border: 1px solid #fd6a58;
+// ── Segment ───────────────────────────────────────────────────────────────────
+
+ion-segment {
+  --background: var(--d-surface-2);
+  margin: var(--d-space-3) var(--d-space-4);
+  border-radius: var(--d-radius-md);
+  padding: 3px;
 }
 
-.friend-item {
-  //--padding-start: 0px;
-  //padding: 10px 0px;
-  //border-bottom: 1px solid lightgray;
-  ion-thumbnail {
-    height: 60px;
-    width: 60px;
-    --border-radius: 50%;
-    margin-right: 10px;
-    padding: 5px;
-    //border: 1px solid #fd6a58;
+ion-segment-button {
+  --color:          var(--d-text-tertiary);
+  --color-checked:  var(--d-text-primary);
+  --background-checked: var(--d-surface-1);
+  --border-radius:  var(--d-radius-sm);
+  --indicator-height: 0;
+  --padding-top: var(--d-space-2);
+  --padding-bottom: var(--d-space-2);
+  min-height: 40px;
+  text-transform: none;
+  font-size: 12px;
+  font-weight: 600;
+  position: relative;
+  box-shadow: none;
+
+  &.segment-button-checked {
+    box-shadow: var(--d-shadow-xs);
   }
-  .content_button {
-    height: 30px;
-    width: 80px;
-    margin: 0px;
-    --border-radius: 30px;
-    color: #ffff;
-    font-size: 10px;
+
+  ion-icon {
+    font-size: 16px;
+    margin-bottom: 0;
   }
-  .content_follow_button {
-    height: 30px;
-    width: 80px;
-    margin: 0px;
-    --border-radius: 30px;
-    border-radius: 30px;
-    color: #fe4a7a;
-    font-size: 10px;
-    --background: #ffff;
-    border: 1px solid #fd6a58;
+
+  ion-label {
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 2px;
+    text-transform: none;
   }
 }
 
-.empty-icon-circle {
-  border-radius: 50%;
-  padding: 20px;
-  margin-top: 5px;
-  margin-bottom: 25px;
-}
-.icon-large {
-  height: 180px;
-  width: 180px;
-}
-.icon-mid {
-  height: 100px;
-  width: 100px;
-}
-.icon-small {
-  height: 60px;
-  width: 60px;
-}
-.empty-icon-color {
-  background: #d6d9dd;
-  color: #fff;
-}
-
-//
-#container-suggestions {
-  text-align: center;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-#container-suggestions strong {
-  font-size: 20px;
-  line-height: 26px;
-}
-
-#container-friends {
-  text-align: center;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-#container-friends strong {
-  font-size: 20px;
-  line-height: 26px;
-}
-
-#container-friends-group {
-  text-align: center;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-#container-friends-group strong {
-  font-size: 20px;
-  line-height: 26px;
-}
-
+// Badge sur l'onglet Invitations
 .segment-badge {
   position: absolute;
-  top: 5px; /* Ajustez cette valeur pour positionner verticalement */
-  right: 15px; /* Ajustez cette valeur pour positionner horizontalement */
-  font-size: 12px; /* Taille du texte du badge */
-  width: 20px; /* Largeur du badge */
-  height: 20px; /* Hauteur du badge */
-  border-radius: 50%; /* Pour créer un badge circulaire */
-  background: var(--text-no-dyspo); /* Couleur de fond du badge */
-  color: white; /* Couleur du texte du badge */
+  top: 4px;
+  right: 8px;
+  font-size: 10px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  background: var(--d-no-dyspo);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 4px;
+  font-weight: 700;
+  animation: d-scale-in 200ms var(--d-spring) both;
 }
 
-ion-fab {
-  ion-fab-button {
-    --background: var(--primary);
-    width: 65px;
-    height: 65px;
+// ── Searchbar ─────────────────────────────────────────────────────────────────
 
-    ion-icon {
-      font-size: 1.9rem;
+ion-searchbar {
+  --background: var(--d-surface-2);
+  --box-shadow: none;
+  --border-radius: var(--d-radius-md);
+  --placeholder-color: var(--d-text-tertiary);
+  --icon-color: var(--d-text-tertiary);
+  --color: var(--d-text-primary);
+  padding: 0 var(--d-space-4) var(--d-space-3);
+}
+
+// ── Listes ────────────────────────────────────────────────────────────────────
+
+ion-list {
+  background: transparent;
+  padding: 0 var(--d-space-4) var(--d-space-12);
+}
+
+// ── Friend item ───────────────────────────────────────────────────────────────
+
+.friend-item {
+  --background: var(--d-surface-1);
+  --border-radius: var(--d-radius-md);
+  --padding-start: var(--d-space-3);
+  --inner-padding-end: var(--d-space-3);
+  --inner-border-width: 0;
+  --min-height: 68px;
+  margin-bottom: var(--d-space-2);
+  border-radius: var(--d-radius-md);
+  box-shadow: var(--d-shadow-xs);
+  transition: box-shadow var(--d-duration-fast) var(--d-ease),
+              transform var(--d-duration-fast) var(--d-ease);
+
+  &:active {
+    box-shadow: none;
+    transform: scale(0.99);
+  }
+
+  ion-thumbnail {
+    width: 46px;
+    height: 46px;
+    --border-radius: 50%;
+    margin-right: var(--d-space-3);
+    flex-shrink: 0;
+    border: 2px solid var(--d-surface-3);
+
+    img {
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  }
+
+  ion-label {
+    ion-row:first-child {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--d-text-primary);
+    }
+    ion-row:last-child {
+      font-size: 13px;
+      color: var(--d-text-secondary);
     }
   }
 }
 
-.shape {
-  background-color: var(--ion-color-primary);
-  width: 100%;
-  height: 50px;
-  z-index: 100;
-  border-bottom-left-radius: 50%;
-  border-bottom-right-radius: 50%;
+// Avatar dans la liste d'autocomplete
+.avatar-thumbnail {
+  width: 46px;
+  height: 46px;
+  --border-radius: 50%;
+  margin-right: var(--d-space-3);
+  border: 2px solid var(--d-surface-3);
+  border-radius: 50%;
+  flex-shrink: 0;
+  overflow: hidden;
 }
 
-app-alphabet-scroll {
-  z-index: 1000000000;
+// Bouton "Inviter"
+ion-button.btn-invite {
+  --border-radius: var(--d-radius-pill);
+  --background: var(--d-brand);
+  --background-activated: var(--d-brand-dark);
+  font-size: 12px;
+  font-weight: 700;
+  height: 32px;
+  text-transform: none;
+  margin: 0;
 }
 
-.black-button {
-  --color: var(--color);
+// ── État vide ─────────────────────────────────────────────────────────────────
+
+.empty-state-friends {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--d-space-16) var(--d-space-6);
+  gap: var(--d-space-3);
+
+  ion-icon {
+    font-size: 56px;
+    color: var(--d-surface-3);
+  }
+
+  p {
+    font-size: 14px;
+    color: var(--d-text-tertiary);
+    text-align: center;
+    margin: 0;
+  }
 }
 
-ion-searchbar {
-  // padding: 0;
-  --box-shadow: none;
-  --background: transparent;
+// ── FAB ────────────────────────────────────────────────────────────────────────
+
+ion-fab-button {
+  --background: var(--d-brand);
+  --background-activated: var(--d-brand-dark);
+  --box-shadow: var(--d-shadow-md);
+  --border-radius: var(--d-radius-lg);
+  width: 52px;
+  height: 52px;
+  transition: transform var(--d-duration-fast) var(--d-spring);
+
+  &:active { transform: scale(0.92); }
+
+  ion-icon { font-size: 22px; }
 }

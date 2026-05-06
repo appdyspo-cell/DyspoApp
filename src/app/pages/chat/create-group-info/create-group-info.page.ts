@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
 
 @Component({
-  selector: 'app-create-group-info',
-  templateUrl: './create-group-info.page.html',
-  styleUrls: ['./create-group-info.page.scss'],
+    selector: 'app-create-group-info',
+    templateUrl: './create-group-info.page.html',
+    styleUrls: ['./create-group-info.page.scss'],
+    standalone: false
 })
 export class CreateGroupInfoPage implements OnInit {
 

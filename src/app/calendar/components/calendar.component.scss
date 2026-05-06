@@ -62,3 +62,25 @@
 :host .title .switch-btn .arrow-dropdown {
   margin-left: 5px;
 }
+
+:host .month-slide-wrapper {
+  overflow: hidden;
+}
+
+@keyframes slideInFromRight {
+  from { transform: translateX(30%); opacity: 0; }
+  to   { transform: translateX(0);   opacity: 1; }
+}
+
+@keyframes slideInFromLeft {
+  from { transform: translateX(-30%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+:host .slide-from-right {
+  animation: slideInFromRight 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+:host .slide-from-left {
+  animation: slideInFromLeft 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}

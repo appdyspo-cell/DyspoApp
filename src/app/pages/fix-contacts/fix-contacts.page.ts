@@ -20,9 +20,10 @@ import { UtilsService } from 'src/app/services/utils.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: 'app-fix-contacts',
-  templateUrl: './fix-contacts.page.html',
-  styleUrls: ['./fix-contacts.page.scss'],
+    selector: 'app-fix-contacts',
+    templateUrl: './fix-contacts.page.html',
+    styleUrls: ['./fix-contacts.page.scss'],
+    standalone: false
 })
 export class FixContactsPage implements OnInit, AfterViewInit {
   @ViewChild('mainContainer', { read: ViewContainerRef })

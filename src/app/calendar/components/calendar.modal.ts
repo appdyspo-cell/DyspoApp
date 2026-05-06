@@ -23,10 +23,10 @@ import { pickModes } from '../config';
 const NUM_OF_MONTHS_TO_CREATE = 6;
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
-  selector: 'ion-calendar-modal',
-  styleUrls: ['./calendar.modal.scss'],
-  template: `
+    // eslint-disable-next-line @angular-eslint/component-selector
+    selector: 'ion-calendar-modal',
+    styleUrls: ['./calendar.modal.scss'],
+    template: `
     <ion-header>
       <ion-toolbar [color]="_d.color || ''">
         <ion-buttons slot="start">
@@ -127,6 +127,7 @@ const NUM_OF_MONTHS_TO_CREATE = 6;
       </ion-infinite-scroll>
     </ion-content>
   `,
+    standalone: false
 })
 // eslint-disable-next-line @angular-eslint/component-class-suffix
 export class CalendarModal implements OnInit, AfterViewInit {

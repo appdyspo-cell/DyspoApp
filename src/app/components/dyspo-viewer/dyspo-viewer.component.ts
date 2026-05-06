@@ -6,12 +6,6 @@ import {
   MediaAlbum,
   MediaSaveOptions,
 } from '@capacitor-community/media';
-import {
-  PanZoomConfig,
-  PanZoomAPI,
-  PanZoomModel,
-  PanZoomConfigOptions,
-} from 'ngx-panzoom';
 import { Capacitor } from '@capacitor/core';
 import { UtilsService } from 'src/app/services/utils.service';
 import { LoggerService } from 'src/app/services/logger.service';
@@ -19,14 +13,18 @@ import { UserService } from 'src/app/services/user.service';
 import { MediaService } from 'src/app/services/media.service';
 
 @Component({
-  selector: 'app-dyspo-viewer',
-  templateUrl: './dyspo-viewer.component.html',
-  styleUrls: ['./dyspo-viewer.component.scss'],
+    selector: 'app-dyspo-viewer',
+    templateUrl: './dyspo-viewer.component.html',
+    styleUrls: ['./dyspo-viewer.component.scss'],
+    standalone: false
 })
 export class DyspoViewerComponent implements OnInit {
   image!: string;
   url: any;
-  panZoomConfig: PanZoomConfig;
+  readonly panZoomKeepInBounds = true;
+  readonly panZoomScalePerZoomLevel = 3;
+  readonly panZoomZoomLevels = 5;
+  readonly panZoomZoomOnDoubleClick = true;
 
   constructor(
     private modalCtrl: ModalController,
@@ -34,14 +32,7 @@ export class DyspoViewerComponent implements OnInit {
     private logger: LoggerService,
     private userSvc: UserService,
     private mediaSvc: MediaService
-  ) {
-    this.panZoomConfig = new PanZoomConfig({
-      keepInBounds: true,
-      scalePerZoomLevel: 3,
-      zoomLevels: 5,
-      zoomOnDoubleClick: true,
-    });
-  }
+  ) {}
 
   ngOnInit() {
     this.url = this.image;
