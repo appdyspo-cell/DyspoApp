@@ -64,6 +64,7 @@ export class FriendsSelectorComponent implements OnInit {
   friendsAlreadyInvited!: string[];
   isInit = false;
   dispalyByDyspo = true;
+  friendSearchTerm = '';
   checkedFriendsDyspo: CheckedFriends[] = [];
   checkedFriendsNoDyspo: CheckedFriends[] = [];
   checkedFriendsDyspoWithKids: CheckedFriends[] = [];
@@ -275,6 +276,14 @@ export class FriendsSelectorComponent implements OnInit {
         ev.end_time_formatted
       );
     }
+  }
+
+  matchesSearch(cf: CheckedFriends): boolean {
+    if (!this.friendSearchTerm.trim()) return true;
+    const term = this.friendSearchTerm.toLowerCase();
+    const first = cf.friend.userData?.firstname?.toLowerCase() ?? '';
+    const last = cf.friend.userData?.lastname?.toLowerCase() ?? '';
+    return first.includes(term) || last.includes(term);
   }
 
   groupFriendsByDyspo() {

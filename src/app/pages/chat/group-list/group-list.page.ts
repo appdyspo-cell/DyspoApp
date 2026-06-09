@@ -14,6 +14,7 @@ import {
   ShowHelper,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
+import { FriendsService } from 'src/app/services/friends.service';
 import { UserService } from 'src/app/services/user.service';
 
 type ChatFilter = 'all' | 'unread' | 'recent' | 'favorites';
@@ -40,12 +41,17 @@ export class GroupListPage implements OnInit {
   activeFilter: ChatFilter = 'all';
   archiveFilter: ChatFilter = 'all';
   favoriteUids = new Set<string>();
+  typeFilter: AgendaEventType | 'all' = 'all';
+
+  defaultAvatar = 'assets/logo.svg';
+  memberAvatarsMap = new Map<string, string[]>();
 
   constructor(
     private route: Router,
     private modalCtrl: ModalController,
     private agendaSvc: AgendaService,
     private userSvc: UserService,
+    private friendsSvc: FriendsService,
     private navCtrl: NavController
   ) {
     this.selectDiscussionsType = DiscussionType.ACTIVE;
@@ -81,6 +87,18 @@ export class GroupListPage implements OnInit {
           this.chatrooms[agEvent.uid!] = agEvent[
             'user_' + this.my_uid
           ] as Chatroom;
+        });
+
+        const friendMap = new Map(
+          this.friendsSvc.friends.map(f => [f.friend_uid!, f.userData?.avatarPath ?? this.defaultAvatar])
+        );
+        this.memberAvatarsMap.clear();
+        [...this.agendaEvents, ...this.agendaEventsArchived].forEach(ev => {
+          const avatars = ev.members_uid
+            .filter(uid => uid !== this.my_uid)
+            .slice(0, 3)
+            .map(uid => friendMap.get(uid) ?? this.defaultAvatar);
+          this.memberAvatarsMap.set(ev.uid!, avatars);
         });
       }
     );
@@ -144,6 +162,10 @@ export class GroupListPage implements OnInit {
     }
   }
 
+  setTypeFilter(type: AgendaEventType | 'all') {
+    this.typeFilter = type;
+  }
+
   get filteredActive(): AgendaEvent[] {
     return this.applyFilter(this.agendaEvents, this.activeFilter);
   }
@@ -153,25 +175,28 @@ export class GroupListPage implements OnInit {
   }
 
   private applyFilter(events: AgendaEvent[], filter: ChatFilter): AgendaEvent[] {
+    const byType = this.typeFilter === 'all'
+      ? events
+      : events.filter(ev => ev.type === this.typeFilter);
     let result: AgendaEvent[];
     switch (filter) {
       case 'unread':
-        result = events.filter(
+        result = byType.filter(
           (ev) => (this.chatrooms[ev.uid!]?.count || 0) > 0
         );
         break;
       case 'recent':
         const cutoff = subDays(new Date(), 7).getTime();
-        result = events.filter((ev) => {
+        result = byType.filter((ev) => {
           const t = ev.last_message?.time_ms || ev.start_date_ts || 0;
           return t >= cutoff;
         });
         break;
       case 'favorites':
-        result = events.filter((ev) => this.favoriteUids.has(ev.uid!));
+        result = byType.filter((ev) => this.favoriteUids.has(ev.uid!));
         break;
       default:
-        result = [...events];
+        result = [...byType];
     }
     // Always pin favorites at the top within the filtered result
     const pinned = result.filter((ev) => this.favoriteUids.has(ev.uid!));

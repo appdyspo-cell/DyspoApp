@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"Select-String -Path 'src/app/pages/register/register.page.ts' -Pattern 'password' | Select-Object -First 30\")",
+      "PowerShell(cd d:\\\\DYSPO\\\\APP\\\\DyspoApp; $ErrorActionPreference = 'Continue'; $out = \\(npx ng build --configuration development\\) 2>&1; $lines = $out -split \"`n\"; $errors = $lines | Where-Object { $_ -match \"^Error:|error NG\" }; Write-Host \"NG Errors: $\\($errors.Count\\)\"; $errors | Select-Object -First 15; Write-Host \"---Last 5---\"; $lines | Select-Object -Last 5)",
+      "Bash(npx ng *)",
+      "Bash(npm run *)",
+      "Bash(Get-Content \"C:\\\\Users\\\\j_cas\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--DYSPO-APP-DyspoApp\\\\3158f164-fc48-49c6-b583-b65e48d2ef62\\\\tasks\\\\b03vkbzak.output\" -Wait)",
+      "Bash(Select-String --line-buffered \"Local:|error|Error|FAILED|Cannot|warning|open your browser\")",
+      "Bash(git rm *)"
+    ]
+  }
+}

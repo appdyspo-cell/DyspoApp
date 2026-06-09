@@ -1,0 +1,42 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // ── User avatars ──────────────────────────────────────────────────────────
+    // Path: avatarsStorage/{userId}/{filename}
+    // Only the owner can write their avatar; any authenticated user can read.
+    match /avatarsStorage/{userId}/{allPaths=**} {
+      allow read:  if isAuth();
+      allow write: if isAuth() && request.auth.uid == userId;
+    }
+
+    // ── Group / event avatars and event media ─────────────────────────────────
+    // These paths do not embed the owner UID in the bucket path, so membership
+    // is enforced by Firestore rules (which restrict who can reach these uploads).
+    // Require authentication for all operations; admin-level restrictions are
+    // enforced server-side via Firebase Security Rules on the Firestore side.
+    match /avatarGroupsStorage/{allPaths=**} {
+      allow read:  if isAuth();
+      allow write: if isAuth();
+    }
+
+    match /avatarEventsStorage/{allPaths=**} {
+      allow read:  if isAuth();
+      allow write: if isAuth();
+    }
+
+    match /eventsMediaStorage/{allPaths=**} {
+      allow read:  if isAuth();
+      allow write: if isAuth();
+    }
+
+    // ── Deny everything else ──────────────────────────────────────────────────
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -52,6 +52,11 @@ export class NotificationService {
   ) {}
 
   async initListeners() {
+    // BC-05: guard — uid doit être initialisé avant d'enregistrer le token
+    if (!this.uid) {
+      console.log('NotificationService: uid non défini, initListeners annulé');
+      return;
+    }
     console.log('NotificationService ---> initListeners');
 
     const { token } = await FirebaseMessaging.getToken();
@@ -111,41 +116,22 @@ export class NotificationService {
   }
 
   public async registerToken(uid: string, token: string) {
-    const userCollectionRef = collection(this.firestore, 'users');
-    const q = query(userCollectionRef, where('uid', '==', uid));
-    const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-      const ref = querySnapshot.docs[0].ref;
-      updateDoc(ref, { notificationToken: token });
-    }
+    // BC-06: doc() direct — évite une query getDocs inutile
+    if (!uid) return;
+    const ref = doc(this.firestore, 'users', uid);
+    await updateDoc(ref, { notificationToken: token });
   }
 
   public async deleteToken(uid: string) {
-    // Remove FCM instance
-    FirebaseMessaging.removeAllListeners()
-      .then((res) => {
-        console.log('FirebaseMessaging.removeAllListeners()->', res);
-      })
-      .catch((err) => {
-        console.log('Error FirebaseMessaging.removeAllListeners()->', err);
-      });
-
-    const userCollectionRef = collection(this.firestore, 'users');
-
-    // Create a query against the collection.
-    const q = query(userCollectionRef, where('uid', '==', uid));
-    const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-      const ref = querySnapshot.docs[0].ref;
-      updateDoc(ref, { notificationToken: '' });
+    // BC-06: doc() direct — évite query + reads inutiles. Nettoyage listeners FCM.
+    if (!uid) return;
+    try {
+      await FirebaseMessaging.removeAllListeners();
+    } catch (err) {
+      console.log('Erreur removeAllListeners: ' + err);
     }
-    //const user = querySnapshot.docs[0].data;
-    //const uid = querySnapshot.docs[0].id;
-
-    querySnapshot.forEach((doc) => {
-      // doc.data() is never undefined for query doc snapshots
-      console.log(doc.id, ' => ', doc.data());
-    });
+    const ref = doc(this.firestore, 'users', uid);
+    await updateDoc(ref, { notificationToken: '' });
   }
 
   resetBadgeCount() {

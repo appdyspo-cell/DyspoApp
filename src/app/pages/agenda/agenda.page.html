@@ -3,6 +3,9 @@
     <ng-container *ngIf="!isFriendMode">
       <ion-title> <h1>Calendrier</h1></ion-title>
       <ion-buttons slot="end">
+        <ion-button class="btn-help" (click)="openHelp()">
+          <ion-icon slot="icon-only" name="help-circle-outline"></ion-icon>
+        </ion-button>
         <ion-toggle
           labelPlacement="start"
           color="primary"
@@ -187,13 +190,14 @@
 
         <ion-buttons slot="end" *ngIf="isFriendMode === false">
           <ion-button
-            *ngIf="agendaEvent.is_multi && agendaEvent.members_uid.length > 1"
-            color="primary"
+            *ngIf="agendaEvent.is_multi"
+            fill="clear"
             (click)="goToChat(agendaEvent, $event)"
+            class="btn-list-chat"
           >
             <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
           </ion-button>
-          <ion-button color="medium" (click)="addToCalendar(agendaEvent, $event)">
+          <ion-button fill="clear" color="medium" (click)="addToCalendar(agendaEvent, $event)">
             <ion-icon name="calendar-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -210,6 +214,16 @@
     </ion-list>
   </div>
 
+  <!-- Bouton Nouveau en mode calendrier ami -->
+  <div *ngIf="isFriendMode && selectedDateMs" class="fab-nouveau-wrapper" slot="fixed">
+    <button class="fab-nouveau-btn" (click)="openCreateEventForFriend()">
+      <div class="fab-circle">
+        <ion-icon name="add"></ion-icon>
+      </div>
+      <span>Nouveau</span>
+    </button>
+  </div>
+
   <div
     *ngIf="agendaMode === agendaModes.EDIT"
     class="ion-padding ion-text-center d-flex"
@@ -220,9 +234,7 @@
       *ngIf="agendaSvc.isModified"
       (click)="saveAgenda()"
       mode="ios"
-      color="tertiary"
-      class="dyspo-button"
-      style="padding-top: 8px"
+      class="dyspo-button btn-agenda-edit"
     >
       Sauvegarder mon agenda
       <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
@@ -230,22 +242,12 @@
 
     <ion-button
       *ngIf="agendaSvc.isModified"
-      color="tertiary"
       mode="ios"
-      class="dyspo-button"
+      class="dyspo-button btn-agenda-edit"
       (click)="cancelAgenda()"
     >
       Annuler
       <ion-icon name="close-circle-outline" slot="start"></ion-icon>
     </ion-button>
   </div>
-  <ion-fab
-    slot="fixed"
-    horizontal="end"
-    vertical="bottom"
-  >
-    <ion-fab-button color="tertiary" size="small" (click)="openHelp()">
-      <ion-icon name="help-outline"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
 </ion-content>

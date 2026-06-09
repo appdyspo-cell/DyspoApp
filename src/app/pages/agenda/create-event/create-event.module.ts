@@ -8,6 +8,7 @@ import { CreateEventPageRoutingModule } from './create-event-routing.module';
 
 import { CreateEventPage } from './create-event.page';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
+import { TimePickerClockComponent } from 'src/app/components/time-picker-clock/time-picker-clock.component';
 
 @NgModule({
   imports: [
@@ -18,7 +19,7 @@ import { SharedModule } from 'src/app/modules/shared/shared.module';
     SharedModule,
     CreateEventPageRoutingModule,
   ],
-  declarations: [CreateEventPage],
+  declarations: [CreateEventPage, TimePickerClockComponent],
   schemas: [NO_ERRORS_SCHEMA],
 })
 export class CreateEventPageModule {}

@@ -25,11 +25,13 @@ import {
   UserDyspoStatus,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
+import { CalendarService } from 'src/app/services/calendar.service';
 import { FriendsService } from 'src/app/services/friends.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import Swal from 'sweetalert2';
 import { DyspoViewerComponent } from '../dyspo-viewer/dyspo-viewer.component';
+import { FriendProfileComponent } from '../friend-profile/friend-profile.component';
 
 @Component({
     selector: 'app-agenda-event-info',
@@ -78,7 +80,8 @@ export class AgendaEventInfoComponent implements OnInit {
     public userSvc: UserService,
     private utils: UtilsService,
     private navCtrl: NavController,
-    private friendsSvc: FriendsService
+    private friendsSvc: FriendsService,
+    private calendarSvc: CalendarService
   ) {
     this.members_loaded = false;
   }
@@ -351,8 +354,9 @@ export class AgendaEventInfoComponent implements OnInit {
     //open calendar
   }
 
-  acceptInvitation() {
+  async acceptInvitation() {
     this.agendaSvc.acceptEventInvitation(this.agendaEvent);
+    await this.calendarSvc.promptAddToCalendar(this.agendaEvent);
     this.close();
   }
 
@@ -394,6 +398,24 @@ export class AgendaEventInfoComponent implements OnInit {
     this.friendsSvc.invite(user, true).then(() => {
       user.is_my_friend = true;
     });
+  }
+
+  async openFriendProfile(member: AppUserWithEvents, event: Event) {
+    event.stopPropagation();
+    const modal = await this.modalCtrl.create({
+      component: FriendProfileComponent,
+      componentProps: {
+        user: member,
+        isFriend: member.is_my_friend !== false,
+      },
+      initialBreakpoint: 0.75,
+      breakpoints: [0, 0.75, 1],
+    });
+    await modal.present();
+    const { data } = await modal.onDidDismiss();
+    if (data === 'requested') {
+      member.is_my_friend = true;
+    }
   }
 
   getSelectedFriendStatusLabel(status: FriendStatus): string {

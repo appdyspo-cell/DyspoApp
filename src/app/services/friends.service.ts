@@ -455,7 +455,7 @@ export class FriendsService {
       doc(this.firestore, `friends/${friend.friend_uid}/friend_list/${uid}`)
     );
 
-    batch.commit();
+    await batch.commit(); // BC-02: await ajouté — suppression amis garantie avant runTransaction
 
     await runTransaction(this.firestore, async (transaction) => {
       const mygroups_snapshots = await getDocs(

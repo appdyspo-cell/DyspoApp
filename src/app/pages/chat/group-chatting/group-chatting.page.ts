@@ -49,6 +49,9 @@ import { AgendaEventInfoComponent } from 'src/app/components/agenda-event-info/a
 import { fr } from 'date-fns/locale';
 import { QueryDocumentSnapshot, DocumentData } from '@angular/fire/firestore';
 import { UserInfoMenuComponent } from 'src/app/components/user-info-menu/user-info-menu.component';
+import { StatusPickerComponent } from 'src/app/calendar/components/status-picker.component';
+import { FriendProfileComponent } from 'src/app/components/friend-profile/friend-profile.component';
+import { getDate, getMonth, getYear } from 'date-fns';
 @Component({
     selector: 'app-group-chatting',
     templateUrl: './group-chatting.page.html',
@@ -132,6 +135,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   showEmojiPicker = false;
   lastClickTime = 0;
   lastClickedMsgUid = '';
+  private singleClickTimer: any;
 
   constructor(
     private navCtrl: NavController,
@@ -584,27 +588,41 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   }
 
   async onSelectUser(user: AppUserWithEvents, $event: MouseEvent) {
-    if (!user.is_my_friend) {
-      this.friendsSvc.invite(user, true).then(() => {
-        user.is_my_friend = true;
+    if (user.uid === this.my_uid) {
+      const modal = await this.modalCtrl.create({
+        component: StatusPickerComponent,
+        componentProps: { hasKids: !!this.userSvc.userInfo?.with_kids },
+        cssClass: 'status-picker-modal',
       });
+      await modal.present();
+      const { data } = await modal.onDidDismiss();
+      if (data != null) {
+        user.dyspoStatus = data as UserDyspoStatus;
+        this.agendaSvc.saveDyspos([{
+          time: this.agendaEvent.start_date_ts,
+          userDyspo: data as UserDyspoStatus,
+          month: getMonth(this.agendaEvent.start_date_ts),
+          year: getYear(this.agendaEvent.start_date_ts),
+          day: getDate(this.agendaEvent.start_date_ts),
+        }]);
+      }
+      return;
     }
 
-    // const modal = await this.popCtrl.create({
-    //   component: UserInfoMenuComponent,
-    //   componentProps: {
-    //     friend_id: null,
-    //     username: null,
-    //     my_chatroom: this.agendaEvent['user_' + this.my_uid] as Chatroom,
-    //   },
-    //   translucent: true,
-    //   event: $event,
-    //   mode: 'md',
-    // });
-
-    // modal.present();
-
-    // const { data, role } = await modal.onWillDismiss();
+    const modal = await this.modalCtrl.create({
+      component: FriendProfileComponent,
+      componentProps: {
+        user,
+        isFriend: user.is_my_friend !== false,
+      },
+      initialBreakpoint: 0.75,
+      breakpoints: [0, 0.75, 1],
+    });
+    await modal.present();
+    const { data } = await modal.onDidDismiss();
+    if (data === 'requested') {
+      user.is_my_friend = true;
+    }
   }
 
   addToCalendar() {
@@ -696,14 +714,20 @@ export class GroupChattingPage implements OnInit, OnDestroy {
   handleMessageClick(msg: ChatMessage) {
     const now = Date.now();
     if (this.lastClickedMsgUid === msg.uid && now - this.lastClickTime < 300) {
-      // Double click detected
+      // Double tap — heart only, cancel the pending single-click
+      clearTimeout(this.singleClickTimer);
+      this.msgSelected = undefined;
       this.toggleLike(msg);
-      this.lastClickTime = 0; // reset
+      this.lastClickTime = 0;
       this.lastClickedMsgUid = '';
     } else {
       this.lastClickTime = now;
       this.lastClickedMsgUid = msg.uid;
-      this.onMsgSelected(msg);
+      // Delay single-click so a double-tap can cancel it
+      clearTimeout(this.singleClickTimer);
+      this.singleClickTimer = setTimeout(() => {
+        this.onMsgSelected(msg);
+      }, 300);
     }
   }
 

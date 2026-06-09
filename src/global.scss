@@ -33,6 +33,19 @@ ion-app {
   --background: var(--d-surface-0);
 }
 
+// ── Modal horloge — centrée, taille fixe ─────────────────────────────────────
+
+ion-modal.clock-modal {
+  --width: 320px;
+  --min-height: 430px;
+  --height: auto;
+  --border-radius: 20px;
+  --box-shadow: 0 12px 50px rgba(0, 0, 0, 0.28);
+  --backdrop-opacity: 0.45;
+  align-items: center;
+  justify-content: center;
+}
+
 // ── 2. Typographie ─────────────────────────────────────────────────────────────
 
 h1, h2, h3, h4, h5, h6 {
@@ -190,9 +203,15 @@ ion-button {
   margin: var(--d-space-2) var(--d-space-4);
 
   &[color="tertiary"] {
-    --background: var(--d-text-primary);
-    --background-activated: #2e3240;
-    --background-focused: #2e3240;
+    --background: #46a2c2;
+    --background-activated: #3586a2;
+    --background-focused: #3586a2;
+    --background-hover: #3586a2;
+    --ion-color-base: #46a2c2;
+    --ion-color-shade: #3586a2;
+    --ion-color-tint: #6ab8d4;
+    --ion-color-contrast: #ffffff;
+    --color: #ffffff;
   }
 
   &[expand="block"] {
@@ -570,11 +589,38 @@ ion-popover {
 
 .icon-android { font-size: 22px; }
 
-// ── 22. Divers — Action sheet legacy ──────────────────────────────────────────
+// ── 22. Action sheet — Saisie des disponibilités ──────────────────────────────
 
-.dyspo-sheet-dyspo          { font-size: 1.1rem; color: var(--d-dyspo); }
-.dyspo-sheet-dyspo-with-kids{ font-size: 1.1rem; color: var(--d-dyspo-kids); }
-.dyspo-sheet-no-dyspo       { font-size: 1.1rem; color: var(--d-no-dyspo); }
+// Titre centré
+.dyspo-sheet .action-sheet-title {
+  text-align: center !important;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.1px;
+}
+
+// Boutons — texte coloré centré, fond transparent
+button.dyspo-sheet-dyspo,
+button.dyspo-sheet-dyspo-with-kids,
+button.dyspo-sheet-no-dyspo {
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  text-align: center !important;
+  justify-content: center !important;
+}
+
+button.dyspo-sheet-dyspo .action-sheet-button-inner,
+button.dyspo-sheet-dyspo-with-kids .action-sheet-button-inner,
+button.dyspo-sheet-no-dyspo .action-sheet-button-inner {
+  justify-content: center !important;
+}
+
+button.dyspo-sheet-dyspo           { color: var(--d-dyspo) !important; }
+button.dyspo-sheet-dyspo-with-kids { color: var(--d-dyspo-kids) !important; }
+button.dyspo-sheet-no-dyspo        { color: var(--d-no-dyspo) !important; }
 
 // ── 23. Pop-over events header ────────────────────────────────────────────────
 
@@ -588,7 +634,44 @@ ion-popover {
   color: var(--d-text-primary);
 }
 
-// ── 24. RTL support (conservé) ────────────────────────────────────────────────
+// ── 24. Modal fiche ami — centrée avec rebond ─────────────────────────────────
+
+@keyframes d-bounce-in {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+ion-modal.friend-profile-modal {
+  --width: 90%;
+  --max-width: 360px;
+  --height: 500px;
+  --border-radius: 20px;
+  --box-shadow: 0 12px 50px rgba(0, 0, 0, 0.28);
+  --backdrop-opacity: 0.45;
+  align-items: center;
+  justify-content: center;
+
+  &::part(content) {
+    animation: d-bounce-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+}
+
+ion-modal.status-picker-modal {
+  --width: 90%;
+  --max-width: 340px;
+  --height: auto;
+  --border-radius: 24px;
+  --box-shadow: 0 16px 60px rgba(0, 0, 0, 0.32);
+  --backdrop-opacity: 0.4;
+  align-items: center;
+  justify-content: center;
+
+  &::part(content) {
+    animation: d-bounce-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+}
+
+// ── 25. RTL support (conservé) ────────────────────────────────────────────────
 
 ion-app[dir="rtl"] {
   ion-header ion-toolbar ion-title {
@@ -644,5 +727,16 @@ ion-app[dir="rtl"] {
     color: var(--d-text-tertiary);
     max-width: 240px;
     line-height: 1.5;
+  }
+}
+
+// ── 27. SweetAlert2 confirm button ────────────────────────────────────────────
+
+.swal2-confirm {
+  background-color: #46a2c2 !important;
+
+  &:hover, &:focus {
+    background-color: #3586a2 !important;
+    box-shadow: none !important;
   }
 }

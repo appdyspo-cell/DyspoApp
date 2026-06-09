@@ -45,8 +45,7 @@ export class FriendsPage implements OnInit {
     const modal = await this.modalCtrl.create({
       component: FriendProfileComponent,
       componentProps: { user: friend.userData },
-      breakpoints: [0, 0.5, 0.85],
-      initialBreakpoint: 0.5,
+      cssClass: 'friend-profile-modal',
     });
     await modal.present();
   }
@@ -55,8 +54,7 @@ export class FriendsPage implements OnInit {
     const modal = await this.modalCtrl.create({
       component: FriendProfileComponent,
       componentProps: { user },
-      breakpoints: [0, 0.5, 0.85],
-      initialBreakpoint: 0.5,
+      cssClass: 'friend-profile-modal',
     });
     await modal.present();
   }

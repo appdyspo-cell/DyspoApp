@@ -1,52 +1,62 @@
 // ── Header ────────────────────────────────────────────────────────────────────
 
 ion-header {
-  ion-toolbar {
-    --background: var(--d-brand);
-    --color: #fff;
-
-    ion-title { padding-inline: var(--d-space-4); }
-    ion-icon { color: #fff; font-size: 22px; }
-  }
-
-  .segment-toolbar {
-    --min-height: 48px;
-    --padding-top: 0;
-    --padding-bottom: 0;
-
-    ion-segment {
-      --background: var(--d-brand);
-      background: var(--d-brand);
-
-      ion-segment-button {
-        --color: rgba(255, 255, 255, 0.65);
-        --color-checked: #fff;
-        --indicator-color: #fff;
-        --indicator-height: 3px;
-        text-transform: uppercase;
-        margin: 0;
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-      }
-    }
+  h1 {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    color: var(--d-text-primary);
   }
 }
 
-// ── Content background ────────────────────────────────────────────────────────
+// ── Segment ───────────────────────────────────────────────────────────────────
 
-.wa-content {
-  --background: var(--d-surface-0);
+ion-segment {
+  --background: var(--d-surface-2);
+  margin: var(--d-space-3) var(--d-space-4);
+  border-radius: var(--d-radius-lg);
+  padding: 4px;
+}
+
+ion-segment-button {
+  --color:              var(--d-text-tertiary);
+  --color-checked:      var(--d-brand);
+  --background-checked: var(--d-surface-1);
+  --border-radius:      var(--d-radius-md);
+  --indicator-height:   0;
+  --padding-top:        var(--d-space-3);
+  --padding-bottom:     var(--d-space-3);
+  min-height: 64px;
+  text-transform: none;
+  position: relative;
+  box-shadow: none;
+
+  &.segment-button-checked {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+  }
+
+  ion-icon {
+    font-size: 22px;
+    margin-bottom: 5px;
+  }
+
+  ion-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    text-transform: none;
+  }
 }
 
 // ── Filter bar ────────────────────────────────────────────────────────────────
 
 .filter-bar {
   display: flex;
-  padding: var(--d-space-3) var(--d-space-4);
+  justify-content: center;
+  padding: 0 var(--d-space-4) var(--d-space-3);
   overflow-x: auto;
   gap: var(--d-space-2);
-  background: var(--d-surface-2);
   scrollbar-width: none;
 
   &::-webkit-scrollbar { display: none; }
@@ -54,7 +64,7 @@ ion-header {
   ion-chip {
     margin: 0;
     height: 32px;
-    background: var(--d-surface-1);
+    background: var(--d-surface-2);
     border: 1px solid var(--d-surface-3);
     font-size: 13px;
     font-weight: 600;
@@ -81,9 +91,8 @@ ion-header {
 // ── List ──────────────────────────────────────────────────────────────────────
 
 .wa-list {
-  background: var(--d-surface-1);
-  padding-top: 0;
-  padding-bottom: 80px;
+  background: transparent;
+  padding: 0 0 80px;
 }
 
 // ── Conversation item ─────────────────────────────────────────────────────────
@@ -100,21 +109,26 @@ ion-header {
   &::part(native) { padding-right: 0; }
 
   &.wa-item-pinned {
-    --background: #fffbf0;
-    --background-focused: #fff3cc;
-    --background-hover: #fff3cc;
+    --background: rgba(70, 162, 194, 0.07);
   }
 
-  .wa-avatar {
-    width: 52px;
-    height: 52px;
-    margin: 12px var(--d-space-4) 12px 0;
+  .member-avatars-stack {
+    position: relative;
+    width: 60px;
+    height: 44px;
+    flex-shrink: 0;
+    margin: 12px var(--d-space-3) 12px 0;
 
-    &.border-kids   { border: 2px solid var(--d-dyspo-kids); }
-    &.border-nokids { border: 2px solid var(--d-dyspo); }
-    &.border-free   { border: 2px solid var(--d-free); }
-
-    img { border-radius: 50%; object-fit: cover; }
+    .stack-av {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--d-surface-0);
+    }
   }
 
   .wa-item-inner {

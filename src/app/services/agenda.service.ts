@@ -423,19 +423,17 @@ export class AgendaService {
 
   public getAgendaEvents() {
     return new Promise<AgendaEvent[]>(async (resolve, reject) => {
-      const agendaEvents: AgendaEvent[] = [];
-      const usersCollectionRef = collection(this.firestore, 'users');
-
-      const querySnapshot = await getDocs(usersCollectionRef);
+      // BC-03: collection corrigée — était 'users', doit être 'agenda_events'
+      const agendaEventsCollectionRef = collection(this.firestore, 'agenda_events');
+      const querySnapshot = await getDocs(agendaEventsCollectionRef);
       querySnapshot.forEach((snap) => {
         const agendaEvt = snap.data() as AgendaEvent;
-
         if (agendaEvt.status === AgendaEventStatus.ACTIVE) {
           agendaEvt.uid = snap.id;
           this.agendaEvents.push(agendaEvt);
         }
       });
-      resolve(agendaEvents);
+      resolve(this.agendaEvents); // BC-03: retourne this.agendaEvents (était agendaEvents vide)
     });
   }
 

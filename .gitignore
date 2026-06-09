@@ -69,3 +69,21 @@ Thumbs.db
 
 resources/ios/**/*
 resources/android/**/*
+# Firebase service account keys (SENSITIVE - never commit)
+service-account-prod.json
+service-account-stg.json
+firestore-backup.json
+
+# Environment files with API keys (SENSITIVE - never commit)
+src/environments/environment.ts
+src/environments/environment.prod.ts
+
+# Firebase platform configs (SENSITIVE - contain API keys)
+**/google-services.json
+**/GoogleService-Info.plist
+
+# Generic secrets patterns
+.env
+.env.*
+*.secret
+**/secrets.json

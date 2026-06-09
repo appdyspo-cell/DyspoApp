@@ -1,64 +1,32 @@
 <ion-header>
   <ion-toolbar mode="md">
     <ion-buttons slot="start">
-      <ion-back-button
-        text=""
-        color="dark"
-        icon="chevron-back-outline"
-      ></ion-back-button>
+      <ion-back-button text="" color="dark" icon="chevron-back-outline"></ion-back-button>
     </ion-buttons>
-    <ion-title style="padding-left: 0px"><h1>Profil</h1></ion-title>
-
-    <!-- <ion-buttons slot="end">
-      <ion-button (click)="logout()" color="dark">
-        <ion-icon name="log-out" slot="icon-only" color="primary"></ion-icon>
-      </ion-button>
-    </ion-buttons> -->
-  </ion-toolbar>
-  <ion-toolbar color="primary">
-    <div class="userSection ion-padding-horizontal">
-      <div
-        slot="start"
-        style="position: relative"
-        tappable
-        (click)="changeAvatar()"
-      >
-        <!-- <div
-          style="
-            position: absolute;
-            right: -7px;
-            background: var('--bg-color-secondary');
-            text-align: center;
-            width: 25px;
-            height: 25px;
-            border-radius: 12px;
-          "
-        >
-          <ion-icon
-            name="camera-outline"
-            color="primary"
-            style="position: relative; top: 4px"
-          ></ion-icon>
-        </div> -->
-
-        <ion-avatar slot="start">
-          <img [src]="user.avatarPath || defaultAvatar" />
-        </ion-avatar>
-      </div>
-
-      <div class="userDetail ion-padding-start">
-        <ion-label class="userName">
-          {{user.firstname}} {{user.lastname}}
-        </ion-label>
-        <ion-text>{{user.email}}</ion-text>
-      </div>
-    </div>
-    <p></p>
+    <ion-title><h1>Profil</h1></ion-title>
   </ion-toolbar>
 </ion-header>
-<ion-content class="ion-padding bg_color">
-  <div class="form" padding>
-    <ion-list class="f-list" lines="none">
+
+<ion-content class="bg_color">
+
+  <!-- Bandeau profil centré -->
+  <div class="profile-banner" tappable (click)="changeAvatar()">
+    <div class="profile-avatar-wrapper">
+      <ion-avatar class="profile-avatar">
+        <img [src]="user.avatarPath || defaultAvatar" />
+      </ion-avatar>
+      <div class="camera-badge">
+        <ion-icon name="camera-outline"></ion-icon>
+      </div>
+    </div>
+    <h2 class="profile-name">{{user.firstname}} {{user.lastname | uppercase}}</h2>
+    <p class="profile-email">{{user.email}}</p>
+  </div>
+
+  <!-- Formulaire -->
+  <ion-card>
+    <ion-list lines="none" class="ion-no-padding">
+
       <ion-item lines="none">
         <ion-input
           label="Nom *"
@@ -68,13 +36,13 @@
           maxlength="20"
           required="true"
           autocomplete="off"
-          type="name"
           autocapitalize="characters"
           [(ngModel)]="user.lastname"
           name="lastname"
           placeholder="Entrez votre nom"
         ></ion-input>
       </ion-item>
+
       <ion-item lines="none">
         <ion-input
           label="Prénom *"
@@ -117,7 +85,7 @@
         ></ion-input>
       </ion-item>
 
-      <ion-item lines="none" style="padding-bottom: 0px">
+      <ion-item lines="none">
         <ion-select
           label="Zone"
           [(ngModel)]="user.geo_zone"
@@ -130,55 +98,50 @@
         </ion-select>
       </ion-item>
 
-      <div class="d-flex ion-align-items-center" style="margin-bottom: 30px">
-        <ion-note> {{academies}} </ion-note>
+      <div class="academies-note">
+        <ion-note>{{academies}}</ion-note>
       </div>
 
-      <ion-item>
-        <ion-text>J'ai des enfants </ion-text>
-        <ion-buttons slot="end">
-          <ion-checkbox [(ngModel)]="user.with_kids"> </ion-checkbox>
-        </ion-buttons>
+      <ion-item lines="none">
+        <ion-toggle
+          style="color: #46a2c2"
+          [(ngModel)]="user.with_kids"
+          slot="end"
+        ></ion-toggle>
+        <ion-label>J'ai des enfants</ion-label>
       </ion-item>
+
+      <div *ngIf="user.with_kids" class="custody-section">
+        <ion-label class="custody-label">
+          Jours de garde <ion-text color="medium">(sur 2 semaines)</ion-text>
+        </ion-label>
+        <div class="custody-week">
+          <div
+            *ngFor="let day of weekDays; let i = index"
+            class="day-bubble"
+            [class.selected]="custodyDays[i]"
+            (click)="toggleCustodyDay(i)"
+          >{{ day }}</div>
+        </div>
+        <div class="custody-week">
+          <div
+            *ngFor="let day of weekDays; let i = index"
+            class="day-bubble"
+            [class.selected]="custodyDays[i + 7]"
+            (click)="toggleCustodyDay(i + 7)"
+          >{{ day }}</div>
+        </div>
+      </div>
 
       <ion-item lines="none">
         <ion-label mode="md" position="stacked">Mot de passe</ion-label>
-
-        <ion-button slot="end" (click)="resetPw()"> Changer</ion-button>
+        <ion-button slot="end" (click)="resetPw()">Changer</ion-button>
       </ion-item>
 
-      <!-- <ion-item class="f-item" lines="none">
-        <ion-label mode="md" position="floating">Téléphone</ion-label>
-        <ion-input
-          mode="md"
-          type="tel"
-          [(ngModel)]="user.phoneNumber"
-          name="phoneNumber"
-          placeholder="Entrez votre téléphone"
-        ></ion-input>
-      </ion-item>
-      <ion-item counter="true" class="desc-inner" lines="none">
-        <ion-label position="floating">Description</ion-label>
-        <ion-textarea
-          [(ngModel)]="user.tagline"
-          rows="3"
-          maxlength="100"
-          placeholder="Décrivez vous en quelques mots..."
-        ></ion-textarea>
-      </ion-item> -->
-      <!-- 
-      <ion-list>
-        <ion-radio-group [(ngModel)]="user.gender">
-          <ion-item>
-            <ion-radio value="M" labelPlacement="start">Homme</ion-radio>
-          </ion-item>
-          <ion-item>
-            <ion-radio value="F" labelPlacement="start">Femme</ion-radio>
-          </ion-item>
-        </ion-radio-group>
-      </ion-list> -->
     </ion-list>
-  </div>
+  </ion-card>
+
+  <!-- Bouton sauvegarder -->
   <div class="d-flex ion-justify-content-center">
     <ion-button
       fill="solid"
@@ -186,10 +149,10 @@
       mode="ios"
       color="tertiary"
       class="dyspo-button"
-      style="margin-left: 0px"
-      >Sauvegarder
+    >
       <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+      Sauvegarder
     </ion-button>
   </div>
+
 </ion-content>
-<!-- <ion-footer class="ion-no-border"> </ion-footer> -->

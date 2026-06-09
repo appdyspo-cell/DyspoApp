@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "dyspo-2bb43",
+    "prod": "dyspo-2bb43",
+    "stg": "dyspo-stg"
+  }
+}

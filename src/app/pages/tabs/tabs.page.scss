@@ -55,6 +55,17 @@
     transform: scale(1.08);
   }
 
+  .tab-icon-sli {
+    font-size: 24px;
+    line-height: 1;
+    color: inherit;
+    transition: transform var(--d-duration-base) var(--d-spring);
+  }
+
+  &.tab-selected .tab-icon-sli {
+    transform: scale(1.08);
+  }
+
   ion-label {
     font-size: 10px;
     font-weight: 600;

@@ -94,6 +94,7 @@ export interface Chatroom {
 
 export interface AgendaEvent {
   title?: string;
+  description?: string;
   startISO: string;
   endISO: string;
   uid?: string;

@@ -29,6 +29,8 @@ export interface CalendarDay {
   isLast?: boolean;
   isEvent?: boolean;
   isHolidays?: boolean;
+  isHolidaysFirst?: boolean;
+  isHolidaysLast?: boolean;
   userDyspo?: UserDyspoStatus;
 }
 

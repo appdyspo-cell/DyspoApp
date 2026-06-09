@@ -2,31 +2,38 @@
   mode="md"
   [(ngModel)]="selectSegment"
   (ionChange)="segmentChanged($event)"
-  style="z-index: 1000"
+  class="friends-segment"
 >
   <ion-segment-button
     value="{{ friendSelectionType.FRIENDS }}"
     class="segmentButton"
-    color="light"
   >
-    <!-- <ion-icon name="person"></ion-icon> -->
     <ion-label>Mes amis</ion-label>
   </ion-segment-button>
   <ion-segment-button
     value="{{ friendSelectionType.GROUP }}"
-    color="light"
     class="segmentButton"
   >
-    <!-- <ion-icon name="person-add"></ion-icon> -->
     <ion-label>Mes groupes</ion-label>
   </ion-segment-button>
 </ion-segment>
 
 <div *ngIf="selectSegment === friendSelectionType.FRIENDS" class="ion-padding-horizontal ion-padding-top">
-  <ion-button expand="block" fill="outline" color="primary" (click)="inviteBySMS()">
+  <ion-button expand="block" fill="outline" class="btn-invite-sms" (click)="inviteBySMS()">
     <ion-icon name="chatbubble-ellipses-outline" slot="start"></ion-icon>
     Inviter par SMS
   </ion-button>
+</div>
+
+<div *ngIf="selectSegment === friendSelectionType.FRIENDS" class="ion-padding-horizontal" style="padding-top: 4px; padding-bottom: 0">
+  <ion-searchbar
+    [(ngModel)]="friendSearchTerm"
+    placeholder="Rechercher un ami…"
+    [debounce]="0"
+    animated="true"
+    mode="md"
+    style="--box-shadow: none; --border-radius: 8px; --background: var(--d-surface-2); padding: 0"
+  ></ion-searchbar>
 </div>
 
 <div
@@ -37,7 +44,7 @@
   <ion-grid>
     <ion-row class="ion-align-items-center">
       <ng-container *ngFor="let checkedFriend of checkedFriends; let i = index">
-        <ion-col size="3" size-md="2" size-lg="1">
+        <ion-col *ngIf="matchesSearch(checkedFriend)" size="3" size-md="2" size-lg="1">
           <div
             style="width: 100%; display: flex; justify-content: center"
             [ngClass]="{ 'friend-is-disabled': checkedFriend.disable }"
@@ -154,6 +161,7 @@ Dyspo With Kids
           let checkedFriendDyspoWithKids of checkedFriendsDyspoWithKids;
           let i = index
         "
+        [hidden]="!matchesSearch(checkedFriendDyspoWithKids)"
         size="3"
         size-md="2"
         size-lg="1"
@@ -228,6 +236,7 @@ Dyspo
     >
       <ion-col
         *ngFor="let checkedFriendDyspo of checkedFriendsDyspo; let i = index"
+        [hidden]="!matchesSearch(checkedFriendDyspo)"
         size="3"
         size-md="2"
         size-lg="1"
@@ -299,6 +308,7 @@ No Dyspo
           let checkedFriendNoDyspo of checkedFriendsNoDyspo;
           let i = index
         "
+        [hidden]="!matchesSearch(checkedFriendNoDyspo)"
         size="3"
         size-md="2"
         size-lg="1"
@@ -372,6 +382,7 @@ No Dyspo
           let checkedFriendDyspoUndefined of checkedFriendsDyspoUndefined;
           let i = index
         "
+        [hidden]="!matchesSearch(checkedFriendDyspoUndefined)"
         size="3"
         size-md="2"
         size-lg="1"

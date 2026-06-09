@@ -50,64 +50,52 @@ interface CompatibleIcons {
     styleUrls: ['./calendar.component.scss'],
     template: `
     <div class="title">
+      <ion-button
+        *ngIf="_showToggleButtons"
+        type="button"
+        fill="clear"
+        class="cal-nav-btn back"
+        [disabled]="!canBack()"
+        (click)="prev()"
+      >
+        <ion-icon slot="icon-only" [name]="_compatibleIcons.chevronBack"></ion-icon>
+      </ion-button>
+      <div *ngIf="!_showToggleButtons" class="cal-nav-spacer"></div>
+
       <ng-template [ngIf]="_showMonthPicker" [ngIfElse]="title">
         <ion-button
           fill="clear"
           class="switch-btn"
-          [attr.aria-label]="
-            getDate(monthOpt.original.time) | date : MONTH_DATE_FORMAT
-          "
+          [attr.aria-label]="getDate(monthOpt.original.time) | date : MONTH_DATE_FORMAT"
           (click)="switchView()"
         >
           {{ _monthFormat(monthOpt.original.time) }}
           <ion-icon
             class="arrow-dropdown"
-            [name]="
-              _view === 'days'
-                ? _compatibleIcons.caretDown
-                : _compatibleIcons.caretUp
-            "
+            [name]="_view === 'days' ? _compatibleIcons.caretDown : _compatibleIcons.caretUp"
           ></ion-icon>
         </ion-button>
       </ng-template>
       <ng-template #title>
         <div
           class="switch-btn"
-          [attr.aria-label]="
-            getDate(monthOpt.original.time) | date : MONTH_DATE_FORMAT
-          "
+          [attr.aria-label]="getDate(monthOpt.original.time) | date : MONTH_DATE_FORMAT"
         >
           {{ _monthFormat(monthOpt.original.time) }}
         </div>
       </ng-template>
-      <ng-template [ngIf]="_showToggleButtons">
-        <ion-button
-          type="button"
-          fill="clear"
-          class="back"
-          [disabled]="!canBack()"
-          (click)="prev()"
-        >
-          <ion-icon
-            slot="icon-only"
-            size="small"
-            [name]="_compatibleIcons.chevronBack"
-          ></ion-icon>
-        </ion-button>
-        <ion-button
-          type="button"
-          fill="clear"
-          class="forward"
-          [disabled]="!canNext()"
-          (click)="next()"
-        >
-          <ion-icon
-            slot="icon-only"
-            size="small"
-            [name]="_compatibleIcons.chevronForward"
-          ></ion-icon>
-        </ion-button>
-      </ng-template>
+
+      <ion-button
+        *ngIf="_showToggleButtons"
+        type="button"
+        fill="clear"
+        class="cal-nav-btn forward"
+        [disabled]="!canNext()"
+        (click)="next()"
+      >
+        <ion-icon slot="icon-only" [name]="_compatibleIcons.chevronForward"></ion-icon>
+      </ion-button>
+      <div *ngIf="!_showToggleButtons" class="cal-nav-spacer"></div>
     </div>
     <ng-template [ngIf]="_view === 'days'" [ngIfElse]="monthPicker">
       <ion-calendar-week
@@ -382,8 +370,8 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
       newMonth: this.calSvc.multiFormat(nextTime),
     });
     this.monthOpt = this.createMonth(nextTime);
-    this.slideClass = 'slide-from-right';
-    setTimeout(() => { this.slideClass = ''; }, 350);
+    this.slideClass = 'page-flip-forward';
+    setTimeout(() => { this.slideClass = ''; }, 500);
   }
 
   canNext(): boolean {
@@ -402,8 +390,8 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
       newMonth: this.calSvc.multiFormat(backTime),
     });
     this.monthOpt = this.createMonth(backTime);
-    this.slideClass = 'slide-from-left';
-    setTimeout(() => { this.slideClass = ''; }, 350);
+    this.slideClass = 'page-flip-backward';
+    setTimeout(() => { this.slideClass = ''; }, 500);
   }
 
   canBack(): boolean {
@@ -422,8 +410,8 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
       newMonth: this.calSvc.multiFormat(newMonth),
     });
     this.monthOpt = this.createMonth(newMonth);
-    this.slideClass = isForward ? 'slide-from-right' : 'slide-from-left';
-    setTimeout(() => { this.slideClass = ''; }, 350);
+    this.slideClass = isForward ? 'page-flip-forward' : 'page-flip-backward';
+    setTimeout(() => { this.slideClass = ''; }, 500);
   }
 
   onChanged($event: CalendarDay[]): void {

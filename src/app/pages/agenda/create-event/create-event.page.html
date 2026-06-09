@@ -26,114 +26,122 @@
     </div>
   </div>
 
-  <ion-card *ngIf="is_multi">
-    <div style="font-size: 1.12em; margin-left: 8px; color: rgb(0, 0, 0)">
-      <ion-select
-        aria-label="Type événement"
-        [(ngModel)]="agendaEvent!.type"
-        mode="md"
-        color="dark"
-      >
-        <ion-avatar
-          slot="start"
-          style="width: 40px; height: 40px; margin-right: 6px"
-        >
-          <ion-img [src]="getIconTypeEvent()"></ion-img>
-        </ion-avatar>
-        <ion-select-option [value]="agendaEventType.KIDS"
-          >Kid(s)</ion-select-option
-        >
-        <ion-select-option [value]="agendaEventType.NOKIDS"
-          >NoKid(s)</ion-select-option
-        >
-        <ion-select-option [value]="agendaEventType.FREE">
-          <span style="color: var(--text-dyspo-free)"
-            >Avec ou sans Kids</span
-          ></ion-select-option
-        >
-      </ion-select>
+  <ion-card *ngIf="is_multi" class="type-picker-card">
+    <div class="type-picker">
+
+      <button class="type-btn"
+        [class.type-btn--active]="agendaEvent!.type === agendaEventType.KIDS"
+        (click)="agendaEvent!.type = agendaEventType.KIDS">
+        <div class="type-bubble type-bubble--kids">
+          <span class="icon-ghost"></span>
+        </div>
+        <span class="type-label">Kid(s)</span>
+      </button>
+
+      <button class="type-btn"
+        [class.type-btn--active]="agendaEvent!.type === agendaEventType.NOKIDS"
+        (click)="agendaEvent!.type = agendaEventType.NOKIDS">
+        <div class="type-bubble type-bubble--nokids">
+          <span class="icon-ghost"></span>
+        </div>
+        <span class="type-label">NoKid(s)</span>
+      </button>
+
+      <button class="type-btn"
+        [class.type-btn--active]="agendaEvent!.type === agendaEventType.FREE"
+        (click)="agendaEvent!.type = agendaEventType.FREE">
+        <div class="type-bubble type-bubble--free">
+          <span class="icon-ghost"></span>
+        </div>
+        <span class="type-label">Avec ou sans Kids</span>
+      </button>
+
     </div>
   </ion-card>
 
-  <ion-popover
-    #popover_time
-    mode="md"
-    trigger="open-time-item"
-    show-backdrop="false"
-    arrow="false"
-  >
-    <ng-template>
-      <ion-datetime
-        #datetime_starttime
-        presentation="date-time"
-        showDefaultButtons="true"
-        doneText="OK"
-        hour-cycle="h23"
-        locale="fr-FR"
-        [value]="agendaEvent?.startISO"
-        cancelText="Fermer"
-        [min]="min_time_ISO_start"
-        [preferWheel]="true"
-        [minuteValues]="minuteValues"
-        (ionChange)="onStartTimeChanged($event)"
-        ><span slot="time-label">Heure</span></ion-datetime
-      >
-    </ng-template>
-  </ion-popover>
+  <ion-card class="date-card">
+    <ion-accordion-group>
+      <ion-accordion value="start" class="date-accordion">
+        <ion-item slot="header" lines="inset" class="date-header-item">
+          <ion-icon name="play-circle-outline" slot="start" class="date-icon"></ion-icon>
+          <ion-label class="date-header-label">
+            <p class="date-caption">Début</p>
+            <p class="date-value">{{agendaEvent?.start_date_formatted}} · {{agendaEvent?.start_time_formatted}}</p>
+          </ion-label>
+        </ion-item>
+        <div slot="content">
+          <ion-datetime
+            presentation="date"
+            locale="fr-FR"
+            [value]="agendaEvent?.startISO"
+            [min]="min_time_ISO_start"
+            (ionChange)="onStartDateOnlyChanged($event)"
+          ></ion-datetime>
+          <button class="time-pick-btn" (click)="showStartClock = true">
+            <ion-icon name="time-outline"></ion-icon>
+            <span>{{ agendaEvent?.start_time_formatted }}</span>
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </button>
+        </div>
+      </ion-accordion>
 
-  <ion-popover
-    #popover_time
-    trigger="open-end-time-item"
-    show-backdrop="false"
-    mode="md"
-    arrow="false"
-  >
-    <ng-template>
-      <ion-datetime
-        presentation="date-time"
-        [preferWheel]="true"
-        showDefaultButtons="true"
-        doneText="OK"
-        hour-cycle="h23"
-        locale="fr-FR"
-        [value]="agendaEvent?.endISO"
-        [min]="min_time_ISO_end"
-        [max]="max_time_ISO_end"
-        [minuteValues]="minuteValues"
-        cancelText="Fermer"
-        (ionChange)="onEndTimeChanged($event)"
-      >
-        <span slot="time-label">Heure</span></ion-datetime
-      >
-    </ng-template>
-  </ion-popover>
-
-  <!-- <div style="height: 50px; width: 100%"></div> -->
-  <ion-card>
-    <ion-item
-      button="true"
-      detail="false"
-      id="open-time-item"
-      lines="none"
-      class="ion-no-padding"
-      style="padding-left: 7px"
-    >
-      <ion-text slot="start">{{agendaEvent?.start_date_formatted}}</ion-text>
-      <ion-text slot="end">{{agendaEvent?.start_time_formatted}}</ion-text>
-    </ion-item>
-
-    <ion-item
-      button="true"
-      detail="false"
-      id="open-end-time-item"
-      lines="none"
-      class="ion-no-padding"
-      style="padding-left: 7px"
-    >
-      <ion-text slot="start">{{agendaEvent?.end_date_formatted}}</ion-text>
-      <ion-text slot="end">{{agendaEvent?.end_time_formatted}}</ion-text>
-    </ion-item>
+      <ion-accordion value="end" class="date-accordion">
+        <ion-item slot="header" lines="none" class="date-header-item">
+          <ion-icon name="flag-outline" slot="start" class="date-icon"></ion-icon>
+          <ion-label class="date-header-label">
+            <p class="date-caption">Fin</p>
+            <p class="date-value">{{agendaEvent?.end_date_formatted}} · {{agendaEvent?.end_time_formatted}}</p>
+          </ion-label>
+        </ion-item>
+        <div slot="content">
+          <ion-datetime
+            presentation="date"
+            locale="fr-FR"
+            [value]="agendaEvent?.endISO"
+            [min]="min_time_ISO_end"
+            [max]="max_time_ISO_end"
+            (ionChange)="onEndDateOnlyChanged($event)"
+          ></ion-datetime>
+          <button class="time-pick-btn" (click)="showEndClock = true">
+            <ion-icon name="time-outline"></ion-icon>
+            <span>{{ agendaEvent?.end_time_formatted }}</span>
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </button>
+        </div>
+      </ion-accordion>
+    </ion-accordion-group>
   </ion-card>
+
+  <!-- Modals horloge style Google Calendar — centrées avec effet rebond -->
+  <ion-modal
+    [isOpen]="showStartClock"
+    cssClass="clock-modal"
+    (didDismiss)="showStartClock = false"
+  >
+    <ng-template>
+      <app-time-picker-clock
+        [hour]="startHour"
+        [minute]="startMinute"
+        (confirmed)="onStartClockConfirmed($event)"
+        (cancelled)="showStartClock = false"
+      ></app-time-picker-clock>
+    </ng-template>
+  </ion-modal>
+
+  <ion-modal
+    [isOpen]="showEndClock"
+    cssClass="clock-modal"
+    (didDismiss)="showEndClock = false"
+  >
+    <ng-template>
+      <app-time-picker-clock
+        [hour]="endHour"
+        [minute]="endMinute"
+        (confirmed)="onEndClockConfirmed($event)"
+        (cancelled)="showEndClock = false"
+      ></app-time-picker-clock>
+    </ng-template>
+  </ion-modal>
 
   <ion-card *ngIf="is_multi">
     <ion-accordion-group>
@@ -269,17 +277,30 @@
   </ion-card>
 
   <ion-card *ngIf="is_multi">
-    <div style="padding-left: 5px; padding-bottom: 16px">
+    <div class="checkbox-row">
       <ion-checkbox [(ngModel)]="allCanEdit" labelPlacement="end"
         >Autoriser l'édition pour tout le monde</ion-checkbox
       >
     </div>
   </ion-card>
   <ion-card *ngIf="!is_multi">
-    <div style="padding-left: 5px; padding-bottom: 16px">
+    <div class="checkbox-row">
       <ion-checkbox [(ngModel)]="allCanSeeTitle" labelPlacement="end"
         >Afficher le titre pour tout le monde</ion-checkbox
       >
+    </div>
+  </ion-card>
+
+  <ion-card class="description-card">
+    <div class="desc-row">
+      <ion-icon name="document-text-outline" class="desc-icon"></ion-icon>
+      <ion-textarea
+        [(ngModel)]="agendaEvent!.description"
+        placeholder="Ajouter une description…"
+        [autoGrow]="true"
+        rows="2"
+        maxlength="500"
+      ></ion-textarea>
     </div>
   </ion-card>
 
@@ -301,9 +322,8 @@
   <div class="d-flex ion-justify-content-center">
     <ion-button
       [disabled]=""
-      class="dyspo-button"
+      class="dyspo-button btn-save-event"
       fill="solid"
-      color="tertiary"
       mode="ios"
       (click)="saveOrUpdateEvent()"
     >

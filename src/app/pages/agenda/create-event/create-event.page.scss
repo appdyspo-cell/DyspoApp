@@ -37,6 +37,72 @@ ion-list-header {
   --border-color: var(--d-surface-3);
 }
 
+// ── Type picker (Kids / NoKids / Free) ───────────────────────────────────────
+
+.type-picker-card {
+  --background: var(--d-surface-1);
+}
+
+.type-picker {
+  display: flex;
+  justify-content: space-around;
+  padding: var(--d-space-4) var(--d-space-3);
+}
+
+.type-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--d-space-2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  opacity: 0.45;
+  transition: opacity var(--d-duration-fast) var(--d-ease),
+              transform var(--d-duration-fast) var(--d-spring);
+
+  &.type-btn--active {
+    opacity: 1;
+  }
+
+  &:active { transform: scale(0.9); }
+}
+
+.type-bubble {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow var(--d-duration-fast) var(--d-ease);
+
+  .icon-ghost {
+    font-size: 26px;
+    color: #fff;
+    line-height: 1;
+  }
+
+  &--kids   { background: var(--d-dyspo-kids); }
+  &--nokids { background: var(--d-dyspo-dark); }
+  &--free   { background: #f5c842; }
+}
+
+.type-btn--active .type-bubble {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+}
+
+.type-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--d-text-secondary);
+  text-align: center;
+  max-width: 70px;
+  line-height: 1.3;
+}
+
 // ── Status radio buttons ──────────────────────────────────────────────────────
 
 ion-radio::part(container) {
@@ -177,20 +243,29 @@ ion-radio.radio-checked::part(mark) {
     .item {
       border-radius: 50%;
       background: transparent !important;
-      width: max-content;
+      width: 56px;
+      flex-shrink: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
 
-      ion-label { font-size: 10px; color: var(--d-text-secondary); }
+      ion-label {
+        font-size: 10px;
+        color: var(--d-text-secondary);
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
+      }
 
       ion-thumbnail {
         border-radius: 50%;
         padding: 2px;
         margin: 2px;
-        height: 60px;
-        width: 60px;
+        height: 48px;
+        width: 48px;
         --background: transparent;
         position: relative;
 
@@ -322,6 +397,142 @@ ion-searchbar {
   display: flex;
   justify-content: center;
   padding: var(--d-space-3);
+}
+
+// ── Bouton Enregistrer ────────────────────────────────────────────────────────
+
+.btn-save-event {
+  --background: #46a2c2;
+  --background-activated: #3586a2;
+  --background-hover: #3586a2;
+  --background-focused: #3586a2;
+  --color: #fff;
+  --border-radius: var(--d-radius-pill);
+}
+
+// ── Checkbox alignement ───────────────────────────────────────────────────────
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  padding: var(--d-space-3) var(--d-space-4);
+
+  ion-checkbox {
+    width: 100%;
+    --checkbox-background-checked: #46a2c2;
+    --border-color-checked: #46a2c2;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--d-text-primary);
+  }
+}
+
+// ── Calendrier inline ─────────────────────────────────────────────────────────
+
+.date-card {
+  ion-accordion-group {
+    background: transparent;
+  }
+}
+
+.date-accordion {
+  background: transparent;
+}
+
+.date-header-item {
+  --min-height: 60px;
+  --padding-start: var(--d-space-4);
+  --inner-padding-end: var(--d-space-3);
+
+  .date-icon {
+    font-size: 22px;
+    color: #46a2c2;
+    margin-right: var(--d-space-3);
+    flex-shrink: 0;
+  }
+}
+
+.date-header-label {
+  p {
+    margin: 0;
+    line-height: 1.35;
+  }
+
+  .date-caption {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--d-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+
+  .date-value {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--d-text-primary);
+    margin-top: 2px;
+  }
+}
+
+ion-datetime {
+  display: block;
+  max-width: 340px;
+  margin: 0 auto;
+  --background: var(--d-surface-1);
+  --color: var(--d-text-primary);
+  --ion-color-primary: #46a2c2;
+  --ion-color-primary-shade: #3586a2;
+  --ion-color-primary-contrast: #fff;
+}
+
+.time-pick-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--d-space-3);
+  width: 100%;
+  padding: var(--d-space-4) var(--d-space-4);
+  background: var(--d-surface-2);
+  border: none;
+  border-top: 1px solid var(--d-surface-3);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+  color: #46a2c2;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  span { flex: 1; text-align: left; }
+  ion-icon { font-size: 20px; }
+
+  &:hover { background: rgba(53, 134, 162, 0.08); color: #3586a2; }
+  &:active { background: var(--d-surface-3); color: #3586a2; }
+}
+
+// ── Description ───────────────────────────────────────────────────────────────
+
+.description-card {
+  .desc-row {
+    display: flex;
+    align-items: flex-start;
+    padding: var(--d-space-3) var(--d-space-4);
+    gap: var(--d-space-3);
+  }
+
+  .desc-icon {
+    font-size: 20px;
+    color: var(--d-text-tertiary);
+    flex-shrink: 0;
+    margin-top: 10px; // aligne le centre de l'icône avec la première ligne de texte
+  }
+
+  ion-textarea {
+    flex: 1;
+    --color: var(--d-text-primary);
+    --placeholder-color: var(--d-text-tertiary);
+    --padding-top: 10px;
+    --padding-bottom: 8px;
+    --padding-start: 0;
+    font-size: 14px;
+  }
 }
 
 // ── Misc ──────────────────────────────────────────────────────────────────────

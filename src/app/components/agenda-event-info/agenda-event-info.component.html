@@ -12,27 +12,23 @@
       slot="start"
       (click)="close()"
       fill="clear"
-      size="large"
-      class="white-btn"
+      class="white-btn toolbar-icon-btn"
     >
       <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
     </ion-button>
     <ion-buttons *ngIf="!isInvitation" slot="end">
       <ion-button
-        *ngIf="agendaEvent.is_multi && agendaEvent.members_uid.length > 1"
-        class="white-btn"
+        *ngIf="agendaEvent.is_multi"
+        class="white-btn toolbar-icon-btn"
         fill="clear"
-        size="large"
         (click)="goToChat(agendaEvent, $event)"
       >
-        <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+        <ion-icon slot="icon-only" name="chatbubble-ellipses-outline"></ion-icon>
       </ion-button>
       <ion-button
-        slot="end"
-        class="white-btn"
+        class="white-btn toolbar-icon-btn"
         (click)="openPopoverMenu($event)"
         fill="clear"
-        size="large"
       >
         <ion-icon slot="icon-only" name="ellipsis-vertical-outline"></ion-icon>
       </ion-button>
@@ -193,7 +189,9 @@
             ></div>
             <ion-icon
               *ngIf="member.is_my_friend === false"
-              class="zmdi zmdi-plus invite-icon"
+              name="add-circle"
+              class="invite-icon"
+              (click)="openFriendProfile(member, $event)"
             ></ion-icon>
             <div
               class="d-flex ion-align-items-center thumbnail-status animate__animated animate__zoomIn"
@@ -232,9 +230,10 @@
               class="thumbnail-badge"
             ></div>
             <ion-icon
-              (click)="invite(member)"
               *ngIf="member.is_my_friend === false"
-              class="zmdi zmdi-plus end invite-icon"
+              name="add-circle"
+              class="invite-icon"
+              (click)="openFriendProfile(member, $event)"
             ></ion-icon>
             <div
               class="d-flex ion-align-items-center thumbnail-status animate__animated animate__zoomIn"
@@ -266,12 +265,27 @@
         </div>
       </div>
 
-      <span style="font-size: 1.3rem; font-weight: bold">{{
-        agendaEvent.title
-      }}</span>
-      <p *ngIf="agendaEvent.place_description !== ''" style="margin-top: 0px">
-        {{ agendaEvent.place_description }}
-      </p>
+      <span class="event-title-text">{{ agendaEvent.title }}</span>
+
+      <div *ngIf="agendaEvent.description" class="event-meta-row">
+        <ion-icon name="document-text-outline" class="event-meta-icon"></ion-icon>
+        <span class="event-meta-text">{{ agendaEvent.description }}</span>
+      </div>
+
+      <div *ngIf="agendaEvent.place_description" class="event-meta-row">
+        <ion-icon name="location-outline" class="event-meta-icon"></ion-icon>
+        <span class="event-meta-text">{{ agendaEvent.place_description }}</span>
+      </div>
+
+      <div
+        *ngIf="!isInvitation && agendaEvent.is_multi"
+        class="event-chat-row"
+      >
+        <ion-button fill="solid" class="event-chat-btn" (click)="goToChat(agendaEvent, $event)">
+          <ion-icon slot="start" name="chatbubble-ellipses-outline"></ion-icon>
+          Discussion
+        </ion-button>
+      </div>
 
       <div
         *ngIf="isInvitation"

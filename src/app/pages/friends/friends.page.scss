@@ -13,8 +13,11 @@ ion-header {
 .btn-repertoire {
   font-size: 13px;
   font-weight: 600;
-  color: var(--d-text-secondary);
-  --color: var(--d-text-secondary);
+  color: #46a2c2;
+  --color: #46a2c2;
+  --color-hover: #3586a2;
+  --color-activated: #3586a2;
+  --color-focused: #3586a2;
 
   ion-icon { font-size: 17px; }
 }
@@ -24,38 +27,36 @@ ion-header {
 ion-segment {
   --background: var(--d-surface-2);
   margin: var(--d-space-3) var(--d-space-4);
-  border-radius: var(--d-radius-md);
-  padding: 3px;
+  border-radius: var(--d-radius-lg);
+  padding: 4px;
 }
 
 ion-segment-button {
-  --color:          var(--d-text-tertiary);
-  --color-checked:  var(--d-text-primary);
+  --color:              var(--d-text-tertiary);
+  --color-checked:      var(--d-brand);
   --background-checked: var(--d-surface-1);
-  --border-radius:  var(--d-radius-sm);
-  --indicator-height: 0;
-  --padding-top: var(--d-space-2);
-  --padding-bottom: var(--d-space-2);
-  min-height: 40px;
+  --border-radius:      var(--d-radius-md);
+  --indicator-height:   0;
+  --padding-top:        var(--d-space-3);
+  --padding-bottom:     var(--d-space-3);
+  min-height: 64px;
   text-transform: none;
-  font-size: 12px;
-  font-weight: 600;
   position: relative;
   box-shadow: none;
 
   &.segment-button-checked {
-    box-shadow: var(--d-shadow-xs);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
   }
 
   ion-icon {
-    font-size: 16px;
-    margin-bottom: 0;
+    font-size: 22px;
+    margin-bottom: 5px;
   }
 
   ion-label {
     font-size: 11px;
-    font-weight: 600;
-    margin-top: 2px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
     text-transform: none;
   }
 }
@@ -98,23 +99,26 @@ ion-list {
   padding: 0 var(--d-space-4) var(--d-space-12);
 }
 
+ion-item {
+  --background: transparent;
+  --background-activated: var(--d-surface-2);
+  --background-hover: var(--d-surface-2);
+}
+
 // ── Friend item ───────────────────────────────────────────────────────────────
 
 .friend-item {
-  --background: var(--d-surface-1);
-  --border-radius: var(--d-radius-md);
+  --background: transparent;
+  --border-radius: 0;
   --padding-start: var(--d-space-3);
   --inner-padding-end: var(--d-space-3);
-  --inner-border-width: 0;
+  --inner-border-width: 1px;
+  --border-color: var(--d-surface-3);
   --min-height: 68px;
-  margin-bottom: var(--d-space-2);
-  border-radius: var(--d-radius-md);
-  box-shadow: var(--d-shadow-xs);
-  transition: box-shadow var(--d-duration-fast) var(--d-ease),
-              transform var(--d-duration-fast) var(--d-ease);
+  margin-bottom: 0;
+  transition: transform var(--d-duration-fast) var(--d-ease);
 
   &:active {
-    box-shadow: none;
     transform: scale(0.99);
   }
 

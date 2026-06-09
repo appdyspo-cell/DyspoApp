@@ -340,18 +340,39 @@ export class AgendaPage implements AfterViewInit {
     if (!this.calendarMonthData) {
       console.log('Can not tag calendar holidays');
     } else {
-      this.calendarMonthData.days.forEach((day) => {
-        day.isHolidays = false;
+      const days = this.calendarMonthData.days;
 
+      // Normalise "zone_A" → "A" pour correspondre aux deux formats possibles
+      const normalizeZone = (z: string | undefined) =>
+        (z ?? '').replace('zone_', '').toUpperCase();
+      const userZone = normalizeZone(this.userSvc.userInfo?.geo_zone);
+
+      // Normalise un timestamp qui pourrait être en secondes ou en millisecondes
+      const toMs = (ts: number) => (ts < 1e10 ? ts * 1000 : ts);
+
+      days.forEach((day) => {
+        day.isHolidays = false;
+        if (!userZone) return;
         this.holidays.forEach((h) => {
           if (
-            h.geo_zone === this.userSvc.userInfo?.geo_zone &&
-            h.start_date_ts <= day.time &&
-            h.end_date_ts >= day.time
+            normalizeZone(h.geo_zone) === userZone &&
+            toMs(h.start_date_ts) <= day.time &&
+            toMs(h.end_date_ts)   >= day.time
           ) {
             day.isHolidays = true;
           }
         });
+      });
+
+      days.forEach((day, i) => {
+        if (day.isHolidays) {
+          const dow = new Date(day.time).getDay(); // 0=Sun, 1=Mon
+          day.isHolidaysFirst = !days[i - 1]?.isHolidays || dow === 1;
+          day.isHolidaysLast  = !days[i + 1]?.isHolidays || dow === 0;
+        } else {
+          day.isHolidaysFirst = false;
+          day.isHolidaysLast  = false;
+        }
       });
     }
   }
@@ -406,6 +427,22 @@ export class AgendaPage implements AfterViewInit {
       this.getAgendaEventsForDate(ev[0].time);
     }
   }
+  async openCreateEventForFriend() {
+    const todayMorning = setHours(new Date(), 0);
+    if (isBefore(new Date(addHours(this.selectedDateMs!, 1)), todayMorning)) {
+      this.utils.showAlert('Vous ne pouvez pas créer un événement dans le passé');
+      return;
+    }
+    const navigationExtras: NavigationExtras = {
+      state: {
+        tsDate: this.selectedDateMs,
+        is_multi: true,
+        preInvitedFriend: this.agendaFriend,
+      },
+    };
+    this.navCtrl.navigateForward('/agenda/me/create-event/new', navigationExtras);
+  }
+
   async openCreateEvent() {
     const todayMorning = setHours(new Date(), 0);
     console.log();

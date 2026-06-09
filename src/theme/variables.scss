@@ -53,13 +53,13 @@ html {
   --ion-color-secondary-shade: #006bb4;
   --ion-color-secondary-tint: #1a87d1;
 
-  // Tertiary = CTA sombre (boutons principaux)
-  --ion-color-tertiary: #1a1d23;
-  --ion-color-tertiary-rgb: 26, 29, 35;
+  // Tertiary = couleur brand (identique à primary pour cohérence)
+  --ion-color-tertiary: #46a2c2;
+  --ion-color-tertiary-rgb: 70, 162, 194;
   --ion-color-tertiary-contrast: #ffffff;
   --ion-color-tertiary-contrast-rgb: 255, 255, 255;
-  --ion-color-tertiary-shade: #0f1014;
-  --ion-color-tertiary-tint: #2e3240;
+  --ion-color-tertiary-shade: #3586a2;
+  --ion-color-tertiary-tint: #6ab8d4;
 
   --ion-color-success: #7ae198;
   --ion-color-success-rgb: 122, 225, 152;

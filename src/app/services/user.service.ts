@@ -217,39 +217,46 @@ export class UserService {
   }
 
   async hydrateAppContacts(appContacts: AppDeviceContact[]) {
-    const collectionUserRef = collection(this.firestore, `users`);
-    //const q = query(collectionUserRef, where('phoneNumber', '==', number));
-    const docFriendSnaps = await getDocs(collectionUserRef);
-    const allPhones: string[] = [];
+    // BC-04: remplacement du full scan par une requête chunked sur les numéros de téléphone
+    // Prépare les numéros au format stocké en DB (préfixe '0' + 9 derniers chiffres)
+    const phoneNumbers = appContacts
+      .filter(c => c.phone_number)
+      .map(c => '0' + c.phone_number);
+
+    if (phoneNumbers.length === 0) {
+      this.logger.logDebug('hydrateAppContacts: aucun contact à hydrater');
+      return;
+    }
+
     const allUsers: AppUser[] = [];
-    docFriendSnaps.forEach((snap) => {
-      const user = snap.data() as AppUser;
-      if (user.phoneNumber) {
-        allUsers.push(user);
-      }
-    });
-    // docFriendSnaps.forEach((snap) => {
-    //   const user = snap.data() as AppUser;
-    //   if (user.phoneNumber) {
-    //     allPhones.push(user.phoneNumber);
-    //   }
-    // });
-    //  appContacts.map(appContact => {
-    //   return appContact.is_member = true
-    // })
-    appContacts.forEach((appContact) => {
-      const foundIndex = allUsers.findIndex((user) => {
-        return user.phoneNumber === '0' + appContact.phone_number;
+    const collectionUserRef = collection(this.firestore, 'users');
+
+    // Chunks de 10 (limite Firestore pour 'in')
+    const chunks: string[][] = [];
+    for (let i = 0; i < phoneNumbers.length; i += 10) {
+      chunks.push(phoneNumbers.slice(i, i + 10));
+    }
+
+    for (const chunk of chunks) {
+      const q = query(collectionUserRef, where('phoneNumber', 'in', chunk));
+      const snaps = await getDocs(q);
+      snaps.forEach((snap) => {
+        allUsers.push(snap.data() as AppUser);
       });
-      if (foundIndex >= 0) {
-        appContact.uid = allUsers[foundIndex].uid;
-        appContact.avatar = allUsers[foundIndex].avatarPath;
+    }
+
+    appContacts.forEach((appContact) => {
+      const targetPhone = '0' + appContact.phone_number;
+      const found = allUsers.find(user => user.phoneNumber === targetPhone);
+      if (found) {
+        appContact.uid = found.uid;
+        appContact.avatar = found.avatarPath;
         appContact.is_member = true;
       } else {
         appContact.is_member = false;
       }
     });
-    console.log('Hydration OK');
+    this.logger.logDebug('hydrateAppContacts: hydratation OK');
   }
 
   async getMartinContacts() {

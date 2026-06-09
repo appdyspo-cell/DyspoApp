@@ -17,7 +17,8 @@ import {
   PickMode,
 } from '../calendar.model';
 import { defaults, pickModes } from '../config';
-import { ActionSheetController, GestureController } from '@ionic/angular';
+import { ActionSheetController, GestureController, ModalController } from '@ionic/angular';
+import { StatusPickerComponent } from './status-picker.component';
 import * as Hammer from 'hammerjs';
 import $$ from 'dom7';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
@@ -56,6 +57,9 @@ export const MONTH_VALUE_ACCESSOR: any = {
               class="days p-day"
               style="position: relative;"
               [id]="'divday-' + day.time"
+              [class.is-holidays-day]="day.isHolidays"
+              [class.is-holidays-first]="day.isHolidaysFirst"
+              [class.is-holidays-last]="day.isHolidaysLast"
             >
               <ng-container *ngIf="day">
                 <button
@@ -214,6 +218,7 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     public ref: ChangeDetectorRef,
     private gestureCtrl: GestureController,
     private actionSheetCtrl: ActionSheetController,
+    private modalCtrl: ModalController,
     public userSvc: UserService
   ) {}
 
@@ -337,35 +342,28 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     buttons.push({
       text: 'Dyspo!',
       cssClass: 'dyspo-sheet-dyspo',
-      data: {
-        action: UserDyspoStatus.DYSPO,
-      },
+      data: { action: UserDyspoStatus.DYSPO },
     });
     if (this.userSvc.userInfo?.with_kids) {
       buttons.push({
         text: 'Kid(s)',
         cssClass: 'dyspo-sheet-dyspo-with-kids',
-        data: {
-          action: UserDyspoStatus.DYSPOWITHKIDS,
-        },
+        data: { action: UserDyspoStatus.DYSPOWITHKIDS },
       });
     }
     buttons.push({
       text: 'Pas dyspo',
       cssClass: 'dyspo-sheet-no-dyspo',
-      data: {
-        action: UserDyspoStatus.NODYSPO,
-      },
+      data: { action: UserDyspoStatus.NODYSPO },
     });
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Saisissez vos disponibilités',
       cssClass: 'dyspo-sheet',
       buttons,
     });
-
     await actionSheet.present();
 
-    let result = await actionSheet.onDidDismiss();
+    const result = await actionSheet.onDidDismiss();
     if (result.data) {
       this.updateDays(result.data.action);
     } else {
@@ -528,7 +526,7 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     return false;
   }
 
-  onSelected(item: CalendarDay, event?: any): void {
+  async onSelected(item: CalendarDay, event?: any): Promise<void> {
     if (this.readonly) {
       console.log('Read Only Mode');
       if (this.pickMode === pickModes.MULTI) {
@@ -624,7 +622,6 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
           item.userDyspo = UserDyspoStatus.DYSPO;
         }
       }
-
       this.change.emit([item]);
     }
   }

@@ -39,7 +39,7 @@ export class AuthService {
       );
       const ref = doc(this.firestore, `users/${credentials.user.uid}`);
       userInfo.uid = credentials.user.uid;
-      setDoc(ref, userInfo);
+      await setDoc(ref, userInfo); // BC-01: await ajouté — profil garanti avant navigation
       return credentials;
     } catch (e) {
       this.utils.log(e);

@@ -99,8 +99,42 @@
 }
 
 :host .is-holidays {
-  border: 1px dashed #1f1f1f;
-  //font-style: italic;
+  border: none;
+  background: transparent;
+}
+
+:host .days {
+  overflow: visible;
+}
+
+:host .days.is-holidays-day::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 0;
+  right: 0;
+  border-top: 1.5px dashed var(--d-text-tertiary, #9aa3b2);
+  border-bottom: 1.5px dashed var(--d-text-tertiary, #9aa3b2);
+  background: rgba(154, 163, 178, 0.10);
+  pointer-events: none;
+  z-index: 0;
+}
+
+:host .days.is-holidays-day.is-holidays-first::before {
+  left: 3px;
+  border-left: 1.5px dashed var(--d-text-tertiary, #9aa3b2);
+  border-radius: 8px 0 0 8px;
+}
+
+:host .days.is-holidays-day.is-holidays-last::before {
+  right: 3px;
+  border-right: 1.5px dashed var(--d-text-tertiary, #9aa3b2);
+  border-radius: 0 8px 8px 0;
+}
+
+:host .days.is-holidays-day.is-holidays-first.is-holidays-last::before {
+  border-radius: 8px;
 }
 
 :host .event-badge {

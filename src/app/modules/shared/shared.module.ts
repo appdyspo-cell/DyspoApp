@@ -17,6 +17,7 @@ import { ReportComponent } from 'src/app/components/report/report.component';
 import { AlphabetScrollComponent } from 'src/app/components/alphabet-scroll/alphabet-scroll.component';
 import { HelperComponent } from 'src/app/components/helper/helper.component';
 import { FriendProfileComponent } from 'src/app/components/friend-profile/friend-profile.component';
+import { StatusPickerComponent } from 'src/app/calendar/components/status-picker.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { FriendProfileComponent } from 'src/app/components/friend-profile/friend
     AlphabetScrollComponent,
     HelperComponent,
     FriendProfileComponent,
+    StatusPickerComponent,
   ],
   imports: [
     CommonModule,
@@ -49,6 +51,7 @@ import { FriendProfileComponent } from 'src/app/components/friend-profile/friend
     AlphabetScrollComponent,
     HelperComponent,
     FriendProfileComponent,
+    StatusPickerComponent,
   ],
   schemas: [NO_ERRORS_SCHEMA],
 })

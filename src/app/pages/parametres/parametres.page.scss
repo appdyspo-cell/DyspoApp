@@ -13,9 +13,9 @@ ion-header {
 // ── Cards ─────────────────────────────────────────────────────────────────────
 
 ion-card {
-  --background: var(--d-surface-1);
-  border-radius: var(--d-radius-lg) !important;
-  box-shadow: var(--d-shadow-sm) !important;
+  --background: transparent;
+  border-radius: 0 !important;
+  box-shadow: none !important;
   margin: 0 var(--d-space-4) var(--d-space-3);
 
   ion-card-header {
@@ -202,13 +202,28 @@ ion-range {
 
 .iconmail {
   font-size: 20px;
-  padding-top: var(--d-space-1);
-  margin-right: var(--d-space-1);
+  color: #46a2c2;
+  flex-shrink: 0;
 }
 
-.change-color {
-  --background: var(--ion-color-danger-shade);
-  --background-focused: var(--ion-color-danger-shade);
+ion-label.text {
+  display: flex !important;
+  align-items: center;
+  gap: var(--d-space-2);
+}
+
+// ── Boutons spécifiques ───────────────────────────────────────────────────────
+
+.dyspo-button[color="tertiary"] {
+  --background: #46a2c2;
+  --background-activated: #3586a2;
+  --background-focused: #3586a2;
+  --background-hover: #3586a2;
+  --ion-color-base: #46a2c2;
+  --ion-color-shade: #3586a2;
+  --ion-color-tint: #6ab8d4;
+  --ion-color-contrast: #ffffff;
+  --color: #ffffff;
 }
 
 app-alphabet-scroll {

@@ -1,0 +1,74 @@
+<div class="cp-wrapper">
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+  <div class="cp-header">
+    <span class="cp-header-label">Entrer l'heure</span>
+    <div class="cp-time-row">
+      <button class="cp-segment" [class.cp-active]="mode === 'hours'" (click)="mode = 'hours'">
+        {{ formattedHour }}
+      </button>
+      <span class="cp-colon">:</span>
+      <button class="cp-segment" [class.cp-active]="mode === 'minutes'" (click)="mode = 'minutes'">
+        {{ formattedMinute }}
+      </button>
+    </div>
+    <div class="cp-mode-hint">
+      <span [class.cp-mode-active]="mode === 'hours'">Heures</span>
+      &nbsp;·&nbsp;
+      <span [class.cp-mode-active]="mode === 'minutes'">Minutes</span>
+    </div>
+  </div>
+
+  <!-- ── Cadran ──────────────────────────────────────────────────────────── -->
+  <div class="cp-clock-area">
+    <div class="cp-face">
+
+      <!-- Aiguille -->
+      <div class="cp-hand" [style.height.px]="handLength" [style.transform]="handTransform">
+        <div class="cp-hand-dot"></div>
+      </div>
+      <div class="cp-center"></div>
+
+      <!-- Mode heures -->
+      <ng-container *ngIf="mode === 'hours'">
+        <button
+          *ngFor="let it of outerHourItems"
+          class="cp-num"
+          [class.cp-hit]="isHourSelected(it.value)"
+          [style.top.px]="it.top"
+          [style.left.px]="it.left"
+          (click)="selectHour(it.value)"
+        >{{ it.value }}</button>
+
+        <button
+          *ngFor="let it of innerHourItems"
+          class="cp-num cp-num-sm"
+          [class.cp-hit]="isHourSelected(it.value)"
+          [style.top.px]="it.top"
+          [style.left.px]="it.left"
+          (click)="selectHour(it.value)"
+        >{{ pad(it.value) }}</button>
+      </ng-container>
+
+      <!-- Mode minutes -->
+      <ng-container *ngIf="mode === 'minutes'">
+        <button
+          *ngFor="let it of minuteItems"
+          class="cp-num"
+          [class.cp-hit]="isMinuteSelected(it.value)"
+          [style.top.px]="it.top"
+          [style.left.px]="it.left"
+          (click)="selectMinute(it.value)"
+        >{{ pad(it.value) }}</button>
+      </ng-container>
+
+    </div>
+  </div>
+
+  <!-- ── Actions ─────────────────────────────────────────────────────────── -->
+  <div class="cp-actions">
+    <ion-button fill="clear" class="cp-btn-cancel" (click)="cancel()">Annuler</ion-button>
+    <ion-button fill="clear" class="cp-btn-ok" (click)="confirm()">OK</ion-button>
+  </div>
+
+</div>

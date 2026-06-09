@@ -1,32 +1,23 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar color="primary" mode="md">
-    <ion-title>
-      <span style="font-weight: 500; font-size: 20px;">{{ 'discussions' | translate }}</span>
-    </ion-title>
-    <ion-buttons slot="end">
-      <ion-button>
-        <ion-icon name="search-outline"></ion-icon>
-      </ion-button>
-      <ion-button>
-        <ion-icon name="ellipsis-vertical"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-  <ion-toolbar color="primary" mode="md" class="segment-toolbar">
-    <ion-segment mode="md" [(ngModel)]="selectDiscussionsType" value="active">
-      <ion-segment-button value="{{discussionType.ACTIVE}}">
-        <ion-label style="font-weight: 600;">ACTIVES</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="{{discussionType.ARCHIVE}}">
-        <ion-label style="font-weight: 600;">ARCHIVES</ion-label>
-      </ion-segment-button>
-    </ion-segment>
+  <ion-toolbar mode="md">
+    <ion-title><h1>{{ 'discussions' | translate }}</h1></ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="wa-content">
+<ion-content class="bg_color">
 
-  <!-- Filtres (contextuels à l'onglet sélectionné) -->
+  <ion-segment mode="md" [(ngModel)]="selectDiscussionsType" lines="none">
+    <ion-segment-button value="{{discussionType.ACTIVE}}" layout="icon-top">
+      <ion-icon name="chatbubbles-outline"></ion-icon>
+      <ion-label>Actives</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="{{discussionType.ARCHIVE}}" layout="icon-top">
+      <ion-icon name="archive-outline"></ion-icon>
+      <ion-label>Archivées</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Filtres -->
   <div class="filter-bar">
     <ion-chip mode="md" [class.filter-chip-active]="currentFilter === 'all'" (click)="setFilter('all')">
       <ion-label>Tous</ion-label>
@@ -48,6 +39,7 @@
   <!-- Onglet ACTIVES -->
   <div *ngIf="selectDiscussionsType === discussionType.ACTIVE">
     <div *ngIf="filteredActive.length === 0 && !isLoading" class="empty-state">
+      <ion-icon name="chatbubbles-outline" class="empty-icon"></ion-icon>
       <p>Pas de discussions en cours</p>
     </div>
     <ion-list class="wa-list" lines="none">
@@ -59,15 +51,15 @@
         class="wa-item animate__animated animate__fadeIn"
         [class.wa-item-pinned]="isFavorite(agendaEvent.uid!)"
       >
-        <ion-avatar slot="start" class="wa-avatar"
-          [ngClass]="{
-            'border-kids': agendaEvent.type === agendaEventType.KIDS,
-            'border-nokids': agendaEvent.type === agendaEventType.NOKIDS,
-            'border-free': agendaEvent.type === agendaEventType.FREE
-          }"
-        >
-          <img [src]="agendaEvent.avatar || 'assets/default-avatar.png'" />
-        </ion-avatar>
+        <div class="member-avatars-stack" slot="start">
+          <img
+            *ngFor="let av of memberAvatarsMap.get(agendaEvent.uid!) ?? []; let j = index"
+            [src]="av"
+            class="stack-av"
+            [style.left.px]="j * 20"
+            [style.z-index]="3 - j"
+          />
+        </div>
 
         <div class="wa-item-inner">
           <div class="wa-item-header">
@@ -123,15 +115,15 @@
         class="wa-item animate__animated animate__fadeIn"
         [class.wa-item-pinned]="isFavorite(agendaEvent.uid!)"
       >
-        <ion-avatar slot="start" class="wa-avatar"
-          [ngClass]="{
-            'border-kids': agendaEvent.type === agendaEventType.KIDS,
-            'border-nokids': agendaEvent.type === agendaEventType.NOKIDS,
-            'border-free': agendaEvent.type === agendaEventType.FREE
-          }"
-        >
-          <img [src]="agendaEvent.avatar || 'assets/default-avatar.png'" />
-        </ion-avatar>
+        <div class="member-avatars-stack" slot="start">
+          <img
+            *ngFor="let av of memberAvatarsMap.get(agendaEvent.uid!) ?? []; let j = index"
+            [src]="av"
+            class="stack-av"
+            [style.left.px]="j * 20"
+            [style.z-index]="3 - j"
+          />
+        </div>
 
         <div class="wa-item-inner">
           <div class="wa-item-header">

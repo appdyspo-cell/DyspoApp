@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionnaire Utilisateurs Test - DyspoApp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2ECC71; /* Vert Dyspo */
+            --primary-dark: #27AE60;
+            --secondary: #3498DB; /* Bleu enfants */
+            --dark: #2C3E50;
+            --light: #F8F9FA;
+            --gray: #BDC3C7;
+            --border: #E0E6ED;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h1 {
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        p.subtitle {
+            color: var(--dark);
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .section-title {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 40px 0 25px 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
+        }
+
+        .question-block {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #ffffff;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .question-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+            border-color: var(--primary);
+        }
+
+        .q-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+        }
+
+        .q-number {
+            color: var(--primary);
+            margin-right: 10px;
+            font-weight: 800;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .options-grid.scale-10 {
+            display: flex;
+            justify-content: space-between;
+            gap: 5px;
+        }
+
+        .scale-number {
+            flex: 1;
+            text-align: center;
+            padding: 10px 0;
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .scale-number:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        label:hover {
+            background: #eafaf1;
+            border-color: var(--primary);
+        }
+
+        input[type="radio"], input[type="checkbox"] {
+            margin-right: 15px;
+            accent-color: var(--primary);
+            transform: scale(1.2);
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        textarea:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+        }
+
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 800;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 50px;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Dyspo - Questionnaire Bêta-Testeurs</h1>
+        <p class="subtitle">Aidez-nous à faire de Dyspo l'application ultime pour organiser vos disponibilités et vos événements entre amis ou en famille.</p>
+    </header>
+
+    <form>
+        
+        <!-- SECTION 1 : PROFIL -->
+        <div class="section-title">1. Votre profil & Habitudes</div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">1.</span> Quelle est votre tranche d'âge ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q1"> 18 - 25 ans</label>
+                <label><input type="radio" name="q1"> 26 - 35 ans</label>
+                <label><input type="radio" name="q1"> 36 - 45 ans</label>
+                <label><input type="radio" name="q1"> 46 ans et plus</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">2.</span> Quelle est votre situation familiale concernant la garde d'enfants ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q2"> Célibataire / En couple (sans enfants)</label>
+                <label><input type="radio" name="q2"> Parents (garde classique)</label>
+                <label><input type="radio" name="q2"> Parents séparés (garde alternée, week-ends, etc.)</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">3.</span> Actuellement, quel outil utilisez-vous le plus pour planifier des moments avec vos proches ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q3"> Groupes WhatsApp / Messenger</label>
+                <label><input type="radio" name="q3"> Appels téléphoniques / SMS</label>
+                <label><input type="radio" name="q3"> Google Agenda / Apple Calendrier partagé</label>
+                <label><input type="radio" name="q3"> Doodle / Sondages</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">4.</span> À quelle fréquence rencontrez-vous des difficultés pour trouver une date commune avec vos amis ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q4"> Très souvent (c'est un enfer)</label>
+                <label><input type="radio" name="q4"> Souvent</label>
+                <label><input type="radio" name="q4"> Rarement (on arrive toujours à s'arranger)</label>
+                <label><input type="radio" name="q4"> Jamais</label>
+            </div>
+        </div>
+
+        <!-- SECTION 2 : INSCRIPTION -->
+        <div class="section-title">2. Première approche et Inscription</div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">5.</span> Comment évaluez-vous la facilité de création de votre compte sur Dyspo ?</div>
+            <div class="options-grid scale-10">
+                <div class="scale-number">1</div><div class="scale-number">2</div><div class="scale-number">3</div><div class="scale-number">4</div><div class="scale-number">5</div>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">6.</span> Le concept de "Zone Géographique Scolaire" (A, B, C) vous a-t-il paru clair et pertinent lors de l'inscription ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q6"> Oui, très clair et utile pour les vacances</label>
+                <label><input type="radio" name="q6"> Clair, mais je n'en vois pas l'utilité pour mon cas</label>
+                <label><input type="radio" name="q6"> C'était confus ou mal expliqué</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">7.</span> Si vous avez indiqué avoir des enfants, la saisie obligatoire de vos jours de garde (sur 2 semaines) était-elle intuitive ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q7"> Très intuitive</label>
+                <label><input type="radio" name="q7"> Moyennement intuitive (j'ai dû chercher un peu)</label>
+                <label><input type="radio" name="q7"> Difficile / Laborieuse</label>
+                <label><input type="radio" name="q7"> Je n'ai pas d'enfants (non applicable)</label>
+            </div>
+        </div>
+
+        <!-- SECTION 3 : LE CALENDRIER -->
+        <div class="section-title">3. Le Calendrier & Gestion des disponibilités</div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">8.</span> Le concept de couleurs (Dyspo Vert = disponible, Bleu = avec enfants) est-il visuellement évident pour vous ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q8"> Oui, on comprend au premier coup d'œil</label>
+                <label><input type="radio" name="q8"> Oui, après une petite période d'adaptation</label>
+                <label><input type="radio" name="q8"> Non, c'est encore confus</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">9.</span> Est-il facile de modifier vos disponibilités directement sur le calendrier ?</div>
+            <div class="options-grid scale-10">
+                <div class="scale-number">1</div><div class="scale-number">2</div><div class="scale-number">3</div><div class="scale-number">4</div><div class="scale-number">5</div>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">10.</span> Appréciez-vous l'intégration automatique des jours fériés et vacances scolaires ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q10"> Oui, c'est un énorme plus</label>
+                <label><input type="radio" name="q10"> Sympa mais anecdotique</label>
+                <label><input type="radio" name="q10"> Je ne l'avais pas remarqué</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">11.</span> Y a-t-il une fonctionnalité qui vous manque dans l'onglet Agenda ?</div>
+            <textarea name="q11" rows="3" placeholder="Synchronisation Google Agenda, vues différentes..."></textarea>
+        </div>
+
+        <!-- SECTION 4 : AMIS ET CONTACTS -->
+        <div class="section-title">4. Amis et Contacts</div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">12.</span> Avez-vous réussi à trouver et inviter vos amis facilement ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q12"> Oui, très facilement</label>
+                <label><input type="radio" name="q12"> Difficilement (la recherche pourrait être améliorée)</label>
+                <label><input type="radio" name="q12"> Je n'ai invité personne pour l'instant</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">13.</span> L'importation depuis les contacts de votre téléphone a-t-elle fonctionné correctement ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q13"> Oui, sans problème</label>
+                <label><input type="radio" name="q13"> Non, j'ai eu une erreur ou je n'ai pas trouvé l'option</label>
+                <label><input type="radio" name="q13"> Je n'ai pas autorisé l'accès à mes contacts</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">14.</span> Que pensez-vous de la lisibilité des statuts de vos amis sur leurs profils (leur zone, enfants, etc.) ?</div>
+            <div class="options-grid scale-10">
+                <div class="scale-number">1</div><div class="scale-number">2</div><div class="scale-number">3</div><div class="scale-number">4</div><div class="scale-number">5</div>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">15.</span> La consultation des disponibilités croisées (voir quand vos amis sont libres en même temps que vous) est-elle pratique ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q15"> C'est la "killer feature" de l'app, super pratique !</label>
+                <label><input type="radio" name="q15"> Pratique mais l'affichage pourrait être amélioré</label>
+                <label><input type="radio" name="q15"> Je n'ai pas compris comment faire</label>
+            </div>
+        </div>
+
+        <!-- SECTION 5 : ÉVÉNEMENTS -->
+        <div class="section-title">5. Création et Gestion des Événements</div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">16.</span> Comment évaluez-vous l'expérience de création d'un nouvel événement ?</div>
+            <div class="options-grid scale-10">
+                <div class="scale-number">1</div><div class="scale-number">2</div><div class="scale-number">3</div><div class="scale-number">4</div><div class="scale-number">5</div>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">17.</span> L'invitation de plusieurs personnes à un événement est-elle claire ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q17"> Oui</label>
+                <label><input type="radio" name="q17"> Non</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">18.</span> Avez-vous testé les événements récurrents (ex: "Foot tous les mardis") ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q18"> Oui, et ça marche super bien</label>
+                <label><input type="radio" name="q18"> Oui, mais c'était compliqué à paramétrer</label>
+                <label><input type="radio" name="q18"> Non, je n'en ai pas eu l'utilité</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">19.</span> Que pensez-vous des fiches récapitulatives d'événements (qui vient, qui a refusé) ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q19"> Très claires</label>
+                <label><input type="radio" name="q19"> Manque d'informations</label>
+                <label><input type="radio" name="q19"> Confuses</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">20.</span> Quelle option ajouteriez-vous pour la gestion des événements ?</div>
+            <textarea name="q20" rows="2" placeholder="(ex: Cagnotte, listes de courses partagées, sondage de dates...)"></textarea>
+        </div>
+
+        <!-- SECTION 6 : CHAT & MESSAGERIE -->
+        <div class="section-title">6. Chat et Groupes</div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">21.</span> Utilisez-vous le chat intégré (lié aux événements ou individuel) ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q21"> Oui, c'est indispensable pour s'organiser</label>
+                <label><input type="radio" name="q21"> Parfois, mais je préfère WhatsApp</label>
+                <label><input type="radio" name="q21"> Non, je n'en vois pas l'intérêt</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">22.</span> Avez-vous remarqué et utilisé les indicateurs de lecture des messages (✅✅) ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q22"> Oui, c'est très réactif</label>
+                <label><input type="radio" name="q22"> Oui mais c'est capricieux</label>
+                <label><input type="radio" name="q22"> Non</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">23.</span> L'envoi de photos/pièces jointes dans le chat est-il fluide ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q23"> Parfait</label>
+                <label><input type="radio" name="q23"> Lent ou instable</label>
+                <label><input type="radio" name="q23"> Pas testé</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">24.</span> Que pensez-vous du fait que chaque événement crée automatiquement un groupe de discussion ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q24"> Excellente idée pour cloisonner les conversations</label>
+                <label><input type="radio" name="q24"> Ça pollue un peu l'onglet messagerie avec trop de groupes</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">25.</span> Si vous pouviez améliorer le chat, que feriez-vous ?</div>
+            <textarea name="q25" rows="2" placeholder="(ex: Réactions émojis, vocaux, GIFs...)"></textarea>
+        </div>
+
+        <!-- SECTION 7 : NOTIFICATIONS -->
+        <div class="section-title">7. Notifications Push</div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">26.</span> Recevez-vous bien les notifications (invitations, messages) ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q26"> Toujours et instantanément</label>
+                <label><input type="radio" name="q26"> Parfois avec du retard</label>
+                <label><input type="radio" name="q26"> Je ne les reçois pas du tout</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">27.</span> Comment jugez-vous la quantité de notifications émises par l'application ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q27"> Trop nombreuses (spammant)</label>
+                <label><input type="radio" name="q27"> Juste ce qu'il faut</label>
+                <label><input type="radio" name="q27"> Pas assez (je rate des infos)</label>
+            </div>
+        </div>
+
+        <!-- SECTION 8 : PARAMÈTRES & PROFIL -->
+        <div class="section-title">8. Paramètres et Personnalisation</div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">28.</span> Avez-vous personnalisé votre profil (Photo/Avatar, bio...) ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q28"> Oui, c'était simple</label>
+                <label><input type="radio" name="q28"> Non, je n'ai pas trouvé où le faire</label>
+                <label><input type="radio" name="q28"> Je ne l'ai pas fait par manque d'intérêt</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">29.</span> Le menu des paramètres de l'application vous paraît-il complet ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q29"> Oui</label>
+                <label><input type="radio" name="q29"> Non (précisez ci-dessous)</label>
+            </div>
+        </div>
+
+        <!-- SECTION 9 : ENGAGEMENT ET RETENTION (Cœur du sujet) -->
+        <div class="section-title">9. Rétention : Ce qui vous ferait utiliser Dyspo tous les jours</div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">30.</span> Pensez-vous utiliser Dyspo à long terme pour remplacer vos anciennes méthodes d'organisation ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q30"> Définitivement, c'est adopté</label>
+                <label><input type="radio" name="q30"> Probablement, si mes amis s'y mettent aussi</label>
+                <label><input type="radio" name="q30"> Non, c'est trop contraignant</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">31.</span> Quelle est la fonctionnalité qui vous motive le plus à ouvrir l'application ?</div>
+            <input type="text" name="q31" placeholder="Votre réponse...">
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">32.</span> À l'inverse, y a-t-il une "friction" ou un point bloquant qui vous décourage d'utiliser Dyspo ?</div>
+            <textarea name="q32" rows="3" placeholder="Bugs, complexité, manque de monde..."></textarea>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">33.</span> Que faudrait-il ajouter pour que Dyspo devienne votre outil principal du quotidien ?</div>
+            <div class="options-grid">
+                <label><input type="checkbox" name="q33_1"> Intégration de tous mes autres calendriers (Google, Apple, Outlook)</label>
+                <label><input type="checkbox" name="q33_2"> Suggestions intelligentes de lieux pour se retrouver (Bars, parcs...)</label>
+                <label><input type="checkbox" name="q33_3"> Un système de sondages (Doodle intégré) pour choisir la date ensemble</label>
+                <label><input type="checkbox" name="q33_4"> Partage de frais (type Tricount) intégré aux événements</label>
+                <label><input type="checkbox" name="q33_5"> Autre (précisez ci-dessous)</label>
+            </div>
+            <input type="text" name="q33_other" placeholder="Autre fonctionnalité..." style="margin-top:10px;">
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">34.</span> Seriez-vous prêt(e) à inviter tout votre cercle proche (amis/famille) sur l'application ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q34"> Absolument, l'app n'a de sens qu'avec eux</label>
+                <label><input type="radio" name="q34"> Seulement un petit groupe spécifique</label>
+                <label><input type="radio" name="q34"> Non, je ne veux pas leur imposer une nouvelle appli</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">35.</span> Un système de widget sur l'écran d'accueil de votre téléphone (pour voir rapidement qui est dispo aujourd'hui) vous inciterait-il à utiliser l'app plus souvent ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q35"> Oui, totalement !</label>
+                <label><input type="radio" name="q35"> Pourquoi pas, c'est gadget</label>
+                <label><input type="radio" name="q35"> Non, je n'utilise pas de widgets</label>
+            </div>
+        </div>
+
+        <!-- SECTION 10 : ÉVALUATION GLOBALE -->
+        <div class="section-title">10. Évaluation globale et Design</div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">36.</span> Comment évaluez-vous l'esthétique générale de l'application (Design, Couleurs, Animations) ?</div>
+            <div class="options-grid scale-10">
+                <div class="scale-number">1</div><div class="scale-number">2</div><div class="scale-number">3</div><div class="scale-number">4</div><div class="scale-number">5</div>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">37.</span> La navigation entre les différents onglets (Calendrier, Chat, Profil) est-elle fluide ?</div>
+            <div class="options-grid">
+                <label><input type="radio" name="q37"> Très fluide et logique</label>
+                <label><input type="radio" name="q37"> Parfois confuse (je me perds)</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">38.</span> Avez-vous rencontré des bugs techniques lors de votre test ?</div>
+            <textarea name="q38" rows="3" placeholder="Si oui, lesquels ? Soyez le plus précis possible..."></textarea>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">39.</span> Quelle note globale attribueriez-vous à Dyspo dans son état actuel ? (1 = Médiocre, 10 = Parfait)</div>
+            <div class="options-grid scale-10">
+                <div class="scale-number">1</div><div class="scale-number">2</div><div class="scale-number">3</div><div class="scale-number">4</div><div class="scale-number">5</div>
+                <div class="scale-number">6</div><div class="scale-number">7</div><div class="scale-number">8</div><div class="scale-number">9</div><div class="scale-number">10</div>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="q-text"><span class="q-number">40.</span> Avez-vous un dernier conseil ou commentaire "magique" à nous donner pour faire de Dyspo un énorme succès ?</div>
+            <textarea name="q40" rows="4" placeholder="Lâchez-vous, toutes les idées sont bonnes à prendre !"></textarea>
+        </div>
+
+        <button type="button" class="submit-btn" onclick="alert('Merci pour vos réponses ! Elles sont précieuses pour l\'amélioration de DyspoApp.')">Envoyer mes réponses</button>
+    </form>
+</div>
+
+</body>
+</html>

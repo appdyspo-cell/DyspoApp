@@ -16,6 +16,7 @@ import {
   getDate,
   getDayOfYear,
   getHours,
+  getMinutes,
   getMonth,
   getYear,
   isAfter,
@@ -106,8 +107,23 @@ export class CreateEventPage implements OnInit, OnDestroy {
   new_members: string[] = [];
 
   isSearching = false;
+  showStartClock = false;
+  showEndClock = false;
   private searchSubject = new Subject<string>();
   private searchSubscription?: Subscription;
+
+  get startHour(): number {
+    return this.agendaEvent ? getHours(parseISO(this.agendaEvent.startISO)) : 12;
+  }
+  get startMinute(): number {
+    return this.agendaEvent ? getMinutes(parseISO(this.agendaEvent.startISO)) : 0;
+  }
+  get endHour(): number {
+    return this.agendaEvent ? getHours(parseISO(this.agendaEvent.endISO)) : 13;
+  }
+  get endMinute(): number {
+    return this.agendaEvent ? getMinutes(parseISO(this.agendaEvent.endISO)) : 0;
+  }
 
   constructor(
     private navCtrl: NavController,
@@ -139,6 +155,8 @@ export class CreateEventPage implements OnInit, OnDestroy {
             this.router.getCurrentNavigation()?.extras.state?.['tsDate'];
           this.is_multi =
             this.router.getCurrentNavigation()?.extras.state?.['is_multi'];
+          const preInvitedFriend =
+            this.router.getCurrentNavigation()?.extras.state?.['preInvitedFriend'];
           const is_kids =
             this.router.getCurrentNavigation()?.extras.state?.['is_kids'];
           const dateHPlus1 = setHours(
@@ -201,10 +219,11 @@ export class CreateEventPage implements OnInit, OnDestroy {
             }
           }
 
+          const preInvitedUid = preInvitedFriend?.friend_uid || preInvitedFriend?.uid;
           this.agendaEvent = {
             admin_uid: this.uid,
             members_uid: [this.uid],
-            members_invited_uid: [],
+            members_invited_uid: preInvitedUid ? [preInvitedUid] : [],
             uid: 'agev_' + new Date().getTime(),
             startISO: formatISO(dateHPlus1),
             endISO: formatISO(dateHPlus2),
@@ -367,6 +386,48 @@ export class CreateEventPage implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.searchSubscription?.unsubscribe();
+  }
+
+  onStartDateOnlyChanged(ev: any) {
+    const newDate = parseISO(ev.detail.value);
+    const existing = parseISO(this.agendaEvent!.startISO);
+    const combined = set(existing, {
+      year: getYear(newDate),
+      month: getMonth(newDate),
+      date: getDate(newDate),
+    });
+    this.onStartTimeChanged({ detail: { value: formatISO(combined) } });
+  }
+
+  onEndDateOnlyChanged(ev: any) {
+    const newDate = parseISO(ev.detail.value);
+    const existing = parseISO(this.agendaEvent!.endISO);
+    const combined = set(existing, {
+      year: getYear(newDate),
+      month: getMonth(newDate),
+      date: getDate(newDate),
+    });
+    this.onEndTimeChanged({ detail: { value: formatISO(combined) } });
+  }
+
+  onStartClockConfirmed(time: { hour: number; minute: number }) {
+    this.showStartClock = false;
+    const combined = set(parseISO(this.agendaEvent!.startISO), {
+      hours: time.hour,
+      minutes: time.minute,
+      seconds: 0,
+    });
+    this.onStartTimeChanged({ detail: { value: formatISO(combined) } });
+  }
+
+  onEndClockConfirmed(time: { hour: number; minute: number }) {
+    this.showEndClock = false;
+    const combined = set(parseISO(this.agendaEvent!.endISO), {
+      hours: time.hour,
+      minutes: time.minute,
+      seconds: 0,
+    });
+    this.onEndTimeChanged({ detail: { value: formatISO(combined) } });
   }
 
   saveOrUpdateEvent() {

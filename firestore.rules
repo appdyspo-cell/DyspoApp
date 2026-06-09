@@ -1,0 +1,107 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
+    function isEventMember(eventData) {
+      return request.auth.uid in eventData.members_uid
+          || request.auth.uid in eventData.members_invited_uid;
+    }
+
+    // ── Users ────────────────────────────────────────────────────────────────
+    // Any authenticated user can read profiles; only the owner can write.
+    match /users/{uid} {
+      allow read:   if isAuth();
+      allow write:  if isOwner(uid);
+    }
+
+    // ── Agenda events ────────────────────────────────────────────────────────
+    // Only members or invited members can read/write an event.
+    // Only the admin can delete it.
+    match /agenda_events/{eventId} {
+      allow read:   if isAuth() && isEventMember(resource.data);
+      allow create: if isAuth() && request.auth.uid == request.resource.data.admin_uid;
+      allow update: if isAuth() && isEventMember(resource.data);
+      allow delete: if isAuth() && resource.data.admin_uid == request.auth.uid;
+
+      // Messages: same membership check, fetched from the parent event.
+      match /messages_list/{msgId} {
+        allow read, write: if isAuth()
+          && isEventMember(
+               get(/databases/$(database)/documents/agenda_events/$(eventId)).data
+             );
+      }
+    }
+
+    // ── Agenda dyspos (availability) ──────────────────────────────────────────
+    match /agenda_dyspos/{uid}/dyspo_list/{dyspoId} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // ── Chatrooms ─────────────────────────────────────────────────────────────
+    match /chatrooms/{uid}/chatroom_list/{chatroomId} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // ── Friends ───────────────────────────────────────────────────────────────
+    match /friends/{uid}/friend_list/{friendId} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // ── Friend groups ─────────────────────────────────────────────────────────
+    match /friend_groups/{uid}/friend_group_list/{groupId} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // ── Holidays (read-only for authenticated users) ───────────────────────────
+    match /holidays/{doc} {
+      allow read:  if isAuth();
+      allow write: if false;
+    }
+
+    // ── Reports (write-only; only admins/Cloud Functions should read) ──────────
+    match /reports/{doc} {
+      allow create: if isAuth();
+      allow read, update, delete: if false;
+    }
+
+    // ── Mails (written by Cloud Functions via the app) ─────────────────────────
+    match /mails/{doc} {
+      allow create: if isAuth();
+      allow read, update, delete: if false;
+    }
+
+    // ── Logs (write-only from authenticated clients) ───────────────────────────
+    match /log_errors/{doc} {
+      allow create: if isAuth();
+      allow read, update, delete: if false;
+    }
+
+    match /log_debug/{doc} {
+      allow create: if isAuth();
+      allow read, update, delete: if false;
+    }
+
+    match /log_uncaught_errors/{doc} {
+      allow create: if isAuth();
+      allow read, update, delete: if false;
+    }
+
+    match /log_debug_data/{doc} {
+      allow create: if isAuth();
+      allow read, update, delete: if false;
+    }
+
+    // ── Deny everything else ──────────────────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

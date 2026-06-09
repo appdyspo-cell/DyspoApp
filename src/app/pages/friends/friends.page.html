@@ -11,7 +11,7 @@
       <ion-button
         fill="clear"
         mode="ios"
-        class="black-button"
+        class="btn-repertoire"
         (click)="openContacts()"
       >
         Répertoire
@@ -23,36 +23,22 @@
 <!-- <div class="shape"></div> -->
 <ion-content class="bg_color">
   <ion-segment mode="md" [(ngModel)]="selectSegment" lines="none">
-    <ion-segment-button
-      mode="md"
-      value="friends"
-      style="text-transform: none !important"
-    >
-      <ion-icon name="person"></ion-icon>
-      <ion-label> Amis </ion-label>
+    <ion-segment-button mode="md" value="friends" layout="icon-top">
+      <ion-icon name="person-outline"></ion-icon>
+      <ion-label>Amis</ion-label>
     </ion-segment-button>
-    <ion-segment-button
-      mode="md"
-      value="friendsgroup"
-      style="text-transform: none !important"
-    >
-      <ion-icon name="people"></ion-icon>
-      <ion-label> Groupes</ion-label>
+    <ion-segment-button mode="md" value="friendsgroup" layout="icon-top">
+      <ion-icon name="people-outline"></ion-icon>
+      <ion-label>Groupes</ion-label>
     </ion-segment-button>
-
-    <ion-segment-button
-      mode="md"
-      value="suggestions"
-      style="text-transform: none !important"
-    >
-      <ion-icon name="person-add"></ion-icon>
-      <ion-label> Invitations </ion-label>
+    <ion-segment-button mode="md" value="suggestions" layout="icon-top">
+      <ion-icon name="person-add-outline"></ion-icon>
+      <ion-label>Invitations</ion-label>
       <ion-badge
-        *ngIf="friendsSuggested.length>0"
+        *ngIf="friendsSuggested.length > 0"
         color="danger"
         class="segment-badge"
-        >{{ friendsSuggested.length }}</ion-badge
-      >
+      >{{ friendsSuggested.length }}</ion-badge>
     </ion-segment-button>
   </ion-segment>
 
@@ -121,7 +107,7 @@
             <ion-icon slot="icon-only" name="trash"></ion-icon>
           </ion-item-option>
         </ion-item-options>
-        <ion-item lines="full" class="friend-item">
+        <ion-item lines="full" class="friend-item" button detail="false" (click)="openFriendProfile(friendListDoc.userData!)">
           <ion-thumbnail slot="start">
             <img
               [defaultImage]="defaultImage"

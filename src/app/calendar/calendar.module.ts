@@ -8,6 +8,7 @@ import { CalendarController } from './calendar.controller';
 import { DEFAULT_CALENDAR_OPTIONS } from './services/calendar-options.provider';
 import { CalendarService } from './services/calendar.service';
 import { CALENDAR_COMPONENTS } from './components';
+import { SharedModule } from 'src/app/modules/shared/shared.module';
 
 export function calendarController(
   modalCtrl: ModalController,
@@ -17,7 +18,7 @@ export function calendarController(
 }
 
 @NgModule({
-  imports: [CommonModule, IonicModule, FormsModule],
+  imports: [CommonModule, IonicModule, FormsModule, SharedModule],
   declarations: CALENDAR_COMPONENTS,
   exports: CALENDAR_COMPONENTS,
   providers: [

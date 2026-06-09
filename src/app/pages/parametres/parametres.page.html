@@ -39,7 +39,7 @@
       <div *ngIf="appSettings">
         <ion-item lines="none">
           <ion-toggle
-            color="primary"
+            style="color: #46a2c2"
             [(ngModel)]="appSettings!.receiveNotification"
             slot="end"
           ></ion-toggle>
@@ -55,7 +55,7 @@
       <div>
         <ion-item lines="none">
           <ion-toggle
-            color="primary"
+            style="color: #46a2c2"
             [(ngModel)]="appSettings!.friendInvitation"
             slot="end"
           ></ion-toggle>
@@ -66,7 +66,7 @@
       <div>
         <ion-item lines="none">
           <ion-toggle
-            color="primary"
+            style="color: #46a2c2"
             [(ngModel)]="appSettings!.eventInvitation"
             slot="end"
           ></ion-toggle>
@@ -77,7 +77,7 @@
       <!-- <div *ngIf="appSettings">
         <ion-item>
           <ion-toggle
-            color="primary"
+            style="color: #46a2c2"
             [(ngModel)]="appSettings.receiveEmail"
             slot="end"
           ></ion-toggle>
@@ -99,7 +99,7 @@
         <div>
           <ion-item>
             <ion-toggle
-              color="primary"
+              style="color: #46a2c2"
               [(ngModel)]="appSettings.shareAgenda"
               slot="end"
             ></ion-toggle>
@@ -116,7 +116,7 @@
         <div>
           <ion-item lines="none">
             <ion-toggle
-              color="primary"
+              style="color: #46a2c2"
               [(ngModel)]="userInfo.with_kids"
               slot="end"
             ></ion-toggle>
@@ -156,7 +156,7 @@
 
             <div class="custody-legend">
               <span class="legend-dot dot-blue"></span> Avec enfants
-              <span class="legend-dot dot-green"></span> Sans enfants (libre)
+              <span class="legend-dot dot-green"></span> Sans enfants
             </div>
 
             <ion-button
@@ -183,7 +183,7 @@
   <ion-card>
     <ion-item tappable (click)="openTutorial()" lines="none">
       <ion-label class="ion-text-wrap text">
-        <ion-icon name="help-circle" class="iconmail" color="primary"></ion-icon>
+        <ion-icon name="help-circle" class="iconmail" style="color: #46a2c2"></ion-icon>
         <ion-text class="contacttext">Voir le tutoriel Dyspo</ion-text>
       </ion-label>
     </ion-item>
@@ -195,8 +195,8 @@
 
   <ion-card>
     <ion-item tappable (click)="openMail()" lines="none">
-      <ion-label class="ion-text-wrap">
-        <ion-icon name="mail" class="iconmail" color="primary"></ion-icon>
+      <ion-label class="ion-text-wrap text">
+        <ion-icon name="mail" class="iconmail" style="color: #46a2c2"></ion-icon>
         <ion-text class="contacttext">Contactez-nous</ion-text>
       </ion-label>
     </ion-item>
@@ -211,7 +211,7 @@
         <ion-icon
           name="information-circle"
           class="iconmail"
-          color="primary"
+          style="color: #46a2c2"
         ></ion-icon>
         <ion-text class="contacttext"
           >Conditions générales d'utilisation</ion-text
@@ -220,7 +220,7 @@
     </ion-item>
     <ion-item tappable (click)="openPrivacy()" lines="none">
       <ion-label class="ion-text-wrap text">
-        <ion-icon name="man" class="iconmail" color="primary"></ion-icon>
+        <ion-icon name="man" class="iconmail" style="color: #46a2c2"></ion-icon>
         <ion-text class="contacttext">Politique de confidentialité</ion-text>
       </ion-label>
     </ion-item>

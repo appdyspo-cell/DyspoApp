@@ -15,8 +15,8 @@ declare interface RegisterErrors {
   email: boolean;
   password: boolean;
   phoneNumber: boolean;
-
   cgu: boolean;
+  custodyDays: boolean;
 }
 
 @Component({
@@ -29,6 +29,7 @@ export class RegisterPage implements OnInit {
   isTermsChecked = false;
   isPrivacyChecked = false;
   academies = '';
+  zonePickerOpen = false;
 
   readonly weekDays = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
   custodyDays: boolean[] = new Array(14).fill(false);
@@ -61,6 +62,7 @@ export class RegisterPage implements OnInit {
     password: false,
     phoneNumber: false,
     cgu: false,
+    custodyDays: false,
   };
   userInfo: AppUser;
   password = '';
@@ -78,6 +80,31 @@ export class RegisterPage implements OnInit {
 
   ngOnInit() {}
 
+  // ── Zone géographique ────────────────────────────────────────────
+
+  openZonePicker() {
+    this.zonePickerOpen = !this.zonePickerOpen;
+  }
+
+  closeZonePicker() {
+    this.zonePickerOpen = false;
+  }
+
+  selectZone(zone: string) {
+    this.userInfo.geo_zone = zone;
+    this.zonePickerOpen = false;
+    this.getAcademies();
+  }
+
+  getZoneLabel(zone: string): string {
+    const map: { [key: string]: string } = {
+      zone_A: 'Zone A',
+      zone_B: 'Zone B',
+      zone_C: 'Zone C',
+    };
+    return map[zone] ?? zone;
+  }
+
   getAcademies() {
     switch (this.userInfo.geo_zone) {
       case 'zone_A':
@@ -91,8 +118,12 @@ export class RegisterPage implements OnInit {
       case 'zone_C':
         this.academies = 'Créteil, Montpellier, Paris, Toulouse et Versailles.';
         break;
+      default:
+        this.academies = '';
     }
   }
+
+  // ── Validation & inscription ─────────────────────────────────────
 
   checkBeforeRegister() {
     if (this.userInfo?.lastname && this.userInfo?.lastname?.length < 3) {
@@ -107,14 +138,16 @@ export class RegisterPage implements OnInit {
     this.errors['password'] = this.password === '' || this.password.length < 6;
     this.errors['cgu'] = !this.isTermsChecked;
     this.errors['privacy'] = !this.isPrivacyChecked;
-    //if (this.userInfo.phoneNumber !== '') {
     this.errors['phoneNumber'] = !this.utils.validatePhone(
       this.userInfo!.phoneNumber
     );
-    // }
-    // else {
-    //   this.errors['phoneNumber'] = false;
-    // }
+
+    if (this.userInfo.with_kids) {
+      this.errors['custodyDays'] = !this.custodyDays.includes(true);
+    } else {
+      this.errors['custodyDays'] = false;
+    }
+
     let errorExists = false;
     for (const key in this.errors) {
       errorExists = errorExists || this.errors[key];
@@ -139,11 +172,19 @@ export class RegisterPage implements OnInit {
         this.userInfo.custody_schedule = [...this.custodyDays];
       }
       const credentials = await this.authSvc.register(this.userInfo, this.password);
-      if (credentials && this.userInfo.with_kids) {
-        await this.agendaSvc.applyCustodySchedule(
-          credentials.user.uid,
-          this.custodyDays
-        );
+      if (credentials) {
+        if (this.userInfo.with_kids) {
+          await this.agendaSvc.applyCustodySchedule(
+            credentials.user.uid,
+            this.custodyDays
+          );
+        } else {
+          const allGreenDays = new Array(14).fill(false);
+          await this.agendaSvc.applyCustodySchedule(
+            credentials.user.uid,
+            allGreenDays
+          );
+        }
       }
       this.utils.hideLoader();
     } else {

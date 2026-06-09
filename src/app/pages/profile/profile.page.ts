@@ -45,6 +45,9 @@ export class ProfilePage implements OnInit {
   avatarChangedURL = '';
   defaultAvatar = environment.DEFAULT_AVATAR;
   userSubscription: Subscription | undefined;
+  readonly weekDays = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+  custodyDays: boolean[] = new Array(14).fill(false);
+
   readonly maskPredicate: MaskitoElementPredicateAsync = async (el) =>
     (el as HTMLIonInputElement).getInputElement();
   readonly phoneMask: MaskitoOptions = {
@@ -84,6 +87,9 @@ export class ProfilePage implements OnInit {
       this.user = user;
       this.getAcademies();
       this.originalEmail = this.user.email;
+      if (user.custody_schedule?.length === 14) {
+        this.custodyDays = [...user.custody_schedule];
+      }
       console.log('user subscription profile page', user);
     });
     //this.user! = Object.assign({}, this.userSvc.userInfo);
@@ -115,6 +121,10 @@ export class ProfilePage implements OnInit {
           this.utils.showFirebaseError(err);
         });
     }
+  }
+
+  toggleCustodyDay(index: number) {
+    this.custodyDays[index] = !this.custodyDays[index];
   }
 
   async save() {
@@ -191,6 +201,9 @@ export class ProfilePage implements OnInit {
         }
       }
     } else {
+      if (this.user.with_kids) {
+        this.user.custody_schedule = [...this.custodyDays];
+      }
       this.userSvc
         .updateUser(Object.assign({}, this.user))
         .then(() => {

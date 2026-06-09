@@ -2,7 +2,6 @@
   padding: 10px 8px;
   box-sizing: border-box;
   display: inline-block;
-  // background-color: #fff;
   background-image: url("/assets/fd_ecran_principal.jpg");
   background-position: center top;
   background-repeat: no-repeat;
@@ -10,77 +9,106 @@
   width: 100%;
 }
 
+/* ── Header : ← Mois Année → sur une ligne ── */
+
 :host .title {
-  padding: 0 40px 0 40px;
-  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
 }
 
-:host .title .back,
-:host .title .forward,
-:host .title .switch-btn {
-  display: block;
-  position: relative;
-  float: left;
-  min-height: 32px;
-  margin: 0;
-  padding: 0;
+/* Boutons flèches — verre dépoli sur l'image de fond */
+:host .cal-nav-btn {
   --padding-start: 0;
   --padding-end: 0;
-  font-size: 15px;
+  --border-radius: 50%;
+  --color: var(--d-brand, #48a1c3);
+  --background: rgba(255, 255, 255, 0.72);
+  --background-activated: rgba(255, 255, 255, 0.92);
+  --background-hover: rgba(255, 255, 255, 0.85);
+  --box-shadow: 0 2px 10px rgba(72, 161, 195, 0.22), 0 1px 3px rgba(0,0,0,0.08);
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  flex-shrink: 0;
+  margin: 0;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  transition: transform 0.15s ease;
+
+  &:active { transform: scale(0.88); }
+
+  ion-icon { font-size: 20px; }
 }
 
-:host .title .back,
-:host .title .forward {
-  color: #757575;
+:host .cal-nav-btn[disabled] {
+  --color: var(--d-text-tertiary, #9aa3b2);
+  --background: rgba(255, 255, 255, 0.35);
+  --box-shadow: none;
+  opacity: 0.5;
 }
 
-:host .title .back {
-  margin-left: -100%;
-  margin-top: 8px;
-  left: -40px;
-  width: 40px;
+:host .cal-nav-spacer {
+  width: 36px;
+  flex-shrink: 0;
 }
 
-:host .title .forward {
-  margin-left: -40px;
-  margin-top: 8px;
-  right: -40px;
-  width: 40px;
-}
-
-:host .title .switch-btn {
-  --margin-top: 0;
-  --margin-bottom: 0;
-  --margin-start: auto;
-  --margin-end: auto;
-  width: 100%;
+/* Mois centré */
+:host .switch-btn {
+  flex: 1;
   text-align: center;
-  line-height: 32px;
-  color: #757575;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--d-text-primary, #1a1d23);
+  text-transform: capitalize;
+  letter-spacing: 0.2px;
+  margin: 0;
+  --padding-start: 6px;
+  --padding-end: 6px;
+  --color: var(--d-text-primary, #1a1d23);
+  --background: transparent;
+  --background-activated: transparent;
+  --background-hover: transparent;
+  text-shadow: 0 1px 6px rgba(255, 255, 255, 0.75);
 }
 
-:host .title .switch-btn .arrow-dropdown {
-  margin-left: 5px;
+:host .title > div.switch-btn {
+  line-height: 36px;
+  color: var(--d-text-primary, #1a1d23);
 }
+
+:host .switch-btn .arrow-dropdown {
+  margin-left: 4px;
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+/* ── Wrapper du mois ── */
 
 :host .month-slide-wrapper {
   overflow: hidden;
 }
 
-@keyframes slideInFromRight {
-  from { transform: translateX(30%); opacity: 0; }
-  to   { transform: translateX(0);   opacity: 1; }
-}
+/* ── Animation slide changement de mois ── */
 
-@keyframes slideInFromLeft {
-  from { transform: translateX(-30%); opacity: 0; }
+@keyframes slideFromRight {
+  from { transform: translateX(28px); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
 }
 
-:host .slide-from-right {
-  animation: slideInFromRight 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+@keyframes slideFromLeft {
+  from { transform: translateX(-28px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
 }
 
-:host .slide-from-left {
-  animation: slideInFromLeft 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+:host .page-flip-forward {
+  animation: slideFromRight 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+:host .page-flip-backward {
+  animation: slideFromLeft 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }

@@ -93,24 +93,75 @@
         >
       </ion-item>
 
-      <ion-item lines="none">
-        <ion-select
-          label="Zone Géographique"
-          (ionChange)="getAcademies()"
-          [(ngModel)]="userInfo.geo_zone"
-          placeholder="Sélectionnez une zone"
-        >
-          <ion-select-option value="zone_A">Zone A</ion-select-option>
-          <ion-select-option value="zone_B">Zone B</ion-select-option>
-          <ion-select-option value="zone_C">Zone C</ion-select-option>
-        </ion-select>
-      </ion-item>
+      <!-- Zone Géographique — Picker Dyspo custom -->
+      <div class="geo-zone-field">
+        <p class="geo-zone-label">Zone Géographique</p>
+        <button class="geo-zone-trigger" (click)="openZonePicker()" type="button">
+          <span *ngIf="!userInfo.geo_zone" class="geo-zone-placeholder">Sélectionnez une zone</span>
+          <span *ngIf="userInfo.geo_zone" class="geo-zone-value">
+            <span class="geo-zone-badge">{{ getZoneLabel(userInfo.geo_zone) }}</span>
+          </span>
+          <ion-icon name="chevron-down-outline" class="geo-zone-chevron" [class.open]="zonePickerOpen"></ion-icon>
+        </button>
 
-      <ion-item>
-        <div class="d-flex ion-align-items-center">
-          <ion-note> {{academies}} </ion-note>
+        <!-- Dropdown picker inline -->
+        <div class="geo-picker-dropdown" [class.visible]="zonePickerOpen">
+          <div class="geo-picker-header">
+            <span>Choisissez votre zone scolaire</span>
+            <button class="geo-picker-close" (click)="closeZonePicker()" type="button">
+              <ion-icon name="close-outline"></ion-icon>
+            </button>
+          </div>
+          <div class="geo-picker-options">
+            <button
+              class="geo-zone-option"
+              [class.selected]="userInfo.geo_zone === 'zone_A'"
+              (click)="selectZone('zone_A')"
+              type="button"
+            >
+              <div class="zone-option-badge">A</div>
+              <div class="zone-option-content">
+                <span class="zone-option-title">Zone A</span>
+                <span class="zone-option-hint">Besançon, Bordeaux, Lyon, Grenoble…</span>
+              </div>
+              <ion-icon *ngIf="userInfo.geo_zone === 'zone_A'" name="checkmark-circle" class="zone-check"></ion-icon>
+            </button>
+
+            <button
+              class="geo-zone-option"
+              [class.selected]="userInfo.geo_zone === 'zone_B'"
+              (click)="selectZone('zone_B')"
+              type="button"
+            >
+              <div class="zone-option-badge zone-b">B</div>
+              <div class="zone-option-content">
+                <span class="zone-option-title">Zone B</span>
+                <span class="zone-option-hint">Aix-Marseille, Nantes, Rennes, Strasbourg…</span>
+              </div>
+              <ion-icon *ngIf="userInfo.geo_zone === 'zone_B'" name="checkmark-circle" class="zone-check"></ion-icon>
+            </button>
+
+            <button
+              class="geo-zone-option"
+              [class.selected]="userInfo.geo_zone === 'zone_C'"
+              (click)="selectZone('zone_C')"
+              type="button"
+            >
+              <div class="zone-option-badge zone-c">C</div>
+              <div class="zone-option-content">
+                <span class="zone-option-title">Zone C</span>
+                <span class="zone-option-hint">Paris, Versailles, Créteil, Toulouse…</span>
+              </div>
+              <ion-icon *ngIf="userInfo.geo_zone === 'zone_C'" name="checkmark-circle" class="zone-check"></ion-icon>
+            </button>
+          </div>
         </div>
-      </ion-item>
+      </div>
+
+      <div class="geo-academies" *ngIf="academies">
+        <ion-icon name="location-outline"></ion-icon>
+        <span>{{ academies }}</span>
+      </div>
 
       <ion-item>
         <ion-text>J'ai des enfants </ion-text>
@@ -139,6 +190,9 @@
             (click)="toggleCustodyDay(i + 7)"
           >{{ day }}</div>
         </div>
+        <ion-note *ngIf="errors['custodyDays']" class="note-error" style="display: block; margin-top: 10px; text-align: center;">
+          Veuillez sélectionner au moins un jour de garde
+        </ion-note>
       </div>
 
       <ion-item>

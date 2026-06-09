@@ -121,3 +121,31 @@ ion-item:last-child {
 .segmentButton {
   text-transform: none;
 }
+
+// ── Segment Mes amis / Mes groupes ────────────────────────────────────────────
+
+.friends-segment {
+  --background: var(--d-surface-2, #f0f3f8);
+
+  ion-segment-button {
+    --color: var(--d-text-tertiary, #9aa3b2);
+    --color-checked: #46a2c2;
+    --indicator-color: #46a2c2;
+    --border-radius: var(--d-radius-sm, 8px);
+    font-weight: 600;
+  }
+}
+
+// ── Bouton Inviter par SMS ────────────────────────────────────────────────────
+
+.btn-invite-sms {
+  --background: transparent;
+  --background-activated: rgba(53, 134, 162, 0.14);
+  --background-hover: rgba(53, 134, 162, 0.08);
+  --border-color: #46a2c2;
+  --border-width: 1.5px;
+  --color: #46a2c2;
+  --color-hover: #3586a2;
+  --border-style: solid;
+  font-weight: 600;
+}

@@ -19,15 +19,6 @@
     </ion-title>
 
     <ion-buttons slot="end">
-      <ion-button color="light" (click)="addToCalendar()">
-        <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
-      </ion-button>
-      <ion-button color="light">
-        <ion-icon slot="icon-only" name="videocam"></ion-icon>
-      </ion-button>
-      <ion-button color="light">
-        <ion-icon slot="icon-only" name="call"></ion-icon>
-      </ion-button>
       <ion-button color="light" (click)="openMenu($event)">
         <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
       </ion-button>
@@ -40,7 +31,6 @@
       <ion-button (click)="msgSelected = undefined" color="light">
         <ion-icon slot="icon-only" name="close-outline"></ion-icon>
       </ion-button>
-      <ion-label color="light" style="margin-left: 10px; font-weight: 500;">1</ion-label>
     </ion-buttons>
 
     <ion-buttons slot="end">
@@ -94,15 +84,6 @@
       >
         <div class="wa-bubble-wrapper" [ngClass]="{'wa-selected': msgSelected === msg}">
           
-          <!-- Quick Reactions (WhatsApp style) -->
-          <div class="wa-quick-reactions" *ngIf="msgSelected === msg">
-            <span *ngFor="let rx of ['👍','❤️','😂','😮','😢','🙏']" 
-                  class="wa-qr-item"
-                  (click)="addReaction(msg, rx, $event)">
-              {{ rx }}
-            </span>
-          </div>
-
           <!-- Triangle (Tail) -->
           <div class="wa-bubble-tail"></div>
           
