@@ -3,11 +3,14 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnDestroy,
   OnInit,
   Output,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
+import { Subject } from 'rxjs';
+import { skip, take, takeUntil } from 'rxjs/operators';
 
 import { cloneDeep } from 'lodash';
 import {
@@ -33,7 +36,8 @@ import { fr } from 'date-fns/locale';
     styleUrls: ['./friends-selector.component.scss'],
     standalone: false
 })
-export class FriendsSelectorComponent implements OnInit {
+export class FriendsSelectorComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   selectedFriend: CheckedFriends | undefined;
 
   @Input() agendaEvent!: AgendaEvent;
@@ -105,26 +109,46 @@ export class FriendsSelectorComponent implements OnInit {
 
   async ngOnInit() {
     this.isInit = true;
-    console.log('init friendSelection');
-
     this.uid = this.userSvc.userInfo?.uid!;
-    this.friends = cloneDeep(this.friendsSvc.friends);
-    this.friends = this.friends.filter((friend) => {
-      return friend.friend_status === FriendStatus.FRIEND;
-    });
-    this.friendGroups = cloneDeep(this.friendsSvc.friendGroups);
-
     this.friendsAlreadyInvited = this.agendaEvent.members_uid.concat(
       this.agendaEvent.members_invited_uid
     );
 
+    if (this.friendsSvc.friends.length > 0) {
+      await this.initFriendsList(this.friendsSvc.friends);
+    } else {
+      // Pas encore de cache local Firestore : on attend le premier snapshot
+      this.friendsSvc.friends$
+        .pipe(skip(1), take(1), takeUntil(this.destroy$))
+        .subscribe(async (allFriends) => {
+          await this.initFriendsList(allFriends);
+        });
+    }
+  }
+
+  private async initFriendsList(allFriends: Friend[]) {
+    this.friends = cloneDeep(allFriends).filter(
+      (f) => f.friend_status === FriendStatus.FRIEND
+    );
+    this.friendGroups = cloneDeep(this.friendsSvc.friendGroups);
+    this.checkedFriends = [];
+    this.resetDyspos();
+
     await this.fillCheckedFriends();
 
-    this.friendGroups.forEach(async (group) => {
-      group.checked_friends = this.checkedFriends.filter((checkedFriend) => {
-        return group.members_uid.includes(checkedFriend.friend.friend_uid!);
-      });
+    this.friendGroups.forEach((group) => {
+      group.checked_friends = this.checkedFriends.filter((cf) =>
+        group.members_uid.includes(cf.friend.friend_uid!)
+      );
     });
+
+    this.changeDetectorRef.markForCheck();
+    this.changeDetectorRef.detectChanges();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   async fillCheckedFriends(fromChanges = false) {
@@ -142,9 +166,10 @@ export class FriendsSelectorComponent implements OnInit {
     const dyspoMap = new Map<string, UserDyspoStatus>();
     allDyspos.forEach((d) => dyspoMap.set(d.friend_uid, d.friend_dyspo));
 
-    // Fetch all events in parallel
+    // Fetch all events in parallel — catch per-friend to survive missing Firestore index
     const fetchEventsPromises = this.friends.map((friend) =>
       this.agendaSvc.getUserAgendaEvents(friend.friend_uid!, this.agendaEvent)
+        .catch(() => ({ uid: friend.friend_uid!, agendaEvents: [], day: 0, month: 0, year: 0 } as any))
     );
     const allEvents = await Promise.all(fetchEventsPromises);
 
