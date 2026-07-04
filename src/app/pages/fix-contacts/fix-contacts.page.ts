@@ -58,11 +58,19 @@ export class FixContactsPage implements OnInit, AfterViewInit {
   ngOnInit() {}
 
   async ngAfterViewInit() {
-    this.appContactsGrouped = this.friendsSvc.appContactsGrouped;
-    this.appContacts = this.friendsSvc.appContacts;
-
     console.log('Fix contacts');
     try {
+      await this.utils.showLoader();
+
+      // initContacts() est appelé sans await au démarrage — si les contacts
+      // ne sont pas encore chargés quand la page s'ouvre, on les charge ici.
+      if (this.friendsSvc.appContacts.length === 0) {
+        await this.friendsSvc.initContacts();
+      }
+
+      this.appContactsGrouped = this.friendsSvc.appContactsGrouped;
+      this.appContacts = this.friendsSvc.appContacts;
+
       //Is my contact a member of Dyspo ?
       await this.userSvc.hydrateAppContacts(this.appContacts);
       //Is my contact a friend ?
@@ -78,6 +86,8 @@ export class FixContactsPage implements OnInit, AfterViewInit {
         'fetchContactsData',
         this.userSvc.userInfo?.uid!
       );
+    } finally {
+      this.utils.hideLoader();
     }
   }
 

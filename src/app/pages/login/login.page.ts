@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 
 import { UtilsService } from 'src/app/services/utils.service';
 
-import Swal from 'sweetalert2';
 import { TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from 'src/app/services/auth.service';
@@ -56,9 +55,7 @@ export class LoginPage implements OnInit {
 
       this.logger.logDebug('user logged');
       this.utils.hideLoader();
-      // this.navController.navigateRoot('/tabs');
       this.logger.logDebug(credentials);
-      this.utils.hideLoader();
       return credentials;
     } catch (error: any) {
       this.utils.hideLoader();
@@ -69,13 +66,9 @@ export class LoginPage implements OnInit {
   }
 
   async forgotPassword() {
-    const { value: email } = await Swal.fire({
+    const email = await this.utils.promptEmail({
       title: 'Mot de passe oublié',
-      input: 'email',
-      heightAuto: false,
-      validationMessage: "L'adresse email n'est pas valide.",
-      inputLabel: 'Votre adresse email',
-      inputPlaceholder: 'Entrez votre email',
+      placeholder: 'Entrez votre email',
     });
     if (email) {
       this.authService

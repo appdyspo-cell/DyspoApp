@@ -99,7 +99,7 @@ ion-button {
       flex-direction: column;
       align-items: center;
       text-align: center;
-      background: #f4f5f8;
+      background: var(--d-surface-2);
       ion-label {
         font-size: 10px;
       }
@@ -117,7 +117,7 @@ ion-button {
           position: absolute;
           bottom: -5px;
           right: -5px;
-          color: #46a2c2;
+          color: var(--d-brand);
           font-size: 20px;
           background: white;
           border-radius: 50%;
@@ -201,7 +201,7 @@ ion-row {
 .skewed-div {
   width: 300px; /* Ajustez la largeur selon vos besoins */
   height: 200px; /* Ajustez la hauteur selon vos besoins */
-  background-color: #f0f0f0; /* Couleur de fond pour la div inclinée */
+  background-color: var(--d-surface-2); /* Couleur de fond pour la div inclinée */
   transform: rotate(-10deg); /* Inclinaison de la div */
   display: flex;
   overflow: hidden;

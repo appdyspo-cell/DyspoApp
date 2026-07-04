@@ -1,0 +1,13 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "agenda_events",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "members_uid", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "start_date_ts", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

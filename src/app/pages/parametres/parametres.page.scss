@@ -202,7 +202,7 @@ ion-range {
 
 .iconmail {
   font-size: 20px;
-  color: #46a2c2;
+  color: var(--d-brand);
   flex-shrink: 0;
 }
 
@@ -215,12 +215,12 @@ ion-label.text {
 // ── Boutons spécifiques ───────────────────────────────────────────────────────
 
 .dyspo-button[color="tertiary"] {
-  --background: #46a2c2;
-  --background-activated: #3586a2;
-  --background-focused: #3586a2;
-  --background-hover: #3586a2;
-  --ion-color-base: #46a2c2;
-  --ion-color-shade: #3586a2;
+  --background: var(--d-brand-dark);
+  --background-activated: var(--ion-color-tertiary-shade);
+  --background-focused: var(--ion-color-tertiary-shade);
+  --background-hover: var(--ion-color-tertiary-shade);
+  --ion-color-base: var(--d-brand-dark);
+  --ion-color-shade: var(--ion-color-tertiary-shade);
   --ion-color-tint: #6ab8d4;
   --ion-color-contrast: #ffffff;
   --color: #ffffff;

@@ -13,8 +13,13 @@
     </ion-tab-button>
 
     <ion-tab-button tab="friends" class="dyspo-tab-btn">
-      <ion-icon class="tab-icon tab-icon-off" name="people-outline"></ion-icon>
-      <ion-icon class="tab-icon tab-icon-on"  name="people"></ion-icon>
+      <div class="tab-chat-wrap">
+        <ion-icon class="tab-icon tab-icon-off" name="people-outline"></ion-icon>
+        <ion-icon class="tab-icon tab-icon-on"  name="people"></ion-icon>
+        <div class="tab-unread-dot" *ngIf="pendingFriendRequestsCount > 0">
+          {{ pendingFriendRequestsCount > 9 ? '9+' : pendingFriendRequestsCount }}
+        </div>
+      </div>
       <ion-label>Amis</ion-label>
     </ion-tab-button>
 

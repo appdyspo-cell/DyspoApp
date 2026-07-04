@@ -14,7 +14,7 @@ ion-content {
 }
 
 .helper-card {
-  background: #fff;
+  background: var(--d-surface-1);
   border-radius: 20px;
   overflow: hidden;
   width: 100%;
@@ -22,7 +22,7 @@ ion-content {
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--d-shadow-xl);
 }
 
 // ── En-tête ────────────────────────────────────────────────────────────────────
@@ -31,7 +31,7 @@ ion-content {
   align-items: center;
   gap: 12px;
   padding: 18px 16px 16px;
-  background: var(--text-dyspo);
+  background: var(--d-brand);
 }
 
 .helper-header-icon {
@@ -92,7 +92,7 @@ ion-content {
   align-items: flex-start;
   gap: 14px;
   padding: 14px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--d-surface-3);
 
   &:last-child {
     border-bottom: none;
@@ -102,8 +102,8 @@ ion-content {
 .tip-icon-wrap {
   width: 40px;
   height: 40px;
-  border-radius: 10px;
-  background: rgba(122, 225, 152, 0.15);
+  border-radius: var(--d-radius-sm);
+  background: var(--d-brand-light);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -112,7 +112,7 @@ ion-content {
 
   ion-icon {
     font-size: 20px;
-    color: var(--text-dyspo);
+    color: var(--d-brand);
   }
 }
 
@@ -124,13 +124,13 @@ ion-content {
 .tip-title {
   font-size: 0.92rem;
   font-weight: 700;
-  color: #2d2d2d;
+  color: var(--d-text-primary);
   margin-bottom: 3px;
 }
 
 .tip-desc {
   font-size: 0.82rem;
-  color: #666;
+  color: var(--d-text-secondary);
   line-height: 1.45;
   white-space: pre-line;
 }
@@ -138,5 +138,5 @@ ion-content {
 // ── Pied de page ──────────────────────────────────────────────────────────────
 .helper-footer {
   padding: 12px 16px 16px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid var(--d-surface-3);
 }

@@ -14,6 +14,11 @@ const config: CapacitorConfig = {
       presentationOptions: ['sound'],
     },
 
+    FirebaseAuthentication: {
+      skipNativeAuth: false,
+      providers: ['google.com', 'apple.com', 'facebook.com'],
+    },
+
     SplashScreen: {
       launchShowDuration: 5000,
       launchAutoHide: false,

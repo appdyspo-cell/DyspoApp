@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Browser } from '@capacitor/browser';
 import { NavController } from '@ionic/angular';
 import { MaskitoElementPredicateAsync, MaskitoOptions } from '@maskito/core';
 import { AppUser } from 'src/app/models/models';
@@ -7,7 +6,6 @@ import { AgendaService } from 'src/app/services/agenda.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
-import { environment } from 'src/environments/environment';
 
 declare interface RegisterErrors {
   firstname: boolean;
@@ -30,9 +28,11 @@ export class RegisterPage implements OnInit {
   isPrivacyChecked = false;
   academies = '';
   zonePickerOpen = false;
+  currentStep = 1;
 
   readonly weekDays = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
   custodyDays: boolean[] = new Array(14).fill(false);
+  isInternationalPhone = false;
   readonly maskPredicate: MaskitoElementPredicateAsync = async (el) =>
     (el as HTMLIonInputElement).getInputElement();
 
@@ -162,12 +162,52 @@ export class RegisterPage implements OnInit {
     this.custodyDays[index] = !this.custodyDays[index];
   }
 
+  toggleInternationalPhone() {
+    this.isInternationalPhone = !this.isInternationalPhone;
+    this.userInfo.phoneNumber = '';
+    this.errors['phoneNumber'] = false;
+  }
+
+  nextStep() {
+    if (this.currentStep === 1) {
+      this.errors['lastname'] =
+        !this.userInfo.lastname || this.userInfo.lastname.length < 3;
+      this.errors['firstname'] =
+        !this.userInfo.firstname || this.userInfo.firstname.length < 3;
+      this.errors['email'] = !this.utils.validateEmail(this.userInfo.email!);
+      this.errors['password'] = this.password === '' || this.password.length < 6;
+      if (
+        this.errors['lastname'] ||
+        this.errors['firstname'] ||
+        this.errors['email'] ||
+        this.errors['password']
+      ) {
+        return;
+      }
+    } else if (this.currentStep === 2) {
+      this.errors['phoneNumber'] = !this.utils.validatePhone(
+        this.userInfo.phoneNumber
+      );
+      if (this.errors['phoneNumber']) {
+        return;
+      }
+    }
+    this.currentStep++;
+  }
+
+  prevStep() {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
+  }
+
   async register() {
     this.utils.showLoader();
 
+    const hasPlus = (this.userInfo.phoneNumber ?? '').trim().startsWith('+');
     const chiffresTrouves = this.userInfo.phoneNumber?.match(/[0-9]/g);
     if (chiffresTrouves) {
-      this.userInfo.phoneNumber = chiffresTrouves.join('');
+      this.userInfo.phoneNumber = (hasPlus ? '+' : '') + chiffresTrouves.join('');
       if (this.userInfo.with_kids) {
         this.userInfo.custody_schedule = [...this.custodyDays];
       }
@@ -193,19 +233,11 @@ export class RegisterPage implements OnInit {
     }
   }
 
-  _gotoLegal() {
+  gotoLegal() {
     this.navCtrl.navigateForward('/cgu');
   }
 
-  async gotoLegal() {
-    await Browser.open({
-      url: environment.cgu_url,
-    });
-  }
-
-  async gotoPrivacy() {
-    await Browser.open({
-      url: environment.privacy_url,
-    });
+  gotoPrivacy() {
+    this.navCtrl.navigateForward('/privacy');
   }
 }

@@ -1,7 +1,24 @@
 {
   "projects": {
-    "default": "dyspo-2bb43",
+    "default": "dyspo-test",
     "prod": "dyspo-2bb43",
-    "stg": "dyspo-stg"
-  }
+    "stg": "dyspo-test"
+  },
+  "targets": {
+    "dyspo-2bb43": {
+      "storage": {
+        "main": [
+          "dyspo-2bb43.appspot.com"
+        ]
+      }
+    },
+    "dyspo-test": {
+      "storage": {
+        "main": [
+          "dyspo-test.firebasestorage.app"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

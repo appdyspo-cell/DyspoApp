@@ -97,6 +97,16 @@ export class FriendsPage implements OnInit {
   friendsSubscrition: Subscription;
   friendGroupsSubscrition: Subscription;
 
+  get filteredFriends(): Friend[] {
+    if (!this.inputSearch) return this.friends;
+    const query = this.inputSearch.toUpperCase();
+    return this.friends.filter(
+      (f) =>
+        (f.userData?.firstname ?? '').toUpperCase().includes(query) ||
+        (f.userData?.lastname ?? '').toUpperCase().includes(query)
+    );
+  }
+
   constructor(
     public utils: UtilsService,
     public alertCtrl: AlertController,
@@ -112,14 +122,27 @@ export class FriendsPage implements OnInit {
     this.friendGroups$ = this.friendService.friendGroups$;
 
     this.friendsSubscrition = this.friends$.subscribe((friends) => {
-      this.friends = friends.filter(
-        (elt) => elt.friend_status === FriendStatus.FRIEND
-      );
+      this.friends = friends
+        .filter((elt) => elt.friend_status === FriendStatus.FRIEND)
+        .sort((a, b) =>
+          (a.userData?.firstname ?? '').localeCompare(b.userData?.firstname ?? '', 'fr', { sensitivity: 'base' })
+        );
       this.friendsAlpha = this.groupContactsByAlphabet(this.friends);
 
-      this.friendsSuggested = friends.filter(
-        (elt) => elt.friend_status === FriendStatus.SUGGESTED
-      );
+      this.friendsSuggested = friends
+        .filter((elt) => elt.friend_status === FriendStatus.SUGGESTED)
+        .sort((a, b) =>
+          (a.userData?.firstname ?? '').localeCompare(b.userData?.firstname ?? '', 'fr', { sensitivity: 'base' })
+        );
+
+      // Calcul asynchrone des amis communs pour chaque invitation reçue
+      this.friendsSuggested.forEach(async (suggested) => {
+        if (suggested.friend_uid) {
+          suggested.commonFriendsCount = await this.friendService.getCommonFriendsCount(
+            suggested.friend_uid
+          );
+        }
+      });
     });
 
     this.friendGroupsSubscrition = this.friendGroups$.subscribe(
@@ -140,21 +163,23 @@ export class FriendsPage implements OnInit {
     // if (this.platform.is('android')) {
     //   this.friendService.initContacts();
     // }
-    const { value } = await Preferences.get({ key: ShowHelper.FRIENDS });
-    if (!value) {
-      this.showHelper = true;
-      const modal = await this.modalCtrl.create({
-        component: HelperComponent,
-        componentProps: {
-          showHelper: ShowHelper.FRIENDS,
-        },
-      });
-      modal.present();
+    if (this.userSvc.userInfo?.firstConnexion) {
+      const { value } = await Preferences.get({ key: ShowHelper.FRIENDS });
+      if (!value) {
+        this.showHelper = true;
+        const modal = await this.modalCtrl.create({
+          component: HelperComponent,
+          componentProps: {
+            showHelper: ShowHelper.FRIENDS,
+          },
+        });
+        modal.present();
 
-      await Preferences.set({
-        key: ShowHelper.FRIENDS,
-        value: 'SHOWN',
-      });
+        await Preferences.set({
+          key: ShowHelper.FRIENDS,
+          value: 'SHOWN',
+        });
+      }
     }
   }
 
@@ -390,14 +415,13 @@ export class FriendsPage implements OnInit {
   groupContactsByAlphabet(contacts: Friend[]) {
     const groups: any = {};
     contacts.forEach((contact) => {
-      const letter = contact.userData!.lastname!.charAt(0).toUpperCase();
+      const letter = (contact.userData?.firstname ?? '').charAt(0).toUpperCase() || '#';
       groups[letter] = groups[letter] || [];
       groups[letter].push(contact);
     });
-    return Object.keys(groups).map((letter) => ({
-      letter,
-      contacts: groups[letter],
-    }));
+    return Object.keys(groups)
+      .sort((a, b) => a.localeCompare(b, 'fr'))
+      .map((letter) => ({ letter, contacts: groups[letter] }));
   }
 
   getMembreLabel(nb: number) {

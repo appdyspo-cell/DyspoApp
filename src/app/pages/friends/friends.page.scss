@@ -13,11 +13,11 @@ ion-header {
 .btn-repertoire {
   font-size: 13px;
   font-weight: 600;
-  color: #46a2c2;
-  --color: #46a2c2;
-  --color-hover: #3586a2;
-  --color-activated: #3586a2;
-  --color-focused: #3586a2;
+  color: var(--d-brand);
+  --color: var(--d-brand);
+  --color-hover: var(--ion-color-tertiary-shade);
+  --color-activated: var(--ion-color-tertiary-shade);
+  --color-focused: var(--ion-color-tertiary-shade);
 
   ion-icon { font-size: 17px; }
 }
@@ -139,12 +139,12 @@ ion-item {
   ion-label {
     ion-row:first-child {
       font-size: 14px;
-      font-weight: 700;
       color: var(--d-text-primary);
     }
     ion-row:last-child {
       font-size: 13px;
-      color: var(--d-text-secondary);
+      font-weight: 700;
+      color: var(--d-text-primary);
     }
   }
 }
@@ -164,7 +164,7 @@ ion-item {
 // Bouton "Inviter"
 ion-button.btn-invite {
   --border-radius: var(--d-radius-pill);
-  --background: var(--d-brand);
+  --background: var(--d-brand-dark);
   --background-activated: var(--d-brand-dark);
   font-size: 12px;
   font-weight: 700;
@@ -196,10 +196,32 @@ ion-button.btn-invite {
   }
 }
 
+// ── Amis en commun ────────────────────────────────────────────────────────────
+
+.common-friends-row {
+  margin-top: 3px;
+  gap: 4px;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.common-friends-icon {
+  font-size: 13px;
+  color: var(--d-brand);
+  flex-shrink: 0;
+}
+
+.common-friends-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--d-brand);
+  line-height: 1;
+}
+
 // ── FAB ────────────────────────────────────────────────────────────────────────
 
 ion-fab-button {
-  --background: var(--d-brand);
+  --background: var(--d-brand-dark);
   --background-activated: var(--d-brand-dark);
   --box-shadow: var(--d-shadow-md);
   --border-radius: var(--d-radius-lg);

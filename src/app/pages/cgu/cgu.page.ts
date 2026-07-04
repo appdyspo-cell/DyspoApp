@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NavController } from '@ionic/angular';
 
 @Component({
     selector: 'app-cgu',
@@ -8,9 +9,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CguPage implements OnInit {
 
-  constructor() { }
+  constructor(private navCtrl: NavController) { }
 
   ngOnInit() {
+  }
+
+  goToPrivacy() {
+    this.navCtrl.navigateForward('/privacy');
   }
 
 }

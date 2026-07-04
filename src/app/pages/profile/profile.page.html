@@ -9,6 +9,18 @@
 
 <ion-content class="bg_color">
 
+  <!-- Aperçu avatar avant upload -->
+  <div class="avatar-preview-overlay" *ngIf="pendingAvatarPreview">
+    <div class="avatar-preview-card">
+      <p>Confirmer cette photo de profil ?</p>
+      <img [src]="pendingAvatarPreview" class="avatar-preview-img" />
+      <div class="avatar-preview-actions">
+        <ion-button fill="outline" (click)="cancelAvatarPreview()">Annuler</ion-button>
+        <ion-button (click)="validateAvatarPreview()">Valider</ion-button>
+      </div>
+    </div>
+  </div>
+
   <!-- Bandeau profil centré -->
   <div class="profile-banner" tappable (click)="changeAvatar()">
     <div class="profile-avatar-wrapper">
@@ -104,7 +116,7 @@
 
       <ion-item lines="none">
         <ion-toggle
-          style="color: #46a2c2"
+          style="color: var(--d-brand)"
           [(ngModel)]="user.with_kids"
           slot="end"
         ></ion-toggle>

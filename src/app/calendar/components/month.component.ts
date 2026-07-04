@@ -9,6 +9,7 @@ import {
   ElementRef,
   ViewChild,
 } from '@angular/core';
+import { format } from 'date-fns';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import {
   CalendarDay,
@@ -102,9 +103,8 @@ export const MONTH_VALUE_ACCESSOR: any = {
                     {{ day.title }}
                   </p>
                   <small *ngIf="day.subTitle">{{ day?.subTitle }}</small>
-                  <!-- <ion-badge>2</ion-badge> -->
-                  <div *ngIf="day.isEvent" class="event-badge">&nbsp;</div>
                 </button>
+                <div *ngIf="!day.isLastMonth && !day.isNextMonth && hasEventOn(day.time)" class="event-badge"></div>
               </ng-container>
             </div>
           </ng-template>
@@ -174,6 +174,8 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   public color?: string = defaults.COLOR;
   @Input()
   public filterDyspo: string | null = null;
+  @Input()
+  public eventDates: Set<string> = new Set();
 
   @Output()
   public longPressDay = new EventEmitter<CalendarDay>();
@@ -221,6 +223,10 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     private modalCtrl: ModalController,
     public userSvc: UserService
   ) {}
+
+  hasEventOn(time: number): boolean {
+    return this.eventDates.has(format(new Date(time), 'yyyy-MM-dd'));
+  }
 
   getDyspoClass(day: CalendarDay): { [klass: string]: boolean } {
     const classes: { [klass: string]: boolean } = {};
@@ -335,6 +341,7 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     // this.startDay = undefined;
     this.startDayIndex = -1;
     this._selectedPanDays = [];
+    this.ref.detectChanges();
   }
 
   async presentAction() {

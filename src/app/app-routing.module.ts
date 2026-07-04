@@ -52,6 +52,11 @@ const routes: Routes = [
       import('./pages/cgu/cgu.module').then((m) => m.CguPageModule),
   },
   {
+    path: 'privacy',
+    loadChildren: () =>
+      import('./pages/privacy/privacy.module').then((m) => m.PrivacyPageModule),
+  },
+  {
     path: 'register',
     loadChildren: () =>
       import('./pages/register/register.module').then(

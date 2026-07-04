@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, doc, setDoc } from '@angular/fire/firestore';
+import { Firestore, collection, addDoc } from '@angular/fire/firestore';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -19,7 +19,7 @@ export class LoggerService {
 
   sendError(error: Error, func: string, uid: string) {
     console.log('Send error');
-    setDoc(doc(this.firestore, `log_errors/`, 'log_' + new Date().getTime()), {
+    addDoc(collection(this.firestore, `log_errors`), {
       msg: error.message,
       user_id: uid,
       name: error.name,
@@ -38,7 +38,7 @@ export class LoggerService {
 
   sendLog(msg: string, func: string, uid: string) {
     console.log('Send log');
-    setDoc(doc(this.firestore, `log_debug/`, 'log_' + new Date().getTime()), {
+    addDoc(collection(this.firestore, `log_debug`), {
       msg,
       func,
       user_id: uid,
@@ -63,12 +63,8 @@ export class LoggerService {
   ) {
     console.error('Send uncaught Erorr ', msg);
 
-    setDoc(
-      doc(
-        this.firestore,
-        `log_uncaught_errors/`,
-        'error_' + new Date().getTime()
-      ),
+    addDoc(
+      collection(this.firestore, `log_uncaught_errors`),
       {
         msg,
         user_id: uid,
@@ -88,14 +84,11 @@ export class LoggerService {
   }
 
   sendDebugData(payload: any) {
-    setDoc(
-      doc(this.firestore, `log_debug_data/`, 'data_' + new Date().getTime()),
-      {
-        msg: payload.msg,
-        user_id: payload.user_id,
-        //dataString: payload.dataString,
-        data: payload.data,
-      }
-    );
+    addDoc(collection(this.firestore, `log_debug_data`), {
+      msg: payload.msg,
+      user_id: payload.user_id,
+      //dataString: payload.dataString,
+      data: payload.data,
+    });
   }
 }

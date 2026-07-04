@@ -85,6 +85,10 @@ export class UserStatusPage implements OnInit, OnDestroy {
 
   nb_notifications = 0;
 
+  get totalNotifications(): number {
+    return this.nb_notifications + this.friendsSuggested.length;
+  }
+
   constructor(
     public userSvc: UserService,
     private modalCtrl: ModalController,
@@ -216,21 +220,23 @@ export class UserStatusPage implements OnInit, OnDestroy {
       }, 380);
     }, 3200);
 
-    const { value } = await Preferences.get({ key: ShowHelper.DASHBOARD });
-    if (!value) {
-      this.showHelper = true;
-      const modal = await this.modalCtrl.create({
-        component: HelperComponent,
-        componentProps: {
-          showHelper: ShowHelper.DASHBOARD,
-        },
-      });
-      modal.present();
+    if (this.userSvc.userInfo?.firstConnexion) {
+      const { value } = await Preferences.get({ key: ShowHelper.DASHBOARD });
+      if (!value) {
+        this.showHelper = true;
+        const modal = await this.modalCtrl.create({
+          component: HelperComponent,
+          componentProps: {
+            showHelper: ShowHelper.DASHBOARD,
+          },
+        });
+        modal.present();
 
-      await Preferences.set({
-        key: ShowHelper.DASHBOARD,
-        value: 'SHOWN',
-      });
+        await Preferences.set({
+          key: ShowHelper.DASHBOARD,
+          value: 'SHOWN',
+        });
+      }
     }
   }
 
@@ -378,12 +384,7 @@ export class UserStatusPage implements OnInit, OnDestroy {
     }
   }
 
-  openNotifications() {
-    const navigationExtras: NavigationExtras = {
-      state: {
-        invitations: this.invitations,
-      },
-    };
-    this.navCtrl.navigateForward('/notifications-list', navigationExtras);
+  openAllNotifications() {
+    this.navCtrl.navigateForward('/notifications-list');
   }
 }

@@ -644,6 +644,28 @@ export class ChatService {
     }
   }
 
+  async markMessageRead(message: ChatMessage, agendaEvent: AgendaEvent) {
+    if (!this.uid) return;
+    if (message.sender === this.uid) return;
+    if (message.read_by?.includes(this.uid)) return;
+
+    try {
+      const messageDocRef = doc(
+        this.firestore,
+        `agenda_events/${agendaEvent.uid}/messages_list`,
+        message.uid
+      );
+
+      const read_by = message.read_by || [];
+      read_by.push(this.uid);
+      message.read_by = read_by;
+
+      await updateDoc(messageDocRef, { read_by });
+    } catch (e: any) {
+      this.loggerSvc.sendError(e, 'markMessageRead', this.uid);
+    }
+  }
+
   async likeMessage(message: ChatMessage, agendaEvent: AgendaEvent) {
     if (!this.uid) return;
 

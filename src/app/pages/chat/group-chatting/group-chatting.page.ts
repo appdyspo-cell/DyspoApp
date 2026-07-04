@@ -19,6 +19,8 @@ import { cloneDeep, reduce } from 'lodash';
 import { Subscription, take } from 'rxjs';
 import { ChatMenuComponent } from 'src/app/components/chat-menu/chat-menu.component';
 import { DyspoViewerComponent } from 'src/app/components/dyspo-viewer/dyspo-viewer.component';
+import { HelperComponent } from 'src/app/components/helper/helper.component';
+import { Preferences } from '@capacitor/preferences';
 import {
   AgendaEvent,
   AppUser,
@@ -32,6 +34,7 @@ import {
   WarnReportGroupStatus,
   ReportType,
   AgendaEventType,
+  ShowHelper,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
 import { CalendarService } from 'src/app/services/calendar.service';
@@ -41,7 +44,6 @@ import { MediaService } from 'src/app/services/media.service';
 import { UserService } from 'src/app/services/user.service';
 import { environment } from 'src/environments/environment';
 import { Keyboard } from '@capacitor/keyboard';
-import Swal from 'sweetalert2';
 import { Device, DeviceInfo } from '@capacitor/device';
 import { UtilsService } from 'src/app/services/utils.service';
 import { NotificationService } from 'src/app/services/notification.service';
@@ -193,6 +195,19 @@ export class GroupChattingPage implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.deviceInfo = await Device.getInfo();
+
+    if (this.userSvc.userInfo?.firstConnexion) {
+      const { value } = await Preferences.get({ key: ShowHelper.GROUP_CHAT });
+      if (!value) {
+        const modal = await this.modalCtrl.create({
+          component: HelperComponent,
+          componentProps: { showHelper: ShowHelper.GROUP_CHAT },
+        });
+        modal.present();
+        await Preferences.set({ key: ShowHelper.GROUP_CHAT, value: 'SHOWN' });
+      }
+    }
+
     // Messages
     this.chatSvc.removeListenMessages();
     const fetchedMessages: GetMessagesResult = await this.chatSvc.getMessages(
@@ -203,13 +218,13 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     this.firstVisibleMessageDoc = fetchedMessages.firstVisibleMessageDoc;
     console.log('First visible msg ', this.firstVisibleMessageDoc?.data());
     await this.chatSvc.resetCount(this.agendaEvent);
-    // On pourrait ici tester si les messages ont été lus et les marquer comme lus si ce n'est pas le cas
+    this.markVisibleMessagesRead();
     this.scrollDown();
     this.chatSvc.listenMessages(this.agendaEvent);
 
     this.messagesSubscription = this.chatSvc.messages$.subscribe((data) => {
       this.msgList = data.messages;
-      console.log('msg list', this.msgList);
+      this.changeDetectorRef.detectChanges();
 
       //Wait the last message Set zero to unread msgs
       if (data.action === 'ADDED') {
@@ -218,11 +233,12 @@ export class GroupChattingPage implements OnInit, OnDestroy {
           lastMessage = data.messages[data.messages.length - 1];
         }
         this.chatSvc.markLastMessageRead(this.agendaEvent, lastMessage);
+        if (lastMessage) {
+          this.chatSvc.markMessageRead(lastMessage, this.agendaEvent);
+        }
         this.scrollDown();
       } else if (data.action === 'MODIFIED') {
         console.log('Modified');
-        console.log('New list ', this.msgList);
-        // this.changeDetectorRef.detectChanges();
       }
     });
 
@@ -253,6 +269,20 @@ export class GroupChattingPage implements OnInit, OnDestroy {
         member.is_my_friend = this.friendsSvc.isMyFriend(member.uid);
       }
     }
+  }
+
+  private markVisibleMessagesRead() {
+    for (const msg of this.msgList) {
+      this.chatSvc.markMessageRead(msg, this.agendaEvent);
+    }
+  }
+
+  getReadByLabel(msg: ChatMessage): string {
+    if (!msg.read_by || msg.read_by.length === 0) return 'Envoyé';
+    const names = msg.read_by
+      .map((uid) => this.member_infos_obj?.[uid]?.firstname)
+      .filter((name) => !!name);
+    return names.length > 0 ? `Lu par ${names.join(', ')}` : 'Lu';
   }
 
   async openMenu(ev: any) {
@@ -425,43 +455,41 @@ export class GroupChattingPage implements OnInit, OnDestroy {
     }, 350);
   }
 
-  deleteMsg(ev: any) {
+  async deleteMsg(ev: any) {
     //Is it the last message of the discussion ?
     const isLastMessage =
       this.msgList.indexOf(this.msgSelected!) === this.msgList.length - 1;
 
     console.log('is last message? ', isLastMessage);
-    Swal.fire({
+    const confirmed = await this.utils.confirmAction({
       title: 'Voulez-vous supprimer ce message ?',
-      showDenyButton: true,
-      heightAuto: false,
-      confirmButtonText: 'Oui',
-      denyButtonText: `Non`,
-    }).then((result) => {
-      if (result.isConfirmed && this.msgSelected) {
-        this.chatSvc.deleteMessage(
-          this.msgSelected,
-          this.agendaEvent,
-          isLastMessage
-        );
-        this.msgSelected = undefined;
-      }
+      message: '',
+      confirmText: 'Oui',
+      cancelText: 'Non',
+      destructive: true,
     });
+    if (confirmed && this.msgSelected) {
+      this.chatSvc.deleteMessage(
+        this.msgSelected,
+        this.agendaEvent,
+        isLastMessage
+      );
+      this.msgSelected = undefined;
+    }
   }
 
   onMsgSelected(msg: ChatMessage) {
     this.msgSelected = msg;
   }
 
-  reportMsg(ev: any) {
-    Swal.fire({
+  async reportMsg(ev: any) {
+    const confirmed = await this.utils.confirmAction({
       title: 'Voulez-vous signaler ce message ?',
-      showDenyButton: true,
-      heightAuto: false,
-      confirmButtonText: 'Oui',
-      denyButtonText: `Non`,
-    }).then(async (result) => {
-      if (result.isConfirmed && this.msgSelected !== undefined) {
+      message: '',
+      confirmText: 'Oui',
+      cancelText: 'Non',
+    });
+    if (confirmed && this.msgSelected !== undefined) {
         const my_id = this.my_uid;
         const now = new Date();
         const now_ISO = now.toISOString();
@@ -487,30 +515,22 @@ export class GroupChattingPage implements OnInit, OnDestroy {
         this.chatSvc
           .warnReportMsg(report_data)
           .then((res) => {
-            this.utils.swalSuccess(
+            this.utils.showAlertSuccess(
               'OK',
               'Le message a été signalé. Votre requête va être examinée.'
             );
           })
           .catch((err) => {
-            this.utils.swalError(err);
+            this.utils.showAlertError(err);
           });
-      }
-    });
+    }
   }
 
   async reportGroup() {
-    const { value: text } = await Swal.fire({
-      input: 'textarea',
-      heightAuto: false,
-      inputLabel: 'Signaler le groupe',
-      inputPlaceholder: 'Decrivez ce qui vous dérange',
-      inputAttributes: {
-        'aria-label': 'Type your message here',
-      },
-      cancelButtonText: 'Annuler',
-      confirmButtonText: 'Envoyer',
-      showCancelButton: true,
+    const text = await this.utils.promptTextarea({
+      title: 'Signaler le groupe',
+      placeholder: 'Décrivez ce qui vous dérange',
+      confirmText: 'Envoyer',
     });
     if (text) {
       //const last_five_messages = this.m
@@ -532,13 +552,13 @@ export class GroupChattingPage implements OnInit, OnDestroy {
       this.chatSvc
         .warnReportGroup(report_data)
         .then((res) => {
-          this.utils.swalSuccess(
+          this.utils.showAlertSuccess(
             'OK',
             'Le groupe a été signalé. Votre requête va être examinée.'
           );
         })
         .catch((err) => {
-          this.utils.swalError(err);
+          this.utils.showAlertError(err);
         });
     }
   }
@@ -560,7 +580,12 @@ export class GroupChattingPage implements OnInit, OnDestroy {
       source: CameraSource.Camera,
       allowEditing: false,
     });
+    if (!filepath) {
+      this.utils.showToastError("Impossible d'accéder à la photo");
+      return;
+    }
     this.pendingAttachment = filepath;
+    this.changeDetectorRef.detectChanges();
     this.scrollDown();
   }
   async openGallery() {
@@ -572,7 +597,12 @@ export class GroupChattingPage implements OnInit, OnDestroy {
       source: CameraSource.Photos,
       allowEditing: false,
     });
+    if (!filepath) {
+      this.utils.showToastError("Impossible d'accéder à la galerie");
+      return;
+    }
     this.pendingAttachment = filepath;
+    this.changeDetectorRef.detectChanges();
     this.scrollDown();
   }
 

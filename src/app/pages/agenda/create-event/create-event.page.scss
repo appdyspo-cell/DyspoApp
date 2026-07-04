@@ -399,15 +399,28 @@ ion-searchbar {
   padding: var(--d-space-3);
 }
 
-// ── Bouton Enregistrer ────────────────────────────────────────────────────────
+// ── Footer fixe Enregistrer ───────────────────────────────────────────────────
+
+.save-event-footer {
+  ion-toolbar {
+    --background: var(--d-surface-1);
+    --padding-start: var(--d-space-4);
+    --padding-end: var(--d-space-4);
+    --padding-top: var(--d-space-3);
+    --padding-bottom: calc(var(--d-space-3) + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 20px rgba(26, 29, 35, 0.10);
+  }
+}
 
 .btn-save-event {
-  --background: #46a2c2;
-  --background-activated: #3586a2;
-  --background-hover: #3586a2;
-  --background-focused: #3586a2;
+  --background: var(--d-brand-dark);
+  --background-activated: var(--ion-color-tertiary-shade);
+  --background-hover: var(--ion-color-tertiary-shade);
+  --background-focused: var(--ion-color-tertiary-shade);
   --color: #fff;
   --border-radius: var(--d-radius-pill);
+  width: 100%;
+  margin: 0;
 }
 
 // ── Checkbox alignement ───────────────────────────────────────────────────────
@@ -419,8 +432,8 @@ ion-searchbar {
 
   ion-checkbox {
     width: 100%;
-    --checkbox-background-checked: #46a2c2;
-    --border-color-checked: #46a2c2;
+    --checkbox-background-checked: var(--d-brand);
+    --border-color-checked: var(--d-brand);
     font-size: 14px;
     font-weight: 500;
     color: var(--d-text-primary);
@@ -446,7 +459,7 @@ ion-searchbar {
 
   .date-icon {
     font-size: 22px;
-    color: #46a2c2;
+    color: var(--d-brand);
     margin-right: var(--d-space-3);
     flex-shrink: 0;
   }
@@ -480,8 +493,8 @@ ion-datetime {
   margin: 0 auto;
   --background: var(--d-surface-1);
   --color: var(--d-text-primary);
-  --ion-color-primary: #46a2c2;
-  --ion-color-primary-shade: #3586a2;
+  --ion-color-primary: var(--d-brand-dark);
+  --ion-color-primary-shade: var(--ion-color-tertiary-shade);
   --ion-color-primary-contrast: #fff;
 }
 
@@ -497,14 +510,14 @@ ion-datetime {
   cursor: pointer;
   font-size: 15px;
   font-weight: 700;
-  color: #46a2c2;
+  color: var(--d-brand);
   transition: background 0.15s ease, color 0.15s ease;
 
   span { flex: 1; text-align: left; }
   ion-icon { font-size: 20px; }
 
-  &:hover { background: rgba(53, 134, 162, 0.08); color: #3586a2; }
-  &:active { background: var(--d-surface-3); color: #3586a2; }
+  &:hover { background: rgba(53, 134, 162, 0.08); color: var(--ion-color-tertiary-shade); }
+  &:active { background: var(--d-surface-3); color: var(--ion-color-tertiary-shade); }
 }
 
 // ── Description ───────────────────────────────────────────────────────────────

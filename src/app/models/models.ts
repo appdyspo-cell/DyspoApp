@@ -24,6 +24,8 @@ export interface AppUser {
   geo_zone?: string;
   with_kids?: boolean;
   custody_schedule?: boolean[];
+  dyspo_ref_monday_ms?: number;
+  dyspo_fill_end_date_ms?: number;
 }
 
 export interface AppDeviceContact {
@@ -42,6 +44,7 @@ export interface Friend extends AppUser {
   requestDate?: number;
   friend_status?: FriendStatus;
   friend_uid?: string;
+  commonFriendsCount?: number;
 
   userData?: AppUser;
 }
@@ -343,4 +346,8 @@ export enum ShowHelper {
   FRIENDS = 'FRIENDS',
   AGENDA = 'AGENDA',
   CHATS = 'CHATS',
+  PROFILE = 'PROFILE',
+  SETTINGS = 'SETTINGS',
+  CREATE_EVENT = 'CREATE_EVENT',
+  GROUP_CHAT = 'GROUP_CHAT',
 }

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Auth, User, authState, user } from '@angular/fire/auth';
-import { NavController, Platform } from '@ionic/angular';
+import { ModalController, NavController, Platform } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
 import { UserService } from './services/user.service';
@@ -14,6 +14,8 @@ import { SplashScreen } from '@capacitor/splash-screen';
 import { App } from '@capacitor/app';
 import { UtilsService } from './services/utils.service';
 import { Contacts } from '@capacitor-community/contacts';
+import { AppUser } from './models/models';
+import { CustodyRenewalModalComponent, CustodyRenewalResult } from './components/custody-renewal/custody-renewal-modal.component';
 
 @Component({
     selector: 'app-root',
@@ -32,6 +34,7 @@ export class AppComponent {
     public platform: Platform,
     private translate: TranslateService,
     private navController: NavController,
+    private modalCtrl: ModalController,
 
     private userSvc: UserService,
     private logger: LoggerService,
@@ -78,9 +81,29 @@ export class AppComponent {
               this.navController.navigateRoot('/tabs');
               setTimeout(() => {
                 SplashScreen.hide();
-              }, 800);
+                this.checkCustodyRenewal(appUser);
+              }, 1200);
             })
-            .catch((err) => {
+            .catch(async (err) => {
+              // Première connexion via un provider social (Google/Apple/Facebook) :
+              // l'utilisateur Firebase Auth existe mais n'a pas encore de profil Firestore.
+              if (err?.msg === 'Utilisateur non trouvé' && aUser.email) {
+                try {
+                  await this.userSvc.createMinimalUserDoc(aUser);
+                  const appUser = await this.userSvc.subscribeUserInfo(aUser.uid);
+                  this.initAllServices(appUser.uid!);
+                  this.navController.navigateRoot('/tabs');
+                  setTimeout(() => {
+                    SplashScreen.hide();
+                  }, 1200);
+                  return;
+                } catch (provisionErr) {
+                  this.logger.logDebug(
+                    'ERR createMinimalUserDoc ',
+                    provisionErr
+                  );
+                }
+              }
               this.logger.logDebug('ERR validateAuthState ', err);
               this.navController.navigateRoot('/login');
               this.utils.showToastError(err.msg);
@@ -100,11 +123,76 @@ export class AppComponent {
         }
       }
     );
+
+    // Fin de la "première connexion" : dès que l'app passe en arrière-plan,
+    // on arrête de proposer les popups tutoriel (ShowHelper) même sur les
+    // pages jamais visitées.
+    App.addListener('appStateChange', (state) => {
+      if (!state.isActive && this.userSvc.userInfo?.firstConnexion) {
+        this.userSvc.endFirstConnexion();
+      }
+    });
+
+    // Deep links : dyspo://event/<uid>
+    App.addListener('appUrlOpen', (event) => {
+      const match = event.url.match(/^dyspo:\/\/event\/(.+)$/);
+      if (!match) return;
+      this.agendaSvc.pendingDeepLinkEventUid = match[1];
+      this.navController.navigateRoot('/tabs');
+    });
   }
 
   ngOnDestroy() {
     this.authStateSubscription.unsubscribe();
     //this.userSubscription.unsubscribe();
+  }
+
+  private async checkCustodyRenewal(user: AppUser) {
+    if (!user.with_kids || !user.custody_schedule || !user.dyspo_fill_end_date_ms) return;
+
+    const daysLeft = Math.ceil(
+      (user.dyspo_fill_end_date_ms - Date.now()) / 86400000
+    );
+    if (daysLeft > 7) return;
+
+    // Avoid showing the popup more than once per day
+    const todayKey = new Date().toISOString().split('T')[0];
+    const storageKey = `dyspo_renewal_shown_${user.uid}`;
+    if (localStorage.getItem(storageKey) === todayKey) return;
+    localStorage.setItem(storageKey, todayKey);
+
+    const modal = await this.modalCtrl.create({
+      component: CustodyRenewalModalComponent,
+      componentProps: {
+        currentCustodyDays: user.custody_schedule,
+        daysLeft: Math.max(0, daysLeft),
+      },
+      breakpoints: [0, 1],
+      initialBreakpoint: 1,
+      cssClass: 'custody-renewal-modal',
+    });
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss<CustodyRenewalResult>();
+    if (!data || data.action === 'later') return;
+
+    const custodyDays =
+      data.action === 'update' && data.newCustodyDays
+        ? data.newCustodyDays
+        : user.custody_schedule;
+
+    try {
+      await this.utils.showLoader();
+      await this.agendaSvc.applyCustodySchedule(user.uid!, custodyDays, {
+        refMondayMs: user.dyspo_ref_monday_ms!,
+        startFromMs: user.dyspo_fill_end_date_ms!,
+      });
+      this.utils.hideLoader();
+      this.utils.showToastSuccess('Calendrier renouvelé pour un an !');
+    } catch (err) {
+      this.utils.hideLoader();
+      this.utils.showToastError(err as string);
+    }
   }
 
   async initAllServices(uid: string) {

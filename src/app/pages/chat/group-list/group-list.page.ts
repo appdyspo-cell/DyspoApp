@@ -107,15 +107,17 @@ export class GroupListPage implements OnInit {
   async ngOnInit() {
     await this.loadFavorites();
 
-    const { value } = await Preferences.get({ key: ShowHelper.CHATS });
-    if (!value) {
-      this.showHelper = true;
-      const modal = await this.modalCtrl.create({
-        component: HelperComponent,
-        componentProps: { showHelper: ShowHelper.CHATS },
-      });
-      modal.present();
-      await Preferences.set({ key: ShowHelper.CHATS, value: 'SHOWN' });
+    if (this.userSvc.userInfo?.firstConnexion) {
+      const { value } = await Preferences.get({ key: ShowHelper.CHATS });
+      if (!value) {
+        this.showHelper = true;
+        const modal = await this.modalCtrl.create({
+          component: HelperComponent,
+          componentProps: { showHelper: ShowHelper.CHATS },
+        });
+        modal.present();
+        await Preferences.set({ key: ShowHelper.CHATS, value: 'SHOWN' });
+      }
     }
   }
 
@@ -226,6 +228,15 @@ export class GroupListPage implements OnInit {
     return format(parseISO(agendaEvent.last_message.date_ISO), 'HH:mm dd MMM', {
       locale: fr,
     });
+  }
+
+  getEventInfoLabel(agendaEvent: AgendaEvent): string {
+    const dateLabel = agendaEvent.startISO
+      ? format(parseISO(agendaEvent.startISO), 'iii dd MMM', { locale: fr })
+      : '';
+    return agendaEvent.place_description
+      ? `${dateLabel} · ${agendaEvent.place_description}`
+      : dateLabel;
   }
 
   getLastMessageMessage(agendaEvent: AgendaEvent) {

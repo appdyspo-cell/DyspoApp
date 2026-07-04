@@ -54,6 +54,7 @@ export class AgendaService {
   private uid!: string;
   public agendaEvents: AgendaEvent[] = [];
   public agendaEventInvitations: AgendaEvent[] = [];
+  public pendingDeepLinkEventUid: string | null = null;
   public holidays: HolidaysEvent[] = [];
   public agendaEventsSubject = new BehaviorSubject<AgendaEvent[]>([]);
   public agendaEventInvitationsSubject = new BehaviorSubject<AgendaEvent[]>([]);
@@ -402,18 +403,10 @@ export class AgendaService {
     }
     //NON RECURRENT
     else {
-      setDoc(
+      await setDoc(
         doc(this.firestore, `agenda_events/`, agendaEvent.uid!),
         agendaEvent
-      )
-        .then(() => {
-          //this.utils.showToastSuccess("L'événement a été sauvegardé");
-          return true;
-        })
-        .catch((err) => {
-          //this.utils.showToastError("Une erreur s'est produite");
-          return false;
-        });
+      );
     }
   }
 
@@ -477,6 +470,13 @@ export class AgendaService {
         isNotifications: true,
       };
       invitation!['user_' + this.uid] = userChatroom;
+
+      // Mise à jour locale immédiate — sans attendre le snapshot Firestore
+      const alreadyInEvents = this.agendaEvents.findIndex((e) => e.uid === invitation.uid) >= 0;
+      if (!alreadyInEvents) {
+        this.agendaEvents.push(invitation);
+        this.agendaEventsSubject.next(this.agendaEvents);
+      }
 
       this.saveOrUpdateEvent(invitation);
     } else {
@@ -611,9 +611,10 @@ export class AgendaService {
 
     // console.log('startDateRef', formatISO(agendaEventToCompare.start_date_ts));
     // console.log('endDateRef', formatISO(agendaEventToCompare.end_date_ts));
+    // Requête par le UID courant (règle Firestore) + filtre client-side pour l'ami
     const queryAgendaEvents = query(
       agendaEventsCollectionRef,
-      where('members_uid', 'array-contains', uid),
+      where('members_uid', 'array-contains', this.uid),
       where('start_date_ts', '>=', agendaEventToCompare.start_date_ts)
     );
 
@@ -623,7 +624,7 @@ export class AgendaService {
     querySnapshots.forEach((snapshot) => {
       const eventResult = snapshot.data() as AgendaEvent;
 
-      if (eventResult.uid !== agendaEventToCompare.uid) {
+      if (eventResult.members_uid?.includes(uid) && eventResult.uid !== agendaEventToCompare.uid) {
         if (eventResult.end_date_ts <= agendaEventToCompare.end_date_ts) {
           events.push(eventResult);
         }
@@ -670,9 +671,10 @@ export class AgendaService {
       `agenda_events/`
     );
 
+    // Requête par le UID courant (règle Firestore) + filtre client-side pour l'ami (uid)
     const queryAgendaEvents = query(
       agendaEventsCollectionRef,
-      where('members_uid', 'array-contains', uid)
+      where('members_uid', 'array-contains', this.uid)
     );
 
     const agendaDysposCollectionRef = collection(
@@ -687,7 +689,10 @@ export class AgendaService {
     const dyspos: AgendaDyspoItem[] = [];
 
     querySnapshotsEvents.forEach((snapshot) => {
-      events.push(snapshot.data() as AgendaEvent);
+      const evt = snapshot.data() as AgendaEvent;
+      if (evt.members_uid?.includes(uid)) {
+        events.push(evt);
+      }
     });
 
     querySnapshotsDyspos.forEach((snapshot) => {
@@ -701,26 +706,47 @@ export class AgendaService {
     };
   }
 
-  async applyCustodySchedule(uid: string, custodyDays: boolean[]): Promise<void> {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+  /**
+   * Pre-fills the user's dyspo calendar for 12 months.
+   *
+   * options.refMondayMs  — timestamp of the original reference Monday (for renewals,
+   *                        so the 14-day cycle stays continuous). Omit for initial fill.
+   * options.startFromMs  — timestamp to start filling from (for renewals = previous
+   *                        end date). Omit for initial fill (starts from this Monday).
+   */
+  async applyCustodySchedule(
+    uid: string,
+    custodyDays: boolean[],
+    options?: { refMondayMs: number; startFromMs: number }
+  ): Promise<void> {
+    let refMonday: Date;
+    let startDate: Date;
 
-    const jsDay = today.getDay(); // 0=dim, 1=lun … 6=sam
-    const daysToMonday = jsDay === 0 ? -6 : 1 - jsDay;
-    const refMonday = new Date(today);
-    refMonday.setDate(today.getDate() + daysToMonday);
+    if (options) {
+      refMonday = new Date(options.refMondayMs);
+      startDate = new Date(options.startFromMs);
+      startDate.setHours(0, 0, 0, 0);
+    } else {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const jsDay = today.getDay();
+      const daysToMonday = jsDay === 0 ? -6 : 1 - jsDay;
+      refMonday = new Date(today);
+      refMonday.setDate(today.getDate() + daysToMonday);
+      startDate = new Date(refMonday);
+    }
 
-    const endDate = addMonths(refMonday, 12);
+    const endDate = addMonths(startDate, 12);
 
     // Firestore batch limit = 500 ops. 12 months ≈ 365 days — safe in one batch.
     const batch = writeBatch(this.firestore);
-    const currentDate = new Date(refMonday);
+    const currentDate = new Date(startDate);
 
     while (currentDate < endDate) {
       const daysDiff = Math.round(
         (currentDate.getTime() - refMonday.getTime()) / 86400000
       );
-      const cycleIndex = daysDiff % 14;
+      const cycleIndex = ((daysDiff % 14) + 14) % 14;
       const y = getYear(currentDate);
       const m = getMonth(currentDate);
       const d = getDate(currentDate);
@@ -747,6 +773,13 @@ export class AgendaService {
     }
 
     await batch.commit();
+
+    // Persist fill metadata so the renewal check can detect expiry.
+    await updateDoc(doc(this.firestore, 'users', uid), {
+      dyspo_ref_monday_ms: refMonday.getTime(),
+      dyspo_fill_end_date_ms: endDate.getTime(),
+      custody_schedule: custodyDays,
+    });
   }
 
   unsubscribeAllAfterLogoutEvent() {

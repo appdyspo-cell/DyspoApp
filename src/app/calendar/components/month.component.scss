@@ -17,7 +17,7 @@
   float: left;
   text-align: center;
   height: 36px;
-  margin-bottom: 9px;
+  margin-bottom: 12px;
 }
 
 :host .days .marked p {
@@ -43,9 +43,9 @@
 }
 
 :host .primary .days .today p {
-  font-weight: 900;
-  font-size: 1.8em;
-  //color: #333 !important;
+  font-weight: 600;
+  font-size: 1.5em;
+  color: #000 !important;
 }
 
 :host .primary .days .last-month-day p,
@@ -98,65 +98,27 @@
   color: #fff !important;
 }
 
-:host .is-holidays {
-  border: none;
-  background: transparent;
-}
-
 :host .days {
   overflow: visible;
 }
 
-:host .days.is-holidays-day::before {
-  content: '';
-  position: absolute;
-  top: 2px;
-  bottom: 2px;
-  left: 0;
-  right: 0;
-  border-top: 1.5px dashed var(--d-text-tertiary, #9aa3b2);
-  border-bottom: 1.5px dashed var(--d-text-tertiary, #9aa3b2);
-  background: rgba(154, 163, 178, 0.10);
-  pointer-events: none;
-  z-index: 0;
-}
-
-:host .days.is-holidays-day.is-holidays-first::before {
-  left: 3px;
-  border-left: 1.5px dashed var(--d-text-tertiary, #9aa3b2);
-  border-radius: 8px 0 0 8px;
-}
-
-:host .days.is-holidays-day.is-holidays-last::before {
-  right: 3px;
-  border-right: 1.5px dashed var(--d-text-tertiary, #9aa3b2);
-  border-radius: 0 8px 8px 0;
-}
-
-:host .days.is-holidays-day.is-holidays-first.is-holidays-last::before {
-  border-radius: 8px;
+:host button.days-btn.is-holidays {
+  outline: 1.5px dashed var(--d-text-tertiary, #9aa3b2);
+  outline-offset: 2px;
+  background: rgba(154, 163, 178, 0.08);
 }
 
 :host .event-badge {
-  //width: 10px;
-  //height: 10px;
-  background: var(--text-no-dyspo);
-  //position: absolute;
-  //border-radius: 5px;
-  z-index: 15;
-
   position: absolute;
-  top: -4px; /* Ajustez cette valeur pour positionner verticalement */
-  right: -3px; /* Ajustez cette valeur pour positionner horizontalement */
-  font-size: 12px; /* Taille du texte du badge */
-  width: 8px; /* Largeur du badge */
-  height: 8px; /* Hauteur du badge */
-  border-radius: 50%; /* Pour créer un badge circulaire */
-
-  color: white; /* Couleur du texte du badge */
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  top: 0px;
+  left: calc(50% + 11px);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f95812;
+  border: 1.5px solid #fff;
+  z-index: 20;
+  pointer-events: none;
 }
 
 ion-badge {
@@ -881,6 +843,7 @@ ion-badge {
   position: relative;
   z-index: 2;
   outline: 0;
+  overflow: visible;
 }
 
 :host button.days-btn p {

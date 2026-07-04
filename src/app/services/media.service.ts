@@ -18,6 +18,8 @@ export interface TakePhotoOptions {
   allowEditing?: boolean;
   firebasePath: string;
   noUpload?: boolean;
+  /** Appelé avec un aperçu local (data URL) avant l'upload Firebase. Si la promesse résout `false`, l'upload est annulé. */
+  confirmBeforeUpload?: (previewDataUrl: string) => Promise<boolean>;
 }
 
 @Injectable({
@@ -96,9 +98,19 @@ export class MediaService {
       const captureDataUrl = result.base64String;
 
       if (captureDataUrl) {
+        const dataUrl = `data:image/jpeg;base64,${captureDataUrl}`;
+
         if (opt.noUpload) {
-          return { filepath: result.dataUrl };
+          return { filepath: dataUrl };
         }
+
+        if (opt.confirmBeforeUpload) {
+          const confirmed = await opt.confirmBeforeUpload(dataUrl);
+          if (!confirmed) {
+            return { filepath: undefined };
+          }
+        }
+
         this.utils.showLoader();
         const path = `${opt.firebasePath}${opt.filename}`;
         const fileRef = ref(this.storage, path);

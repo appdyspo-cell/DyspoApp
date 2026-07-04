@@ -63,14 +63,14 @@ export class ReportComponent implements OnInit {
     this.chatSvc
       .warnReportUser(this.user_id, this.report_text)
       .then((res) => {
-        this.utils.swalSuccess(
+        this.utils.showAlertSuccess(
           'OK',
           'Le groupe a été signalé. Votre requête va être examinée.'
         );
         this.modalCtrl.dismiss();
       })
       .catch((err: any) => {
-        this.utils.swalError(err);
+        this.utils.showAlertError(err);
       });
   }
 }

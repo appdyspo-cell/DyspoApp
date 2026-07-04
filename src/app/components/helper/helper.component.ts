@@ -22,14 +22,14 @@ const HELPER_CONTENTS: Record<ShowHelper, HelperContent> = {
     subtitle: 'Votre calendrier social',
     tips: [
       {
+        icon: 'notifications-outline',
+        title: 'Invitations',
+        description: 'Recevez une notification quand vous êtes invité à un événement et validez ou déclinez votre présence.',
+      },
+      {
         icon: 'radio-button-on-outline',
         title: 'Statut du jour',
         description: 'Changez votre disponibilité d\'un simple appui sur le statut affiché en haut de l\'écran.',
-      },
-      {
-        icon: 'calendar-outline',
-        title: 'Événements à venir',
-        description: 'Consultez d\'un coup d\'œil vos prochains événements personnels et de groupe.',
       },
       {
         icon: 'add-circle-outline',
@@ -37,9 +37,9 @@ const HELPER_CONTENTS: Record<ShowHelper, HelperContent> = {
         description: 'Créez facilement un rendez-vous personnel ou invitez vos amis à un événement commun.',
       },
       {
-        icon: 'notifications-outline',
-        title: 'Invitations',
-        description: 'Recevez une notification quand vous êtes invité à un événement et validez ou déclinez votre présence.',
+        icon: 'calendar-outline',
+        title: 'Événements à venir',
+        description: 'Consultez d\'un coup d\'œil vos prochains événements personnels et de groupe.',
       },
     ],
   },
@@ -88,7 +88,7 @@ const HELPER_CONTENTS: Record<ShowHelper, HelperContent> = {
       {
         icon: 'person-add-outline',
         title: 'Demandes en attente',
-        description: 'Acceptez ou déclinez les demandes d\'amis reçues directement depuis cette page.',
+        description: 'Acceptez ou déclinez les demandes d\'amis reçues ici et dans vos notifications.',
       },
       {
         icon: 'calendar-outline',
@@ -116,6 +116,99 @@ const HELPER_CONTENTS: Record<ShowHelper, HelperContent> = {
         icon: 'archive-outline',
         title: 'Archives',
         description: 'Une fois l\'événement passé, la discussion bascule automatiquement dans les archives pour garder votre liste propre.',
+      },
+    ],
+  },
+  [ShowHelper.PROFILE]: {
+    icon: 'person-circle-outline',
+    title: 'Votre profil',
+    subtitle: 'Vos informations personnelles',
+    tips: [
+      {
+        icon: 'camera-outline',
+        title: 'Photo de profil',
+        description: 'Appuyez sur votre avatar pour prendre ou choisir une nouvelle photo de profil.',
+      },
+      {
+        icon: 'people-outline',
+        title: 'J\'ai des enfants',
+        description: 'Activez ce réglage pour indiquer votre planning de garde sur 2 semaines, utilisé pour préremplir votre calendrier.',
+      },
+      {
+        icon: 'call-outline',
+        title: 'Coordonnées',
+        description: 'Votre téléphone et votre zone géographique aident vos amis à vous identifier et à connaître votre académie scolaire.',
+      },
+    ],
+  },
+  [ShowHelper.SETTINGS]: {
+    icon: 'settings-outline',
+    title: 'Paramètres',
+    subtitle: 'Personnalisez votre expérience',
+    tips: [
+      {
+        icon: 'notifications-outline',
+        title: 'Notifications',
+        description: 'Choisissez précisément quelles notifications vous souhaitez recevoir (invitations, messages, demandes d\'ami…).',
+      },
+      {
+        icon: 'document-text-outline',
+        title: 'Mentions légales',
+        description: 'Retrouvez à tout moment les CGU et la politique de confidentialité de l\'application.',
+      },
+      {
+        icon: 'trash-outline',
+        title: 'Gestion du compte',
+        description: 'Déconnexion ou suppression définitive de votre compte, directement depuis cette page.',
+      },
+    ],
+  },
+  [ShowHelper.CREATE_EVENT]: {
+    icon: 'add-circle-outline',
+    title: 'Créer un événement',
+    subtitle: 'Planifiez en quelques étapes',
+    tips: [
+      {
+        icon: 'people-outline',
+        title: 'Participants',
+        description: 'Ajoutez vos amis à l\'événement : ils recevront une invitation à accepter ou décliner.',
+      },
+      {
+        icon: 'color-palette-outline',
+        title: 'Type d\'événement',
+        description: 'Kid(s), NoKid(s) ou libre — ce type détermine la couleur de l\'événement dans le calendrier et la discussion associée.',
+      },
+      {
+        icon: 'location-outline',
+        title: 'Lieu',
+        description: 'Renseignez une adresse pour la retrouver facilement et la partager avec les participants.',
+      },
+      {
+        icon: 'people-circle-outline',
+        title: 'Disponibilité de vos amis',
+        description: 'Voyez qui de vos amis est Dyspo ! en un clin d\'œil grâce aux bulles de couleur sur leur photo.',
+      },
+    ],
+  },
+  [ShowHelper.GROUP_CHAT]: {
+    icon: 'chatbubbles-outline',
+    title: 'Conversation de groupe',
+    subtitle: 'Échangez avec les participants',
+    tips: [
+      {
+        icon: 'heart-outline',
+        title: 'Réagir à un message',
+        description: 'Double-tapez un message pour lui envoyer un cœur.',
+      },
+      {
+        icon: 'person-add-outline',
+        title: 'Participant non-ami',
+        description: 'Le « + » sur la photo d\'un participant que vous ne connaissez pas ouvre sa fiche et permet de lui envoyer une demande d\'ami.',
+      },
+      {
+        icon: 'flag-outline',
+        title: 'Signaler',
+        description: 'Un message ou un comportement inapproprié ? Signalez-le directement depuis le menu de la conversation.',
       },
     ],
   },

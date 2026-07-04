@@ -25,6 +25,9 @@ import { LoggerService } from 'src/app/services/logger.service';
 
 import { NotificationService } from 'src/app/services/notification.service';
 import { Browser } from '@capacitor/browser';
+import { Preferences } from '@capacitor/preferences';
+import { ShowHelper } from 'src/app/models/models';
+import { HelperComponent } from 'src/app/components/helper/helper.component';
 
 @Component({
     selector: 'app-parametres',
@@ -113,11 +116,23 @@ export class ParametresPage implements OnInit {
     private agendaSvc: AgendaService
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.presentingElement = document.querySelector('.ion-page');
     this.logger.logDebug('ngOnInit Parametres');
 
     this.loadInfos();
+
+    if (this.userSvc.userInfo?.firstConnexion) {
+      const { value } = await Preferences.get({ key: ShowHelper.SETTINGS });
+      if (!value) {
+        const modal = await this.modalCtrl.create({
+          component: HelperComponent,
+          componentProps: { showHelper: ShowHelper.SETTINGS },
+        });
+        modal.present();
+        await Preferences.set({ key: ShowHelper.SETTINGS, value: 'SHOWN' });
+      }
+    }
   }
 
   ionViewWillEnter() {
@@ -226,16 +241,12 @@ export class ParametresPage implements OnInit {
     }
   }
 
-  async openCGU() {
-    await Browser.open({
-      url: environment.cgu_url,
-    });
+  openCGU() {
+    this.navCtrl.navigateForward('/cgu');
   }
 
-  async openPrivacy() {
-    await Browser.open({
-      url: environment.privacy_url,
-    });
+  openPrivacy() {
+    this.navCtrl.navigateForward('/privacy');
   }
 
   async openTutorial() {

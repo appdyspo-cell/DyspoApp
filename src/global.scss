@@ -15,7 +15,6 @@
 @import "~animate.css/animate.min.css";
 @import "swiper/swiper.css";
 @import "./assets/webfonts/simple-line-icons.css";
-@import "@sweetalert2/themes/bootstrap-4/bootstrap-4.scss";
 
 // ── 1. Reset & base ────────────────────────────────────────────────────────────
 
@@ -26,6 +25,22 @@
 
 ion-app {
   background: var(--d-surface-0);
+}
+
+// Safe area Android 15 edge-to-edge
+ion-tab-bar {
+  padding-bottom: env(safe-area-inset-bottom);
+  height: calc(56px + env(safe-area-inset-bottom));
+}
+
+ion-content {
+  --padding-bottom: env(safe-area-inset-bottom);
+}
+
+// Boutons fixes en bas (ex: "Enregistrer l'événement")
+.fixed-bottom-btn,
+ion-footer ion-toolbar {
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 // Page background — propre, sans image de fond
@@ -203,12 +218,12 @@ ion-button {
   margin: var(--d-space-2) var(--d-space-4);
 
   &[color="tertiary"] {
-    --background: #46a2c2;
-    --background-activated: #3586a2;
-    --background-focused: #3586a2;
-    --background-hover: #3586a2;
-    --ion-color-base: #46a2c2;
-    --ion-color-shade: #3586a2;
+    --background: var(--d-brand-dark);
+    --background-activated: var(--ion-color-tertiary-shade);
+    --background-focused: var(--ion-color-tertiary-shade);
+    --background-hover: var(--ion-color-tertiary-shade);
+    --ion-color-base: var(--d-brand-dark);
+    --ion-color-shade: var(--ion-color-tertiary-shade);
     --ion-color-tint: #6ab8d4;
     --ion-color-contrast: #ffffff;
     --color: #ffffff;
@@ -405,6 +420,82 @@ ion-alert {
   text-align: left;
   font-size: 0.9rem;
   line-height: 1.55;
+}
+
+.dyspo-alert-confirm {
+  .alert-wrapper {
+    max-width: 300px;
+    border-radius: var(--d-radius-xl);
+  }
+
+  .alert-head {
+    padding-bottom: var(--d-space-2);
+  }
+
+  .alert-title {
+    font-size: 16px !important;
+  }
+
+  .alert-message {
+    font-size: 13px !important;
+    padding-top: 0;
+  }
+
+  .alert-button-group {
+    padding: var(--d-space-2) var(--d-space-3) var(--d-space-3);
+    gap: var(--d-space-2);
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .alert-button {
+    border-radius: var(--d-radius-pill);
+    min-height: 36px;
+    padding: 0 var(--d-space-4);
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    margin: 0;
+    color: #fff !important;
+
+    &:not(.alert-button-role-destructive):not(.alert-button-role-cancel) {
+      background: var(--d-dyspo-kids);
+    }
+
+    &.alert-button-role-cancel {
+      background: var(--d-dyspo-kids);
+    }
+
+    &.alert-button-role-destructive {
+      background: var(--d-free);
+    }
+  }
+}
+
+// ── Scrollbars ────────────────────────────────────────────────────────────────
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--d-text-tertiary);
+  border-radius: var(--d-radius-pill);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--d-text-secondary);
+}
+
+// ── Custody renewal sheet modal ───────────────────────────────────────────────
+
+.custody-renewal-modal {
+  --border-radius: var(--d-radius-xl) var(--d-radius-xl) 0 0;
+  --background: var(--d-surface-1);
 }
 
 // ── 15. Avatars ────────────────────────────────────────────────────────────────
@@ -727,16 +818,5 @@ ion-app[dir="rtl"] {
     color: var(--d-text-tertiary);
     max-width: 240px;
     line-height: 1.5;
-  }
-}
-
-// ── 27. SweetAlert2 confirm button ────────────────────────────────────────────
-
-.swal2-confirm {
-  background-color: #46a2c2 !important;
-
-  &:hover, &:focus {
-    background-color: #3586a2 !important;
-    box-shadow: none !important;
   }
 }

@@ -1,19 +1,13 @@
 <ion-content [fullscreen]="true" class="bg_color">
   <div class="main">
-    <div
-      button
-      (click)="openNotifications()"
-      *ngIf="nb_notifications > 0"
-      style="display: flex; align-items: center; height: 50px"
-    >
-      <ion-icon
-        class="icon-bell"
-        style="padding-right: 5px; font-size: 1.5rem"
-      ></ion-icon>
-      <ion-text style="padding-right: 5px; line-height: 1.2"
-        >Notifications</ion-text
-      >
-      <ion-badge>{{nb_notifications}}</ion-badge>
+    <!-- ── Bloc Notifications ──────────────────────────────────────── -->
+    <div class="notif-center" (click)="openAllNotifications()">
+      <div class="notif-icon-wrap">
+        <ion-icon name="notifications-outline" class="notif-bell-icon"></ion-icon>
+        <div class="notif-badge-dot" *ngIf="totalNotifications > 0">{{ totalNotifications }}</div>
+      </div>
+      <span class="notif-label">Notifications</span>
+      <span class="notif-sub" *ngIf="totalNotifications === 0">Aucune notification</span>
     </div>
     <ion-text style="padding-top: 30px">- Aujourd'hui -</ion-text>
     <span style="font-size: 1.4em; font-weight: 600">{{todayFormatted}}</span>

@@ -1,3 +1,51 @@
+// ── Aperçu avatar avant upload ──────────────────────────────────────────────────
+
+.avatar-preview-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.avatar-preview-card {
+  background: var(--d-surface-1, #fff);
+  border-radius: var(--d-radius-xl, 20px);
+  padding: var(--d-space-5);
+  width: 85%;
+  max-width: 320px;
+  text-align: center;
+  box-shadow: var(--d-shadow-xl);
+
+  p {
+    margin: 0 0 var(--d-space-3);
+    font-weight: 600;
+    color: var(--d-text-primary);
+  }
+
+  .avatar-preview-img {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto var(--d-space-4);
+    display: block;
+    border: 3px solid var(--d-brand);
+  }
+
+  .avatar-preview-actions {
+    display: flex;
+    gap: var(--d-space-3);
+
+    ion-button {
+      flex: 1;
+      margin: 0;
+    }
+  }
+}
+
 // ── Header ────────────────────────────────────────────────────────────────────
 
 ion-header {
@@ -44,7 +92,7 @@ ion-header {
       right: 0;
       width: 26px;
       height: 26px;
-      background: #46a2c2;
+      background: var(--d-brand);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -137,8 +185,8 @@ ion-item {
       transition: background-color 0.18s, border-color 0.18s, color 0.18s;
 
       &.selected {
-        background-color: #46a2c2;
-        border-color: #46a2c2;
+        background-color: var(--d-brand);
+        border-color: var(--d-brand);
         color: #fff;
       }
     }

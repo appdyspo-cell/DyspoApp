@@ -27,6 +27,22 @@ ion-header {
   overflow: hidden;
 }
 
+.friend-mode-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--d-space-2);
+  padding: var(--d-space-2) var(--d-space-4);
+  background: var(--d-brand-light, #e8f4f8);
+  color: var(--d-brand-dark, #2d8aaa);
+  font-size: 0.82rem;
+  font-weight: 600;
+
+  ion-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+}
+
 // ── Légende des couleurs ───────────────────────────────────────────────────────
 
 .container {
@@ -167,7 +183,7 @@ ion-list {
   display: flex;
   align-items: center;
   gap: var(--d-space-1);
-  background: #46a2c2;
+  background: var(--d-brand);
   color: #fff;
   border-radius: var(--d-radius-pill);
   padding: 4px 10px;
@@ -198,18 +214,18 @@ ion-list {
 // ── Bouton chat dans la liste des événements ──────────────────────────────────
 
 .btn-list-chat {
-  --color: #46a2c2;
-  --color-hover: #3586a2;
+  --color: var(--d-brand);
+  --color-hover: var(--ion-color-tertiary-shade);
   --background-hover: rgba(53, 134, 162, 0.1);
 }
 
 // ── Boutons mode édition ──────────────────────────────────────────────────────
 
 .btn-agenda-edit {
-  --background: #46a2c2;
-  --background-activated: #3586a2;
-  --background-focused: #3586a2;
-  --background-hover: #3586a2;
+  --background: var(--d-brand-dark);
+  --background-activated: var(--ion-color-tertiary-shade);
+  --background-focused: var(--ion-color-tertiary-shade);
+  --background-hover: var(--ion-color-tertiary-shade);
   --color: #fff;
 }
 
@@ -230,27 +246,27 @@ ion-list {
   gap: 10px;
   padding: 8px 18px 8px 8px;
   border-radius: 30px;
-  border: 2px solid #46a2c2;
+  border: 2px solid var(--d-brand);
   background: var(--d-surface-1, #fff);
   cursor: pointer;
-  color: #46a2c2;
+  color: var(--d-brand);
   font-size: 15px;
   font-weight: 700;
   box-shadow: 0 2px 14px rgba(70, 162, 194, 0.22);
   transition: border-color 0.15s ease, color 0.15s ease;
 
   &:hover, &:active {
-    border-color: #3586a2;
-    color: #3586a2;
+    border-color: var(--ion-color-tertiary-shade);
+    color: var(--ion-color-tertiary-shade);
 
-    .fab-circle { background: #3586a2; }
+    .fab-circle { background: var(--ion-color-tertiary-shade); }
   }
 
   .fab-circle {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: #46a2c2;
+    background: var(--d-brand);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -265,9 +281,9 @@ ion-list {
 // ── Bouton aide ───────────────────────────────────────────────────────────────
 
 .btn-help {
-  --color: #46a2c2;
-  --color-hover: #3586a2;
-  --color-focused: #3586a2;
+  --color: var(--d-brand);
+  --color-hover: var(--ion-color-tertiary-shade);
+  --color-focused: var(--ion-color-tertiary-shade);
   --background-hover: rgba(53, 134, 162, 0.1);
   --background-focused: rgba(53, 134, 162, 0.1);
 

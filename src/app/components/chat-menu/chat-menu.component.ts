@@ -8,8 +8,6 @@ import { ChatService } from 'src/app/services/chat.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { ReportComponent } from '../report/report.component';
 import { Chatroom, WarnReportGroup } from 'src/app/models/models';
-import Swal from 'sweetalert2';
-
 @Component({
     selector: 'app-chat-menu',
     templateUrl: './chat-menu.component.html',
@@ -80,46 +78,22 @@ export class ChatMenuComponent implements OnInit {
   }
 
   async quitEvent() {
-    Swal.fire({
-      title:
-        "Voulez-vous vraiment quitter ce groupe ? Ceci effacera l'événement de votre agenda",
-      showDenyButton: true,
-      heightAuto: false,
-      confirmButtonText: 'Oui',
-      denyButtonText: 'Non',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.confirmQuitEvent();
-      } else {
-        this.popCtrl.dismiss({ friend: undefined }, 'cancel');
-      }
-    });
-  }
-
-  async _quitEvent() {
     const alert = await this.alertCtrl.create({
-      //cssClass: 'my-custom-class',
-      header: 'Confirmation',
-      message:
-        "Voulez-vous vraiment quitter ce groupe ? Ceci effacera l'événement de votre agenda",
+      header: 'Quitter le groupe',
+      message: "Voulez-vous vraiment quitter ce groupe ? Ceci effacera l'événement de votre agenda.",
+      cssClass: 'dyspo-alert-confirm',
       buttons: [
         {
-          text: 'NON',
+          text: 'Annuler',
           role: 'cancel',
-          cssClass: 'secondary',
-          handler: () => {
-            console.log('Confirm Cancel: blah');
-          },
         },
         {
-          text: 'OUI',
-          handler: () => {
-            this.confirmQuitEvent();
-          },
+          text: 'Quitter',
+          role: 'destructive',
+          handler: () => this.confirmQuitEvent(),
         },
       ],
     });
-
     await alert.present();
   }
   confirmQuitEvent() {

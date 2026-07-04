@@ -1,0 +1,135 @@
+<ion-header class="ion-no-border renewal-header">
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="later()">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="renewal-content">
+
+  <!-- ── Étape 1 : choix ────────────────────────────────────── -->
+  <div *ngIf="step === 'choice'" class="renewal-body">
+    <div class="renewal-icon">
+      <ion-icon name="calendar-outline"></ion-icon>
+    </div>
+
+    <h2 class="renewal-title">Renouveler votre calendrier</h2>
+
+    <p class="renewal-subtitle" *ngIf="daysLeft > 0">
+      Votre planning de garde se termine dans
+      <strong>{{ daysLeft }} jour{{ daysLeft > 1 ? 's' : '' }}</strong>.
+      Souhaitez-vous le renouveler pour une année supplémentaire ?
+    </p>
+    <p class="renewal-subtitle" *ngIf="daysLeft <= 0">
+      Votre planning de garde est <strong>expiré</strong>.
+      Renouvelez-le pour une année supplémentaire.
+    </p>
+
+    <!-- Aperçu du rythme actuel -->
+    <div class="schedule-preview">
+      <p class="preview-label">Rythme actuel — semaine 1</p>
+      <div class="custody-week">
+        <div
+          *ngFor="let day of weekDays; let i = index"
+          class="day-bubble"
+          [class.selected]="currentCustodyDays[i]"
+        >{{ day }}</div>
+      </div>
+      <p class="preview-label" style="margin-top: 8px">Semaine 2</p>
+      <div class="custody-week">
+        <div
+          *ngFor="let day of weekDays; let i = index"
+          class="day-bubble"
+          [class.selected]="currentCustodyDays[i + 7]"
+        >{{ day }}</div>
+      </div>
+    </div>
+
+    <div class="renewal-actions">
+      <ion-button
+        expand="block"
+        class="btn-keep"
+        (click)="keepSameSchedule()"
+      >
+        <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+        Même rythme
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        fill="outline"
+        class="btn-edit"
+        (click)="openEdit()"
+      >
+        <ion-icon slot="start" name="create-outline"></ion-icon>
+        Modifier le rythme
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        fill="clear"
+        class="btn-later"
+        (click)="later()"
+      >
+        Plus tard
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- ── Étape 2 : édition des 2 semaines ──────────────────── -->
+  <div *ngIf="step === 'edit'" class="renewal-body">
+    <button class="back-btn" (click)="step = 'choice'">
+      <ion-icon name="chevron-back-outline"></ion-icon>
+      Retour
+    </button>
+
+    <div class="renewal-icon">
+      <ion-icon name="create-outline"></ion-icon>
+    </div>
+
+    <h2 class="renewal-title">Nouveau rythme de garde</h2>
+    <p class="renewal-subtitle">Sélectionnez vos jours de garde sur 2 semaines.</p>
+
+    <div class="custody-edit-section">
+      <p class="preview-label">Semaine 1</p>
+      <div class="custody-week">
+        <div
+          *ngFor="let day of weekDays; let i = index"
+          class="day-bubble"
+          [class.selected]="editDays[i]"
+          (click)="toggleDay(i)"
+        >{{ day }}</div>
+      </div>
+
+      <p class="preview-label" style="margin-top: 12px">Semaine 2</p>
+      <div class="custody-week">
+        <div
+          *ngFor="let day of weekDays; let i = index"
+          class="day-bubble"
+          [class.selected]="editDays[i + 7]"
+          (click)="toggleDay(i + 7)"
+        >{{ day }}</div>
+      </div>
+
+      <p *ngIf="!editDays.includes(true)" class="edit-error">
+        Sélectionnez au moins un jour de garde.
+      </p>
+    </div>
+
+    <div class="renewal-actions">
+      <ion-button
+        expand="block"
+        class="btn-keep"
+        (click)="validateEdit()"
+        [disabled]="!editDays.includes(true)"
+      >
+        <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+        Valider et renouveler
+      </ion-button>
+    </div>
+  </div>
+
+</ion-content>

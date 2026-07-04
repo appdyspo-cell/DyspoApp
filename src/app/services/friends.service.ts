@@ -250,6 +250,41 @@ export class FriendsService {
     }
   }
 
+  /** Calcule le nombre d'amis en commun avec un autre utilisateur.
+   *  Charge la friendlist de l'autre user depuis Firestore (uniquement les FRIEND)
+   *  puis compare avec nos propres amis. */
+  async getCommonFriendsCount(otherUserUid: string): Promise<number> {
+    try {
+      const myFriendUids = new Set(
+        this.friends
+          .filter((f) => f.friend_status === FriendStatus.FRIEND)
+          .map((f) => f.friend_uid)
+          .filter(Boolean) as string[]
+      );
+
+      if (myFriendUids.size === 0) return 0;
+
+      const otherFriendListRef = collection(
+        this.firestore,
+        `friends/${otherUserUid}/friend_list`
+      );
+      const otherFriendsSnap = await getDocs(
+        query(otherFriendListRef, where('friend_status', '==', FriendStatus.FRIEND))
+      );
+
+      let count = 0;
+      otherFriendsSnap.forEach((snap) => {
+        const data = snap.data() as Friend;
+        if (data.friend_uid && myFriendUids.has(data.friend_uid)) {
+          count++;
+        }
+      });
+      return count;
+    } catch {
+      return 0;
+    }
+  }
+
   getFriendStatus(uid: string): FriendStatus {
     const foundIndex = this.friends.findIndex((f) => {
       return f.friend_uid === uid;
@@ -543,6 +578,11 @@ export class FriendsService {
   }
 
   async initContacts() {
+    const perm = await Contacts.requestPermissions();
+    if (perm.contacts !== 'granted') {
+      console.warn('Contacts permission denied');
+      return;
+    }
     const result = await Contacts.getContacts({
       projection: {
         name: true,

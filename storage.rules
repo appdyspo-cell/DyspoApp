@@ -11,27 +11,35 @@ service firebase.storage {
     // Only the owner can write their avatar; any authenticated user can read.
     match /avatarsStorage/{userId}/{allPaths=**} {
       allow read:  if isAuth();
-      allow write: if isAuth() && request.auth.uid == userId;
+      allow write: if isAuth() && request.auth.uid == userId
+        && request.resource.size < 8 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
     }
 
     // ── Group / event avatars and event media ─────────────────────────────────
     // These paths do not embed the owner UID in the bucket path, so membership
     // is enforced by Firestore rules (which restrict who can reach these uploads).
-    // Require authentication for all operations; admin-level restrictions are
-    // enforced server-side via Firebase Security Rules on the Firestore side.
+    // Require authentication for all operations, and additionally restrict
+    // uploads to reasonably-sized images to prevent storage abuse / arbitrary
+    // file hosting by any authenticated account.
+    function isValidImageUpload() {
+      return request.resource.size < 8 * 1024 * 1024
+          && request.resource.contentType.matches('image/.*');
+    }
+
     match /avatarGroupsStorage/{allPaths=**} {
       allow read:  if isAuth();
-      allow write: if isAuth();
+      allow write: if isAuth() && isValidImageUpload();
     }
 
     match /avatarEventsStorage/{allPaths=**} {
       allow read:  if isAuth();
-      allow write: if isAuth();
+      allow write: if isAuth() && isValidImageUpload();
     }
 
     match /eventsMediaStorage/{allPaths=**} {
       allow read:  if isAuth();
-      allow write: if isAuth();
+      allow write: if isAuth() && isValidImageUpload();
     }
 
     // ── Deny everything else ──────────────────────────────────────────────────

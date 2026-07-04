@@ -6,7 +6,6 @@ import {
 } from '@ionic/angular';
 import { environment } from 'src/environments/environment';
 
-import Swal from 'sweetalert2';
 import { LoggerService } from './logger.service';
 import { fr } from 'date-fns/locale';
 import { format, parseISO } from 'date-fns';
@@ -159,45 +158,131 @@ export class UtilsService {
   }
 
   validatePhone(phone: string | undefined) {
-    if (!phone) return;
-    // eslint-disable-next-line no-useless-escape
-    //const re = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
-    const re =
+    if (!phone) return false;
+    const cleaned = String(phone).trim().toLowerCase();
+    // Numéro français (avec ou sans indicatif +33 / 0033)
+    const frRegex =
       /^(?:(?:\+|00)33[\s.-]{0,3}(?:\(0\)[\s.-]{0,3})?|0)[1-9](?:(?:[\s.-]?\d{2}){4}|\d{2}(?:[\s.-]?\d{3}){2})$/;
-    return re.test(String(phone).toLowerCase());
+    if (frRegex.test(cleaned)) return true;
+    // Repli international (E.164) : + suivi de l'indicatif pays et du numéro
+    const intlRegex = /^\+[1-9]\d{7,14}$/;
+    return intlRegex.test(cleaned.replace(/[\s.-]/g, ''));
   }
 
   createUID() {
     return Math.floor(100000 + Math.random() * 900000);
   }
 
-  //Sweet alerts
-  swalError(message: string) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Erreur',
-      text: message,
-      //footer: '<a href>Why do I have this issue?</a>',
-      heightAuto: false,
+  showAlertError(message: string) {
+    this.alertCtrl
+      .create({
+        header: 'Erreur',
+        message,
+        buttons: ['OK'],
+      })
+      .then((alert) => alert.present());
+  }
+
+  showAlertSuccess(title: string, message: string) {
+    this.alertCtrl
+      .create({
+        header: title,
+        message,
+        buttons: ['OK'],
+      })
+      .then((alert) => alert.present());
+  }
+
+  // Confirmation Oui/Non (remplace les anciens Swal.fire showDenyButton/showCancelButton)
+  confirmAction(opts: {
+    title?: string;
+    message: string;
+    confirmText?: string;
+    cancelText?: string;
+    destructive?: boolean;
+  }): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.alertCtrl
+        .create({
+          header: opts.title,
+          message: opts.message,
+          cssClass: 'dyspo-alert-confirm',
+          buttons: [
+            {
+              text: opts.cancelText || 'Annuler',
+              role: 'cancel',
+              handler: () => resolve(false),
+            },
+            {
+              text: opts.confirmText || 'Confirmer',
+              role: opts.destructive ? 'destructive' : undefined,
+              handler: () => resolve(true),
+            },
+          ],
+        })
+        .then((alert) => alert.present());
     });
   }
 
-  swalWarning(message: string) {
-    Swal.fire({
-      icon: 'warning',
-      //title: 'Erreur',
-      text: message,
-      //footer: '<a href>Why do I have this issue?</a>',
-      heightAuto: false,
+  // Saisie d'un email avec validation (remplace les anciens Swal.fire input: 'email')
+  promptEmail(opts: { title: string; placeholder?: string }): Promise<string | undefined> {
+    return new Promise<string | undefined>((resolve) => {
+      this.alertCtrl
+        .create({
+          header: opts.title,
+          inputs: [
+            {
+              name: 'email',
+              type: 'email',
+              placeholder: opts.placeholder || 'Entrez votre email',
+            },
+          ],
+          buttons: [
+            { text: 'Annuler', role: 'cancel', handler: () => resolve(undefined) },
+            {
+              text: 'Envoyer',
+              handler: (data) => {
+                const email = (data.email || '').trim();
+                if (!this.validateEmail(email)) {
+                  this.showToastError("L'adresse email n'est pas valide.");
+                  return false;
+                }
+                resolve(email);
+                return true;
+              },
+            },
+          ],
+        })
+        .then((alert) => alert.present());
     });
   }
 
-  swalSuccess(title: string, message: string) {
-    Swal.fire({
-      title,
-      text: message,
-      icon: 'success',
-      heightAuto: false,
+  // Saisie libre multi-ligne (remplace les anciens Swal.fire input: 'textarea')
+  promptTextarea(opts: {
+    title?: string;
+    placeholder?: string;
+    confirmText?: string;
+  }): Promise<string | undefined> {
+    return new Promise<string | undefined>((resolve) => {
+      this.alertCtrl
+        .create({
+          header: opts.title,
+          inputs: [
+            {
+              name: 'text',
+              type: 'textarea',
+              placeholder: opts.placeholder,
+            },
+          ],
+          buttons: [
+            { text: 'Annuler', role: 'cancel', handler: () => resolve(undefined) },
+            {
+              text: opts.confirmText || 'Envoyer',
+              handler: (data) => resolve((data.text || '').trim() || undefined),
+            },
+          ],
+        })
+        .then((alert) => alert.present());
     });
   }
 

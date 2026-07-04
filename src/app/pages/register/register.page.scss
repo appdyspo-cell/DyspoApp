@@ -88,19 +88,19 @@
       width: 38px;
       height: 38px;
       border-radius: 50%;
-      border: 2px solid #ccc;
+      border: 2px solid var(--d-surface-3);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
       font-size: 0.85rem;
-      color: #888;
+      color: var(--d-text-tertiary);
       cursor: pointer;
       transition: background-color 0.18s, border-color 0.18s, color 0.18s;
 
       &.selected {
-        background-color: #3880ff;
-        border-color: #3880ff;
+        background-color: var(--d-brand);
+        border-color: var(--d-brand);
         color: #fff;
       }
     }
@@ -338,59 +338,138 @@
   }
 }
 
-.social_login {
-  width: calc(100% - 40px);
-  margin: 0 auto;
-  --animate-duration: 0.4s !important;
 
-  p {
-    margin: 0;
-    color: var(--primary);
-    font-weight: 500;
-    opacity: 0.3;
-    font-size: 0.9rem;
-    margin-bottom: 15px;
+.intl-phone-toggle {
+  margin: 4px 16px 0;
+  font-size: 0.8rem;
+  color: var(--d-brand);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+// ── Connexion sociale ─────────────────────────────────────────────────────────
+
+.social-login-block {
+  padding: var(--d-space-4) var(--d-space-5) 0;
+
+  .social-btn-row {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin: 0 0 var(--d-space-3);
   }
 
-  ion-row {
-    /* margin: 0 -8px; */
-    margin-bottom: 20px;
-    width: calc(100% + 8px);
+  .social-btn {
+    width: 52px;
+    height: 52px;
+    --padding-start: 0;
+    --padding-end: 0;
+    --border-radius: 50%;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    flex: none;
 
-    ion-col {
-      padding: 0 8px;
+    ion-icon {
+      font-size: 22px;
+      margin: 0;
+    }
 
-      ion-button.btn {
-        letter-spacing: 0 !important;
-        font-weight: 400;
-        font-size: 0.95rem;
+    &.social-btn--google {
+      --border-color: var(--d-surface-3, #e4e8ef);
+      --color: var(--d-text-primary);
+    }
 
-        img {
-          width: 16px;
-          position: relative;
-          left: -14px;
-        }
+    &.social-btn--apple {
+      --background: #000;
+      --color: #fff;
+    }
 
-        &.fb_btn {
-          --background: #3c5a99;
-        }
-
-        &.google_btn {
-          --background: var(--white);
-          color: #393a3f;
-          font-weight: 500;
-        }
-      }
+    &.social-btn--facebook {
+      --background: #1877f2;
+      --color: #fff;
     }
   }
 
-  ion-button.btn {
-    &.new_user {
-      --background: var(--bg-color2);
-      color: var(--primary);
-      font-size: 1.15rem;
-      letter-spacing: 0 !important;
-      font-weight: 700;
+  .social-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: var(--d-space-4) 0;
+    color: var(--d-text-tertiary, #9aa3b2);
+    font-size: 0.8rem;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--d-surface-3, #e4e8ef);
+    }
+
+    span {
+      padding: 0 var(--d-space-3);
     }
   }
+}
+
+.register-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 32px 0;
+
+  .step-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    background: var(--d-surface-2, #f0f3f8);
+    color: var(--d-text-tertiary, #9aa3b2);
+    transition: background 0.2s, color 0.2s;
+
+    &.active {
+      background: var(--d-brand);
+      color: #fff;
+    }
+
+    &.done {
+      background: var(--d-brand-dark);
+      color: #fff;
+    }
+  }
+
+  .step-line {
+    flex: 1;
+    height: 2px;
+    margin: 0 6px;
+    background: var(--d-surface-3, #e4e8ef);
+
+    &.done {
+      background: var(--d-brand-dark);
+    }
+  }
+}
+
+.step-caption {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--d-text-secondary, #5a6476);
+  margin: 8px 0 0;
+}
+
+.step-nav {
+  gap: 12px;
+
+  ion-button {
+    flex: 1;
+  }
+}
+
+.dyspo-button-outline {
+  --border-color: var(--d-brand);
+  color: var(--d-brand);
 }

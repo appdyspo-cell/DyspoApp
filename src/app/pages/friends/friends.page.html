@@ -62,7 +62,10 @@
         </ion-thumbnail>
         <ion-label>
           <ion-row class="ion-align-items-center">
-            {{user.lastname | uppercase}} {{user.firstname}}
+            {{user.firstname}}
+          </ion-row>
+          <ion-row class="ion-align-items-center">
+            {{user.lastname | uppercase}}
           </ion-row>
         </ion-label>
         <ion-button
@@ -91,13 +94,23 @@
         >
       </strong>
     </div>
+    <div
+      *ngIf="friends.length > 0 && filteredFriends.length === 0 && autocompleteItems.length === 0"
+      class="ion-padding ion-text-center"
+    >
+      <strong>
+        <ion-text style="color: rgb(100, 100, 100)"
+          >Aucun ami ne correspond à votre recherche</ion-text
+        >
+      </strong>
+    </div>
     <ion-list
-      *ngIf="friends.length > 0 && autocompleteItems.length === 0"
+      *ngIf="filteredFriends.length > 0 && autocompleteItems.length === 0"
       class="ion-no-padding"
     >
       <ion-item-sliding
         [id]="'slidingItem' + i"
-        *ngFor="let friendListDoc of friends ; let i = index;"
+        *ngFor="let friendListDoc of filteredFriends ; let i = index;"
       >
         <ion-item-options>
           <ion-item-option
@@ -117,10 +130,10 @@
           </ion-thumbnail>
           <ion-label>
             <ion-row class="ion-align-items-center">
-              {{friendListDoc.userData?.lastname | uppercase}}
+              {{friendListDoc.userData?.firstname}}
             </ion-row>
             <ion-row class="ion-align-items-center">
-              {{friendListDoc.userData?.firstname}}
+              {{friendListDoc.userData?.lastname | uppercase}}
             </ion-row>
           </ion-label>
 
@@ -229,10 +242,17 @@
 
           <ion-label>
             <ion-row class="ion-align-items-center">
-              {{friendSuggested.userData?.lastname | uppercase}}
+              {{friendSuggested.userData?.firstname}}
             </ion-row>
             <ion-row class="ion-align-items-center">
-              {{friendSuggested.userData?.firstname}}
+              {{friendSuggested.userData?.lastname | uppercase}}
+            </ion-row>
+            <ion-row class="ion-align-items-center common-friends-row" *ngIf="friendSuggested.commonFriendsCount && friendSuggested.commonFriendsCount > 0">
+              <ion-icon name="people-outline" class="common-friends-icon"></ion-icon>
+              <span class="common-friends-label">
+                {{ friendSuggested.commonFriendsCount }}
+                {{ friendSuggested.commonFriendsCount === 1 ? 'ami en commun' : 'amis en commun' }}
+              </span>
             </ion-row>
           </ion-label>
 

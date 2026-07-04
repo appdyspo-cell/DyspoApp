@@ -25,8 +25,6 @@ import { defaults, pickModes } from '../config';
 import { isIonIconsV4 } from '../utils/icons';
 import { AgendaService } from 'src/app/services/agenda.service';
 import { UtilsService } from 'src/app/services/utils.service';
-import Swal, { SweetAlertResult } from 'sweetalert2';
-import { resolve } from 'dns';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -112,6 +110,7 @@ interface CompatibleIcons {
           [month]="monthOpt"
           [readonly]="readonly"
           [filterDyspo]="filterDyspo"
+          [eventDates]="eventDates"
           (change)="onChanged($event)"
           (select)="select.emit($event)"
           (selectStart)="selectStart.emit($event)"
@@ -191,6 +190,8 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
   public readonly = false;
   @Input()
   public filterDyspo: string | null = null;
+  @Input()
+  public eventDates: Set<string> = new Set();
   @Output()
   // eslint-disable-next-line @angular-eslint/no-output-native
   public change: EventEmitter<CalendarComponentPayloadTypes> =
@@ -280,29 +281,13 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
     }
   }
 
-  async checkBeforeNavigate() {
-    return new Promise(async (resolve, reject) => {
-      Swal.fire({
-        title: 'Voulez vous vraiment quitter?',
-        text: 'Tous vos changements seront perdus',
-        showDenyButton: false,
-        heightAuto: false,
-        showCancelButton: true,
-        confirmButtonText: 'Quitter',
-        cancelButtonText: 'Annuler',
-      });
-
-      const result: SweetAlertResult = await Swal.fire({
-        title: 'Voulez vous vraiment quitter?',
-        text: 'Tous vos changements seront perdus',
-        showDenyButton: false,
-        heightAuto: false,
-        showCancelButton: true,
-        confirmButtonText: 'Quitter',
-        cancelButtonText: 'Annuler',
-      });
-
-      resolve(result.isConfirmed);
+  async checkBeforeNavigate(): Promise<boolean> {
+    return this.utils.confirmAction({
+      title: 'Voulez vous vraiment quitter?',
+      message: 'Tous vos changements seront perdus',
+      confirmText: 'Quitter',
+      cancelText: 'Annuler',
+      destructive: true,
     });
   }
 

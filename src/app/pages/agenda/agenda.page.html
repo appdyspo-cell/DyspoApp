@@ -37,6 +37,10 @@
 </ion-header>
 
 <ion-content class="bg_color">
+  <div class="friend-mode-banner" *ngIf="isFriendMode">
+    <ion-icon name="eye-outline"></ion-icon>
+    <span>Vous consultez le calendrier de {{ agendaFriend?.userData?.firstname }}</span>
+  </div>
   <div class="container">
     <ion-chip
       *ngIf="!isFriendMode && my_info.with_kids"
@@ -100,6 +104,7 @@
     [format]="'YYYY-MM-DD'"
     [readonly]="agendaMode === agendaModes.READONLY"
     [filterDyspo]="activeFilter"
+    [eventDates]="calendarEventDates"
   ></ion-calendar>
   <div *ngIf="agendaMode === agendaModes.READONLY" style="padding-top: 5px">
     <!-- <ion-toolbar style="padding: 0px 6px; --background: transparent"> -->

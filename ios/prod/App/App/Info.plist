@@ -59,5 +59,41 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<!-- Connexion sociale : remplacer REPLACE_WITH_... par les vraies valeurs (voir guide de configuration) -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.liaisongraphique.dyspo</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>dyspo</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.1017972190269-4g3oslsh9pup5bt3p9cbi6ubhe9p3hlg</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fbREPLACE_WITH_FACEBOOK_APP_ID</string>
+			</array>
+		</dict>
+	</array>
+	<key>FacebookAppID</key>
+	<string>REPLACE_WITH_FACEBOOK_APP_ID</string>
+	<key>FacebookClientToken</key>
+	<string>REPLACE_WITH_FACEBOOK_CLIENT_TOKEN</string>
+	<key>FacebookDisplayName</key>
+	<string>dyspo!</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>fbapi</string>
+		<string>fbauth2</string>
+		<string>fb-messenger-share-api</string>
+	</array>
 </dict>
 </plist>

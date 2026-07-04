@@ -17,26 +17,7 @@
     </ion-segment-button>
   </ion-segment>
 
-  <!-- Filtres -->
-  <div class="filter-bar">
-    <ion-chip mode="md" [class.filter-chip-active]="currentFilter === 'all'" (click)="setFilter('all')">
-      <ion-label>Tous</ion-label>
-    </ion-chip>
-    <ion-chip mode="md" [class.filter-chip-active]="currentFilter === 'unread'" (click)="setFilter('unread')">
-      <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
-      <ion-label>Non lus</ion-label>
-    </ion-chip>
-    <ion-chip mode="md" [class.filter-chip-active]="currentFilter === 'recent'" (click)="setFilter('recent')">
-      <ion-icon name="time-outline"></ion-icon>
-      <ion-label>Récents</ion-label>
-    </ion-chip>
-    <ion-chip mode="md" [class.filter-chip-active]="currentFilter === 'favorites'" (click)="setFilter('favorites')">
-      <ion-icon name="star-outline"></ion-icon>
-      <ion-label>Favoris</ion-label>
-    </ion-chip>
-  </div>
-
-  <!-- Onglet ACTIVES -->
+  <!-- Onglet ACTIVES — sans filtre de tri -->
   <div *ngIf="selectDiscussionsType === discussionType.ACTIVE">
     <div *ngIf="filteredActive.length === 0 && !isLoading" class="empty-state">
       <ion-icon name="chatbubbles-outline" class="empty-icon"></ion-icon>
@@ -63,7 +44,10 @@
 
         <div class="wa-item-inner">
           <div class="wa-item-header">
-            <h2 class="wa-title">{{agendaEvent.title}}</h2>
+            <div class="wa-title-block">
+              <h2 class="wa-title">{{agendaEvent.title}}</h2>
+              <p class="wa-event-info" *ngIf="getEventInfoLabel(agendaEvent)">{{ getEventInfoLabel(agendaEvent) }}</p>
+            </div>
             <div class="wa-header-right">
               <span class="wa-time" [ngClass]="{'wa-time-unread': (chatrooms[agendaEvent.uid!]?.count || 0) > 0}">
                 {{getLastMessageDate(agendaEvent)}}
@@ -100,8 +84,26 @@
     </ion-list>
   </div>
 
-  <!-- Onglet ARCHIVES -->
+  <!-- Onglet ARCHIVES — avec filtre de tri -->
   <div *ngIf="selectDiscussionsType === discussionType.ARCHIVE">
+    <div class="filter-bar">
+      <ion-chip mode="md" [class.filter-chip-active]="currentFilter === 'all'" (click)="setFilter('all')">
+        <ion-label>Tous</ion-label>
+      </ion-chip>
+      <ion-chip mode="md" [class.filter-chip-active]="currentFilter === 'unread'" (click)="setFilter('unread')">
+        <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+        <ion-label>Non lus</ion-label>
+      </ion-chip>
+      <ion-chip mode="md" [class.filter-chip-active]="currentFilter === 'recent'" (click)="setFilter('recent')">
+        <ion-icon name="time-outline"></ion-icon>
+        <ion-label>Récents</ion-label>
+      </ion-chip>
+      <ion-chip mode="md" [class.filter-chip-active]="currentFilter === 'favorites'" (click)="setFilter('favorites')">
+        <ion-icon name="star-outline"></ion-icon>
+        <ion-label>Favoris</ion-label>
+      </ion-chip>
+    </div>
+
     <div *ngIf="filteredArchived.length === 0 && !isLoading" class="empty-state">
       <ion-icon name="archive-outline" class="empty-icon"></ion-icon>
       <p>Pas de discussions archivées</p>
@@ -127,7 +129,10 @@
 
         <div class="wa-item-inner">
           <div class="wa-item-header">
-            <h2 class="wa-title">{{agendaEvent.title}}</h2>
+            <div class="wa-title-block">
+              <h2 class="wa-title">{{agendaEvent.title}}</h2>
+              <p class="wa-event-info" *ngIf="getEventInfoLabel(agendaEvent)">{{ getEventInfoLabel(agendaEvent) }}</p>
+            </div>
             <div class="wa-header-right">
               <span class="wa-time" [ngClass]="{'wa-time-unread': (chatrooms[agendaEvent.uid!]?.count || 0) > 0}">
                 {{getLastMessageDate(agendaEvent)}}

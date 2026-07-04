@@ -25,7 +25,7 @@
 
   <ion-list lines="none" class="info-list">
     <ion-item *ngIf="user?.geo_zone">
-      <ion-icon name="location-outline" slot="start" style="color: #46a2c2"></ion-icon>
+      <ion-icon name="location-outline" slot="start" style="color: var(--d-brand)"></ion-icon>
       <ion-label>
         <p>Zone</p>
         <h3>{{ user?.geo_zone === 'zone_A' ? 'Zone A' : user?.geo_zone === 'zone_B' ? 'Zone B' : 'Zone C' }}</h3>
@@ -33,7 +33,7 @@
     </ion-item>
 
     <ion-item *ngIf="user?.with_kids !== undefined">
-      <ion-icon name="people-outline" slot="start" style="color: #46a2c2"></ion-icon>
+      <ion-icon name="people-outline" slot="start" style="color: var(--d-brand)"></ion-icon>
       <ion-label>
         <p>Enfants</p>
         <h3>{{ user?.with_kids ? 'Avec enfants' : 'Sans enfants' }}</h3>
@@ -41,7 +41,7 @@
     </ion-item>
 
     <ion-item *ngIf="user?.dyspoStatus">
-      <ion-icon name="calendar-outline" slot="start" style="color: #46a2c2"></ion-icon>
+      <ion-icon name="calendar-outline" slot="start" style="color: var(--d-brand)"></ion-icon>
       <ion-label>
         <p>Statut dyspo</p>
         <h3>

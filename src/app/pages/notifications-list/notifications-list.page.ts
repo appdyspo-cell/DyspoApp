@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { ModalController } from '@ionic/angular';
+import { ModalController, NavController } from '@ionic/angular';
 import { isAfter, isBefore, parseISO } from 'date-fns';
 import { Subscription } from 'rxjs';
 import { AgendaEventInfoComponent } from 'src/app/components/agenda-event-info/agenda-event-info.component';
-import { AgendaEvent } from 'src/app/models/models';
+import { AgendaEvent, Friend, FriendStatus } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
+import { FriendsService } from 'src/app/services/friends.service';
 
 @Component({
     selector: 'app-notifications-list',
@@ -15,48 +15,40 @@ import { AgendaService } from 'src/app/services/agenda.service';
 })
 export class NotificationsListPage implements OnInit {
   invitations: AgendaEvent[] = [];
-  invitationsSubscription!: Subscription;
+  friendsSuggested: Friend[] = [];
+  defaultImage = 'assets/logo.svg';
+  private invitationsSub!: Subscription;
+  private friendsSub!: Subscription;
 
   constructor(
-    private router: Router,
     private modalCtrl: ModalController,
-    private agendaSvc: AgendaService
-  ) {
-    // this.invitations =
-    //   this.router.getCurrentNavigation()?.extras.state?.['invitations'];
-    // for (let i = 0; i < 35; i++) {
-    //   this.invitations = this.invitations.concat(myinvitations);
-    // }
-    this.invitationsSubscription =
-      this.agendaSvc.agendaEventInvitations$.subscribe((invitations) => {
-        this.invitations = invitations;
-        this.invitations.sort((item1, item2) => {
-          const date1 = parseISO(item1.startISO);
-          const date2 = parseISO(item2.startISO);
-          if (isBefore(date1, date2)) {
-            return -1; // item1 doit être trié avant item2
-          } else if (isAfter(date1, date2)) {
-            return 1; // item1 doit être trié après item2
-          } else {
-            return 0; // les dates sont égales
-          }
-        });
+    private navCtrl: NavController,
+    private agendaSvc: AgendaService,
+    private friendsSvc: FriendsService
+  ) {}
 
-        this.invitations = invitations.filter((ev) => {
-          return isAfter(parseISO(ev.endISO), new Date().getTime());
-        });
-
-        // this.nb_notifications = this.invitations.length;
+  ngOnInit() {
+    this.invitationsSub = this.agendaSvc.agendaEventInvitations$.subscribe((invitations) => {
+      const sorted = [...invitations].sort((a, b) => {
+        const d1 = parseISO(a.startISO);
+        const d2 = parseISO(b.startISO);
+        return isBefore(d1, d2) ? -1 : isAfter(d1, d2) ? 1 : 0;
       });
+      this.invitations = sorted.filter((ev) => isAfter(parseISO(ev.endISO), new Date()));
+    });
 
-    console.log(this.invitations);
+    this.friendsSub = this.friendsSvc.friends$.subscribe((friends) => {
+      this.friendsSuggested = friends.filter(f => f.friend_status === FriendStatus.SUGGESTED);
+    });
   }
 
-  ngOnInit() {}
-
   ionViewWillLeave() {
-    if (this.invitationsSubscription)
-      this.invitationsSubscription.unsubscribe();
+    if (this.invitationsSub) this.invitationsSub.unsubscribe();
+    if (this.friendsSub) this.friendsSub.unsubscribe();
+  }
+
+  openFriendRequests() {
+    this.navCtrl.navigateForward('/tabs/friends', { state: { isFromNotif: true } });
   }
 
   async openAgendaEventInfo(agendaEvent: AgendaEvent) {
@@ -69,11 +61,6 @@ export class NotificationsListPage implements OnInit {
       },
     });
     modal.present();
-
-    const { data, role } = await modal.onWillDismiss();
-
-    console.log(data);
-    if (role === 'confirm') {
-    }
+    await modal.onWillDismiss();
   }
 }

@@ -13,6 +13,7 @@ import {
   ModalController,
   NavController,
 } from '@ionic/angular';
+
 import { format, isBefore, isSameDay, parseISO, setHours } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import {
@@ -29,7 +30,6 @@ import { CalendarService } from 'src/app/services/calendar.service';
 import { FriendsService } from 'src/app/services/friends.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
-import Swal from 'sweetalert2';
 import { DyspoViewerComponent } from '../dyspo-viewer/dyspo-viewer.component';
 import { FriendProfileComponent } from '../friend-profile/friend-profile.component';
 
@@ -76,6 +76,7 @@ export class AgendaEventInfoComponent implements OnInit {
 
   constructor(
     private modalCtrl: ModalController,
+    private alertCtrl: AlertController,
     private agendaSvc: AgendaService,
     public userSvc: UserService,
     private utils: UtilsService,
@@ -183,65 +184,63 @@ export class AgendaEventInfoComponent implements OnInit {
     const allMembers = this.members_presence_confirmed.concat(
       this.members_presence_not_confirmed
     );
-    for (let member of allMembers) {
-      // Is he my friend ?
-      member.is_my_friend = this.friendsSvc.isMyFriend(member.uid);
 
-      // Dyspos
-      const dyspo = (
-        await this.agendaSvc.getDyspos([member.uid], this.agendaEvent)
-      )[0];
-      const dyspoStatus = dyspo.friend_dyspo;
-      // Hydrate AppUser with dyspo status
-      member.dyspoStatus = dyspoStatus;
+    // Paralléliser les requêtes par membre (au lieu d'un for...of séquentiel)
+    await Promise.all(
+      allMembers.map(async (member) => {
+        // Is he my friend ?
+        member.is_my_friend = this.friendsSvc.isMyFriend(member.uid);
 
-      // Fetch events of members
-      const events = await this.agendaSvc.getUserAgendaEvents(
-        member.uid,
-        this.agendaEvent
-      );
+        const [dyspoResults, events] = await Promise.all([
+          this.agendaSvc.getDyspos([member.uid], this.agendaEvent),
+          this.agendaSvc.getUserAgendaEvents(member.uid, this.agendaEvent),
+        ]);
+        const dyspo = dyspoResults[0];
+        const dyspoStatus = dyspo.friend_dyspo;
+        // Hydrate AppUser with dyspo status
+        member.dyspoStatus = dyspoStatus;
+        member.agendaEvents = events.agendaEvents;
 
-      member.agendaEvents = events.agendaEvents;
+        // My Info
+        if (member.uid === this.userSvc.userInfo?.uid) {
+          member.firstname = 'Vous';
+          this.my_dyspoStatus = dyspo.friend_dyspo;
+          this.my_dyspoStatus_label = '';
+          this.my_agendaEvents = events.agendaEvents;
+          this.my_agendaEvents_label = '';
 
-      // My Info
-      if (member.uid === this.userSvc.userInfo?.uid) {
-        member.firstname = 'Vous';
-        this.my_dyspoStatus = dyspo.friend_dyspo;
-        this.my_dyspoStatus_label = '';
-        this.my_agendaEvents = events.agendaEvents;
-        this.my_agendaEvents_label = '';
+          if (this.my_agendaEvents.length === 1) {
+            this.my_agendaEvents_label = 'Vous avez un événement ce jour là';
+          }
 
-        if (this.my_agendaEvents.length === 1) {
-          this.my_agendaEvents_label = 'Vous avez un événement ce jour là';
+          if (this.my_agendaEvents.length > 1) {
+            this.my_agendaEvents_label =
+              'Vous avez plusieurs événements ce jour là';
+          }
+
+          if (this.my_agendaEvents.length === 0) {
+            this.my_agendaEvents_label = "Vous n'avez rien de prévu à cette date";
+          }
+
+          switch (this.my_dyspoStatus) {
+            case UserDyspoStatus.DYSPO:
+              this.my_dyspoStatus_label = 'Vous êtes disponible à cette date';
+              break;
+            case UserDyspoStatus.NODYSPO:
+              this.my_dyspoStatus_label =
+                "Vous n'êtes pas disponible à cette date";
+              break;
+            case UserDyspoStatus.DYSPOWITHKIDS:
+              this.my_dyspoStatus_label = 'Vous avez vos enfants à cette date';
+              break;
+            case UserDyspoStatus.UNDEFINED:
+              this.my_dyspoStatus_label =
+                'Vous n’avez pas indiqué si vous êtes disponible à cette date';
+              break;
+          }
         }
-
-        if (this.my_agendaEvents.length > 1) {
-          this.my_agendaEvents_label =
-            'Vous avez plusieurs événements ce jour là';
-        }
-
-        if (this.my_agendaEvents.length === 0) {
-          this.my_agendaEvents_label = "Vous n'avez rien de prévu à cette date";
-        }
-
-        switch (this.my_dyspoStatus) {
-          case UserDyspoStatus.DYSPO:
-            this.my_dyspoStatus_label = 'Vous êtes disponible à cette date';
-            break;
-          case UserDyspoStatus.NODYSPO:
-            this.my_dyspoStatus_label =
-              "Vous n'êtes pas disponible à cette date";
-            break;
-          case UserDyspoStatus.DYSPOWITHKIDS:
-            this.my_dyspoStatus_label = 'Vous avez vos enfants à cette date';
-            break;
-          case UserDyspoStatus.UNDEFINED:
-            this.my_dyspoStatus_label =
-              'Vous n’avez pas indiqué si vous êtes disponible à cette date';
-            break;
-        }
-      }
-    }
+      })
+    );
   }
 
   openPopoverMenu(e: Event) {
@@ -308,46 +307,40 @@ export class AgendaEventInfoComponent implements OnInit {
   }
 
   async quitEvent() {
-    Swal.fire({
-      title: 'Voulez-vous vraiment supprimer cet événement de votre agenda?',
-      showDenyButton: true,
-      heightAuto: false,
-      confirmButtonText: 'Oui',
-      denyButtonText: 'Non',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.isPopoverOpen = false;
-        // I am the admin
-        if (this.agendaEvent.admin_uid === this.userSvc.userInfo?.uid) {
-          if (this.new_admin_candidates.length > 0) {
-            this.modalNewAdminOpened = true;
-            return;
-          }
-          // No candidates => Delete event
-          else {
-            this.agendaSvc
-              .quitEvent(this.agendaEvent)
-              .then((res) => {
-                this.close();
-              })
-              .catch((err) => {
-                this.utils.showToastError(err);
-                this.close();
-              });
-          }
-        } else {
-          this.agendaSvc
-            .quitEvent(this.agendaEvent)
-            .then((res) => {
-              this.close();
-            })
-            .catch((err) => {
-              this.utils.showToastError(err);
-              this.close();
-            });
-        }
-      }
+    const alert = await this.alertCtrl.create({
+      header: 'Supprimer l\'événement',
+      message: 'Voulez-vous vraiment supprimer cet événement de votre agenda ?',
+      cssClass: 'dyspo-alert-confirm',
+      buttons: [
+        {
+          text: 'Annuler',
+          role: 'cancel',
+        },
+        {
+          text: 'Supprimer',
+          role: 'destructive',
+          handler: () => {
+            this.isPopoverOpen = false;
+            if (this.agendaEvent.admin_uid === this.userSvc.userInfo?.uid) {
+              if (this.new_admin_candidates.length > 0) {
+                this.modalNewAdminOpened = true;
+                return;
+              }
+              this.agendaSvc
+                .quitEvent(this.agendaEvent)
+                .then(() => this.close())
+                .catch((err) => { this.utils.showToastError(err); this.close(); });
+            } else {
+              this.agendaSvc
+                .quitEvent(this.agendaEvent)
+                .then(() => this.close())
+                .catch((err) => { this.utils.showToastError(err); this.close(); });
+            }
+          },
+        },
+      ],
     });
+    await alert.present();
   }
 
   onProfile() {

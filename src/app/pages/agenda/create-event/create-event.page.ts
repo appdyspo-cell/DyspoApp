@@ -2,8 +2,10 @@ import { Component, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { NavController, SelectChangeEventDetail } from '@ionic/angular';
+import { ModalController, NavController, SelectChangeEventDetail } from '@ionic/angular';
 import { IonSelectCustomEvent } from '@ionic/core';
+import { Preferences } from '@capacitor/preferences';
+import { HelperComponent } from 'src/app/components/helper/helper.component';
 
 import {
   add,
@@ -41,6 +43,7 @@ import {
   CheckedFriends,
   Friend,
   FriendStatus,
+  ShowHelper,
   UserDyspoStatus,
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
@@ -51,7 +54,6 @@ import { NotificationService } from 'src/app/services/notification.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { environment } from 'src/environments/environment';
-import Swal from 'sweetalert2';
 
 export enum FriendSelectionType {
   FRIENDS = 'Amis',
@@ -136,7 +138,8 @@ export class CreateEventPage implements OnInit, OnDestroy {
     private friendsSvc: FriendsService,
     private notificationsSvc: NotificationService,
     private logger: LoggerService,
-    private zone: NgZone
+    private zone: NgZone,
+    private modalCtrl: ModalController
   ) {
     this.uid = this.userSvc.userInfo?.uid!;
     this.GoogleAutocompleteSvc = new google.maps.places.AutocompleteService();
@@ -382,7 +385,19 @@ export class CreateEventPage implements OnInit, OnDestroy {
     await Promise.all(promises);
   }
 
-  ngOnInit() {}
+  async ngOnInit() {
+    if (this.userSvc.userInfo?.firstConnexion) {
+      const { value } = await Preferences.get({ key: ShowHelper.CREATE_EVENT });
+      if (!value) {
+        const modal = await this.modalCtrl.create({
+          component: HelperComponent,
+          componentProps: { showHelper: ShowHelper.CREATE_EVENT },
+        });
+        modal.present();
+        await Preferences.set({ key: ShowHelper.CREATE_EVENT, value: 'SHOWN' });
+      }
+    }
+  }
 
   ngOnDestroy() {
     this.searchSubscription?.unsubscribe();
@@ -430,9 +445,13 @@ export class CreateEventPage implements OnInit, OnDestroy {
     this.onEndTimeChanged({ detail: { value: formatISO(combined) } });
   }
 
-  saveOrUpdateEvent() {
+  async saveOrUpdateEvent() {
     try {
       if (this.agendaEvent?.title) {
+        if (!isBefore(parseISO(this.agendaEvent.startISO), parseISO(this.agendaEvent.endISO))) {
+          this.utils.showToastError("L'heure de fin doit être après l'heure de début");
+          return;
+        }
         this.agendaEvent.all_can_edit = this.allCanEdit;
         this.agendaEvent.all_can_see_title = this.allCanSeeTitle;
         //Recurrence
@@ -458,11 +477,11 @@ export class CreateEventPage implements OnInit, OnDestroy {
               )
             );
           }
-          this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!, true);
+          await this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!, true);
         }
         // Non recurrent
         else {
-          this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!, false);
+          await this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!, false);
           // If New members -> send Notif
           if (this.new_members.length > 0) {
             this.notificationsSvc.sendInviteAgendaEvent(
@@ -478,6 +497,7 @@ export class CreateEventPage implements OnInit, OnDestroy {
         return;
       }
     } catch (e: any) {
+      this.utils.showToastError("Erreur lors de la sauvegarde de l'événement");
       this.logger.sendError(
         e,
         'saveOrUpdateEvent',

@@ -41,6 +41,7 @@ export class CalendarService {
   // ── Google Calendar ────────────────────────────────────────────────────────
 
   private openGoogleCalendar(event: AgendaEvent) {
+    const deepLink = `dyspo://event/${event.uid}`;
     const params = new URLSearchParams({
       action: 'TEMPLATE',
       text: event.title || 'Événement dyspo',
@@ -49,6 +50,10 @@ export class CalendarService {
     if (event.place_description) {
       params.set('location', event.place_description);
     }
+    const detailsParts: string[] = [];
+    if (event.description) detailsParts.push(event.description);
+    detailsParts.push(`Voir dans l'app Dyspo : ${deepLink}`);
+    params.set('details', detailsParts.join('\n\n'));
     window.open(
       `https://calendar.google.com/calendar/render?${params.toString()}`,
       '_blank'
@@ -114,6 +119,13 @@ export class CalendarService {
     if (event.place_description) {
       lines.push(`LOCATION:${this.escapeICS(event.place_description)}`);
     }
+
+    const deepLink = `dyspo://event/${event.uid}`;
+    const descParts: string[] = [];
+    if (event.description) descParts.push(event.description);
+    descParts.push(`Voir dans l'app Dyspo : ${deepLink}`);
+    lines.push(`DESCRIPTION:${this.escapeICS(descParts.join('\n\n'))}`);
+    lines.push(`URL:${deepLink}`);
 
     lines.push('END:VEVENT', 'END:VCALENDAR');
     return lines.join('\r\n');

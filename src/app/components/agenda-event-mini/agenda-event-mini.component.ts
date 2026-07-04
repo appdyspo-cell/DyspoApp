@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { AgendaEvent, AgendaEventType } from 'src/app/models/models';
 import { Output, EventEmitter } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
@@ -10,6 +10,7 @@ import { fr } from 'date-fns/locale';
     selector: 'app-agenda-event-mini',
     templateUrl: './agenda-event-mini.component.html',
     styleUrls: ['./agenda-event-mini.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: false
 })
 export class AgendaEventMiniComponent implements OnInit {

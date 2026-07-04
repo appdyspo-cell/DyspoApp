@@ -15,20 +15,61 @@
   class="bg_color"
   style="padding: var(--ion-safe-area-top) 0px var(--ion-safe-area-bottom) 0px"
 >
-  <div *ngIf="invitations.length === 0" class="ion-padding ion-text-center">
+  <div *ngIf="friendsSuggested.length === 0 && invitations.length === 0" class="ion-padding ion-text-center">
     <strong>
-      <ion-text style="color: rgb(100, 100, 100)"
-        >Pas de notifications</ion-text
-      >
+      <ion-text style="color: rgb(100, 100, 100)">Pas de notifications</ion-text>
     </strong>
   </div>
-  <div class="event-wrapper" *ngFor="let nextEvent of invitations">
-    <app-agenda-event-mini
-      class="animate__animated animate__fadeIn"
-      [agendaEvent]="nextEvent"
-      [isInvitation]="true"
-      (click)="openAgendaEventInfo(nextEvent)"
-    >
-    </app-agenda-event-mini>
+
+  <!-- Demandes d'amis -->
+  <div *ngIf="friendsSuggested.length > 0">
+    <div class="notif-section-header">
+      <ion-icon name="person-add-outline"></ion-icon>
+      <span>Demandes d'amis</span>
+    </div>
+    <ion-list class="ion-no-padding">
+      <ion-item
+        *ngFor="let friend of friendsSuggested"
+        (click)="openFriendRequests()"
+        lines="full"
+        class="friend-item"
+        button
+        detail="false"
+      >
+        <ion-thumbnail slot="start">
+          <img
+            [defaultImage]="defaultImage"
+            [lazyLoad]="friend.userData?.avatarPath!"
+            class="crop_img fade-img"
+          />
+        </ion-thumbnail>
+        <ion-label>
+          <ion-row class="ion-align-items-center">
+            {{ friend.userData?.firstname }}
+          </ion-row>
+          <ion-row class="ion-align-items-center">
+            {{ friend.userData?.lastname | uppercase }}
+          </ion-row>
+        </ion-label>
+        <ion-icon slot="end" name="chevron-forward-outline" color="medium"></ion-icon>
+      </ion-item>
+    </ion-list>
+  </div>
+
+  <!-- Invitations événements -->
+  <div *ngIf="invitations.length > 0">
+    <div class="notif-section-header">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <span>Invitations à un événement</span>
+    </div>
+    <div class="event-wrapper" *ngFor="let nextEvent of invitations">
+      <app-agenda-event-mini
+        class="animate__animated animate__fadeIn"
+        [agendaEvent]="nextEvent"
+        [isInvitation]="true"
+        (click)="openAgendaEventInfo(nextEvent)"
+      >
+      </app-agenda-event-mini>
+    </div>
   </div>
 </ion-content>

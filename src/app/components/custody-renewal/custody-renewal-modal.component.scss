@@ -1,0 +1,172 @@
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+.renewal-header {
+  ion-toolbar {
+    --background: var(--d-surface-1);
+    --border-width: 0;
+  }
+}
+
+.renewal-content {
+  --background: var(--d-surface-1);
+}
+
+.renewal-body {
+  padding: 0 24px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.renewal-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(72, 161, 195, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 8px auto 20px;
+
+  ion-icon {
+    font-size: 32px;
+    color: var(--d-dyspo-kids);
+  }
+}
+
+.renewal-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--d-text-primary);
+  margin: 0 0 10px;
+}
+
+.renewal-subtitle {
+  font-size: 14px;
+  color: var(--d-text-secondary);
+  margin: 0 0 24px;
+  line-height: 1.55;
+  max-width: 280px;
+}
+
+// ── Preview / Edit custody grid ──────────────────────────────────────────────
+
+.schedule-preview,
+.custody-edit-section {
+  width: 100%;
+  background: var(--d-surface-2);
+  border-radius: var(--d-radius-xl);
+  padding: 16px;
+  margin-bottom: 28px;
+}
+
+.preview-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--d-text-tertiary);
+  margin: 0 0 8px;
+  text-align: left;
+}
+
+.custody-week {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.day-bubble {
+  flex: 1;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid var(--d-surface-3, #e0e4ed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--d-text-tertiary);
+  cursor: default;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  &.selected {
+    background-color: var(--d-dyspo-kids);
+    border-color: var(--d-dyspo-kids);
+    color: #fff;
+  }
+}
+
+// Editable bubbles get pointer cursor
+.custody-edit-section .day-bubble {
+  cursor: pointer;
+
+  &:active {
+    transform: scale(0.9);
+  }
+}
+
+.edit-error {
+  font-size: 12px;
+  color: var(--ion-color-danger);
+  margin: 10px 0 0;
+  text-align: center;
+}
+
+// ── Action buttons ───────────────────────────────────────────────────────────
+
+.renewal-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-keep {
+  --background: var(--d-dyspo-kids);
+  --background-activated: var(--d-dyspo-kids-dark);
+  --border-radius: var(--d-radius-pill);
+  --color: #fff;
+  font-weight: 700;
+  height: 48px;
+}
+
+.btn-edit {
+  --border-radius: var(--d-radius-pill);
+  --color: var(--d-dyspo-kids);
+  --border-color: var(--d-dyspo-kids);
+  font-weight: 600;
+  height: 48px;
+}
+
+.btn-later {
+  --color: var(--d-text-tertiary);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+// ── Back button ──────────────────────────────────────────────────────────────
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--d-text-tertiary);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0 0 16px;
+  cursor: pointer;
+  align-self: flex-start;
+
+  ion-icon {
+    font-size: 18px;
+  }
+}

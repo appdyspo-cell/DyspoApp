@@ -28,7 +28,11 @@ service cloud.firestore {
     match /agenda_events/{eventId} {
       allow read:   if isAuth() && isEventMember(resource.data);
       allow create: if isAuth() && request.auth.uid == request.resource.data.admin_uid;
-      allow update: if isAuth() && isEventMember(resource.data);
+      // Un membre peut modifier l'événement, mais seul l'admin actuel peut
+      // changer admin_uid (transfert d'admin) — empêche l'auto-promotion.
+      allow update: if isAuth() && isEventMember(resource.data)
+        && (request.resource.data.admin_uid == resource.data.admin_uid
+            || resource.data.admin_uid == request.auth.uid);
       allow delete: if isAuth() && resource.data.admin_uid == request.auth.uid;
 
       // Messages: same membership check, fetched from the parent event.
@@ -41,8 +45,12 @@ service cloud.firestore {
     }
 
     // ── Agenda dyspos (availability) ──────────────────────────────────────────
+    // Lecture ouverte à tous les utilisateurs authentifiés : les dyspos sont des
+    // données de disponibilité (DYSPO/NODYSPO/…), non confidentielles, nécessaires
+    // pour l'affichage du calendrier ami et la vérification des conflits.
     match /agenda_dyspos/{uid}/dyspo_list/{dyspoId} {
-      allow read, write: if isOwner(uid);
+      allow read:  if isAuth();
+      allow write: if isOwner(uid);
     }
 
     // ── Chatrooms ─────────────────────────────────────────────────────────────
@@ -51,8 +59,13 @@ service cloud.firestore {
     }
 
     // ── Friends ───────────────────────────────────────────────────────────────
+    // friends/{uid}/friend_list/{friendId} stores uid's view of friendId.
+    // La lecture est ouverte à tout utilisateur authentifié (nécessaire pour
+    // compter les amis en commun). L'écriture reste restreinte au propriétaire
+    // et à la personne concernée (côté invitation).
     match /friends/{uid}/friend_list/{friendId} {
-      allow read, write: if isOwner(uid);
+      allow read:  if isAuth();
+      allow write: if isOwner(uid) || isOwner(friendId);
     }
 
     // ── Friend groups ─────────────────────────────────────────────────────────

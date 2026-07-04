@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import {
   ActionSheetController,
@@ -7,6 +7,7 @@ import {
 } from '@ionic/angular';
 import {
   addHours,
+  format,
   getDate,
   getMonth,
   getYear,
@@ -71,6 +72,7 @@ export class AgendaPage implements AfterViewInit {
 
   eventsForDate: AgendaEvent[] = [];
   selectedDate: any;
+  calendarEventDates: Set<string> = new Set();
 
   agendaEvents$: Observable<AgendaEvent[]> | undefined;
   agendaEvents: AgendaEvent[] = [];
@@ -110,7 +112,8 @@ export class AgendaPage implements AfterViewInit {
     private calendarSvc: CalendarService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    public userSvc: UserService
+    public userSvc: UserService,
+    private cdr: ChangeDetectorRef
   ) {
     this.userSubscription = this.userSvc.appUserInfoObs$.subscribe((user) => {
       this.my_info = user;
@@ -125,7 +128,9 @@ export class AgendaPage implements AfterViewInit {
           (agendaEvents: AgendaEvent[]) => {
             console.log('Ag events', agendaEvents);
             this.agendaEvents = agendaEvents;
+            this.buildCalendarEventDates();
             this.tagCalendarEventsDataForMonth();
+            this.cdr.detectChanges();
           }
         );
 
@@ -139,6 +144,7 @@ export class AgendaPage implements AfterViewInit {
             ) {
               this.agendaDyspos = agendaDyspos.items;
               this.tagCalendarUserDyspoData();
+              this.cdr.detectChanges();
             }
           }
         );
@@ -189,9 +195,32 @@ export class AgendaPage implements AfterViewInit {
     });
   }
 
+  ionViewWillEnter() {
+    this.buildCalendarEventDates();
+    if (this.calendarMonthData) {
+      this.tagCalendarEventsDataForMonth();
+      this.tagCalendarUserDyspoData();
+    }
+    this.cdr.detectChanges();
+    this.handlePendingDeepLink();
+  }
+
+  private handlePendingDeepLink() {
+    const uid = this.agendaSvc.pendingDeepLinkEventUid;
+    if (!uid) return;
+    this.agendaSvc.pendingDeepLinkEventUid = null;
+    const event = this.agendaSvc.agendaEvents.find((e) => e.uid === uid);
+    if (event) {
+      this.openEvent(event);
+    }
+  }
+
   ngOnDestroy() {
     if (this.agendaEventsSubscription) {
       this.agendaEventsSubscription.unsubscribe();
+    }
+    if (this.agendaDysposSubscription) {
+      this.agendaDysposSubscription.unsubscribe();
     }
     if (this.userSubscription) {
       this.userSubscription.unsubscribe();
@@ -210,21 +239,23 @@ export class AgendaPage implements AfterViewInit {
   }
 
   async ngAfterViewInit() {
-    const { value } = await Preferences.get({ key: ShowHelper.AGENDA });
-    if (!value) {
-      this.showHelper = true;
-      const modal = await this.modalCtrl.create({
-        component: HelperComponent,
-        componentProps: {
-          showHelper: ShowHelper.AGENDA,
-        },
-      });
-      modal.present();
+    if (this.userSvc.userInfo?.firstConnexion) {
+      const { value } = await Preferences.get({ key: ShowHelper.AGENDA });
+      if (!value) {
+        this.showHelper = true;
+        const modal = await this.modalCtrl.create({
+          component: HelperComponent,
+          componentProps: {
+            showHelper: ShowHelper.AGENDA,
+          },
+        });
+        modal.present();
 
-      await Preferences.set({
-        key: ShowHelper.AGENDA,
-        value: 'SHOWN',
-      });
+        await Preferences.set({
+          key: ShowHelper.AGENDA,
+          value: 'SHOWN',
+        });
+      }
     }
     this.optionsMulti = {
       pickMode: 'multi',
@@ -260,6 +291,32 @@ export class AgendaPage implements AfterViewInit {
     this.tagCalendarUserDyspoData();
     this.tagHolidays();
     if (this.isFriendMode) this.tagCommonDates();
+    this.cdr.detectChanges();
+  }
+
+  buildCalendarEventDates() {
+    const dates = new Set<string>();
+    this.agendaEvents.forEach((ev) => {
+      let startStr: string;
+      let endStr: string;
+      if (ev.ref_start_ISO) {
+        startStr = ev.ref_start_ISO.substring(0, 10);
+        endStr = ev.ref_end_ISO ? ev.ref_end_ISO.substring(0, 10) : startStr;
+      } else {
+        startStr = format(new Date(ev.start_date_ts), 'yyyy-MM-dd');
+        endStr = format(new Date(ev.end_date_ts), 'yyyy-MM-dd');
+      }
+      // Pour les événements multi-jours, ajouter chaque jour de la plage
+      let current = startStr;
+      while (current <= endStr) {
+        dates.add(current);
+        const d = new Date(current);
+        d.setDate(d.getDate() + 1);
+        current = format(d, 'yyyy-MM-dd');
+        if (current > endStr) break;
+      }
+    });
+    this.calendarEventDates = dates;
   }
 
   tagCalendarEventsDataForMonth() {
@@ -286,31 +343,23 @@ export class AgendaPage implements AfterViewInit {
         //   new Date(day.time).toISOString()
         // );
 
-        let newDateCalendar = new Date(day.time);
-        newDateCalendar.setMinutes(
-          newDateCalendar.getMinutes() - newDateCalendar.getTimezoneOffset()
-        );
+        // Date du jour au format YYYY-MM-DD (heure locale) — indépendant du fuseau
+        const calDayStr = format(new Date(day.time), 'yyyy-MM-dd');
 
         this.agendaEvents.forEach((agendaEvent) => {
-          //For Legacy compatibility
-          let newDateStartEvent = agendaEvent.start_date_ts;
-          let newDateEndEvent = agendaEvent.end_date_ts;
-          if (agendaEvent.ref_start_ISO && agendaEvent.ref_end_ISO) {
-            let newDateStartEventUTC =
-              agendaEvent!.ref_start_ISO!.slice(0, -6) + 'Z';
-            console.log('new Date Start du event', newDateStartEventUTC);
-            newDateStartEvent = parseISO(newDateStartEventUTC).getTime();
-
-            let newDateEndEventUTC =
-              agendaEvent!.ref_end_ISO!.slice(0, -6) + 'Z';
-            console.log('new Date End du event', newDateEndEventUTC);
-            newDateEndEvent = parseISO(newDateEndEventUTC).getTime();
+          let eventStartStr: string;
+          let eventEndStr: string;
+          if (agendaEvent.ref_start_ISO) {
+            eventStartStr = agendaEvent.ref_start_ISO.substring(0, 10);
+            eventEndStr   = agendaEvent.ref_end_ISO
+              ? agendaEvent.ref_end_ISO.substring(0, 10)
+              : eventStartStr;
+          } else {
+            eventStartStr = format(new Date(agendaEvent.start_date_ts), 'yyyy-MM-dd');
+            eventEndStr   = format(new Date(agendaEvent.end_date_ts), 'yyyy-MM-dd');
           }
 
-          if (
-            newDateStartEvent <= newDateCalendar.getTime() &&
-            newDateEndEvent >= newDateCalendar.getTime()
-          ) {
+          if (calDayStr >= eventStartStr && calDayStr <= eventEndStr) {
             day.isEvent = true;
             //Prevent doublons for long events
             const foundIndex = this.eventsForDate.findIndex((evForDate) => {

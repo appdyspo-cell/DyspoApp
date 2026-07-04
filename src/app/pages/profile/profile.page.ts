@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { ActionSheetController } from '@ionic/angular';
-import { AppUser } from 'src/app/models/models';
+import { ActionSheetController, ModalController } from '@ionic/angular';
+import { Preferences } from '@capacitor/preferences';
+import { AppUser, ShowHelper } from 'src/app/models/models';
 import { AuthService } from 'src/app/services/auth.service';
+import { HelperComponent } from 'src/app/components/helper/helper.component';
 import { environment } from 'src/environments/environment';
 
 import { Router } from '@angular/router';
 import { UserService } from 'src/app/services/user.service';
-import Swal from 'sweetalert2';
 import { UtilsService } from 'src/app/services/utils.service';
 import {
   Auth,
@@ -47,6 +48,8 @@ export class ProfilePage implements OnInit {
   userSubscription: Subscription | undefined;
   readonly weekDays = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
   custodyDays: boolean[] = new Array(14).fill(false);
+  pendingAvatarPreview: string | undefined;
+  private avatarConfirmResolver?: (confirmed: boolean) => void;
 
   readonly maskPredicate: MaskitoElementPredicateAsync = async (el) =>
     (el as HTMLIonInputElement).getInputElement();
@@ -78,10 +81,11 @@ export class ProfilePage implements OnInit {
     private utils: UtilsService,
     private logger: LoggerService,
     private mediaSvc: MediaService,
-    private notificationsSvc: NotificationService
+    private notificationsSvc: NotificationService,
+    private modalCtrl: ModalController
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.user = this.userSvc.getEmptyUser();
     this.userSubscription = this.userSvc.appUserInfoObs$.subscribe((user) => {
       this.user = user;
@@ -93,6 +97,18 @@ export class ProfilePage implements OnInit {
       console.log('user subscription profile page', user);
     });
     //this.user! = Object.assign({}, this.userSvc.userInfo);
+
+    if (this.userSvc.userInfo?.firstConnexion) {
+      const { value } = await Preferences.get({ key: ShowHelper.PROFILE });
+      if (!value) {
+        const modal = await this.modalCtrl.create({
+          component: HelperComponent,
+          componentProps: { showHelper: ShowHelper.PROFILE },
+        });
+        modal.present();
+        await Preferences.set({ key: ShowHelper.PROFILE, value: 'SHOWN' });
+      }
+    }
   }
 
   ngOnDestroy() {
@@ -100,13 +116,9 @@ export class ProfilePage implements OnInit {
   }
 
   async resetPw() {
-    const { value: email } = await Swal.fire({
+    const email = await this.utils.promptEmail({
       title: 'Entrez votre email',
-      input: 'email',
-      heightAuto: false,
-      validationMessage: "L'adresse email n'est pas valide.",
-      inputLabel: 'Votre adresse email',
-      inputPlaceholder: 'Entrez votre email',
+      placeholder: 'Entrez votre email',
     });
     if (email) {
       this.authSvc
@@ -130,7 +142,7 @@ export class ProfilePage implements OnInit {
   async save() {
     this.logger.logDebug('save');
     const userFirstName = this.user.firstname || '';
-    const userLasttName = this.user.firstname || '';
+    const userLasttName = this.user.lastname || '';
     if (userFirstName.length < 2 || userLasttName.length < 2) {
       this.utils.showToastError('Nom et prénom sont requis');
       return;
@@ -218,9 +230,13 @@ export class ProfilePage implements OnInit {
   async changeAvatar() {
     const user_id = this.user.uid;
     const filename = 'avatar_' + user_id + '.jpg';
-    const { filepath } = await this.mediaSvc.takePhotoPrompt({
+    const { filepath } = await this.mediaSvc.takePhoto({
       firebasePath: environment.firebase_avatar_storage_path,
       filename,
+      source: CameraSource.Photos,
+      allowEditing: false,
+      confirmBeforeUpload: (previewDataUrl) =>
+        this.confirmAvatarPreview(previewDataUrl),
     });
 
     if (filepath) {
@@ -228,6 +244,23 @@ export class ProfilePage implements OnInit {
       this.userSvc.updateUser(Object.assign({}, this.user));
       this.avatarPath = filepath;
     }
+  }
+
+  private confirmAvatarPreview(previewDataUrl: string): Promise<boolean> {
+    this.pendingAvatarPreview = previewDataUrl;
+    return new Promise<boolean>((resolve) => {
+      this.avatarConfirmResolver = resolve;
+    });
+  }
+
+  validateAvatarPreview() {
+    this.pendingAvatarPreview = undefined;
+    this.avatarConfirmResolver?.(true);
+  }
+
+  cancelAvatarPreview() {
+    this.pendingAvatarPreview = undefined;
+    this.avatarConfirmResolver?.(false);
   }
 
   logout() {

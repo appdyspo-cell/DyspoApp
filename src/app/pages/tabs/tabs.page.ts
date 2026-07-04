@@ -1,8 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { Subscription } from 'rxjs';
-import { AgendaEvent, Chatroom } from 'src/app/models/models';
+import { AgendaEvent, Chatroom, FriendStatus } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
+import { FriendsService } from 'src/app/services/friends.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { LocalNotifications } from '@capacitor/local-notifications';
@@ -16,15 +17,18 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 export class TabsPage implements OnInit, OnDestroy {
   isIos: boolean;
   unreadMessagesCount = 0;
+  pendingFriendRequestsCount = 0;
   private agendaSub!: Subscription;
+  private friendsSub!: Subscription;
   private myUid: string | undefined;
   private previousCounts: Record<string, number> = {};
 
   constructor(
-    public platform: Platform, 
+    public platform: Platform,
     private utils: UtilsService,
     private agendaSvc: AgendaService,
-    private userSvc: UserService
+    private userSvc: UserService,
+    private friendsSvc: FriendsService
   ) {
     this.isIos = this.platform.is('ios');
     console.log('platform ios ?', this.isIos);
@@ -40,7 +44,17 @@ export class TabsPage implements OnInit, OnDestroy {
       if (user && user.uid) {
         this.myUid = user.uid;
         this.listenToAgendaEvents();
+        this.listenToFriendRequests();
       }
+    });
+  }
+
+  listenToFriendRequests() {
+    if (this.friendsSub) return;
+    this.friendsSub = this.friendsSvc.friends$.subscribe(friends => {
+      this.pendingFriendRequestsCount = friends.filter(
+        f => f.friend_status === FriendStatus.SUGGESTED
+      ).length;
     });
   }
 
@@ -88,5 +102,6 @@ export class TabsPage implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if (this.agendaSub) this.agendaSub.unsubscribe();
+    if (this.friendsSub) this.friendsSub.unsubscribe();
   }
 }

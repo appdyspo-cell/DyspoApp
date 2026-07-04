@@ -103,11 +103,12 @@
               <span class="wa-text">{{msg.message}}</span>
               <div class="wa-message-meta">
                 <span class="wa-time">{{msg.date_ISO | date: 'HH:mm'}}</span>
-                <ion-icon 
-                  *ngIf="msg.sender === my_uid" 
-                  [name]="(msg.read_by?.length || 0) > 0 ? 'checkmark-done-outline' : 'checkmark-outline'" 
+                <ion-icon
+                  *ngIf="msg.sender === my_uid"
+                  [name]="(msg.read_by?.length || 0) > 0 ? 'checkmark-done-outline' : 'checkmark-outline'"
                   class="wa-ticks"
                   [ngClass]="{'wa-read': (msg.read_by?.length || 0) > 0}"
+                  [title]="getReadByLabel(msg)"
                 ></ion-icon>
               </div>
             </div>

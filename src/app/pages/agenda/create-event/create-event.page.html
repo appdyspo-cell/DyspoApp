@@ -30,6 +30,7 @@
     <div class="type-picker">
 
       <button class="type-btn"
+        title="Événement qui se déroule pendant que vous avez la garde des enfants"
         [class.type-btn--active]="agendaEvent!.type === agendaEventType.KIDS"
         (click)="agendaEvent!.type = agendaEventType.KIDS">
         <div class="type-bubble type-bubble--kids">
@@ -39,6 +40,7 @@
       </button>
 
       <button class="type-btn"
+        title="Événement qui se déroule pendant que vous n'avez pas la garde des enfants"
         [class.type-btn--active]="agendaEvent!.type === agendaEventType.NOKIDS"
         (click)="agendaEvent!.type = agendaEventType.NOKIDS">
         <div class="type-bubble type-bubble--nokids">
@@ -48,6 +50,7 @@
       </button>
 
       <button class="type-btn"
+        title="Événement compatible avec ou sans la présence des enfants"
         [class.type-btn--active]="agendaEvent!.type === agendaEventType.FREE"
         (click)="agendaEvent!.type = agendaEventType.FREE">
         <div class="type-bubble type-bubble--free">
@@ -73,6 +76,7 @@
           <ion-datetime
             presentation="date"
             locale="fr-FR"
+            firstDayOfWeek="1"
             [value]="agendaEvent?.startISO"
             [min]="min_time_ISO_start"
             (ionChange)="onStartDateOnlyChanged($event)"
@@ -97,6 +101,7 @@
           <ion-datetime
             presentation="date"
             locale="fr-FR"
+            firstDayOfWeek="1"
             [value]="agendaEvent?.endISO"
             [min]="min_time_ISO_end"
             [max]="max_time_ISO_end"
@@ -319,28 +324,6 @@
     </div>
   </div>
 
-  <div class="d-flex ion-justify-content-center">
-    <ion-button
-      [disabled]=""
-      class="dyspo-button btn-save-event"
-      fill="solid"
-      mode="ios"
-      (click)="saveOrUpdateEvent()"
-    >
-      Enregistrer l'événement
-      <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
-    </ion-button>
-  </div>
-
-  <!-- <ion-toolbar class="footer">
-    <ion-buttons slot="end">
-      <ion-button [disabled]="" fill="solid" (click)="saveOrUpdateEvent()">
-        Enregistrer l'événement
-        <ion-icon slot="start" name="checkmark-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar> -->
-
   <ion-popover
     #popoverUserEvents
     [isOpen]="isPopoverUserEventsOpen"
@@ -392,3 +375,17 @@
     </ng-template>
   </ion-popover>
 </ion-content>
+
+<ion-footer class="ion-no-border save-event-footer">
+  <ion-toolbar>
+    <ion-button
+      class="dyspo-button btn-save-event"
+      fill="solid"
+      mode="ios"
+      (click)="saveOrUpdateEvent()"
+    >
+      <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+      Enregistrer l'événement
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

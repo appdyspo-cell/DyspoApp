@@ -16,6 +16,7 @@ import {
   getDoc,
   getDocs,
   query,
+  setDoc,
   updateDoc,
   where,
 } from '@angular/fire/firestore';
@@ -107,6 +108,18 @@ export class UserService {
     updateDoc(ref, appUserClone);
   }
 
+  /**
+   * Marque la fin de la toute première connexion de l'utilisateur — appelé quand
+   * l'application passe en arrière-plan pour la première fois après sa création
+   * de compte. Sert de garde globale pour les popups tutoriel (ShowHelper).
+   */
+  async endFirstConnexion(): Promise<void> {
+    if (!this.userInfo?.uid || this.userInfo.firstConnexion === false) return;
+    this.userInfo.firstConnexion = false;
+    const ref = doc(this.firestore, `users/${this.userInfo.uid}`);
+    await updateDoc(ref, { firstConnexion: false });
+  }
+
   public getEmptyUser(): AppUser {
     return {
       email: '',
@@ -132,6 +145,35 @@ export class UserService {
       geo_zone: 'zone_A',
       with_kids: false,
     };
+  }
+
+  /**
+   * Provisionne le document Firestore d'un utilisateur lors de sa toute première
+   * connexion via un provider social (Google/Apple/Facebook) — ces comptes n'ont
+   * pas suivi le formulaire d'inscription classique.
+   */
+  public async createMinimalUserDoc(firebaseUser: {
+    uid: string;
+    email: string | null;
+    displayName: string | null;
+    photoURL: string | null;
+  }): Promise<void> {
+    const [firstname, ...rest] = (firebaseUser.displayName ?? '')
+      .trim()
+      .split(' ')
+      .filter((part) => part !== '');
+
+    const newUser: AppUser = {
+      ...this.getEmptyUser(),
+      uid: firebaseUser.uid,
+      email: firebaseUser.email ?? '',
+      firstname: firstname || '',
+      lastname: rest.join(' ') || '',
+      avatarPath: firebaseUser.photoURL ?? environment.DEFAULT_AVATAR,
+    };
+
+    const ref = doc(this.firestore, `users/${firebaseUser.uid}`);
+    await setDoc(ref, newUser);
   }
 
   public getAllOtherUsers() {

@@ -2,7 +2,7 @@
 
 .wa-header {
   ion-toolbar {
-    --background: var(--d-brand);
+    --background: var(--d-brand-dark);
     --color: #fff;
     --padding-start: 4px;
     --padding-end: 8px;
@@ -268,7 +268,10 @@
 
 // ── Footer / Input ────────────────────────────────────────────────────────────
 
-.wa-footer { background: transparent; }
+.wa-footer {
+  background: var(--d-surface-2);
+  padding-bottom: env(safe-area-inset-bottom);
+}
 
 .wa-input-toolbar {
   --background: var(--d-surface-2);
@@ -317,7 +320,7 @@
     position: relative;
 
     .wa-send-btn {
-      --background: var(--d-brand);
+      --background: var(--d-brand-dark);
       --background-activated: var(--d-brand-dark);
       --box-shadow: none;
       margin: 0;

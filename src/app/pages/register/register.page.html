@@ -17,8 +17,22 @@
       <ion-title size="large">{{'REGISTER' | translate}}</ion-title>
     </ion-toolbar>
   </ion-header>
+  <div class="register-stepper">
+    <div class="step-dot" [class.active]="currentStep === 1" [class.done]="currentStep > 1">1</div>
+    <div class="step-line" [class.done]="currentStep > 1"></div>
+    <div class="step-dot" [class.active]="currentStep === 2" [class.done]="currentStep > 2">2</div>
+    <div class="step-line" [class.done]="currentStep > 2"></div>
+    <div class="step-dot" [class.active]="currentStep === 3">3</div>
+  </div>
+  <p class="step-caption">
+    <ng-container *ngIf="currentStep === 1">Étape 1/3 — Votre compte</ng-container>
+    <ng-container *ngIf="currentStep === 2">Étape 2/3 — Votre profil</ng-container>
+    <ng-container *ngIf="currentStep === 3">Étape 3/3 — Famille &amp; conditions</ng-container>
+  </p>
+
   <div class="form ion-padding">
     <ion-list>
+      <ng-container *ngIf="currentStep === 1">
       <ion-item mode="md">
         <ion-input
           label="Nom *"
@@ -92,7 +106,9 @@
           >Le mot de passe doit comporter 6 caractères minimum</ion-note
         >
       </ion-item>
+      </ng-container>
 
+      <ng-container *ngIf="currentStep === 2">
       <!-- Zone Géographique — Picker Dyspo custom -->
       <div class="geo-zone-field">
         <p class="geo-zone-label">Zone Géographique</p>
@@ -163,6 +179,46 @@
         <span>{{ academies }}</span>
       </div>
 
+      <ion-item *ngIf="!isInternationalPhone">
+        <ion-input
+          [maskito]="phoneMask"
+          [maskitoElement]="maskPredicate"
+          label="Téléphone *"
+          labelPlacement="floating"
+          type="tel"
+          [(ngModel)]="userInfo.phoneNumber"
+          autocomplete="off"
+          name="phoneNumber"
+          required="true"
+          placeholder="Entrez votre téléphone"
+        ></ion-input>
+        <ion-note *ngIf="errors['phoneNumber']" class="note-error"
+          >Le téléphone n'est pas valide</ion-note
+        >
+      </ion-item>
+
+      <ion-item *ngIf="isInternationalPhone">
+        <ion-input
+          label="Téléphone *"
+          labelPlacement="floating"
+          type="tel"
+          [(ngModel)]="userInfo.phoneNumber"
+          autocomplete="off"
+          name="phoneNumber"
+          required="true"
+          placeholder="+33612345678"
+        ></ion-input>
+        <ion-note *ngIf="errors['phoneNumber']" class="note-error"
+          >Le téléphone n'est pas valide</ion-note
+        >
+      </ion-item>
+
+      <p class="intl-phone-toggle" (click)="toggleInternationalPhone()">
+        {{ isInternationalPhone ? 'Numéro français ?' : 'Numéro hors France ?' }}
+      </p>
+      </ng-container>
+
+      <ng-container *ngIf="currentStep === 3">
       <ion-item>
         <ion-text>J'ai des enfants </ion-text>
         <ion-buttons slot="end">
@@ -194,24 +250,6 @@
           Veuillez sélectionner au moins un jour de garde
         </ion-note>
       </div>
-
-      <ion-item>
-        <ion-input
-          [maskito]="phoneMask"
-          [maskitoElement]="maskPredicate"
-          label="Téléphone *"
-          labelPlacement="floating"
-          type="tel"
-          [(ngModel)]="userInfo.phoneNumber"
-          autocomplete="off"
-          name="phoneNumber"
-          required="true"
-          placeholder="Entrez votre téléphone"
-        ></ion-input>
-        <ion-note *ngIf="errors['phoneNumber']" class="note-error"
-          >Le téléphone n'est pas valide</ion-note
-        >
-      </ion-item>
 
       <!-- <ion-item class="desc-inner" lines="none">
         <ion-textarea
@@ -279,10 +317,28 @@
       <ion-note *ngIf="errors['cgu']" class="note-error"
         >Veuillez accepter les conditions générales d'utilisation</ion-note
       >
+      </ng-container>
     </ion-list>
   </div>
-  <div class="ion-padding ion-justify-content-center d-flex">
+  <div class="ion-padding ion-justify-content-center d-flex step-nav">
     <ion-button
+      *ngIf="currentStep > 1"
+      class="dyspo-button-outline"
+      mode="ios"
+      fill="outline"
+      (click)="prevStep()"
+      >Précédent</ion-button
+    >
+    <ion-button
+      *ngIf="currentStep < 3"
+      class="dyspo-button"
+      mode="ios"
+      color="tertiary"
+      (click)="nextStep()"
+      >Suivant<ion-icon name="chevron-forward-outline" slot="end"></ion-icon
+    ></ion-button>
+    <ion-button
+      *ngIf="currentStep === 3"
       class="dyspo-button"
       mode="ios"
       color="tertiary"

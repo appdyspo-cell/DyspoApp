@@ -814,3 +814,138 @@ L'application a la structure pour devenir un outil de référence dans la coordi
 
 *Audit réalisé avec Claude Code (Anthropic) — Antigravity session 2026-05-07*  
 *Fichiers analysés : 50+ (services, pages, composants, règles, configuration, modèles)*
+
+---
+
+## 12. Mise à jour de l'audit — 2026-05-12 : Readiness migration prod + publication stores
+
+> Contexte : depuis l'audit du 07/05, plusieurs points "Haute priorité" ont déjà été corrigés (FriendProfileComponent intégré à SharedModule, couleurs SweetAlert2 unifiées, `webContentsDebuggingEnabled` repassé à `false` en prod, règles Firestore/Storage durcies). Cette section couvre une revue de sécurité ciblée (skill `security-review` sur le diff en cours), un état des dépendances, et la préparation technique à la migration vers la base Firebase de production et à la publication App Store / Google Play.
+
+### 12.1 Revue de sécurité du diff en cours
+
+Analyse en 2 passes (identification puis contre-vérification anti-faux-positifs) sur l'ensemble des fichiers modifiés/non commités.
+
+**Résultat : aucune vulnérabilité à haute confiance (≥8/10) trouvée.**
+
+Un point d'hygiène a été identifié puis écarté du seuil de sévérité après contre-vérification :
+- `firestore.rules` — la règle `friends/{uid}/friend_list/{friendId}` (`allow write: if isOwner(uid) || isOwner(friendId);`) permet à un utilisateur A d'écrire directement (hors UI, via le SDK) une entrée `FRIEND` dans la liste d'amis de B sans validation de transition d'état. Impact réel limité : `friend_status` n'est utilisé nulle part comme verrou d'autorisation (ni dans les règles `agenda_events`/`agenda_dyspos`, ni côté app pour débloquer un accès) — au pire, pollution cosmétique de la liste d'amis de B. **Confiance : 3/10 → non bloquant**, mais à corriger en hygiène défensive avant V2 (ajouter une contrainte sur `request.resource.data.friend_status` pour interdire un saut direct à `FRIEND` côté non-owner).
+- Les changements `agenda_events.admin_uid` (anti auto-promotion admin) et `storage.rules` (validation taille/type image) sont des **améliorations de sécurité nettes**, sans régression détectée.
+
+### 12.2 Dépendances — état des mises à jour
+
+```
+npm outdated → Angular 20.3.25 (latest 21.2.17), Capacitor 7.6.x (latest 8.4.1), @angular/fire 20.0.1 (à jour)
+npm audit    → 56 vulnérabilités (2 critical, 27 high, 19 moderate, 8 low)
+```
+
+**Lecture importante :** la quasi-totalité des vulnérabilités `npm audit` remontent de la chaîne `@angular-devkit/build-angular → esbuild/vite/webpack-dev-server` — ce sont des **outils de build (devDependencies)**, jamais exécutés dans l'app livrée sur les stores. Risque réel pour la publication : **faible**. Action recommandée : `npm audit fix` (sans `--force`) pour absorber les correctifs non-majeurs, puis revalider le build — ne pas se précipiter sur la montée Angular 21 / Capacitor 8 avant la publication (changement majeur, à traiter en post-lancement).
+
+Rien dans `dependencies` (code réellement embarqué) ne présente de CVE critique exploitable à l'exécution.
+
+### 12.3 Blocages techniques avant publication (nouveaux, non listés dans l'audit du 07/05)
+
+| # | Constat | Pourquoi ça bloque | Sévérité | Statut |
+|---|---|---|---|---|
+| 1 | **`PrivacyInfo.xcprivacy` absent** (`ios/prod/App/`, `ios/stg/App/`) | Apple **refuse** depuis mai 2024 tout binaire utilisant des "Required Reason APIs" (UserDefaults, timestamps fichiers — utilisés par plusieurs plugins Capacitor/Firebase) sans ce manifeste de confidentialité. **Rejet automatique probable à l'upload App Store Connect.** | Bloquant | ✅ Corrigé le 12/05 — fichier créé + intégré aux deux projets Xcode (prod et stg, pour couvrir aussi TestFlight) |
+| 2 | **`google-services.json` / `GoogleService-Info.plist` absents en local** (`android/prod`, `ios/prod`) | Correctement exclus du repo (`.gitignore`), mais **aucun des deux n'est présent localement** → build natif prod impossible tant qu'ils ne sont pas téléchargés depuis la Console Firebase du projet `dyspo-2bb43`. | Bloquant | ⏳ **Action utilisateur requise** — ce sont des identifiants réels liés à un compte Firebase, impossibles à générer par l'assistant. Voir §12.4 Étape 3. |
+| 3 | **`firestore.indexes.json` absent** | L'index composite `agenda_events` (`members_uid` Arrays + `start_date_ts` Asc), documenté dans CLAUDE.md, n'est pas géré par `firebase deploy`. Sur `dyspo-2bb43` (jamais utilisé en usage réel), cet index **n'existe probablement pas encore** → la sélection de participants dans la création d'événement plantera silencieusement en prod. | Bloquant | ✅ Codé le 12/05 (`firestore.indexes.json` + référencé dans `firebase.json`) — ⏳ déploiement (`firebase deploy --only firestore:indexes`) à exécuter par l'utilisateur, le CLI local n'est pas authentifié |
+| 4 | **`.firebaserc` incohérent** : alias `"stg": "dyspo-stg"`, mais `environment.ts` (build staging réel) pointe vers `firebaseConfig.projectId: 'dyspo-test'` | Tout `firebase deploy --project stg` déploierait les règles sur le **mauvais projet** (`dyspo-stg`, inutilisé), pas sur celui que l'app utilise réellement. Risque de croire les règles stg à jour alors qu'elles ne le sont pas. | Élevée | ✅ Corrigé le 12/05 — alias `stg` repointé vers `dyspo-test` ; `default` repointé vers `dyspo-test` (au lieu de prod) pour qu'un `firebase deploy` lancé sans `--project` ne touche jamais la prod par erreur |
+| 5 | **Permission Android `WRITE_CONTACTS` déclarée mais jamais utilisée** (seul `Contacts.getContacts()` en lecture est appelé dans tout le code) | Google Play scrute les permissions sensibles non justifiées dans le formulaire de déclaration ; ralentit/complique la review. | Moyenne | ✅ Corrigé le 12/05 — retirée de `android/prod` et `android/stg` |
+| 6 | **`versionCode` (Android) = 9 / `CURRENT_PROJECT_VERSION` (iOS) = 10**, `versionName`/`MARKETING_VERSION` = `1.0.1` | À vérifier contre ce qui est **actuellement live** sur Play Console / App Store Connect — toute resoumission doit avoir un `versionCode`/build number strictement supérieur. | À vérifier | ⏳ **Action utilisateur requise** — l'assistant n'a pas accès aux consoles Play Store / App Store Connect ; impossible de vérifier ou bumper sans risquer de se tromper dans un sens ou l'autre. Donner le numéro actuellement live et le bump sera fait. |
+
+### 12.4 Plan de migration — passage de la base de test (`dyspo-test`) vers la base de production (`dyspo-2bb43`)
+
+> Important : il ne s'agit pas de "migrer des données" (la base prod `dyspo-2bb43` est neuve et n'a jamais servi en usage réel) mais de **mettre la base prod dans un état fonctionnellement identique à la base de test** avant de basculer les builds natifs dessus.
+
+**Étape 1 — Réconcilier les règles de sécurité**
+```bash
+firebase deploy --project dyspo-2bb43 --only firestore:rules,storage:rules
+```
+Vérifier au préalable que `firestore.rules` / `storage.rules` locaux sont bien ceux validés (état actuel = durci, cf. §12.1). Faire de même sur `dyspo-test` pour qu'ils restent synchronisés (`firebase deploy --project dyspo-test --only firestore:rules,storage:rules`).
+
+**Étape 2 — Recréer les index composites manuellement**
+Dans la Console Firebase du projet `dyspo-2bb43` → Firestore → Index : recréer l'index `agenda_events` (`members_uid` Array-contains + `start_date_ts` Ascending) listé dans CLAUDE.md. Astuce : lancer l'app une fois pointée sur prod en mode dev — Firebase logue un lien direct de création d'index dans la console JS dès qu'une requête échoue pour cette raison ; cliquer ce lien crée l'index identique en un clic.
+
+**Étape 3 — Récupérer les fichiers de configuration plateforme**
+- Console Firebase `dyspo-2bb43` → Paramètres du projet → application Android `com.liaisongraphique.dyspo` → télécharger `google-services.json` → placer dans `android/prod/app/`
+- Même écran → application iOS `com.liaisongraphique.dyspo` → télécharger `GoogleService-Info.plist` → placer dans `ios/prod/App/App/`
+- Si ces apps n'existent pas encore côté `dyspo-2bb43`, les créer dans la Console avec les mêmes Bundle ID / Package name que la config Capacitor (`cap-configs/prod/capacitor.config.ts` → `com.liaisongraphique.dyspo`).
+
+**Étape 4 — Activer les services nécessaires sur le projet prod**
+- Authentication → activer Email/Password (et tout autre fournisseur utilisé)
+- Firestore → créer la base en mode production (si pas déjà fait)
+- Storage → créer le bucket
+- Cloud Messaging (FCM) → vérifier la clé serveur / config Android & iOS (certificats push APNs pour iOS — **à uploader dans la Console Firebase**, sans quoi les notifications push ne fonctionneront pas en prod)
+
+**Étape 5 — Corriger l'alias `.firebaserc`**
+```json
+{
+  "projects": {
+    "default": "dyspo-2bb43",
+    "prod": "dyspo-2bb43",
+    "stg": "dyspo-test"
+  }
+}
+```
+(remplace l'alias `dyspo-stg` mort par le vrai projet de staging utilisé par l'app)
+
+**Étape 6 — Build et test de bout en bout sur prod avant soumission**
+```bash
+npm run web-prod      # valide le build web pointé prod
+npm run android-prod  # sync Capacitor + build natif Android
+npm run ios-prod       # sync Capacitor + build natif iOS
+```
+Tester sur device réel : inscription, création d'événement multi-participants (déclenche l'index du §Étape 2), upload avatar/photo chat (déclenche les nouvelles règles Storage), notification push.
+
+**Étape 7 — Nettoyage avant publication**
+- Exécuter `seed-test-data.js` **uniquement** sur `dyspo-test`, jamais sur prod — ce script crée des comptes de démonstration pour les reviewers Apple/Google ; si un compte reviewer est nécessaire en prod, créer un compte réel dédié (`reviewer@dyspo.app`) directement via l'app, pas via le script admin.
+- Retirer la permission `WRITE_CONTACTS` du `AndroidManifest.xml` prod (non utilisée).
+- Ajouter le fichier `PrivacyInfo.xcprivacy` (cf. §12.5).
+
+### 12.5 Plan de publication — App Store (iOS) et Google Play (Android)
+
+**A. Pré-requis communs**
+- [ ] Bumper `versionCode` (Android) et `CURRENT_PROJECT_VERSION` (iOS build number) au-dessus de la version actuellement live
+- [ ] Ajouter `PrivacyInfo.xcprivacy` dans `ios/prod/App/App/` déclarant les "Required Reason APIs" utilisées (UserDefaults via Capacitor Preferences, File timestamp via Filesystem/Camera) — généré automatiquement par `npx @capacitor/assets` n'inclut pas ce fichier, il doit être ajouté manuellement ou via un plugin (`cordova-plugin-ios-privacy-manifest` ou ajout manuel dans Xcode)
+- [ ] Vérifier que la fiche stores (description, captures d'écran, politique de confidentialité publique `https://www.dyspo.app/charte-vie-privee.html`) est accessible et à jour
+- [ ] Lien CGU/vie privée accessible depuis l'app (déjà présent dans `environment.prod.ts` via `cgu_url`/`privacy_url` — vérifier qu'il est bien affiché dans `parametres.page.html`, cf. §9 audit initial)
+
+**B. Google Play (Android)**
+1. `npm run android-prod` → ouvre Android Studio via `ionic cap sync android -c production`
+2. Android Studio → Build → Generate Signed Bundle/APK → **Android App Bundle (.aab)** (format obligatoire Play Store)
+3. Signer avec le keystore de production (géré hors-repo — aucun `.jks` trouvé dans le repo, bon réflexe ; vérifier qu'il est sauvegardé en lieu sûr, sa perte empêche toute mise à jour future de l'app)
+4. Play Console → Production (ou track "Internal testing" en premier passage) → uploader le `.aab`
+5. Renseigner/valider : Formulaire de sécurité des données (Data Safety), classification du contenu, permissions déclarées (retirer `WRITE_CONTACTS`), politique de confidentialité
+6. Soumettre à review (délai habituel : quelques heures à 2-3 jours)
+
+**C. App Store (iOS)**
+1. `npm run ios-prod` → ouvre Xcode via `ionic cap sync ios -c production`
+2. Xcode → vérifier signature (Automatically manage signing avec le compte développeur Apple lié à `com.liaisongraphique.dyspo`)
+3. Ajouter le fichier `PrivacyInfo.xcprivacy` au target App (cf. A.)
+4. Product → Archive → Distribute App → App Store Connect
+5. App Store Connect → renseigner la fiche "Confidentialité de l'app" (Nutrition Label : quelles données sont collectées — email, téléphone, photos, contacts — et à quelles fins), captures d'écran, mots-clés
+6. Soumettre à review (délai habituel : 24h-48h, parfois plus au premier passage)
+
+**D. Ordre conseillé**
+1. Corriger les 3 blocages techniques du §12.3 (PrivacyInfo, fichiers Firebase, index Firestore)
+2. Exécuter le plan de migration §12.4 en entier sur `dyspo-2bb43`
+3. Tester en conditions réelles sur device avec build `*-prod`
+4. Soumettre Android en premier (review plus rapide, permet de valider le pipeline) puis iOS
+
+### 12.6 Synthèse priorisée (cumulée avec l'audit du 07/05)
+
+| Priorité | Item | Bloquant publication ? |
+|---|---|---|
+| 1 | Ajouter `PrivacyInfo.xcprivacy` (iOS) | Oui |
+| 2 | Récupérer `google-services.json` / `GoogleService-Info.plist` pour `dyspo-2bb43` | Oui |
+| 3 | Créer l'index composite Firestore manquant sur `dyspo-2bb43` | Oui (silencieux — bug en prod sinon) |
+| 4 | Corriger `.firebaserc` (alias stg fantôme) | Non, mais piège opérationnel |
+| 5 | Bumper version/build number Android+iOS | Oui |
+| 6 | Retirer permission `WRITE_CONTACTS` inutilisée | Non, mais ralentit la review |
+| 7 | Paralléliser les requêtes N+1 dans `agenda-event-info.component.ts` (cf. §5 audit initial) | Non, mais impacte fortement les premières reviews utilisateurs |
+| 8 | Liens CGU/vie privée visibles dans les paramètres (cf. §9 audit initial) | Oui (exigence stores) |
+| 9 | `npm audit fix` (sans --force) sur les devDependencies de build | Non |
+
+---
+
+*Mise à jour réalisée avec Claude Code (Anthropic) — session 2026-05-12. Revue de sécurité effectuée via le skill `security-review` (2 passes, 0 finding ≥8/10 confiance).*

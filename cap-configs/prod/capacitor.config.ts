@@ -14,6 +14,11 @@ const config: CapacitorConfig = {
       presentationOptions: ['sound'],
     },
 
+    FirebaseAuthentication: {
+      skipNativeAuth: false,
+      providers: ['google.com'],
+    },
+
     SplashScreen: {
       launchShowDuration: 5000,
       launchAutoHide: true,
@@ -23,11 +28,11 @@ const config: CapacitorConfig = {
   ios: {
     path: 'ios/prod',
     appendUserAgent: 'ios:application',
-    webContentsDebuggingEnabled: true,
+    webContentsDebuggingEnabled: false,
   },
   android: {
     path: 'android/prod',
-    webContentsDebuggingEnabled: true,
+    webContentsDebuggingEnabled: false,
   },
 };
 
