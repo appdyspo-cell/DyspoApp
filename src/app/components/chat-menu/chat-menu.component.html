@@ -1,17 +1,20 @@
 <ion-content>
-  <ion-list>
-    <ion-item *ngIf="can_quit" (click)="quitEvent()" lines="none">
+  <ion-list lines="none">
+    <ion-item *ngIf="can_quit" (click)="quitEvent()">
       <ion-text>Quitter l'événement</ion-text>
     </ion-item>
-    <ion-item (click)="toggleNotifications()" lines="none">
+    <ion-item (click)="toggleNotifications()">
       <ion-text>{{
         my_chatroom.isNotifications
           ? "Désactiver les notifications"
           : "Activer les notifications"
       }}</ion-text>
     </ion-item>
-    <ion-item (click)="requestReport()" lines="none">
+    <ion-item (click)="requestReport()">
       <ion-text>Signaler le groupe</ion-text>
+    </ion-item>
+    <ion-item (click)="quitChat()">
+      <ion-text color="danger">Quitter le chat</ion-text>
     </ion-item>
   </ion-list>
 </ion-content>

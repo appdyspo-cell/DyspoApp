@@ -239,7 +239,7 @@ export class CalendarService {
           endOffsetIndex < days.length + (endOffsetIndex % 7);
           endOffsetIndex++
         ) {
-          if (days[endOffsetIndex - 1].time) {
+          if (days[endOffsetIndex - 1]?.time) {
             const dayAfter = moment(days[endOffsetIndex - 1].time)
               .clone()
               .add(1, 'd');

@@ -537,6 +537,7 @@ ion-popover {
 .thumb-event-kids   { border: 3px solid var(--d-dyspo-kids); }
 .thumb-event-nokids { border: 3px solid var(--d-dyspo); }
 .thumb-event-free   { border: 3px solid var(--d-free); }
+.thumb-event-solo   { border: 3px solid var(--d-no-dyspo); }
 
 .bg-nokids   { --background: var(--d-dyspo);      color: var(--d-text-primary); }
 .bg-kids     { --background: var(--d-dyspo-kids);  color: #fff; }
@@ -818,5 +819,24 @@ ion-app[dir="rtl"] {
     color: var(--d-text-tertiary);
     max-width: 240px;
     line-height: 1.5;
+  }
+}
+
+// ── Chat menu popover : largeur ajustée au contenu ──────────────
+.chat-menu-popover {
+  --width: fit-content;
+  --min-width: 210px;
+  --max-width: 280px;
+
+  ion-list {
+    padding: 4px 0;
+  }
+
+  ion-item {
+    --padding-start: 16px;
+    --padding-end: 20px;
+    --min-height: 44px;
+    font-size: 15px;
+    white-space: nowrap;
   }
 }

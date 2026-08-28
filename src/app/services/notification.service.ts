@@ -8,8 +8,7 @@ import {
   NotifSubject,
 } from '../models/models';
 import { NavigationExtras, Router } from '@angular/router';
-import { httpsCallable } from 'firebase/functions';
-import { Functions } from '@angular/fire/functions';
+import { Functions, httpsCallable } from '@angular/fire/functions';
 
 import {
   Firestore,
@@ -52,67 +51,70 @@ export class NotificationService {
   ) {}
 
   async initListeners() {
-    // BC-05: guard — uid doit être initialisé avant d'enregistrer le token
     if (!this.uid) {
       console.log('NotificationService: uid non défini, initListeners annulé');
       return;
     }
     console.log('NotificationService ---> initListeners');
 
-    const { token } = await FirebaseMessaging.getToken();
+    let token: string | undefined;
+    try {
+      const result = await FirebaseMessaging.getToken();
+      token = result.token;
+    } catch (err) {
+      console.log('ERR NotificationService ---> getToken() failed:', err);
+      return;
+    }
 
     if (!token) {
       console.log('ERR NotificationService ---> getToken() null');
-    } else {
-      this.registerToken(this.uid, token);
-      FirebaseMessaging.addListener(
-        'notificationReceived',
-        (event: NotificationReceivedEvent) => {
-          console.log('notification ' + JSON.stringify(event.notification));
-          this.zone.run(() => {
-            this.notifications.push(event.notification);
-          });
-        }
-      );
-      FirebaseMessaging.addListener(
-        'notificationActionPerformed',
-        (actionPerformed: NotificationActionPerformedEvent) => {
-          try {
-            const data = actionPerformed.notification.data as any;
-            console.log('data ' + JSON.stringify(data));
-
-            const subject: NotifSubject = data['subject'];
-            switch (subject) {
-              case NotifSubject.AGENDA_EVENT:
-                this.openEvent(data['info']);
-                break;
-              case NotifSubject.MESSAGE:
-                this.goToChat(data['info']);
-                break;
-              case NotifSubject.INVITE:
-                this.goToFriends();
-                break;
-            }
-          } catch (err) {}
-        }
-      );
+      return;
     }
+
+    this.registerToken(this.uid, token).catch((err) => console.log('ERR registerToken:', err));
+
+    FirebaseMessaging.addListener(
+      'notificationReceived',
+      (event: NotificationReceivedEvent) => {
+        console.log('notification ' + JSON.stringify(event.notification));
+        this.zone.run(() => {
+          this.notifications.push(event.notification);
+        });
+      }
+    ).catch((err) => console.log('ERR addListener notificationReceived:', err));
+
+    FirebaseMessaging.addListener(
+      'notificationActionPerformed',
+      (actionPerformed: NotificationActionPerformedEvent) => {
+        try {
+          const data = actionPerformed.notification.data as any;
+          console.log('data ' + JSON.stringify(data));
+          const subject: NotifSubject = data['subject'];
+          switch (subject) {
+            case NotifSubject.AGENDA_EVENT:
+              this.openEvent(data['info']);
+              break;
+            case NotifSubject.MESSAGE:
+              this.goToChat(data['info']);
+              break;
+            case NotifSubject.INVITE:
+              this.goToFriends();
+              break;
+          }
+        } catch (err) {}
+      }
+    ).catch((err) => console.log('ERR addListener notificationActionPerformed:', err));
   }
 
-  public initService(uid: string) {
+  public async initService(uid: string) {
     this.uid = uid;
-    this.initListeners();
-    FirebaseMessaging.requestPermissions().then((response) => {
-      if (response.receive === 'granted') {
-        // Register with Apple / Google to receive push via APNS/FCM
-        // PushNotifications.register().then((res) => {
-        //   console.log(res);
-        // });
-      } else {
-        // Show some error
-        //alert('Vous avez désactivé les notifications pour cette application');
-      }
-    });
+    // Demander la permission d'abord, puis récupérer le token
+    try {
+      await FirebaseMessaging.requestPermissions();
+    } catch (err) {
+      console.log('ERR NotificationService ---> requestPermissions():', err);
+    }
+    this.initListeners().catch((err) => console.log('ERR initListeners:', err));
   }
 
   public async registerToken(uid: string, token: string) {

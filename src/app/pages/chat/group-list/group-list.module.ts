@@ -8,7 +8,6 @@ import { IonicModule } from '@ionic/angular';
 import { GroupListPageRoutingModule } from './group-list-routing.module';
 
 import { GroupListPage } from './group-list.page';
-import { LazyLoadImageModule } from 'ng-lazyload-image';
 
 @NgModule({
   imports: [
@@ -16,7 +15,6 @@ import { LazyLoadImageModule } from 'ng-lazyload-image';
     FormsModule,
     IonicModule,
     TranslateModule,
-    LazyLoadImageModule,
     GroupListPageRoutingModule,
   ],
   declarations: [GroupListPage],

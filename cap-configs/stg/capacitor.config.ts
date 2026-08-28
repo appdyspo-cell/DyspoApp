@@ -11,7 +11,7 @@ const config: CapacitorConfig = {
   },
   plugins: {
     FirebaseMessaging: {
-      presentationOptions: ['sound'],
+      presentationOptions: ['badge', 'sound', 'alert'],
     },
 
     FirebaseAuthentication: {
@@ -20,8 +20,8 @@ const config: CapacitorConfig = {
     },
 
     SplashScreen: {
-      launchShowDuration: 5000,
-      launchAutoHide: false,
+      launchShowDuration: 0,
+      launchAutoHide: true,
     },
   },
   ios: {

@@ -17,7 +17,21 @@ npm run android-prod       # Production → Android
 npm run android-stg        # Staging → Android
 npm run web-prod           # Production → ionic serve
 npm run web-stg            # Staging → ionic serve
+
+# npm install requires --legacy-peer-deps due to @angular-eslint/schematics peer conflict
+npm install --legacy-peer-deps
+npm uninstall <pkg> --legacy-peer-deps
 ```
+
+## Android Release Builds
+
+The signed AAB must be generated from Android Studio (not CLI) — the keystore is at `D:\DYSPO\keystores\dyspo-upload-key.jks`, alias `dyspo-upload`. Workflow:
+1. Bump `versionCode` and `versionName` in `android/prod/app/build.gradle`
+2. Run `npm run android-prod` to build web assets and sync
+3. Android Studio → `android/prod/` → **Build > Generate Signed Bundle** → release variant
+4. Upload `android/prod/app/release/app-release.aab` to Play Console
+
+Current versionCode: **51** (v1.3.1). Always check Play Console for the last used versionCode before bumping — Play Console rejects codes already submitted even if unpublished.
 
 ## Architecture
 
@@ -39,7 +53,8 @@ All services use `providedIn: 'root'` and are initialized after login via `initS
 | `AgendaService` | Event CRUD, recurrence, Dyspo status, invite logic |
 | `ChatService` | Group chat, messages Firestore (`agenda_events/{uid}/messages_list`), pagination |
 | `NotificationService` | FCM, local notifications, notification routing |
-| `MediaService` | Camera/gallery, Firebase Storage uploads |
+| `MediaService` | Camera/gallery, Firebase Storage uploads. `saveToGallery()` uses `Filesystem` (write to cache) + `Share` (system share sheet) — **not** `@capacitor-community/media` (removed, see constraints) |
+| `CalendarService` | Export events to Google Calendar (URL) or ICS file; includes event description, location, and `dyspo://event/<uid>` deep link |
 | `UtilsService` | Toast/Alert/Loading UI, Firebase error → French message mapping |
 | `LoggerService` | Debug logging, error submission to Firestore |
 
@@ -75,11 +90,32 @@ Several queries require composite indexes created manually in each Firebase proj
 - `agenda_events`: `members_uid` (Arrays) + `start_date_ts` (Ascending) — used by the friends-selector participant availability check
 - When an index is missing, Firebase logs an error with a direct Console link to create it
 
+## Deep Links (`dyspo://event/<uid>`)
+
+The `dyspo://` custom URL scheme lets external links open the app at a specific event. Registration:
+- **Android**: intent filter in `android/prod/app/src/main/AndroidManifest.xml` and `android/stg/...`
+- **iOS**: `CFBundleURLTypes` entry in `ios/prod/App/App/Info.plist` and `ios/stg/...`
+
+Runtime flow: `app.component.ts` registers `App.addListener('appUrlOpen', ...)` which parses the UID and stores it in `AgendaService.pendingDeepLinkEventUid`. `agenda.page.ts:ionViewWillEnter()` calls `handlePendingDeepLink()` which reads and clears the pending UID, then opens the matching event modal.
+
+Cold-start limitation: if the app was not running when the link was tapped, `agendaEvents` may not yet be populated from Firestore when `ionViewWillEnter` fires — the modal won't open, but the user lands on the agenda page.
+
+## Safe Area (Android 15 Edge-to-Edge)
+
+Android 15 enforces edge-to-edge display. Use `env(safe-area-inset-bottom)` at the **footer/container level**, not on individual toolbar paddings. The global rules in `src/global.scss` cover standard `ion-toolbar` / `ion-tab-bar` / `ion-content` cases. Per-component fixes are needed for:
+- Custom footers without `ion-toolbar` child — add `padding-bottom: env(safe-area-inset-bottom)` to the footer container
+- Chat input: handled on `.wa-footer` background container, not `ion-toolbar --padding-bottom`
+- Non-standard footer padding: use `max(Xpx, env(safe-area-inset-bottom))` to keep a minimum padding
+
 ## Important Constraints
 
 - **Recurrence** is capped at 1 year maximum to limit Firestore writes (enforced in `AgendaService.saveOrUpdateEvent`).
 - **Dyspo batch writes** split at 490 operations per batch (Firestore hard limit is 500).
 - **Firestore `added` vs `modified`**: when a user accepts an event invitation, their UID moves from `members_invited_uid` to `members_uid`, so the event appears as `added` (not `modified`) in the `queryAgendaEvents` listener. The `acceptEventInvitation()` method also immediately pushes the event to the local `agendaEvents` array before Firestore responds, so the calendar updates without waiting for the snapshot.
+- **`@capacitor-community/media` is removed** — Google Play rejected the app because `READ_MEDIA_IMAGES`/`READ_MEDIA_VIDEO` permissions were flagged as not core to the app's purpose. The plugin also cannot be stripped via `tools:node="remove"` in the manifest (Play's APK analyzer scans embedded AAR manifests). Do not re-add this plugin. Use `@capacitor/filesystem` + `@capacitor/share` for saving images instead.
+- **`proguard-android.txt` is no longer supported** by Android Gradle Plugin 8+. Always use `getDefaultProguardFile('proguard-android-optimize.txt')` in `build.gradle` files. A `postinstall` script (`scripts/fix-proguard.js`) patches Capacitor plugin `build.gradle` files in `node_modules` automatically — re-run `npm install` or `node scripts/fix-proguard.js` if adding new Android plugins.
+- **`Contacts.requestPermissions()`** must always be wrapped in a `platform.is('ios') || platform.is('android')` check before calling — the Capacitor web implementation throws `Not implemented on web` which propagates to Angular's error handler even inside try/catch via Zone.js.
+- **`@angular/fire` v20 injection context warnings** — Firebase APIs (`getDoc`, `onSnapshot`, etc.) called inside Firestore snapshot callbacks run outside Angular's injection context. These appear as `console.warn` in `angular-fire.mjs`. They don't crash the app but indicate calls should be wrapped with `runInInjectionContext` or moved to service constructors. This is a known systemic issue — do not silence the warnings by patching `angular-fire.mjs`.
 
 ## i18n
 

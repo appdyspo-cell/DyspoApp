@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Politique de confidentialité — Dyspo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+
+  <style>
+    /* ── Tokens ──────────────────────────────────────────── */
+    :root {
+      --bg:         #F6F8FB;
+      --surface:    #FFFFFF;
+      --text:       #1A2332;
+      --text2:      #52637A;
+      --accent:     #48A1C3;
+      --accent-dim: #EBF5FA;
+      --border:     #DDE5EE;
+      --stripe:     #F3F7FA;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg:         #0F1922;
+        --surface:    #192840;
+        --text:       #E4EBF3;
+        --text2:      #7A94AA;
+        --accent:     #5BB5D0;
+        --accent-dim: #182A38;
+        --border:     #263748;
+        --stripe:     #1B3045;
+      }
+    }
+
+    /* ── Reset ───────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+      font-size: 17px;
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Site header ─────────────────────────────────────── */
+    .site-header {
+      background: var(--surface);
+      border-top: 3px solid var(--accent);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+    }
+
+    .logo {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 21px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+      flex-shrink: 0;
+    }
+
+    .header-sep {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      margin: 0 16px;
+      flex-shrink: 0;
+    }
+
+    .header-doc-label {
+      font-size: 13.5px;
+      color: var(--text2);
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    /* ── Document ────────────────────────────────────────── */
+    .doc {
+      max-width: 780px;
+      margin: 52px auto 88px;
+      padding: 0 28px;
+    }
+
+    .doc-header {
+      margin-bottom: 44px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .doc-title {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: clamp(26px, 4vw, 38px);
+      font-weight: 600;
+      line-height: 1.15;
+      color: var(--text);
+      text-wrap: balance;
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+
+    .doc-meta {
+      font-size: 14px;
+      color: var(--text2);
+    }
+
+    .intro {
+      font-size: 17px;
+      line-height: 1.8;
+      margin-bottom: 44px;
+      max-width: 66ch;
+    }
+
+    /* ── Sections ────────────────────────────────────────── */
+    .doc section { margin-bottom: 44px; }
+
+    .doc h2 {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 19px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 14px;
+      padding-left: 18px;
+      position: relative;
+      text-wrap: balance;
+      line-height: 1.3;
+    }
+
+    .doc h2::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 3px;
+      bottom: 3px;
+      width: 3px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    .doc p { max-width: 66ch; margin-bottom: 14px; }
+    .doc p:last-child { margin-bottom: 0; }
+
+    .doc ul {
+      padding-left: 1.5em;
+      max-width: 66ch;
+      margin-bottom: 14px;
+    }
+
+    .doc li { margin-bottom: 7px; }
+
+    /* ── Table ───────────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-top: 14px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+      font-family: 'Source Serif 4', Georgia, serif;
+      line-height: 1.6;
+    }
+
+    .data-table thead th {
+      background: var(--accent-dim);
+      color: var(--text);
+      font-weight: 600;
+      text-align: left;
+      padding: 10px 16px;
+      font-size: 12px;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .data-table td {
+      padding: 11px 16px;
+      vertical-align: top;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .data-table tbody tr:last-child td { border-bottom: none; }
+    .data-table tbody tr:nth-child(even) td { background: var(--stripe); }
+
+    .data-table td:first-child {
+      font-weight: 600;
+      white-space: nowrap;
+      width: 155px;
+    }
+
+    /* ── Contact block ───────────────────────────────────── */
+    .contact-block {
+      background: var(--accent-dim);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 6px;
+      padding: 16px 20px;
+      font-size: 15.5px;
+      max-width: 66ch;
+    }
+
+    a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+    a:hover { opacity: 0.8; }
+    a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    .site-footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 20px 32px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.7;
+    }
+
+    .site-footer a { color: var(--accent); }
+
+    /* ── Responsive ──────────────────────────────────────── */
+    @media (max-width: 520px) {
+      .doc { padding: 0 18px; margin-top: 36px; }
+      .site-header { padding: 12px 18px; }
+      .data-table td:first-child { white-space: normal; width: auto; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <span class="logo">dyspo!</span>
+  <span class="header-sep" aria-hidden="true"></span>
+  <span class="header-doc-label">Politique de confidentialité</span>
+</header>
+
+<main>
+  <article class="doc">
+
+    <div class="doc-header">
+      <h1 class="doc-title">Politique de confidentialité</h1>
+      <p class="doc-meta">Dernière mise à jour : 12 mai 2026</p>
+    </div>
+
+    <p class="intro">
+      La présente politique décrit comment <strong>SAS DYSPO</strong> (42 rue Falque, 13006 Marseille — SIREN 894&nbsp;833&nbsp;326), responsable du traitement, collecte, utilise et protège les données personnelles des Utilisateurs de l'application Dyspo, conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés.
+    </p>
+
+    <section>
+      <h2>1. Données que nous collectons</h2>
+      <p>Selon votre usage de l'Application, nous collectons les catégories suivantes :</p>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Catégorie</th><th>Détail</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Identité</td><td>Prénom, nom, adresse email, numéro de téléphone, photo de profil</td></tr>
+            <tr><td>Profil</td><td>Zone géographique scolaire (indicative, pas de géolocalisation GPS), indication « avec enfants »</td></tr>
+            <tr><td>Vie familiale</td><td>Planning de garde partagée (jours de garde sur un cycle de deux semaines), si renseigné</td></tr>
+            <tr><td>Disponibilités</td><td>Statut Dyspo quotidien (disponible / disponible avec enfant(s) / non disponible / non renseigné)</td></tr>
+            <tr><td>Réseau social</td><td>Liste d'amis, demandes d'ami envoyées/reçues, groupes d'amis</td></tr>
+            <tr><td>Contenu généré</td><td>Événements créés (titre, lieu, dates, participants), messages échangés dans le chat, photos partagées, réactions</td></tr>
+            <tr><td>Contacts</td><td>Lus localement sur votre appareil, avec votre autorisation, uniquement pour suggérer des amis déjà inscrits (comparaison par numéro de téléphone). Vos contacts ne sont jamais transmis ni stockés sur nos serveurs.</td></tr>
+            <tr><td>Données techniques</td><td>Jeton de notification push, journaux techniques en cas d'erreur (pour le diagnostic)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>2. Pourquoi nous collectons ces données</h2>
+      <ul>
+        <li>Fournir les fonctionnalités de l'Application : calendrier, statut Dyspo, événements partagés, planning de garde, messagerie de groupe ;</li>
+        <li>Vous permettre de retrouver vos amis déjà inscrits et de gérer vos relations sur l'Application ;</li>
+        <li>Vous envoyer des notifications relatives à votre activité (invitations, messages, demandes d'ami) ;</li>
+        <li>Assurer la sécurité de votre compte et prévenir les usages frauduleux ou abusifs ;</li>
+        <li>Diagnostiquer et corriger les anomalies techniques.</li>
+      </ul>
+      <p>
+        Le traitement repose sur l'exécution du contrat conclu lors de la création de votre compte (CGU), ainsi que, pour l'accès à vos contacts et l'envoi de notifications, sur votre consentement explicite recueilli au sein de l'Application.
+      </p>
+    </section>
+
+    <section>
+      <h2>3. Qui a accès à vos données</h2>
+      <p>
+        Les informations nécessaires au fonctionnement social de l'Application (nom, photo, statut Dyspo, événements partagés) sont visibles par les autres Membres avec lesquels vous interagissez (amis, participants à un même événement).
+      </p>
+      <p>Nous ne vendons jamais vos données à des tiers et ne les utilisons pas à des fins de publicité ciblée.</p>
+      <p>
+        Vos données sont hébergées par <strong>Google Ireland Limited</strong> (services Firebase / Google Cloud Platform), sous-traitant au sens du RGPD. Ce prestataire peut traiter des données hors de l'Union européenne, dans le cadre des clauses contractuelles types approuvées par la Commission européenne, garantissant un niveau de protection adéquat.
+      </p>
+    </section>
+
+    <section>
+      <h2>4. Durée de conservation</h2>
+      <p>
+        Vos données sont conservées tant que votre compte est actif. En cas de suppression du compte, vos données ne sont plus accessibles aux autres Utilisateurs ni utilisées pour fournir le service. Vous pouvez à tout moment demander l'effacement complet et définitif de vos données en écrivant à l'adresse de contact ci-dessous ; cette demande sera traitée dans les délais prévus par le RGPD.
+      </p>
+    </section>
+
+    <section>
+      <h2>5. Sécurité de vos données</h2>
+      <p>
+        L'accès à vos données est protégé par une authentification sécurisée et des règles d'accès strictes : chaque Utilisateur ne peut consulter ou modifier que les données dont il est propriétaire, ou celles explicitement partagées avec lui dans le cadre d'un événement ou d'une relation d'amitié. Les échanges entre l'Application et nos serveurs sont chiffrés (HTTPS).
+      </p>
+    </section>
+
+    <section>
+      <h2>6. Cookies et traceurs</h2>
+      <p>
+        L'Application n'utilise pas de cookies publicitaires ou de traceurs tiers à des fins de suivi. Certaines informations techniques (jeton de connexion, préférences d'affichage) sont conservées localement sur votre appareil afin d'assurer le bon fonctionnement de l'Application entre deux utilisations.
+      </p>
+    </section>
+
+    <section>
+      <h2>7. Vos droits</h2>
+      <p>
+        Conformément au RGPD, vous disposez des droits suivants sur vos données personnelles : droit d'accès, de rectification, d'effacement, de limitation du traitement, d'opposition et de portabilité.
+      </p>
+      <p>Pour exercer l'un de ces droits, contactez-nous à l'adresse : <strong>appdyspo&#64;gmail.com</strong></p>
+      <p>
+        Si vous estimez que vos droits ne sont pas respectés, vous pouvez introduire une réclamation auprès de la Commission Nationale de l'Informatique et des Libertés (CNIL) — <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer">www.cnil.fr</a>.
+      </p>
+    </section>
+
+    <section>
+      <h2>8. Mineurs</h2>
+      <p>
+        L'Application n'est pas destinée aux enfants n'ayant pas la capacité juridique de consentir à un traitement de données personnelles sans l'autorisation d'un représentant légal. Si vous êtes mineur, vous devez obtenir l'accord de votre représentant légal avant de créer un compte.
+      </p>
+    </section>
+
+    <section>
+      <h2>9. Modification de cette politique</h2>
+      <p>
+        Cette politique de confidentialité peut être mise à jour pour refléter l'évolution de l'Application ou de la réglementation. La version en vigueur est celle accessible depuis la présente URL. En cas de modification substantielle, vous en serez informé par un moyen approprié.
+      </p>
+    </section>
+
+    <section>
+      <h2>10. Contact</h2>
+      <div class="contact-block">
+        <strong>SAS DYSPO</strong><br>
+        42 rue Falque, 13006 Marseille<br>
+        SIREN 894&nbsp;833&nbsp;326<br>
+        <br>
+        <strong>appdyspo&#64;gmail.com</strong>
+      </div>
+    </section>
+
+  </article>
+</main>
+
+<footer class="site-footer">
+  SAS DYSPO — 42 rue Falque, 13006 Marseille — SIREN 894&nbsp;833&nbsp;326
+  &ensp;·&ensp; Application Dyspo
+</footer>
+
+</body>
+</html>

@@ -9,8 +9,8 @@ import {
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { UtilsService } from './utils.service';
 import { ActionSheetController } from '@ionic/angular';
-import { Media, MediaSaveOptions } from '@capacitor-community/media';
-import { Capacitor } from '@capacitor/core';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 
 export interface TakePhotoOptions {
   filename: string;
@@ -31,8 +31,6 @@ export class MediaService {
     private utils: UtilsService,
     private actionSheetController: ActionSheetController
   ) {}
-
-  MEDIA_ALBUM = 'Dyspo!';
 
   async takePhotoPrompt(
     options: TakePhotoOptions
@@ -115,7 +113,10 @@ export class MediaService {
         const path = `${opt.firebasePath}${opt.filename}`;
         const fileRef = ref(this.storage, path);
 
-        await uploadString(fileRef, captureDataUrl, StringFormat.BASE64);
+        // contentType explicite requis pour que la règle Storage (image/.*) passe
+        await uploadString(fileRef, captureDataUrl, StringFormat.BASE64, {
+          contentType: 'image/jpeg',
+        });
         const fpath = await getDownloadURL(fileRef);
         this.utils.hideLoader();
         return { filepath: fpath };
@@ -123,61 +124,39 @@ export class MediaService {
         return { filepath: undefined };
       }
     } catch (error) {
-      // Gérer les erreurs ici, vous pouvez soit les logger ou les gérer en conséquence
       console.error('Pas de photo :', error);
+      this.utils.hideLoader();
+      this.utils.showToastError("Impossible de charger l'image");
       return { filepath: undefined };
     }
   }
 
-  /*Gets the path where album folders and their corresponding photos are stored on the Android filesystem. 
-  This can be used to identify your album by more than just its name on Android, in case there are multiple albums with the same name,
-  which is possible on Android.
-  Just compare the albums path to the start of the album identifier when getting albums.
-  */
-  ensureDyspoAlbum = async () => {
-    let dyspoAlbum = await this.findDyspoAlbum();
-    if (!dyspoAlbum) {
-      console.log('Album not found... Create it...');
-      await Media.createAlbum({ name: this.MEDIA_ALBUM });
-      console.log('Album created');
-      dyspoAlbum = await this.findDyspoAlbum();
-      if (!dyspoAlbum) {
-        throw new Error('CAN_NOT_CREATE_ALBUM');
-      } else {
-        console.log('Album found ', dyspoAlbum.identifier);
-        return dyspoAlbum.identifier;
-      }
-    } else {
-      console.log('Album found ', dyspoAlbum.identifier);
-      return dyspoAlbum.identifier;
-    }
-  };
-
-  async findDyspoAlbum() {
-    const { albums } = await Media.getAlbums();
-
-    let dyspoAlbum = undefined;
-    if (Capacitor.getPlatform() === 'android') {
-      const albumsPath = (await Media.getAlbumsPath()).path;
-      dyspoAlbum = albums.find(
-        (a) =>
-          a.name === this.MEDIA_ALBUM && a.identifier.startsWith(albumsPath)
-      );
-    } else {
-      dyspoAlbum = albums.find((a) => a.name === this.MEDIA_ALBUM);
-    }
-
-    return dyspoAlbum;
-  }
-
   async saveToGallery(url: string) {
-    let opts: MediaSaveOptions = {
-      path: url,
-      albumIdentifier: await this.ensureDyspoAlbum(),
-    };
-    console.log('Save To Media Album');
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const base64 = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
 
-    await Media.savePhoto(opts);
+    const filename = `dyspo_${Date.now()}.jpg`;
+    await Filesystem.writeFile({
+      path: filename,
+      data: base64,
+      directory: Directory.Cache,
+    });
+
+    const { uri } = await Filesystem.getUri({
+      path: filename,
+      directory: Directory.Cache,
+    });
+
+    await Share.share({
+      title: 'Enregistrer la photo',
+      files: [uri],
+    });
   }
 
 }

@@ -74,9 +74,8 @@ export class LoginPage implements OnInit {
       this.authService
         .resetPw(email)
         .then(() => {
-          console.log('Un email');
           this.utils.showToastSuccess(
-            'Un email vous a été envoyé pour réinitialiser votre mot de passe'
+            `Email envoyé à ${email} — vérifie aussi tes spams`
           );
         })
         .catch((err: any) => {

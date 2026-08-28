@@ -82,7 +82,8 @@ export class AgendaEventInfoComponent implements OnInit {
     private utils: UtilsService,
     private navCtrl: NavController,
     private friendsSvc: FriendsService,
-    private calendarSvc: CalendarService
+    private calendarSvc: CalendarService,
+    private ngZone: NgZone
   ) {
     this.members_loaded = false;
   }
@@ -150,40 +151,31 @@ export class AgendaEventInfoComponent implements OnInit {
           locale: fr,
         });
     }
-    // Get members info
-    console.log('agenda ev', this.agendaEvent);
-    this.members_presence_not_confirmed = await this.userSvc.getUserInfos(
-      this.agendaEvent!.members_invited_uid
-    );
+    // ── Récupération des listes de membres (hors zone, OK pour les requêtes) ──
+    const [notConfirmed, confirmed] = await Promise.all([
+      this.userSvc.getUserInfos(this.agendaEvent!.members_invited_uid),
+      this.userSvc.getUserInfos(this.agendaEvent!.members_uid),
+    ]);
 
-    this.members_presence_confirmed = await this.userSvc.getUserInfos(
-      this.agendaEvent!.members_uid
-    );
+    // ── Phase 1 : afficher la liste des membres immédiatement dans la zone ──
+    // @angular/fire v20 exécute getDocs() hors de la zone Angular.
+    // Sur iOS (WKWebView), Angular ne détecte pas les changements sans ngZone.run().
+    this.ngZone.run(() => {
+      this.members_presence_not_confirmed = notConfirmed;
+      this.members_presence_confirmed = confirmed;
+      this.members_loaded = true;
 
-    this.members_loaded = true;
+      // New Admin candidates
+      if (this.agendaEvent.admin_uid === this.userSvc.userInfo?.uid) {
+        this.admin = confirmed.find(m => m.uid === this.agendaEvent.admin_uid);
+        this.new_admin_candidates = confirmed.filter(m => m.uid !== this.userSvc.userInfo?.uid);
+      } else {
+        this.admin = confirmed.find(m => m.uid === this.agendaEvent.admin_uid);
+      }
+    });
 
-    // New Admin candidates
-    if (this.agendaEvent.admin_uid === this.userSvc.userInfo?.uid) {
-      //this.admin = this.userSvc.userInfo;
-
-      this.admin = this.members_presence_confirmed.filter(
-        (member) => member.uid === this.agendaEvent.admin_uid
-      )[0];
-      this.new_admin_candidates = this.members_presence_confirmed.filter(
-        (m) => {
-          return m.uid !== this.userSvc.userInfo?.uid;
-        }
-      );
-    } else {
-      this.admin = this.members_presence_confirmed.filter(
-        (member) => member.uid === this.agendaEvent.admin_uid
-      )[0];
-    }
-
-    // Get dyspos
-    const allMembers = this.members_presence_confirmed.concat(
-      this.members_presence_not_confirmed
-    );
+    // ── Requêtes dyspos / événements par membre (hors zone, OK) ────────────
+    const allMembers = confirmed.concat(notConfirmed);
 
     // Paralléliser les requêtes par membre (au lieu d'un for...of séquentiel)
     await Promise.all(
@@ -235,12 +227,20 @@ export class AgendaEventInfoComponent implements OnInit {
               break;
             case UserDyspoStatus.UNDEFINED:
               this.my_dyspoStatus_label =
-                'Vous n’avez pas indiqué si vous êtes disponible à cette date';
+                "Vous n’avez pas indiqué si vous êtes disponible à cette date";
               break;
           }
         }
       })
     );
+
+    // ── Phase 2 : forcer le re-rendu avec les statuts dyspo/événements ──────
+    // Les propriétés des membres ont été mutées en place hors zone —
+    // on spread les tableaux pour qu’Angular détecte les changements sur iOS.
+    this.ngZone.run(() => {
+      this.members_presence_confirmed = [...this.members_presence_confirmed];
+      this.members_presence_not_confirmed = [...this.members_presence_not_confirmed];
+    });
   }
 
   openPopoverMenu(e: Event) {

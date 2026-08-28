@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActionSheetController, ModalController } from '@ionic/angular';
 import { Preferences } from '@capacitor/preferences';
 import { AppUser, ShowHelper } from 'src/app/models/models';
 import { AuthService } from 'src/app/services/auth.service';
+import { AgendaService } from 'src/app/services/agenda.service';
 import { HelperComponent } from 'src/app/components/helper/helper.component';
 import { environment } from 'src/environments/environment';
 
@@ -51,6 +52,11 @@ export class ProfilePage implements OnInit {
   pendingAvatarPreview: string | undefined;
   private avatarConfirmResolver?: (confirmed: boolean) => void;
 
+  // Valeurs de référence pour ne recalculer le calendrier que si le planning change
+  private originalWithKids = false;
+  private originalCustodyDays: boolean[] = new Array(14).fill(false);
+  private custodySettingsLoaded = false;
+
   readonly maskPredicate: MaskitoElementPredicateAsync = async (el) =>
     (el as HTMLIonInputElement).getInputElement();
   readonly phoneMask: MaskitoOptions = {
@@ -76,13 +82,15 @@ export class ProfilePage implements OnInit {
     public actionSheetController: ActionSheetController,
     public storage: Storage,
     private authSvc: AuthService,
+    private agendaSvc: AgendaService,
     public router: Router,
     public userSvc: UserService,
     private utils: UtilsService,
     private logger: LoggerService,
     private mediaSvc: MediaService,
     private notificationsSvc: NotificationService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private cdr: ChangeDetectorRef
   ) {}
 
   async ngOnInit() {
@@ -93,6 +101,15 @@ export class ProfilePage implements OnInit {
       this.originalEmail = this.user.email;
       if (user.custody_schedule?.length === 14) {
         this.custodyDays = [...user.custody_schedule];
+      }
+      // Mémoriser le planning initial une seule fois (premier chargement),
+      // pour détecter si le planning change réellement lors de la sauvegarde.
+      if (!this.custodySettingsLoaded) {
+        this.originalWithKids = user.with_kids ?? false;
+        this.originalCustodyDays = user.custody_schedule?.length === 14
+          ? [...user.custody_schedule]
+          : new Array(14).fill(false);
+        this.custodySettingsLoaded = true;
       }
       console.log('user subscription profile page', user);
     });
@@ -116,22 +133,20 @@ export class ProfilePage implements OnInit {
   }
 
   async resetPw() {
-    const email = await this.utils.promptEmail({
-      title: 'Entrez votre email',
-      placeholder: 'Entrez votre email',
-    });
-    if (email) {
-      this.authSvc
-        .resetPw(email)
-        .then(() => {
-          console.log('Un email');
-          this.utils.showToastSuccess(
-            'Un email vous a été envoyé pour réinitialiser votre mot de passe'
-          );
-        })
-        .catch((err: any) => {
-          this.utils.showFirebaseError(err);
-        });
+    // L'utilisateur est déjà connecté : on utilise son email directement
+    // pour éviter les fautes de frappe et lui indiquer clairement où chercher.
+    const email = this.user.email || this.userSvc.userInfo?.email;
+    if (!email) {
+      this.utils.showToastError('Email introuvable. Veuillez contacter le support.');
+      return;
+    }
+    try {
+      await this.authSvc.resetPw(email);
+      this.utils.showToastSuccess(
+        `Email envoyé à ${email} — vérifie aussi tes spams`
+      );
+    } catch (err: any) {
+      this.utils.showFirebaseError(err);
     }
   }
 
@@ -216,14 +231,36 @@ export class ProfilePage implements OnInit {
       if (this.user.with_kids) {
         this.user.custody_schedule = [...this.custodyDays];
       }
-      this.userSvc
-        .updateUser(Object.assign({}, this.user))
-        .then(() => {
-          this.utils.showToastSuccess('Les données ont été sauvegardées');
-        })
-        .catch((err) => {
-          this.utils.showToastError(err);
-        });
+      try {
+        await this.utils.showLoader();
+        await this.userSvc.updateUser(Object.assign({}, this.user));
+
+        // Recalculer le calendrier dyspo UNIQUEMENT si le planning a changé :
+        // - basculement avec_enfants ON/OFF, OU
+        // - même bascule ON mais jours de garde modifiés
+        // Évite 365 écritures Firestore inutiles qui font disparaître
+        // temporairement les événements du vue agenda.
+        const withKidsChanged = (this.user.with_kids ?? false) !== this.originalWithKids;
+        const custodyDaysChanged = (this.user.with_kids ?? false) &&
+          this.custodyDays.some((v, i) => v !== this.originalCustodyDays[i]);
+
+        if (withKidsChanged || custodyDaysChanged) {
+          const uid = this.user.uid!;
+          const custodyDays = this.user.with_kids
+            ? [...this.custodyDays]        // Avec enfants → alternance garde/libre
+            : new Array(14).fill(false);   // Sans enfants → tout vert (DYSPO)
+          await this.agendaSvc.applyCustodySchedule(uid, custodyDays);
+          // Mettre à jour les références pour la prochaine sauvegarde
+          this.originalWithKids = this.user.with_kids ?? false;
+          this.originalCustodyDays = [...custodyDays];
+        }
+
+        this.utils.showToastSuccess('Les données ont été sauvegardées');
+      } catch (err: any) {
+        this.utils.showToastError(err);
+      } finally {
+        this.utils.hideLoader();
+      }
     }
   }
 
@@ -248,6 +285,9 @@ export class ProfilePage implements OnInit {
 
   private confirmAvatarPreview(previewDataUrl: string): Promise<boolean> {
     this.pendingAvatarPreview = previewDataUrl;
+    // Capacitor peut résoudre la promesse Camera hors de la zone Angular :
+    // on force la détection de changement pour que *ngIf s'active immédiatement.
+    this.cdr.detectChanges();
     return new Promise<boolean>((resolve) => {
       this.avatarConfirmResolver = resolve;
     });

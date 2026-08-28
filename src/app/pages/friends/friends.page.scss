@@ -64,8 +64,9 @@ ion-segment-button {
 // Badge sur l'onglet Invitations
 .segment-badge {
   position: absolute;
-  top: 4px;
-  right: 8px;
+  top: 8px;
+  left: calc(50% + 8px);
+  right: auto;
   font-size: 10px;
   min-width: 18px;
   height: 18px;

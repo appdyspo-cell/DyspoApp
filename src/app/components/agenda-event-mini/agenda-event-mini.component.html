@@ -31,7 +31,13 @@
   <div style="display: flex; width: auto; align-items: center">
     <ion-thumbnail
       class="event-avatar"
-      style="overflow: hidden; margin-right: 8px; margin-top: 3px"
+      [ngClass]="{
+        'thumb-event-kids':   agendaEvent.type === agendaEventType.KIDS,
+        'thumb-event-nokids': agendaEvent.type === agendaEventType.NOKIDS,
+        'thumb-event-free':   agendaEvent.type === agendaEventType.FREE,
+        'thumb-event-solo':   agendaEvent.type === agendaEventType.SOLO
+      }"
+      style="overflow: hidden; margin-right: 8px; margin-top: 3px; --border-radius: 50%"
     >
       <img src="{{ agendaEvent.avatar }}" />
     </ion-thumbnail>

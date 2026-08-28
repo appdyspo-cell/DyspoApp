@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, NgZone, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import {
   ActionSheetController,
@@ -23,7 +23,7 @@ import {
   CalendarDay,
   CalendarMonth,
 } from 'src/app/calendar';
-import { CalendarMode } from 'src/app/components/calendar';
+type CalendarMode = 'day' | 'month' | 'week';
 import {
   AgendaDyspoItem,
   AgendaEvent,
@@ -73,6 +73,7 @@ export class AgendaPage implements AfterViewInit {
   eventsForDate: AgendaEvent[] = [];
   selectedDate: any;
   calendarEventDates: Set<string> = new Set();
+  calendarCommonEventDates: Set<string> = new Set();  // événements partagés → bulle rose
 
   agendaEvents$: Observable<AgendaEvent[]> | undefined;
   agendaEvents: AgendaEvent[] = [];
@@ -113,7 +114,8 @@ export class AgendaPage implements AfterViewInit {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     public userSvc: UserService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
   ) {
     this.userSubscription = this.userSvc.appUserInfoObs$.subscribe((user) => {
       this.my_info = user;
@@ -126,11 +128,15 @@ export class AgendaPage implements AfterViewInit {
         this.agendaEvents$ = this.agendaSvc.agendaEvents$;
         this.agendaEventsSubscription = this.agendaSvc.agendaEvents$.subscribe(
           (agendaEvents: AgendaEvent[]) => {
-            console.log('Ag events', agendaEvents);
-            this.agendaEvents = agendaEvents;
-            this.buildCalendarEventDates();
-            this.tagCalendarEventsDataForMonth();
-            this.cdr.detectChanges();
+            // onSnapshot Firebase s'exécute hors de la zone Angular (@angular/fire v20).
+            // NgZone.run() garantit que les mises à jour déclenchent bien le cycle CD
+            // et que la chaîne AgendaPage → CalendarComponent → MonthComponent se met à jour.
+            this.ngZone.run(() => {
+              console.log('Ag events', agendaEvents.length, 'events, dates:', agendaEvents.slice(0,2).map(e => e.ref_start_ISO?.substring(0,10)));
+              this.agendaEvents = agendaEvents;
+              this.buildCalendarEventDates();
+              this.tagCalendarEventsDataForMonth();
+            });
           }
         );
 
@@ -171,15 +177,19 @@ export class AgendaPage implements AfterViewInit {
           true
         );
         if (friendData.allowShare) {
-          this.agendaEvents = friendData.agendaEvents;
-          this.tagCalendarEventsDataForMonth();
-          this.agendaDyspos = friendData.dyspos;
-          this.tagCalendarUserDyspoData();
-          // Load own dyspos for common-dates feature
+          // On récupère d'abord les données asynchrones (hors zone, c'est OK pour les requêtes)
           const myData = await this.agendaSvc.getUserAgendaEventsAndDyspos(
             this.userSvc.userInfo!.uid, false
           );
-          this.myDysposForCommon = myData.dyspos;
+          // Puis on met à jour la vue dans la zone Angular —
+          // indispensable sur iOS avec @angular/fire v20 (les callbacks s'exécutent hors zone)
+          this.ngZone.run(() => {
+            this.agendaEvents = friendData.agendaEvents;
+            this.tagCalendarEventsDataForMonth();
+            this.agendaDyspos = friendData.dyspos;
+            this.tagCalendarUserDyspoData();
+            this.myDysposForCommon = myData.dyspos;
+          });
         } else {
           this.utils.showAlert('Ne souhaite pas partager son calendrier');
         }
@@ -296,6 +306,7 @@ export class AgendaPage implements AfterViewInit {
 
   buildCalendarEventDates() {
     const dates = new Set<string>();
+    const commonDates = new Set<string>(); // événements partagés (bulle rose)
     this.agendaEvents.forEach((ev) => {
       let startStr: string;
       let endStr: string;
@@ -306,10 +317,12 @@ export class AgendaPage implements AfterViewInit {
         startStr = format(new Date(ev.start_date_ts), 'yyyy-MM-dd');
         endStr = format(new Date(ev.end_date_ts), 'yyyy-MM-dd');
       }
+      const isShared = ev.is_multi || (ev.members_uid?.length ?? 0) > 1;
       // Pour les événements multi-jours, ajouter chaque jour de la plage
       let current = startStr;
       while (current <= endStr) {
         dates.add(current);
+        if (isShared) commonDates.add(current);
         const d = new Date(current);
         d.setDate(d.getDate() + 1);
         current = format(d, 'yyyy-MM-dd');
@@ -317,6 +330,8 @@ export class AgendaPage implements AfterViewInit {
       }
     });
     this.calendarEventDates = dates;
+    this.calendarCommonEventDates = commonDates;
+    console.log('[AgendaPage] calendarEventDates:', dates.size, 'dates, shared:', commonDates.size);
   }
 
   tagCalendarEventsDataForMonth() {
@@ -335,13 +350,9 @@ export class AgendaPage implements AfterViewInit {
       // console.log('Probleme with this event', prob);
 
       this.calendarMonthData.days.forEach((day) => {
-        day.isEvent = false;
+        if (!day) return; // Guard : peut être null si monthOpt est corrompu
 
-        // Il ne faut pas faire ça, on se retrouve a 22h la veille
-        // console.log(
-        //   'Convert start date day time to ISO',
-        //   new Date(day.time).toISOString()
-        // );
+        day.isEvent = false;
 
         // Date du jour au format YYYY-MM-DD (heure locale) — indépendant du fuseau
         const calDayStr = format(new Date(day.time), 'yyyy-MM-dd');

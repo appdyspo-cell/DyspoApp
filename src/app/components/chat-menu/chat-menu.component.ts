@@ -128,4 +128,8 @@ export class ChatMenuComponent implements OnInit {
       'togglenotifications'
     );
   }
+
+  quitChat() {
+    this.popCtrl.dismiss(undefined, 'quitchat');
+  }
 }

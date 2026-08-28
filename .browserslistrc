@@ -1,9 +1,7 @@
-# Angular 19 / Capacitor 7 — targets modernes
-# iOS 16+ couvre 98%+ des appareils actifs (Apple Stats 2024)
-
-Chrome >=107
-ChromeAndroid >=107
-Firefox >=104
-Edge >=107
-Safari >=16
-iOS >=16
+# Capacitor 7 — compatibilité élargie Samsung/Honor (WebView peut être Chrome 90-105 sur OneUI 4/MagicOS)
+Chrome >=90
+ChromeAndroid >=90
+Firefox >=90
+Edge >=90
+Safari >=15
+iOS >=15

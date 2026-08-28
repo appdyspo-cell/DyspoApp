@@ -299,6 +299,7 @@ export class GroupChattingPage implements OnInit, OnDestroy {
       translucent: true,
       event: ev,
       mode: 'md',
+      cssClass: 'chat-menu-popover',
     });
 
     modal.present();
@@ -333,6 +334,8 @@ export class GroupChattingPage implements OnInit, OnDestroy {
       );
     } else if (role === 'warnreportgroup') {
       this.reportGroup();
+    } else if (role === 'quitchat') {
+      this.navCtrl.pop();
     }
   }
 

@@ -9,7 +9,6 @@ import { ProfilePageRoutingModule } from './profile-routing.module';
 import { ProfilePage } from './profile.page';
 import { TranslateModule } from '@ngx-translate/core';
 import { MaskitoModule } from '@maskito/angular';
-import { LazyLoadImageModule } from 'ng-lazyload-image';
 
 @NgModule({
   imports: [
@@ -18,7 +17,6 @@ import { LazyLoadImageModule } from 'ng-lazyload-image';
     IonicModule,
     TranslateModule,
     MaskitoModule,
-    LazyLoadImageModule,
     ProfilePageRoutingModule,
   ],
   declarations: [ProfilePage],

@@ -13,36 +13,30 @@ import {
   AppUser,
   Friend,
   FriendStatus,
-  Notif,
   ShowHelper,
   UserDyspoStatus,
 } from 'src/app/models/models';
 import { UserService } from 'src/app/services/user.service';
 import { OverlayEventDetail } from '@ionic/core/components';
-import { UtilsService } from 'src/app/services/utils.service';
 import { AgendaService } from 'src/app/services/agenda.service';
 import { Observable, Subscription } from 'rxjs';
 import {
-  addHours,
   format,
   getDate,
   getMonth,
   getYear,
   isAfter,
   isBefore,
-  isSameDay,
-  isSameMonth,
   parseISO,
-  setHours,
 } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { AgendaEventInfoComponent } from 'src/app/components/agenda-event-info/agenda-event-info.component';
 import { FriendsService } from 'src/app/services/friends.service';
 import { App } from '@capacitor/app';
+import { PluginListenerHandle } from '@capacitor/core';
 import { NavigationExtras } from '@angular/router';
 import { NotificationService } from 'src/app/services/notification.service';
 import { Preferences } from '@capacitor/preferences';
-import { PictureComponent } from 'src/app/components/picture/picture.component';
 import { HelperComponent } from 'src/app/components/helper/helper.component';
 
 @Component({
@@ -56,7 +50,6 @@ export class UserStatusPage implements OnInit, OnDestroy {
   userInfo: AppUser | undefined;
   dyspoStatus = UserDyspoStatus;
   nextAgendaEvents: AgendaEvent[] = [];
-  notifications: Notif[] = [];
 
   // ── CTA animated phrases ──────────────────────────────────────────────────
   readonly ctaPhrases = [
@@ -85,6 +78,8 @@ export class UserStatusPage implements OnInit, OnDestroy {
 
   nb_notifications = 0;
 
+  private resumeHandle?: PluginListenerHandle;
+
   get totalNotifications(): number {
     return this.nb_notifications + this.friendsSuggested.length;
   }
@@ -102,39 +97,26 @@ export class UserStatusPage implements OnInit, OnDestroy {
     this.notificationsSvc.resetBadgeCount();
     // On Resume App
     App.addListener('resume', () => {
-      if (this.agendaDysposSubscription)
-        this.agendaDysposSubscription.unsubscribe();
-      if (this.agendaDysposSubscription)
-        this.agendaDysposSubscription.unsubscribe();
+      this.unsubscribeAll();
       this.todayFormatted = format(new Date(), 'iiii dd MMMM yyyy', {
         locale: fr,
       });
-
       this.notificationsSvc.resetBadgeCount();
       this.fetchData();
-    });
+    }).then(handle => { this.resumeHandle = handle; });
   }
 
   fetchData() {
     this.friends$ = this.friendService.friends$;
     this.agendaEventsSubscription = this.agendaSvc.agendaEvents$.subscribe(
       (agendaEvents) => {
-        this.nextAgendaEvents = agendaEvents.filter((agEvent) => {
-          return isAfter(parseISO(agEvent.startISO), new Date());
-        });
-
-        this.nextAgendaEvents.sort((item1, item2) => {
-          const date1 = parseISO(item1.startISO);
-          const date2 = parseISO(item2.startISO);
-          if (isBefore(date1, date2)) {
-            return -1; // item1 doit être trié avant item2
-          } else if (isAfter(date1, date2)) {
-            return 1; // item1 doit être trié après item2
-          } else {
-            return 0; // les dates sont égales
-          }
-        });
-        // console.log('Sort events', this.nextAgendaEvents);
+        this.nextAgendaEvents = agendaEvents
+          .filter((agEvent) => isAfter(parseISO(agEvent.startISO), new Date()))
+          .sort((a, b) => {
+            const d1 = parseISO(a.startISO);
+            const d2 = parseISO(b.startISO);
+            return isBefore(d1, d2) ? -1 : isAfter(d1, d2) ? 1 : 0;
+          });
       }
     );
 
@@ -142,44 +124,18 @@ export class UserStatusPage implements OnInit, OnDestroy {
       this.friendsSuggested = friends.filter(
         (elt) => elt.friend_status === FriendStatus.SUGGESTED
       );
-      this.friendsSuggested.forEach((friendSuggestion) => {
-        const notif: Notif = {
-          user_id: '',
-          title: '',
-          message: '',
-          subject: '',
-          create_at_ms: 0,
-          create_at_ISO: '',
-          status: '',
-        };
-        this.notifications.push(notif);
-      });
     });
 
     this.invitationsSubscription =
       this.agendaSvc.agendaEventInvitations$.subscribe((invitations) => {
-        this.invitations = invitations;
-        this.invitations.sort((item1, item2) => {
-          const date1 = parseISO(item1.startISO);
-          const date2 = parseISO(item2.startISO);
-          if (isBefore(date1, date2)) {
-            return -1; // item1 doit être trié avant item2
-          } else if (isAfter(date1, date2)) {
-            return 1; // item1 doit être trié après item2
-          } else {
-            return 0; // les dates sont égales
-          }
+        const sorted = [...invitations].sort((a, b) => {
+          const d1 = parseISO(a.startISO);
+          const d2 = parseISO(b.startISO);
+          return isBefore(d1, d2) ? -1 : isAfter(d1, d2) ? 1 : 0;
         });
-
-        this.invitations = invitations.filter((ev) => {
-          return isAfter(parseISO(ev.endISO), new Date().getTime());
-        });
-
-        // this.invitations.forEach((invit) => {
-        //   //console.log('Push notif invit', invit);
-        //   // this.notifications.push(notif);
-        // });
-
+        this.invitations = sorted.filter((ev) =>
+          isAfter(parseISO(ev.endISO), new Date())
+        );
         this.nb_notifications = this.invitations.length;
       });
 
@@ -208,6 +164,13 @@ export class UserStatusPage implements OnInit, OnDestroy {
         }
       }
     );
+  }
+
+  private unsubscribeAll() {
+    this.agendaEventsSubscription?.unsubscribe();
+    this.invitationsSubscription?.unsubscribe();
+    this.friendsSubscrition?.unsubscribe();
+    this.agendaDysposSubscription?.unsubscribe();
   }
 
   async ngOnInit() {
@@ -242,15 +205,15 @@ export class UserStatusPage implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if (this.ctaInterval) clearInterval(this.ctaInterval);
+    this.unsubscribeAll();
+    this.resumeHandle?.remove();
   }
 
   cancel() {
     this.modal.dismiss(null, 'cancel');
   }
 
-  confirm() {
-    //this.modal.dismiss(this.name, 'confirm');
-  }
+  confirm() {}
 
   updateStatus(dyspoStatus: UserDyspoStatus) {
     this.modal.dismiss(dyspoStatus, 'confirm');
@@ -259,7 +222,6 @@ export class UserStatusPage implements OnInit, OnDestroy {
   onWillDismiss(event: Event) {
     const ev = event as CustomEvent<OverlayEventDetail<string>>;
     if (ev.detail.role === 'confirm') {
-      console.log('Update dyspo');
       this.todayDyspo.userDyspo = ev.detail.data as UserDyspoStatus;
       this.agendaSvc.updateOrCreateDyspo(this.todayDyspo);
     }
@@ -275,12 +237,7 @@ export class UserStatusPage implements OnInit, OnDestroy {
       },
     });
     modal.present();
-
-    const { data, role } = await modal.onWillDismiss();
-
-    console.log(data);
-    if (role === 'confirm') {
-    }
+    await modal.onWillDismiss();
   }
 
   async openInvitation(agendaEvent: AgendaEvent) {
@@ -293,13 +250,7 @@ export class UserStatusPage implements OnInit, OnDestroy {
       },
     });
     modal.present();
-
-    const { data, role } = await modal.onWillDismiss();
-
-    console.log(data);
-    if (role === 'confirm') {
-      //this.agendaSvc.saveOrUpdateEvent(this.agendaEvent!);
-    }
+    await modal.onWillDismiss();
   }
 
   async openCreateEventPerso() {
@@ -344,32 +295,26 @@ export class UserStatusPage implements OnInit, OnDestroy {
   }
 
   async openCreateEvent() {
-    const buttons = [];
-    buttons.push({
-      text: 'Personnel',
-      // cssClass: 'dyspo-sheet-dyspo',
-      data: {
-        is_multi: false,
+    const buttons = [
+      {
+        text: 'Personnel',
+        data: { is_multi: false },
       },
-    });
-
-    buttons.push({
-      text: 'Groupe',
-      //  cssClass: 'dyspo-sheet-dyspo-with-kids',
-      data: {
-        is_multi: true,
+      {
+        text: 'Groupe',
+        data: { is_multi: true },
       },
-    });
+    ];
 
     const actionSheet = await this.actionSheetCtrl.create({
-      header: "Saisissez le type de l' événement",
+      header: "Saisissez le type de l'événement",
       cssClass: 'dyspo-sheet',
       buttons,
     });
 
     await actionSheet.present();
 
-    let result = await actionSheet.onDidDismiss();
+    const result = await actionSheet.onDidDismiss();
     if (result.data) {
       const navigationExtras: NavigationExtras = {
         state: {

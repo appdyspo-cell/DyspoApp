@@ -14,6 +14,9 @@
     <ion-segment-button value="{{discussionType.ARCHIVE}}" layout="icon-top">
       <ion-icon name="archive-outline"></ion-icon>
       <ion-label>Archivées</ion-label>
+      <ion-badge *ngIf="archivedUnreadCount > 0" color="danger" class="segment-badge">
+        {{ archivedUnreadCount }}
+      </ion-badge>
     </ion-segment-button>
   </ion-segment>
 

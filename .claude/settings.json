@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(findstr :8101)",
+      "Bash(taskkill /PID 8940 /F)",
+      "PowerShell(Stop-Process -Id 8940 -Force)",
+      "Bash(node -e \"require\\('firebase-admin'\\); console.log\\('OK'\\)\")"
+    ]
+  }
+}

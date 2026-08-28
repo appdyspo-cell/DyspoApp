@@ -411,7 +411,7 @@ export class AgendaService {
   }
 
   async removeEvent(agendaEvent: AgendaEvent) {
-    deleteDoc(doc(this.firestore, `agenda_events/`, agendaEvent.uid!));
+    await deleteDoc(doc(this.firestore, `agenda_events/`, agendaEvent.uid!));
   }
 
   public getAgendaEvents() {
@@ -444,14 +444,14 @@ export class AgendaService {
     });
   }
 
-  public updateOrCreateDyspo(agendaDyspo: AgendaDyspoItem) {
+  public async updateOrCreateDyspo(agendaDyspo: AgendaDyspoItem) {
     const agendaDyspoClone: Partial<AgendaDyspoItem> = { ...agendaDyspo };
     const ref = doc(
       this.firestore,
       `agenda_dyspos/${this.uid}/dyspo_list`,
       agendaDyspo.year + '_' + agendaDyspo.month + '_' + agendaDyspo.day
     );
-    setDoc(ref, agendaDyspoClone);
+    await setDoc(ref, agendaDyspoClone);
   }
 
   public acceptEventInvitation(invitation: AgendaEvent) {
@@ -478,7 +478,9 @@ export class AgendaService {
         this.agendaEventsSubject.next(this.agendaEvents);
       }
 
-      this.saveOrUpdateEvent(invitation);
+      this.saveOrUpdateEvent(invitation).catch((err) =>
+        console.error('acceptEventInvitation save failed:', err)
+      );
     } else {
       console.error('Can not find invitation uid in members invited');
     }
@@ -786,6 +788,7 @@ export class AgendaService {
     if (this.dysposOnSpnashotCancel) this.dysposOnSpnashotCancel();
     if (this.eventsOnSnapshotCancel) this.eventsOnSnapshotCancel();
     if (this.holidaysOnSnapshotCancel) this.holidaysOnSnapshotCancel();
+    if (this.eventInvitationsOnSnapshotCancel) this.eventInvitationsOnSnapshotCancel();
     this.agendaEvents = [];
     this.agendaDyspos = [];
     this.holidays = [];

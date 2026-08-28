@@ -12,21 +12,14 @@ import {
   WarnReportGroup,
   WarnReportMsg,
   WarnReportUser,
+  ReportType,
 } from '../models/models';
-import {
-  Database,
-  child,
-  get,
-  onChildAdded,
-  onChildChanged,
-  onChildRemoved,
-  ref,
-} from '@angular/fire/database';
 import {
   DocumentData,
   Firestore,
   QueryDocumentSnapshot,
   addDoc,
+  arrayUnion,
   collection,
   deleteDoc,
   doc,
@@ -334,6 +327,7 @@ export class ChatService {
     const documentSnapshots = await getDocs(q);
     const firstVisibleMessageDoc =
       documentSnapshots.docs[documentSnapshots.docs.length - 1];
+    this.messages = [];
     documentSnapshots.forEach((documentSnapshot) => {
       this.messages.push(documentSnapshot.data() as ChatMessage);
     });
@@ -411,7 +405,7 @@ export class ChatService {
 
   async deleteChatroom(chatroom: Chatroom) {
     await deleteDoc(
-      doc(this.firestore, this.chatroomsCollectionRef + chatroom.uid)
+      doc(this.firestore, this.chatroomsCollectionRef + '/' + chatroom.uid)
     );
   }
 
@@ -433,59 +427,30 @@ export class ChatService {
   }
 
   async warnReportUser(report_user_id: string, report_text: string) {
+    const now = new Date();
+    const uid = `report_user_${now.getTime()}`;
+    const report: WarnReportUser = {
+      uid,
+      date_ms: now.getTime(),
+      date_ISO: now.toISOString(),
+      from_user_id: this.uid,
+      report_user_id,
+      report_text,
+      report_type: ReportType.USER,
+    };
+    const ref = doc(this.firestore, 'reports', uid);
+    await setDoc(ref, report);
+    const refMail = doc(this.firestore, 'mails', `mail_${now.getTime()}`);
+    await setDoc(refMail, {
+      to: environment.dyspo_email,
+      message: {
+        subject: 'Signalement utilisateur',
+        html:
+          `Utilisateur ${this.uid} a signalé :<br><br>` +
+          `<b>ID signalé : ${report_user_id}</b><br><br>Message :<br><br>${report_text}`,
+      },
+    });
     return true;
-    // return new Promise(async (resolve, reject) => {
-    //   const my_id = this.utils.userInfo.id;
-    //   const now = new Date();
-    //   const now_ISO = now.toISOString();
-    //   const report_data: ReportUser = {
-    //     report_date_ms: now.getTime(),
-    //     report_date_ISO: now_ISO,
-    //     from_user_id: my_id,
-    //     report_user_id,
-    //     report_text,
-    //   };
-
-    //   const report_user_data = await this.getUserByID(report_user_id);
-
-    //   report_data.report_user_data = report_user_data;
-    //   report_data.from_user_data = this.utils.userInfo;
-    //   this.afs
-    //     .collection<ReportUser>(`report_users`)
-    //     .add(report_data)
-    //     .then((res) => {
-    //       this.afs
-    //         .collection('mail')
-    //         .add({
-    //           to: environment.email,
-    //           message: {
-    //             subject: 'Signalement utilisateur',
-    //             html:
-    //               this.utils.userInfo.firstname +
-    //               ' ' +
-    //               this.utils.userInfo.lastname +
-    //               ' a signalé un utilisateur :<br><br><b>' +
-    //               report_user_data.firstname +
-    //               ' ' +
-    //               report_user_data.lastname +
-    //               ' (id: ' +
-    //               report_user_id +
-    //               ')</b><br><br>  Message :<br><br>' +
-    //               report_text,
-    //           },
-    //         })
-    //         .then(() => {
-    //           resolve(true);
-    //         })
-    //         .catch((error: any) => {
-    //           reject(error);
-    //         });
-    //       resolve(res);
-    //     })
-    //     .catch((err: any) => {
-    //       reject(err);
-    //     });
-    // });
   }
 
   async warnReportMsg(report: WarnReportMsg) {
@@ -548,7 +513,6 @@ export class ChatService {
       'mails',
       'mail_' + new Date().getTime()
     );
-    await setDoc(ref, reportGroupClone);
     const mail = {
       to: environment.dyspo_email,
       message: {
@@ -695,62 +659,16 @@ export class ChatService {
   }
 
   async blockUser(uid: string) {
+    const ref = doc(this.firestore, `users/${this.uid}`);
+    await updateDoc(ref, { blocked_uids: arrayUnion(uid) });
     return true;
-    // return new Promise(async (resolve, reject) => {
-    //   const user_id = this.utils.userInfo.id;
-    //   const my_id = this.utils.userInfo.id;
-
-    //   this.afs
-    //     .collection<Friend>(`friends`)
-    //     .doc(this.user_id)
-    //     .collection('friend_list', (ref) =>
-    //       ref.where('friend_id', '==', friend_id)
-    //     )
-    //     .get()
-    //     .subscribe((snaps) => {
-    //       const snap = snaps.docs[0];
-    //       //On met le status de l'ami à 'BLOCKED' chez nous et 'BEENBLOCKED' chez lui
-    //       this.afs
-    //         .collection<Friend>(`friends`)
-    //         .doc(this.user_id)
-    //         .collection('friend_list')
-    //         .doc(snap.id)
-    //         .update({ status: 'BLOCKED', since: new Date().getTime() })
-    //         .then(() => {
-    //           console.log('Finish update my friend list');
-
-    //           this.afs
-    //             .collection<Friend>(`friends`)
-    //             .doc(friend_id)
-    //             .collection('friend_list', (ref) =>
-    //               ref.where('friend_id', '==', this.user_id)
-    //             )
-    //             .get()
-    //             .subscribe((snapsB) => {
-    //               const snapB = snapsB.docs[0];
-    //               this.afs
-    //                 .collection<Friend>(`friends`)
-    //                 .doc(friend_id)
-    //                 .collection('friend_list')
-    //                 .doc(snapB.id)
-    //                 .update({
-    //                   status: 'BEENBLOCKED',
-    //                   since: new Date().getTime(),
-    //                 })
-    //                 .then(() => {
-    //                   console.log('Finish update his friend list');
-    //                   //this.eventService.publishReloadFriends(this.user_id);
-    //                 });
-    //             });
-    //         });
-    //     });
-    // });
   }
 
   unsubscribeAllAfterLogoutEvent() {
     this.chatrooms = [];
+    this.messages = [];
     if (this.chatroomsOnSnapshotCancel) this.chatroomsOnSnapshotCancel();
+    if (this.messagesOnSnapshotCancel) this.messagesOnSnapshotCancel();
     this.chatroomsSubject.next([]);
-    //off(ref(this.db, 'chats/' + chatroomKey))
   }
 }

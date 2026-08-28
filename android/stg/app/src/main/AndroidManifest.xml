@@ -61,6 +61,8 @@
     android:maxSdkVersion="29"
   />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <!-- Requis par @capacitor-community/contacts v7 même en lecture seule -->
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
 
     <!-- Bloquer les permissions média injectées par les plugins Capacitor -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />

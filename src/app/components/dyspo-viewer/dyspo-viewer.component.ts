@@ -1,12 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { ChatMessage } from 'src/app/models/models';
-import {
-  Media,
-  MediaAlbum,
-  MediaSaveOptions,
-} from '@capacitor-community/media';
-import { Capacitor } from '@capacitor/core';
 import { UtilsService } from 'src/app/services/utils.service';
 import { LoggerService } from 'src/app/services/logger.service';
 import { UserService } from 'src/app/services/user.service';

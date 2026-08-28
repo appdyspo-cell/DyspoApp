@@ -96,19 +96,20 @@
 /* ── Animation slide changement de mois ── */
 
 @keyframes slideFromRight {
-  from { transform: translateX(28px); opacity: 0; }
+  from { transform: translateX(44px); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
 }
 
 @keyframes slideFromLeft {
-  from { transform: translateX(-28px); opacity: 0; }
+  from { transform: translateX(-44px); opacity: 0; }
   to   { transform: translateX(0);     opacity: 1; }
 }
 
+/* cubic-bezier spring : légère impulsion (overshoot) avant de se stabiliser */
 :host .page-flip-forward {
-  animation: slideFromRight 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  animation: slideFromRight 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 :host .page-flip-backward {
-  animation: slideFromLeft 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  animation: slideFromLeft 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }

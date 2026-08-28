@@ -8,6 +8,7 @@ import { NotificationsListPageRoutingModule } from './notifications-list-routing
 
 import { NotificationsListPage } from './notifications-list.page';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
+import { LazyLoadImageModule } from 'ng-lazyload-image';
 
 @NgModule({
   imports: [
@@ -15,6 +16,7 @@ import { SharedModule } from 'src/app/modules/shared/shared.module';
     FormsModule,
     IonicModule,
     SharedModule,
+    LazyLoadImageModule,
     NotificationsListPageRoutingModule,
   ],
   declarations: [NotificationsListPage],

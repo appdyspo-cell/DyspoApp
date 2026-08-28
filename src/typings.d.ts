@@ -1,1 +1,1 @@
-declare module 'dom7';
+// Déclarations de modules tiers sans types officiels

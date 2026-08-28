@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   OnInit,
@@ -9,6 +10,7 @@ import {
   ViewChildren,
   ViewContainerRef,
 } from '@angular/core';
+import { Contacts } from '@capacitor-community/contacts';
 import { ContactPayload } from '@capacitor-community/contacts';
 import { Share } from '@capacitor/share';
 import { IonItemGroup, Platform } from '@ionic/angular';
@@ -35,6 +37,8 @@ export class FixContactsPage implements OnInit, AfterViewInit {
   appContacts: AppDeviceContact[] = [];
   appContactsGrouped: { letter: string; contacts: AppDeviceContact[] }[] = [];
   scroll = false;
+  /** true si la permission contacts a été refusée */
+  permissionDenied = false;
   colors = [
     '#a2b9bc',
     '#6b5b95',
@@ -52,7 +56,9 @@ export class FixContactsPage implements OnInit, AfterViewInit {
     private userSvc: UserService,
     private utils: UtilsService,
     private friendsSvc: FriendsService,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private platform: Platform,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {}
@@ -60,25 +66,60 @@ export class FixContactsPage implements OnInit, AfterViewInit {
   async ngAfterViewInit() {
     console.log('Fix contacts');
     try {
-      await this.utils.showLoader();
+      // ── 1. Permission contacts (mobile uniquement) ─────────────────────────
+      if (this.platform.is('ios') || this.platform.is('android')) {
+        const perm = await Contacts.requestPermissions();
+        if (perm.contacts !== 'granted') {
+          this.permissionDenied = true;
+          this.cdr.detectChanges();
+          return;
+        }
+        this.permissionDenied = false;
+      }
 
-      // initContacts() est appelé sans await au démarrage — si les contacts
-      // ne sont pas encore chargés quand la page s'ouvre, on les charge ici.
-      if (this.friendsSvc.appContacts.length === 0) {
-        await this.friendsSvc.initContacts();
+      // ── 2. Chargement des contacts du téléphone ────────────────────────────
+      // Si déjà en cache (chargé au démarrage), on affiche immédiatement.
+      // Sinon on montre un loader le temps de lire le répertoire.
+      const alreadyCached = this.friendsSvc.appContacts.length > 0;
+      if (!alreadyCached) {
+        await this.utils.showLoader();
+        try {
+          await this.friendsSvc.initContacts();
+        } catch (contactsErr: any) {
+          console.error('[FixContacts] initContacts threw:', contactsErr);
+          this.logger.sendError(contactsErr, 'initContacts', this.userSvc.userInfo?.uid!);
+        } finally {
+          this.utils.hideLoader();
+        }
       }
 
       this.appContactsGrouped = this.friendsSvc.appContactsGrouped;
       this.appContacts = this.friendsSvc.appContacts;
+      console.log(`[FixContacts] ${this.appContacts.length} contact(s), ${this.appContactsGrouped.length} groupe(s)`);
 
-      //Is my contact a member of Dyspo ?
-      await this.userSvc.hydrateAppContacts(this.appContacts);
-      //Is my contact a friend ?
+      // ── 3. Affichage immédiat avec les données en cache ───────────────────
+      this.cdr.detectChanges();
+      this.buildData(this.appContactsGrouped);
+
+      // ── 4. Hydratation Firestore (uniquement si pas encore faite) ─────────
+      // Si is_member est déjà connu sur tous les contacts, on ne re-requête pas.
+      const alreadyHydrated = this.appContacts.length > 0 &&
+        this.appContacts.some(c => c.is_member !== undefined);
+
+      if (!alreadyHydrated) {
+        try {
+          await this.userSvc.hydrateAppContacts(this.appContacts);
+        } catch (hydrateErr) {
+          console.error('hydrateAppContacts failed, affichage sans statut membre :', hydrateErr);
+        }
+      }
+
+      // Mettre à jour le flag is_my_friend dans tous les cas
       this.appContacts.forEach((contact) => {
         contact.is_my_friend = this.friendsSvc.isMyFriend(contact.uid!);
       });
+      this.cdr.detectChanges();
 
-      this.buildData(this.appContactsGrouped);
     } catch (err: any) {
       console.error(err);
       this.logger.sendError(
@@ -86,8 +127,29 @@ export class FixContactsPage implements OnInit, AfterViewInit {
         'fetchContactsData',
         this.userSvc.userInfo?.uid!
       );
-    } finally {
-      this.utils.hideLoader();
+    }
+  }
+
+  /** Appelé depuis le bouton "Autoriser" quand la permission est refusée */
+  async requestPermissionAndReload() {
+    if (!(this.platform.is('ios') || this.platform.is('android'))) return;
+    const perm = await Contacts.requestPermissions();
+    if (perm.contacts === 'granted') {
+      this.permissionDenied = false;
+      // Vider le container avant de recharger
+      if (this.container) this.container.clear();
+      this.appContacts = [];
+      this.appContactsGrouped = [];
+      this.cdr.detectChanges();
+      await this.friendsSvc.initContacts();
+      this.appContactsGrouped = this.friendsSvc.appContactsGrouped;
+      this.appContacts = this.friendsSvc.appContacts;
+      this.cdr.detectChanges();
+      this.buildData(this.appContactsGrouped);
+    } else {
+      this.utils.showToastError(
+        'Autorise l\'accès aux contacts dans Paramètres → Applications → Dyspo → Autorisations'
+      );
     }
   }
 
@@ -157,8 +219,8 @@ export class FixContactsPage implements OnInit, AfterViewInit {
   }
 
   async buildData(groups: { letter: string; contacts: AppDeviceContact[] }[]) {
-    const ITEMS_RENDERED_AT_ONCE = 2;
-    const INTERVAL_IN_MS = 100;
+    const ITEMS_RENDERED_AT_ONCE = 6;
+    const INTERVAL_IN_MS = 40;
     let currentIndex = 0;
     const length = groups.length;
 

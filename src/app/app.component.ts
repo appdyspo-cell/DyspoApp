@@ -28,6 +28,7 @@ export class AppComponent {
   user$: Observable<User | null>;
   authState$: Observable<User | null>;
   authStateSubscription: Subscription;
+  isLoading = true;
 
   constructor(
     private auth: Auth,
@@ -63,6 +64,11 @@ export class AppComponent {
 
     this.translate.use('fr');
 
+    // Cacher immédiatement le splash screen natif (launchShowDuration: 0 dans capacitor.config.ts).
+    // L'overlay Angular startup-loader (fond blanc + logo texte + bulles) est l'unique écran de chargement visible.
+    // Sur navigateur web, SplashScreen.hide() est un no-op.
+    SplashScreen.hide();
+
     this.user$ = user(this.auth);
     this.authState$ = authState(this.auth);
 
@@ -72,19 +78,31 @@ export class AppComponent {
 
         if (aUser) {
           this.logger.logDebug('authStateSubscription', aUser);
+
+          // Filet de sécurité : si subscribeUserInfo ne résout ni ne rejette
+          // dans les 10s (réseau coupé, règles Firestore, etc.), on libère quand même
+          // le splash et on renvoie vers le login.
+          const splashSafetyTimer = setTimeout(() => {
+            this.logger.logDebug('WARN: splashSafetyTimer déclenché — Firestore trop lent');
+            this.hideStartupLoader();
+            this.navController.navigateRoot('/login');
+          }, 10000);
+
           // Init user svc
           this.userSvc
             .subscribeUserInfo(aUser.uid)
             .then((appUser) => {
+              clearTimeout(splashSafetyTimer);
               this.initAllServices(appUser.uid!);
               this.logger.logDebug('validateAuthState userInfo ---> ', appUser);
               this.navController.navigateRoot('/tabs');
               setTimeout(() => {
-                SplashScreen.hide();
+                this.hideStartupLoader();
                 this.checkCustodyRenewal(appUser);
               }, 1200);
             })
             .catch(async (err) => {
+              clearTimeout(splashSafetyTimer);
               // Première connexion via un provider social (Google/Apple/Facebook) :
               // l'utilisateur Firebase Auth existe mais n'a pas encore de profil Firestore.
               if (err?.msg === 'Utilisateur non trouvé' && aUser.email) {
@@ -94,7 +112,7 @@ export class AppComponent {
                   this.initAllServices(appUser.uid!);
                   this.navController.navigateRoot('/tabs');
                   setTimeout(() => {
-                    SplashScreen.hide();
+                    this.hideStartupLoader();
                   }, 1200);
                   return;
                 } catch (provisionErr) {
@@ -107,11 +125,11 @@ export class AppComponent {
               this.logger.logDebug('ERR validateAuthState ', err);
               this.navController.navigateRoot('/login');
               this.utils.showToastError(err.msg);
-              SplashScreen.hide();
+              this.hideStartupLoader();
             });
         } else {
           setTimeout(() => {
-            SplashScreen.hide();
+            this.hideStartupLoader();
           }, 800);
           this.logger.logDebug(
             'authStateSubscription NOUSER -> navigateRoot: Login'
@@ -195,19 +213,23 @@ export class AppComponent {
     }
   }
 
+  private hideStartupLoader() {
+    this.isLoading = false;
+    // SplashScreen.hide() déjà appelé au boot (200ms) — pas besoin ici
+  }
+
   async initAllServices(uid: string) {
-    try {
-      await Contacts.requestPermissions();
-    } catch (err) {
-      console.log(err);
-    }
     this.friendsSvc.initService(uid);
     this.agendaSvc.initService(uid);
     this.chatSvc.initService(uid);
     this.notificationSvc.initService(uid);
 
-    console.log('Init Contacts');
     if (this.platform.is('ios') || this.platform.is('android')) {
+      try {
+        await Contacts.requestPermissions();
+      } catch (err) {
+        console.log(err);
+      }
       this.friendsSvc.initContacts();
     }
   }

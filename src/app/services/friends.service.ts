@@ -9,7 +9,6 @@ import {
   getDocs,
   onSnapshot,
   query,
-  runTransaction,
   setDoc,
   updateDoc,
   where,
@@ -44,7 +43,6 @@ export class FriendsService {
 
   public friends$!: Observable<Friend[]>;
   public friendGroups$!: Observable<FriendGroup[]>;
-  public friendsSuggested$!: Observable<Friend[]>;
   onSnapshotFriendGroupsCancel!: import('@angular/fire/firestore').Unsubscribe;
   onSnapshotFriendsCancel!: import('@angular/fire/firestore').Unsubscribe;
 
@@ -55,6 +53,9 @@ export class FriendsService {
     letter: string;
     contacts: AppDeviceContact[];
   }[] = [];
+  /** Dedup : si initContacts() est déjà en cours, les appelants concurrents
+   *  attendent la même promesse plutôt que de lancer un second chargement. */
+  private _initContactsPromise: Promise<void> | null = null;
 
   constructor(
     private firestore: Firestore,
@@ -409,25 +410,18 @@ export class FriendsService {
   async addFriend(friend: Friend) {
     console.log('Add friend');
     const uid = this.userSvc.userInfo?.uid || 'unknown';
+    const since = new Date().getTime();
 
-    updateDoc(
-      doc(this.firestore, `friends/${uid}/friend_list/${friend.friend_uid}`),
-      {
-        friend_status: FriendStatus.FRIEND,
-        since: new Date().getTime(),
-      }
-    );
-
-    updateDoc(
-      doc(this.firestore, `friends/${friend.friend_uid}/friend_list/${uid}`),
-      {
-        friend_status: FriendStatus.FRIEND,
-        since: new Date().getTime(),
-      }
-    );
-
-    // Send notif ?
-    // this.notification-service.sendConfirmFriend()
+    await Promise.all([
+      updateDoc(
+        doc(this.firestore, `friends/${uid}/friend_list/${friend.friend_uid}`),
+        { friend_status: FriendStatus.FRIEND, since }
+      ),
+      updateDoc(
+        doc(this.firestore, `friends/${friend.friend_uid}/friend_list/${uid}`),
+        { friend_status: FriendStatus.FRIEND, since }
+      ),
+    ]);
   }
 
   async saveFriendGroup(friendGroup: FriendGroup) {
@@ -455,7 +449,7 @@ export class FriendsService {
       );
     } else {
       friendGroup.members_uid = members;
-      setDoc(
+      await setDoc(
         doc(
           this.firestore,
           `friend_groups/${uid}/friend_group_list`,
@@ -490,47 +484,40 @@ export class FriendsService {
       doc(this.firestore, `friends/${friend.friend_uid}/friend_list/${uid}`)
     );
 
-    await batch.commit(); // BC-02: await ajouté — suppression amis garantie avant runTransaction
+    await batch.commit();
 
-    await runTransaction(this.firestore, async (transaction) => {
-      const mygroups_snapshots = await getDocs(
+    // Lire les groupes concernés avant d'écrire (getDocs hors transaction —
+    // transaction.get() n'accepte pas de Query dans le SDK modulaire)
+    const [mygroups_snapshots, hisgroups_snapshots] = await Promise.all([
+      getDocs(
         query(
           collection(this.firestore, `friend_groups/${uid}/friend_group_list`),
           where('members_uid', 'array-contains', friend.friend_uid)
         )
-      );
-      const hisgroups_snapshots = await getDocs(
+      ),
+      getDocs(
         query(
-          collection(
-            this.firestore,
-            `friend_groups/${friend.friend_uid}/friend_group_list`
-          ),
+          collection(this.firestore, `friend_groups/${friend.friend_uid}/friend_group_list`),
           where('members_uid', 'array-contains', uid)
         )
-      );
+      ),
+    ]);
 
-      // Remove friend from my groups
-      mygroups_snapshots.forEach((snap) => {
-        const group = snap.data() as FriendGroup;
-        const updateMembers = group.members_uid.splice(
-          group.members_uid.indexOf(friend.friend_uid!),
-          1
-        );
+    const groupBatch = writeBatch(this.firestore);
 
-        transaction.update(snap.ref, { members_uid: group.members_uid });
-      });
-
-      // Remove friend from his groups
-      hisgroups_snapshots.forEach((snap) => {
-        const group = snap.data() as FriendGroup;
-        const updateMembers = group.members_uid.splice(
-          group.members_uid.indexOf(uid!),
-          1
-        );
-
-        transaction.update(snap.ref, { members_uid: group.members_uid });
-      });
+    mygroups_snapshots.forEach((snap) => {
+      const group = snap.data() as FriendGroup;
+      const updated = group.members_uid.filter((m) => m !== friend.friend_uid);
+      groupBatch.update(snap.ref, { members_uid: updated });
     });
+
+    hisgroups_snapshots.forEach((snap) => {
+      const group = snap.data() as FriendGroup;
+      const updated = group.members_uid.filter((m) => m !== uid);
+      groupBatch.update(snap.ref, { members_uid: updated });
+    });
+
+    await groupBatch.commit();
   }
 
   async deleteFriendGroup(friendGroup: FriendGroup, listElement: any) {
@@ -554,6 +541,7 @@ export class FriendsService {
       this.appContactsGrouped = [];
       this.contacts = [];
       this.appContacts = [];
+      this._initContactsPromise = null;
     } catch (err) {
       //console.log('Can not unsubscribe ', err);
     }
@@ -577,10 +565,25 @@ export class FriendsService {
       }));
   }
 
-  async initContacts() {
+  async initContacts(): Promise<void> {
+    // Dedup : si un chargement est déjà en cours, retourner la même promesse.
+    if (this._initContactsPromise) {
+      return this._initContactsPromise;
+    }
+    // Réinitialiser avant chaque nouveau chargement pour éviter les doublons.
+    this.appContacts = [];
+    this.appContactsGrouped = [];
+    const p = this._execInitContacts();
+    this._initContactsPromise = p;
+    p.finally(() => { this._initContactsPromise = null; });
+    return p;
+  }
+
+  private async _execInitContacts(): Promise<void> {
+    try {
     const perm = await Contacts.requestPermissions();
     if (perm.contacts !== 'granted') {
-      console.warn('Contacts permission denied');
+      console.warn('[FriendsService] Contacts permission denied');
       return;
     }
     const result = await Contacts.getContacts({
@@ -589,6 +592,7 @@ export class FriendsService {
         phones: true,
       },
     });
+    console.log(`[FriendsService] getContacts: ${result.contacts.length} contacts bruts`);
 
     // const res = (await this.userSvc.getMartinContacts()) as any;
     // const martinContacts = [];
@@ -671,10 +675,9 @@ export class FriendsService {
         );
       }
     }
-    console.log('appContacts', this.appContacts);
+    console.log(`[FriendsService] Contacts valides après filtre: ${this.appContacts.length}`);
     this.appContactsGrouped = this.groupContactsByAlphabet(this.appContacts);
-
-    console.log('My Contacts Grouped ', this.appContactsGrouped);
+    console.log(`[FriendsService] Groupes: ${this.appContactsGrouped.length}`);
 
     //Send debug data
     if (environment.sendDebugData) {
@@ -691,6 +694,12 @@ export class FriendsService {
         //dataString: JSON.stringify(debug_data),
         user_id: this.userSvc.userInfo?.uid,
       });
+    }
+    } catch (err: any) {
+      // Ne jamais rejeter la promesse — on log et on laisse la page afficher
+      // la liste vide plutôt que de planter le flux entier.
+      console.error('[FriendsService] _execInitContacts error:', err);
+      this.logger.sendError(err, '_execInitContacts', this.userSvc.userInfo?.uid!);
     }
   }
 }

@@ -20,8 +20,6 @@ import {
 import { defaults, pickModes } from '../config';
 import { ActionSheetController, GestureController, ModalController } from '@ionic/angular';
 import { StatusPickerComponent } from './status-picker.component';
-import * as Hammer from 'hammerjs';
-import $$ from 'dom7';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { UserDyspoStatus } from 'src/app/models/models';
 import { UserService } from 'src/app/services/user.service';
@@ -104,7 +102,9 @@ export const MONTH_VALUE_ACCESSOR: any = {
                   </p>
                   <small *ngIf="day.subTitle">{{ day?.subTitle }}</small>
                 </button>
-                <div *ngIf="!day.isLastMonth && !day.isNextMonth && hasEventOn(day.time)" class="event-badge"></div>
+                <div *ngIf="!day.isLastMonth && !day.isNextMonth && hasEventOn(day.time)"
+                     [class.event-badge]="!hasCommonEventOn(day.time)"
+                     [class.common-event-badge]="hasCommonEventOn(day.time)"></div>
               </ng-container>
             </div>
           </ng-template>
@@ -176,6 +176,8 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   public filterDyspo: string | null = null;
   @Input()
   public eventDates: Set<string> = new Set();
+  @Input()
+  public commonEventDates: Set<string> = new Set();
 
   @Output()
   public longPressDay = new EventEmitter<CalendarDay>();
@@ -228,6 +230,10 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     return this.eventDates.has(format(new Date(time), 'yyyy-MM-dd'));
   }
 
+  hasCommonEventOn(time: number): boolean {
+    return this.commonEventDates.has(format(new Date(time), 'yyyy-MM-dd'));
+  }
+
   getDyspoClass(day: CalendarDay): { [klass: string]: boolean } {
     const classes: { [klass: string]: boolean } = {};
     classes['out-of-month'] = !!(day.isLastMonth || day.isNextMonth);
@@ -247,7 +253,13 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
     console.log('pan end');
     if (this.readonly) {
       console.log('Read Only Mode');
-
+      return;
+    }
+    // Un geste rapide (swipe de navigation) déclenche aussi panend — on l'ignore
+    // pour éviter d'afficher la feuille de sélection de statut par erreur.
+    if (Math.abs(ev.velocityX) > 0.3) {
+      this.startDayIndex = -1;
+      this._selectedPanDays = [];
       return;
     }
     console.log('_selectedPanDays ', this._selectedPanDays);
@@ -261,22 +273,19 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   }
 
   onSwipeLeft(ev: any) {
-    console.log('swipe left');
-    if (!this.readonly) {
-      console.log('Edit Mode');
-
-      return;
-    }
+    // Le swipe de navigation prend toujours la priorité sur la sélection multi-jours.
+    // On efface la sélection en cours (créée par panmove) pour ne pas la confondre
+    // avec un glissement intentionnel de sélection de jours.
+    this.startDayIndex = -1;
+    this._selectedPanDays = [];
+    Haptics.impact({ style: ImpactStyle.Light });
     this.onSwipedLeft.emit(ev);
   }
 
   onSwipeRight(ev: any) {
-    console.log('swipe right');
-    if (!this.readonly) {
-      console.log('Edit Mode');
-
-      return;
-    }
+    this.startDayIndex = -1;
+    this._selectedPanDays = [];
+    Haptics.impact({ style: ImpactStyle.Light });
     this.onSwipedRight.emit(ev);
   }
 
@@ -382,33 +391,10 @@ export class MonthComponent implements ControlValueAccessor, AfterViewInit {
   ngAfterViewInit(): void {
     console.log('after view init month comp');
     this._isInit = true;
-    const element = this.myElement.nativeElement;
-    const hammer = new Hammer.Manager(element);
-    const tap = new Hammer.Tap({ event: 'tap' });
-    const doubleTap = new Hammer.Tap({ event: 'doubletap', taps: 2 });
-
-    hammer.add([doubleTap, tap]);
-    doubleTap.requireFailure(tap);
-
-    // const gesture = this.gestureCtrl.create({
-    //   el: element,
-    //   onStart: (ev) => {},
-    //   onEnd: (ev) => {},
-    //   onMove: (ev) => {},
-    //   gestureName: 'mygg',
-    // });
-
-    // gesture.enable();
-
-    // hammer.on('tap', (event: any) => {
-    //   // Gestion de l'événement de tap
-    //   console.log('Tap détecté', event);
-    // });
-
-    // hammer.on('doubletap', (event: any) => {
-    //   // Gestion de l'événement de double tap
-    //   console.log('Double tap détecté', event);
-    // });
+    // Les gestes (tap, doubletap, press, swipeleft, swiperight, panmove, panend) sont
+    // gérés par le HammerModule d'Angular configuré dans app.module.ts.
+    // Ne PAS créer un second Hammer.Manager ici : deux instances sur le même élément
+    // entrent en conflit sur touch-action et empêchent la reconnaissance des swipes.
   }
 
   get value() {

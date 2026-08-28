@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Firestore, collection, addDoc } from '@angular/fire/firestore';
 import { environment } from 'src/environments/environment';
+import { Device } from '@capacitor/device';
 
 @Injectable({
   providedIn: 'root',
@@ -19,21 +20,22 @@ export class LoggerService {
 
   sendError(error: Error, func: string, uid: string) {
     console.log('Send error');
-    addDoc(collection(this.firestore, `log_errors`), {
+    const payload: any = {
       msg: error.message,
       user_id: uid,
       name: error.name,
       stack: error.stack,
       func,
-    })
-      .then(() => {
-        //this.utils.showToastSuccess("L'événement a été sauvegardé");
-        return true;
+      ts: new Date().toISOString(),
+    };
+    Device.getInfo()
+      .then((info) => {
+        payload.device = `${info.manufacturer} ${info.model}`;
+        payload.os_version = info.osVersion;
+        payload.platform = info.platform;
       })
-      .catch((err) => {
-        //this.utils.showToastError("Une erreur s'est produite");
-        return false;
-      });
+      .catch(() => {})
+      .finally(() => addDoc(collection(this.firestore, 'log_errors'), payload).catch(() => {}));
   }
 
   sendLog(msg: string, func: string, uid: string) {
@@ -53,34 +55,25 @@ export class LoggerService {
       });
   }
 
-  sendUncaughtError(
-    msg: any,
-    url: any,
-    lineNo: any,
-    columnNo: any,
-    error: any,
-    uid: any
-  ) {
-    console.error('Send uncaught Erorr ', msg);
-
-    addDoc(
-      collection(this.firestore, `log_uncaught_errors`),
-      {
-        msg,
-        user_id: uid,
-        url,
-        lineNo,
-        columnNo,
-      }
-    )
-      .then(() => {
-        //this.utils.showToastSuccess("L'événement a été sauvegardé");
-        return true;
+  sendUncaughtError(msg: any, url: any, lineNo: any, columnNo: any, error: any, uid: any) {
+    console.error('Uncaught error:', msg);
+    const payload: any = {
+      msg: String(msg),
+      user_id: uid ?? 'unknown',
+      url,
+      lineNo,
+      columnNo,
+      stack: error?.stack ?? String(error),
+      ts: new Date().toISOString(),
+    };
+    Device.getInfo()
+      .then((info) => {
+        payload.device = `${info.manufacturer} ${info.model}`;
+        payload.os_version = info.osVersion;
+        payload.platform = info.platform;
       })
-      .catch((err) => {
-        //this.utils.showToastError("Une erreur s'est produite");
-        return false;
-      });
+      .catch(() => {})
+      .finally(() => addDoc(collection(this.firestore, 'log_uncaught_errors'), payload).catch(() => {}));
   }
 
   sendDebugData(payload: any) {

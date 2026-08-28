@@ -7,10 +7,8 @@ import {
   UserStatus,
 } from '../models/models';
 import {
-  DocumentData,
   Firestore,
   collection,
-  collectionSnapshots,
   doc,
   docData,
   getDoc,
@@ -34,7 +32,6 @@ export class UserService {
     this.getEmptyUser()
   );
 
-  private docDataObs$: Observable<any> | undefined;
   private docDataSubscribtion: Subscription = new Subscription();
 
   //userInfoFirebaseObs$!: Observable<AppUser>;
@@ -65,8 +62,8 @@ export class UserService {
       if (uid) {
         this.logger.logDebug('userSvc subscribe to ----- ', uid);
         const docRef = doc(this.firestore, 'users', uid);
-        this.docDataSubscribtion = docData(docRef).subscribe(
-          (firebaseUserDocData: any) => {
+        this.docDataSubscribtion = docData(docRef).subscribe({
+          next: (firebaseUserDocData: any) => {
             if (!firebaseUserDocData) {
               console.error('User not found');
               reject({ msg: 'Utilisateur non trouvé', error: true });
@@ -85,8 +82,14 @@ export class UserService {
                 resolve(this.userInfo!);
               }
             }
+          },
+          error: (err) => {
+            // Erreur Firestore (permission denied, réseau, etc.) :
+            // sans ce handler, la Promise ne résout jamais → SplashScreen bloqué.
+            this.logger.logDebug('ERR subscribeUserInfo Firestore error', err);
+            reject({ msg: 'Erreur de connexion au serveur', error: true });
           }
-        );
+        });
       } else {
         reject('NOUID');
       }
@@ -103,9 +106,8 @@ export class UserService {
   async updateUser(appUser: AppUser) {
     this.logger.logDebug('Update User');
     const appUserClone: Partial<AppUser> = { ...appUser };
-    //delete appUserClone.id;
     const ref = doc(this.firestore, `users/${appUser.uid}`);
-    updateDoc(ref, appUserClone);
+    await updateDoc(ref, appUserClone);
   }
 
   /**
@@ -176,31 +178,24 @@ export class UserService {
     await setDoc(ref, newUser);
   }
 
-  public getAllOtherUsers() {
-    return new Promise<AppUser[]>(async (resolve, reject) => {
-      const users: AppUser[] = [];
-      const usersCollectionRef = collection(this.firestore, 'users');
-
-      const querySnapshot = await getDocs(usersCollectionRef);
-      querySnapshot.forEach((snap) => {
+  public async getAllOtherUsers(): Promise<AppUser[]> {
+    const q = query(
+      collection(this.firestore, 'users'),
+      where('status', '==', UserStatus.ACTIVE)
+    );
+    const querySnapshot = await getDocs(q);
+    const users: AppUser[] = [];
+    querySnapshot.forEach((snap) => {
+      if (snap.id !== this.userInfo!.uid) {
         const user = snap.data() as AppUser;
-
-        if (
-          user.status === UserStatus.ACTIVE &&
-          snap.id !== this.userInfo!.uid
-        ) {
-          user.uid = snap.id;
-          users.push(user);
-        }
-      });
-      resolve(users);
+        user.uid = snap.id;
+        users.push(user);
+      }
     });
+    return users;
   }
 
-  public async getUserInfos(
-    uids: string[],
-    withEvents = false
-  ): Promise<AppUserWithEvents[]> {
+  public async getUserInfos(uids: string[]): Promise<AppUserWithEvents[]> {
     if (!uids || uids.length === 0) return [];
     const appUsers: AppUserWithEvents[] = [];
     const chunks = [];

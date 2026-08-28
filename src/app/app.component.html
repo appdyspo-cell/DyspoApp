@@ -1,3 +1,15 @@
 <ion-app>
+
+  <!-- ── Écran de démarrage ────────────────────────────────────────────────── -->
+  <div class="startup-loader" [class.startup-loader--out]="!isLoading">
+    <img src="assets/logo_login.png" class="startup-loader__logo" alt="Dyspo" />
+    <div class="startup-loader__bubbles">
+      <span class="startup-bubble"></span>
+      <span class="startup-bubble"></span>
+      <span class="startup-bubble"></span>
+    </div>
+  </div>
+
   <ion-router-outlet></ion-router-outlet>
+
 </ion-app>

@@ -7,11 +7,13 @@ service firebase.storage {
     }
 
     // ── User avatars ──────────────────────────────────────────────────────────
-    // Path: avatarsStorage/{userId}/{filename}
-    // Only the owner can write their avatar; any authenticated user can read.
-    match /avatarsStorage/{userId}/{allPaths=**} {
+    // Path: avatarsStorage/avatar_{uid}.jpg  (fichier plat, pas de sous-dossier)
+    // Seul le propriétaire peut écrire son propre avatar ; tout utilisateur
+    // authentifié peut lire (affichage des avatars dans l'app).
+    match /avatarsStorage/{filename} {
       allow read:  if isAuth();
-      allow write: if isAuth() && request.auth.uid == userId
+      allow write: if isAuth()
+        && filename == 'avatar_' + request.auth.uid + '.jpg'
         && request.resource.size < 8 * 1024 * 1024
         && request.resource.contentType.matches('image/.*');
     }

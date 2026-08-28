@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
 import { ModalController, NavController } from '@ionic/angular';
@@ -26,7 +26,7 @@ const FAVORITES_PREF_KEY = 'chat_favorites';
     styleUrls: ['./group-list.page.scss'],
     standalone: false
 })
-export class GroupListPage implements OnInit {
+export class GroupListPage implements OnInit, OnDestroy {
   agendaEventType = AgendaEventType;
   agendaSubscription: Subscription;
   discussionType = DiscussionType;
@@ -176,6 +176,14 @@ export class GroupListPage implements OnInit {
     return this.applyFilter(this.agendaEventsArchived, this.archiveFilter);
   }
 
+  /** Total des messages non lus dans les discussions archivées */
+  get archivedUnreadCount(): number {
+    return this.agendaEventsArchived.reduce(
+      (sum, ev) => sum + (this.chatrooms[ev.uid!]?.count || 0),
+      0
+    );
+  }
+
   private applyFilter(events: AgendaEvent[], filter: ChatFilter): AgendaEvent[] {
     const byType = this.typeFilter === 'all'
       ? events
@@ -252,5 +260,9 @@ export class GroupListPage implements OnInit {
 
   getDelayClass(index: number): string {
     return 'animated delay_' + Math.min(index, 12);
+  }
+
+  ngOnDestroy() {
+    this.agendaSubscription?.unsubscribe();
   }
 }

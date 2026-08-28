@@ -207,6 +207,10 @@ export class UtilsService {
           header: opts.title,
           message: opts.message,
           cssClass: 'dyspo-alert-confirm',
+          // backdropDismiss: false évite que la Promise reste en suspens si l'utilisateur
+          // tape en dehors du dialog sans appuyer sur un bouton — ce qui bloquait toute
+          // navigation ultérieure dans le calendrier.
+          backdropDismiss: false,
           buttons: [
             {
               text: opts.cancelText || 'Annuler',

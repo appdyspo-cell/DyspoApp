@@ -111,6 +111,7 @@ interface CompatibleIcons {
           [readonly]="readonly"
           [filterDyspo]="filterDyspo"
           [eventDates]="eventDates"
+          [commonEventDates]="commonEventDates"
           (change)="onChanged($event)"
           (select)="select.emit($event)"
           (selectStart)="selectStart.emit($event)"
@@ -192,6 +193,8 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
   public filterDyspo: string | null = null;
   @Input()
   public eventDates: Set<string> = new Set();
+  @Input()
+  public commonEventDates: Set<string> = new Set();
   @Output()
   // eslint-disable-next-line @angular-eslint/no-output-native
   public change: EventEmitter<CalendarComponentPayloadTypes> =
@@ -218,7 +221,10 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
     this._options = value;
     this.initOpt();
     if (this.monthOpt && this.monthOpt.original) {
-      this.monthOpt = this.createMonth(this.monthOpt.original.time);
+      // Guard: si le temps du mois actuel est invalide (peut arriver quand writeValue()
+      // est appelé avant que pickMode soit 'multi'), on revient au mois courant.
+      const t = this.monthOpt.original.time;
+      this.monthOpt = this.createMonth((!t || isNaN(t)) ? new Date().getTime() : t);
     }
   }
 
@@ -380,7 +386,7 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
   }
 
   canBack(): boolean {
-    if (!this._d.from || this._view !== 'days') {
+    if (!this._d.from || this._view !== 'days' || !this.monthOpt?.original) {
       return true;
     }
     return this.monthOpt.original.time > moment(this._d.from).valueOf();
@@ -539,9 +545,17 @@ export class CalendarComponent implements ControlValueAccessor, OnInit {
 
   writeValue(obj: any): void {
     this._writeValue(obj);
-    if (obj) {
-      if (this._calendarMonthValue[0]) {
-        this.monthOpt = this.createMonth(this._calendarMonthValue[0].time);
+    // Ne rien faire si obj est falsy ou un tableau vide (pas encore de sélection).
+    // Cas critique : quand ngModel appelle writeValue([]) au démarrage alors que
+    // pickMode est encore 'single', _createCalendarDay([]) renvoie un timestamp
+    // invalide (année ~1900) → monthOpt corrompu → boutons de navigation cassés.
+    const hasRealValue = obj && !(Array.isArray(obj) && obj.length === 0);
+    if (hasRealValue) {
+      const firstDate = this._calendarMonthValue[0];
+      const t = firstDate?.time;
+      // Guard supplémentaire : rejeter les timestamps invalides
+      if (t && !isNaN(t)) {
+        this.monthOpt = this.createMonth(t);
       } else {
         this.monthOpt = this.createMonth(new Date().getTime());
       }

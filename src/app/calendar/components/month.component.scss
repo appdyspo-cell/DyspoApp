@@ -121,6 +121,20 @@
   pointer-events: none;
 }
 
+// Bulle rose : événement partagé avec des amis (is_multi ou plusieurs membres)
+:host .common-event-badge {
+  position: absolute;
+  top: 0px;
+  left: calc(50% + 11px);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #E91E8B;
+  border: 1.5px solid #fff;
+  z-index: 20;
+  pointer-events: none;
+}
+
 ion-badge {
   position: absolute;
   top: -5px; /* Ajustez cette valeur pour positionner verticalement */

@@ -20,7 +20,7 @@ const config: CapacitorConfig = {
     },
 
     SplashScreen: {
-      launchShowDuration: 5000,
+      launchShowDuration: 0,
       launchAutoHide: true,
       androidSplashResourceName: 'splash',
     },

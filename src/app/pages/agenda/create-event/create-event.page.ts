@@ -97,7 +97,7 @@ export class CreateEventPage implements OnInit, OnDestroy {
   autocompletePlaces: google.maps.places.AutocompletePrediction[] = [];
   inputSearch = '';
 
-  GoogleAutocompleteSvc: google.maps.places.AutocompleteService;
+  GoogleAutocompleteSvc: google.maps.places.AutocompleteService | null = null;
   autocompletePlaceInput!: { input: string };
   mode: any;
   uid = '';
@@ -113,6 +113,8 @@ export class CreateEventPage implements OnInit, OnDestroy {
   showEndClock = false;
   private searchSubject = new Subject<string>();
   private searchSubscription?: Subscription;
+  private membersInfoSubject = new Subject<void>();
+  private membersInfoSubscription?: Subscription;
 
   get startHour(): number {
     return this.agendaEvent ? getHours(parseISO(this.agendaEvent.startISO)) : 12;
@@ -142,13 +144,18 @@ export class CreateEventPage implements OnInit, OnDestroy {
     private modalCtrl: ModalController
   ) {
     this.uid = this.userSvc.userInfo?.uid!;
-    this.GoogleAutocompleteSvc = new google.maps.places.AutocompleteService();
+    if ((window as any).google?.maps?.places) {
+      this.GoogleAutocompleteSvc = new google.maps.places.AutocompleteService();
+    }
     this.autocompletePlaceInput = { input: '' };
     this.autocompletePlaces = [];
     this.searchSubscription = this.searchSubject.pipe(
       debounceTime(300),
       distinctUntilChanged()
     ).subscribe(input => this.fetchPredictions(input));
+    this.membersInfoSubscription = this.membersInfoSubject.pipe(
+      debounceTime(400)
+    ).subscribe(() => this.getMembersInfo());
     this.activatedRoute.params.subscribe((params) => {
       this.mode = params['mode'];
       console.log('Create ev');
@@ -360,14 +367,18 @@ export class CreateEventPage implements OnInit, OnDestroy {
   }
 
   async getMembersInfo() {
-    this.members = await this.userSvc.getUserInfos(
+    // ── Toutes les requêtes Firestore d'abord (hors zone, OK) ────────────────
+    const members = await this.userSvc.getUserInfos(
       this.agendaEvent!.members_uid.concat(
         this.agendaEvent!.members_invited_uid
       )
     );
 
-    const memberUids = this.members.map(m => m.uid);
-    if(memberUids.length === 0) return;
+    const memberUids = members.map(m => m.uid);
+    if (memberUids.length === 0) {
+      this.zone.run(() => { this.members = []; });
+      return;
+    }
 
     // Fetch dyspos in one bulk call instead of individually per member
     const allDyspos = await this.agendaSvc.getDyspos(memberUids, this.agendaEvent!);
@@ -375,14 +386,19 @@ export class CreateEventPage implements OnInit, OnDestroy {
     allDyspos.forEach(d => dyspoMap.set(d.friend_uid, d.friend_dyspo));
 
     // Parallelize members events fetching
-    const promises = this.members.map(async (member) => {
+    await Promise.all(members.map(async (member) => {
       member.is_my_friend = this.friendsSvc.isMyFriend(member.uid);
       member.dyspoStatus = dyspoMap.get(member.uid) || UserDyspoStatus.UNDEFINED;
       const events = await this.agendaSvc.getUserAgendaEvents(member.uid, this.agendaEvent!);
       member.agendaEvents = events.agendaEvents;
-    });
+    }));
 
-    await Promise.all(promises);
+    // ── Assignation dans la zone Angular ────────────────────────────────────
+    // @angular/fire v20 exécute les callbacks Firestore hors de la zone.
+    // Sur iOS (WKWebView), zone.run() est indispensable pour déclencher le cycle CD.
+    this.zone.run(() => {
+      this.members = members;
+    });
   }
 
   async ngOnInit() {
@@ -401,6 +417,7 @@ export class CreateEventPage implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.searchSubscription?.unsubscribe();
+    this.membersInfoSubscription?.unsubscribe();
   }
 
   onStartDateOnlyChanged(ev: any) {
@@ -578,7 +595,7 @@ export class CreateEventPage implements OnInit, OnDestroy {
     //}
 
     //Reload members info
-    this.getMembersInfo();
+    this.membersInfoSubject.next();
   }
 
   onEndTimeChanged(ev: any) {
@@ -606,7 +623,7 @@ export class CreateEventPage implements OnInit, OnDestroy {
     );
     console.log('Reload infos');
     //Reload members info
-    this.getMembersInfo();
+    this.membersInfoSubject.next();
   }
 
   selectSearchResult(prediction: google.maps.places.AutocompletePrediction) {
@@ -636,6 +653,14 @@ export class CreateEventPage implements OnInit, OnDestroy {
   }
 
   private fetchPredictions(input: string) {
+    if (!this.GoogleAutocompleteSvc) {
+      if ((window as any).google?.maps?.places) {
+        this.GoogleAutocompleteSvc = new google.maps.places.AutocompleteService();
+      } else {
+        this.isSearching = false;
+        return;
+      }
+    }
     this.GoogleAutocompleteSvc.getPlacePredictions(
       { input, types: ['geocode', 'establishment'] },
       (predictions) => {

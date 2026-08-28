@@ -169,6 +169,11 @@ const HELPER_CONTENTS: Record<ShowHelper, HelperContent> = {
     subtitle: 'Planifiez en quelques étapes',
     tips: [
       {
+        icon: 'people-circle-outline',
+        title: 'Disponibilité de vos amis',
+        description: 'Voyez qui de vos amis est Dyspo ! en un clin d\'œil grâce aux bulles de couleur sur leur photo.',
+      },
+      {
         icon: 'people-outline',
         title: 'Participants',
         description: 'Ajoutez vos amis à l\'événement : ils recevront une invitation à accepter ou décliner.',
@@ -182,11 +187,6 @@ const HELPER_CONTENTS: Record<ShowHelper, HelperContent> = {
         icon: 'location-outline',
         title: 'Lieu',
         description: 'Renseignez une adresse pour la retrouver facilement et la partager avec les participants.',
-      },
-      {
-        icon: 'people-circle-outline',
-        title: 'Disponibilité de vos amis',
-        description: 'Voyez qui de vos amis est Dyspo ! en un clin d\'œil grâce aux bulles de couleur sur leur photo.',
       },
     ],
   },
