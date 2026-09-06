@@ -3,8 +3,9 @@
 .dyspo-tab-bar {
   --background: var(--d-surface-1);
   --border: none;
-  height: 62px;
-  padding-bottom: env(safe-area-inset-bottom, 0);
+  // Hauteur dynamique : 56px d'icônes + inset navigation Android
+  height: calc(56px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   box-shadow: 0 -1px 0 var(--d-surface-3), 0 -4px 16px rgba(26, 29, 35, 0.06);
   border-top: none;
 }
@@ -46,7 +47,7 @@
   }
 
   ion-icon {
-    font-size: 24px;
+    font-size: 28px;
     margin: 0;
     transition: transform var(--d-duration-base) var(--d-spring);
   }
@@ -56,7 +57,7 @@
   }
 
   .tab-icon-sli {
-    font-size: 24px;
+    font-size: 28px;
     line-height: 1;
     color: inherit;
     transition: transform var(--d-duration-base) var(--d-spring);

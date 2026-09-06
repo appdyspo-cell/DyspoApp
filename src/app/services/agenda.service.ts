@@ -602,6 +602,36 @@ export class AgendaService {
     return dyspos;
   }
 
+  /**
+   * Charge le statut dyspo d'aujourd'hui pour une liste d'UIDs en une seule
+   * vague de requêtes parallèles. Utilisé par la page Amis pour afficher la
+   * bulle colorée autour de l'avatar.
+   */
+  async getTodayDyspos(uids: string[]): Promise<Map<string, UserDyspoStatus>> {
+    const result = new Map<string, UserDyspoStatus>();
+    if (!uids || uids.length === 0) return result;
+
+    const today = new Date();
+    const key = `${getYear(today)}_${getMonth(today)}_${getDate(today)}`;
+
+    await Promise.all(
+      uids.map(async (uid) => {
+        const docRef = doc(this.firestore, `agenda_dyspos/${uid}/dyspo_list`, key);
+        try {
+          const snap = await getDoc(docRef);
+          result.set(uid, snap.exists()
+            ? (snap.data() as AgendaDyspoItem).userDyspo
+            : UserDyspoStatus.UNDEFINED
+          );
+        } catch {
+          result.set(uid, UserDyspoStatus.UNDEFINED);
+        }
+      })
+    );
+
+    return result;
+  }
+
   async getUserAgendaEvents(
     uid: string,
     agendaEventToCompare: AgendaEvent
@@ -658,7 +688,8 @@ export class AgendaService {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const result = docSnap.data() as AppUser;
-        allowShare = result.appSettings?.shareAgenda!;
+        // ?? true : si le champ est absent (anciens comptes), on partage par défaut
+        allowShare = result.appSettings?.shareAgenda ?? true;
         if (!allowShare) {
           return {
             agendaEvents: [],

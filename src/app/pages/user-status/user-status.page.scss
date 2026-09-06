@@ -102,6 +102,62 @@ ion-badge {
   }
 }
 
+// ── Bloc date ─────────────────────────────────────────────────────────────────
+
+.status-date-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 20px;
+  margin-bottom: 0;
+}
+
+.today-pre {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--d-text-tertiary);
+  letter-spacing: 0.5px;
+}
+
+.today-date {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--d-text-primary);
+  text-transform: capitalize;
+}
+
+// ── Bulle statut (tap target) ─────────────────────────────────────────────────
+
+.status-bubble-block {
+  width: 68%;
+  max-width: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 24px 0 8px;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease;
+
+  &:active { transform: scale(0.96); }
+
+  ion-img { width: 100%; }
+}
+
+.status-tap-hint {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--d-brand);
+  letter-spacing: 0.2px;
+  opacity: 0.85;
+}
+
+// ── (legacy, gardé pour rétro-compat) ────────────────────────────────────────
+
 .dyspo-button {
   width: 100%;
   min-height: 160px;
@@ -112,6 +168,149 @@ ion-badge {
   width: 100%;
   position: relative;
   overflow: hidden;
+}
+
+// ── Modal statut redesigné ────────────────────────────────────────────────────
+
+.status-modal-content {
+  background: var(--d-surface-1);
+  width: 100%;
+  height: auto;
+  border-radius: 24px;
+}
+
+.status-modal-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 28px 20px 20px;
+  gap: 0;
+}
+
+.status-modal-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.status-modal-title {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--d-text-primary);
+  letter-spacing: -0.2px;
+  margin-bottom: 4px;
+}
+
+.status-modal-sub {
+  font-size: 0.8rem;
+  color: var(--d-text-tertiary);
+  font-weight: 600;
+}
+
+// ── Cartes de choix de statut ─────────────────────────────────────────────────
+
+.status-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@keyframes status-bump {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.06); }
+  65%  { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+.status-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 14px 12px 12px;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  font-family: var(--ion-font-family);
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  transition: filter 0.1s ease;
+
+  &:active {
+    animation: status-bump 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+    filter: brightness(0.95);
+  }
+
+  .sopt-img {
+    width: 52px;
+    flex-shrink: 0;
+  }
+
+  .sopt-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .sopt-label {
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1.2;
+    transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  &:active .sopt-label {
+    transform: scale(1.08);
+  }
+
+  .sopt-sub {
+    font-size: 0.75rem;
+    font-weight: 500;
+    opacity: 0.75;
+  }
+
+  .sopt-arrow {
+    font-size: 18px;
+    opacity: 0.4;
+    flex-shrink: 0;
+  }
+
+  // Variants couleur
+  &.status-opt-dyspo {
+    background: var(--d-dyspo-light);
+    .sopt-label, .sopt-sub { color: #184d2b; }
+  }
+
+  &.status-opt-kids {
+    background: var(--d-dyspo-kids-light);
+    .sopt-label, .sopt-sub { color: var(--d-dyspo-kids-dark); }
+  }
+
+  &.status-opt-nodyspo {
+    background: var(--d-no-dyspo-light);
+    .sopt-label { color: var(--d-no-dyspo); }
+    .sopt-sub   { color: var(--d-no-dyspo); }
+  }
+}
+
+// ── Bouton annuler ────────────────────────────────────────────────────────────
+
+.status-cancel-btn {
+  margin-top: 16px;
+  background: transparent;
+  border: none;
+  font-family: var(--ion-font-family);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--d-text-tertiary);
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 10px;
+  align-self: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s ease;
+
+  &:active { opacity: 0.5; }
 }
 
 .dyspo {

@@ -462,6 +462,12 @@ export class CreateEventPage implements OnInit, OnDestroy {
     this.onEndTimeChanged({ detail: { value: formatISO(combined) } });
   }
 
+  /** Applique un raccourci horaire (Matinée / Journée / Soirée) */
+  applyTimePreset(startH: number, startM: number, endH: number, endM: number) {
+    this.onStartClockConfirmed({ hour: startH, minute: startM });
+    this.onEndClockConfirmed({ hour: endH, minute: endM });
+  }
+
   async saveOrUpdateEvent() {
     try {
       if (this.agendaEvent?.title) {

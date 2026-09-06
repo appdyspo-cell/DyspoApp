@@ -1,22 +1,27 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
   NgZone,
+  OnDestroy,
   OnInit,
   Output,
   ViewChild,
 } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { NavigationExtras } from '@angular/router';
 import {
+  ActionSheetController,
   AlertController,
   ModalController,
   NavController,
 } from '@ionic/angular';
 
-import { format, isBefore, isSameDay, parseISO, setHours } from 'date-fns';
+import { format, getDate, getMonth, getYear, isBefore, isSameDay, parseISO, setHours } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import {
+  AgendaDyspoItem,
   AgendaEvent,
   AgendaEventType,
   AppUser,
@@ -39,7 +44,7 @@ import { FriendProfileComponent } from '../friend-profile/friend-profile.compone
     styleUrls: ['./agenda-event-info.component.scss'],
     standalone: false
 })
-export class AgendaEventInfoComponent implements OnInit {
+export class AgendaEventInfoComponent implements OnInit, OnDestroy {
   @Output() outevt = new EventEmitter<string>();
   @Input() agendaEvent!: AgendaEvent;
   @Input() isInvitation!: boolean;
@@ -73,17 +78,20 @@ export class AgendaEventInfoComponent implements OnInit {
   selectedUser: AppUserWithEvents | undefined;
   selectedUserFriendStatus: FriendStatus | undefined;
   selectedUserFriendStatusLabel = '';
+  private subs: Subscription[] = [];
 
   constructor(
     private modalCtrl: ModalController,
     private alertCtrl: AlertController,
+    private actionSheetCtrl: ActionSheetController,
     private agendaSvc: AgendaService,
     public userSvc: UserService,
     private utils: UtilsService,
     private navCtrl: NavController,
     private friendsSvc: FriendsService,
     private calendarSvc: CalendarService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {
     this.members_loaded = false;
   }
@@ -216,14 +224,14 @@ export class AgendaEventInfoComponent implements OnInit {
 
           switch (this.my_dyspoStatus) {
             case UserDyspoStatus.DYSPO:
-              this.my_dyspoStatus_label = 'Vous êtes disponible à cette date';
+              this.my_dyspoStatus_label = "Vous êtes disponible à cette date";
               break;
             case UserDyspoStatus.NODYSPO:
               this.my_dyspoStatus_label =
                 "Vous n'êtes pas disponible à cette date";
               break;
             case UserDyspoStatus.DYSPOWITHKIDS:
-              this.my_dyspoStatus_label = 'Vous avez vos enfants à cette date';
+              this.my_dyspoStatus_label = "Vous avez vos enfants à cette date";
               break;
             case UserDyspoStatus.UNDEFINED:
               this.my_dyspoStatus_label =
@@ -241,6 +249,74 @@ export class AgendaEventInfoComponent implements OnInit {
       this.members_presence_confirmed = [...this.members_presence_confirmed];
       this.members_presence_not_confirmed = [...this.members_presence_not_confirmed];
     });
+
+    // ── Souscriptions live : mises à jour réactives du bloc disponibilité ──
+    // Les labels sont recalculés chaque fois que les events ou le statut
+    // dyspo changent (ex: un autre événement créé pendant que la modale est ouverte).
+    if (this.isInvitation) {
+      this.subs.push(
+        this.agendaSvc.agendaEventsSubject.subscribe(events => {
+          this.ngZone.run(() => {
+            this.recomputeMyEventsLabel(events);
+            this.cdr.detectChanges();
+          });
+        }),
+        this.agendaSvc.agendaDysposSubject.subscribe(({ items }) => {
+          this.ngZone.run(() => {
+            this.recomputeMyDyspoLabel(items);
+            this.cdr.detectChanges();
+          });
+        })
+      );
+    }
+  }
+
+  ngOnDestroy() {
+    this.subs.forEach(s => s.unsubscribe());
+  }
+
+  /** Recalcule le label "événements ce jour" depuis le cache local. */
+  private recomputeMyEventsLabel(events: AgendaEvent[]) {
+    // Overlap correct : mon événement chevauche la date de l’invitation
+    // (pas seulement contenu dedans)
+    const overlapping = events.filter(ev =>
+      ev.uid !== this.agendaEvent.uid &&
+      ev.start_date_ts <= this.agendaEvent.end_date_ts &&
+      ev.end_date_ts >= this.agendaEvent.start_date_ts
+    );
+    if (overlapping.length === 0) {
+      this.my_agendaEvents_label = "Vous n’avez rien de prévu à cette date";
+    } else if (overlapping.length === 1) {
+      this.my_agendaEvents_label = "Vous avez un événement ce jour là";
+    } else {
+      this.my_agendaEvents_label = "Vous avez plusieurs événements ce jour là";
+    }
+  }
+
+  /** Recalcule le label "statut dyspo" depuis le cache local. */
+  private recomputeMyDyspoLabel(dyspos: AgendaDyspoItem[]) {
+    const startDate = parseISO(this.agendaEvent.startISO);
+    const y = getYear(startDate);
+    const m = getMonth(startDate); // 0-indexed, identique au stockage AgendaDyspoItem
+    const d = getDate(startDate);
+    const matching = dyspos.find(item =>
+      item.year === y && item.month === m && item.day === d
+    );
+    const status = matching?.userDyspo ?? UserDyspoStatus.UNDEFINED;
+
+    switch (status) {
+      case UserDyspoStatus.DYSPO:
+        this.my_dyspoStatus_label = "Vous êtes disponible à cette date";
+        break;
+      case UserDyspoStatus.NODYSPO:
+        this.my_dyspoStatus_label = "Vous n’êtes pas disponible à cette date";
+        break;
+      case UserDyspoStatus.DYSPOWITHKIDS:
+        this.my_dyspoStatus_label = "Vous avez vos enfants à cette date";
+        break;
+      default:
+        this.my_dyspoStatus_label = "Vous n’avez pas indiqué votre disponibilité";
+    }
   }
 
   openPopoverMenu(e: Event) {
@@ -349,8 +425,11 @@ export class AgendaEventInfoComponent implements OnInit {
 
   async acceptInvitation() {
     this.agendaSvc.acceptEventInvitation(this.agendaEvent);
-    await this.calendarSvc.promptAddToCalendar(this.agendaEvent);
     this.close();
+  }
+
+  addToCalendar() {
+    this.calendarSvc.promptAddToCalendar(this.agendaEvent);
   }
 
   declineInvitation() {
@@ -393,8 +472,40 @@ export class AgendaEventInfoComponent implements OnInit {
     });
   }
 
-  async openFriendProfile(member: AppUserWithEvents, event: Event) {
+  /** Clique sur le "+" d'un participant non-ami → action sheet avec 2 options */
+  async openParticipantActions(member: AppUserWithEvents, event: Event) {
     event.stopPropagation();
+    const firstname = member.firstname || 'ce participant';
+    const sheet = await this.actionSheetCtrl.create({
+      header: firstname,
+      cssClass: 'participant-action-sheet',
+      buttons: [
+        {
+          text: `Voir la fiche de ${firstname}`,
+          icon: 'person-circle-outline',
+          handler: () => { this.openFriendProfileModal(member); },
+        },
+        {
+          text: 'Demander en ami',
+          icon: 'person-add-outline',
+          handler: () => {
+            this.friendsSvc.invite(member, true).then(() => {
+              member.is_my_friend = true;
+            });
+          },
+        },
+        {
+          text: 'Annuler',
+          role: 'cancel',
+          icon: 'close-outline',
+        },
+      ],
+    });
+    await sheet.present();
+  }
+
+  /** Ouvre la fiche profil du participant dans une modale */
+  private async openFriendProfileModal(member: AppUserWithEvents) {
     const modal = await this.modalCtrl.create({
       component: FriendProfileComponent,
       componentProps: {
@@ -428,6 +539,38 @@ export class AgendaEventInfoComponent implements OnInit {
         break;
     }
     return label;
+  }
+
+  /** Classe CSS appliquée sur le card wrapper pour les tokens couleur */
+  get evTypeClass(): string {
+    switch (this.agendaEvent?.type) {
+      case AgendaEventType.KIDS:   return 'ev-KIDS';
+      case AgendaEventType.NOKIDS: return 'ev-NOKIDS';
+      case AgendaEventType.FREE:   return 'ev-FREE';
+      case AgendaEventType.SOLO:   return 'ev-SOLO';
+      default:                     return 'ev-SOLO';
+    }
+  }
+
+  /** Classe d'anneau dyspo autour de l'avatar admin */
+  get adminDyspoRingClass(): string {
+    const status = (this.admin as AppUserWithEvents)?.dyspoStatus;
+    switch (status) {
+      case UserDyspoStatus.DYSPOWITHKIDS: return 'ring-kids';
+      case UserDyspoStatus.DYSPO:         return 'ring-dyspo';
+      case UserDyspoStatus.NODYSPO:       return 'ring-nodyspo';
+      default:                            return '';
+    }
+  }
+
+  /** Classe d'anneau dyspo autour d'un avatar participant */
+  getMemberRingClass(member: AppUserWithEvents): string {
+    switch (member.dyspoStatus) {
+      case UserDyspoStatus.DYSPOWITHKIDS: return 'ring-kids';
+      case UserDyspoStatus.DYSPO:         return 'ring-dyspo';
+      case UserDyspoStatus.NODYSPO:       return 'ring-nodyspo';
+      default:                            return 'ring-undef';
+    }
   }
 
   getOtherEventLabel(ev: AgendaEvent) {

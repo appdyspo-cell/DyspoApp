@@ -2,6 +2,7 @@ import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { CustodyRenewalModalComponent } from './components/custody-renewal/custody-renewal-modal.component';
+import { CalendarOnboardingModalComponent } from './components/calendar-onboarding/calendar-onboarding-modal.component';
 import { RouteReuseStrategy } from '@angular/router';
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
@@ -36,7 +37,7 @@ export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 
-@NgModule({ declarations: [AppComponent, CustodyRenewalModalComponent],
+@NgModule({ declarations: [AppComponent, CustodyRenewalModalComponent, CalendarOnboardingModalComponent],
     schemas: [NO_ERRORS_SCHEMA],
     bootstrap: [AppComponent], imports: [BrowserModule,
         FormsModule,

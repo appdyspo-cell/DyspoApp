@@ -16,6 +16,7 @@ import { UtilsService } from './services/utils.service';
 import { Contacts } from '@capacitor-community/contacts';
 import { AppUser } from './models/models';
 import { CustodyRenewalModalComponent, CustodyRenewalResult } from './components/custody-renewal/custody-renewal-modal.component';
+import { CalendarOnboardingModalComponent, CalendarOnboardingResult } from './components/calendar-onboarding/calendar-onboarding-modal.component';
 
 @Component({
     selector: 'app-root',
@@ -98,7 +99,11 @@ export class AppComponent {
               this.navController.navigateRoot('/tabs');
               setTimeout(() => {
                 this.hideStartupLoader();
-                this.checkCustodyRenewal(appUser);
+                // Popup unique de 1ère configuration (utilisateurs existants sans calendrier)
+                // checkFirstCalendarSetup s'enchaîne avec checkCustodyRenewal si besoin.
+                this.checkFirstCalendarSetup(appUser).then(() => {
+                  this.checkCustodyRenewal(appUser);
+                });
               }, 1200);
             })
             .catch(async (err) => {
@@ -163,6 +168,62 @@ export class AppComponent {
   ngOnDestroy() {
     this.authStateSubscription.unsubscribe();
     //this.userSubscription.unsubscribe();
+  }
+
+  /**
+   * Popup unique affiché une seule fois aux utilisateurs existants qui n'ont
+   * jamais configuré leur calendrier de disponibilités (dyspo_fill_end_date_ms absent).
+   *
+   * - Sans enfants → remplit tout en vert (DYSPO) pour 1 an.
+   * - Avec enfants → affiche la grille de garde 2 semaines, puis remplit le calendrier.
+   *
+   * La clé localStorage `dyspo_cal_setup_<uid>` évite de ré-afficher le popup.
+   */
+  private async checkFirstCalendarSetup(user: AppUser): Promise<void> {
+    // Déjà configuré → rien à faire
+    if (user.dyspo_fill_end_date_ms) return;
+
+    // Déjà montré lors d'une session précédente
+    const storageKey = `dyspo_cal_setup_${user.uid}`;
+    if (localStorage.getItem(storageKey)) return;
+    localStorage.setItem(storageKey, '1');
+
+    const modal = await this.modalCtrl.create({
+      component: CalendarOnboardingModalComponent,
+      breakpoints: [0, 1],
+      initialBreakpoint: 1,
+      backdropDismiss: false,      // l'utilisateur doit répondre
+      cssClass: 'calendar-onboarding-modal',
+    });
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss<CalendarOnboardingResult>();
+    if (!data) return;
+
+    try {
+      await this.utils.showLoader();
+
+      // Sans enfants → tableau vide → applyCustodySchedule remplit tout en DYSPO
+      // Avec enfants → tableau de garde → alternance DYSPOWITHKIDS / DYSPO
+      const custodyDays = data.withKids && data.custodyDays
+        ? data.custodyDays
+        : new Array(14).fill(false);
+
+      await this.agendaSvc.applyCustodySchedule(user.uid!, custodyDays);
+
+      // Mettre à jour le profil : with_kids + custody_schedule
+      await this.userSvc.updateUser({
+        ...user,
+        with_kids: data.withKids,
+        custody_schedule: custodyDays,
+      });
+
+      this.utils.hideLoader();
+      this.utils.showToastSuccess('Calendrier rempli pour un an !');
+    } catch (err) {
+      this.utils.hideLoader();
+      this.utils.showToastError(err as string);
+    }
   }
 
   private async checkCustodyRenewal(user: AppUser) {

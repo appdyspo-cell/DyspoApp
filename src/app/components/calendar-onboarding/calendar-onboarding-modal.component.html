@@ -1,0 +1,95 @@
+<ion-header class="ion-no-border onboarding-header">
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <!-- Pas de bouton fermer : le popup est important, l'utilisateur doit répondre -->
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="onboarding-content">
+
+  <!-- ── Étape 1 : question enfants ─────────────────────────────── -->
+  <div *ngIf="step === 'kids-question'" class="onboarding-body">
+    <div class="onboarding-icon">
+      <ion-icon name="people-outline"></ion-icon>
+    </div>
+
+    <h2 class="onboarding-title">Bienvenue dans cette mise à jour !</h2>
+    <p class="onboarding-subtitle">
+      Dyspo peut maintenant pré-remplir votre calendrier de disponibilités automatiquement.
+      Pour commencer, une question rapide :
+    </p>
+
+    <p class="onboarding-question">Avez-vous des enfants ?</p>
+
+    <div class="choice-buttons">
+      <button class="choice-btn choice-yes" (click)="chooseYes()">
+        <span class="choice-icon">👨‍👧</span>
+        <span class="choice-label">Oui</span>
+        <span class="choice-hint">Je gère un planning de garde</span>
+      </button>
+      <button class="choice-btn choice-no" (click)="chooseNo()">
+        <span class="choice-icon">😊</span>
+        <span class="choice-label">Non</span>
+        <span class="choice-hint">Remplir mon calendrier tout en vert</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Étape 2 : grille de garde (si oui) ──────────────────────── -->
+  <div *ngIf="step === 'custody-picker'" class="onboarding-body">
+    <button class="back-btn" (click)="step = 'kids-question'">
+      <ion-icon name="chevron-back-outline"></ion-icon>
+      Retour
+    </button>
+
+    <div class="onboarding-icon icon-custody">
+      <ion-icon name="calendar-outline"></ion-icon>
+    </div>
+
+    <h2 class="onboarding-title">Votre planning de garde</h2>
+    <p class="onboarding-subtitle">
+      Sélectionnez vos jours de garde sur 2 semaines.
+      Dyspo alternera automatiquement toute l'année.
+    </p>
+
+    <div class="custody-section">
+      <p class="week-label">Semaine 1</p>
+      <div class="custody-week">
+        <div
+          *ngFor="let day of weekDays; let i = index"
+          class="day-bubble"
+          [class.selected]="custodyDays[i]"
+          (click)="toggleDay(i)"
+        >{{ day }}</div>
+      </div>
+
+      <p class="week-label" style="margin-top: 14px">Semaine 2</p>
+      <div class="custody-week">
+        <div
+          *ngFor="let day of weekDays; let i = index"
+          class="day-bubble"
+          [class.selected]="custodyDays[i + 7]"
+          (click)="toggleDay(i + 7)"
+        >{{ day }}</div>
+      </div>
+
+      <p *ngIf="!custodyDays.includes(true)" class="edit-error">
+        Sélectionnez au moins un jour de garde.
+      </p>
+    </div>
+
+    <div class="onboarding-actions">
+      <ion-button
+        expand="block"
+        class="btn-confirm"
+        (click)="confirmCustody()"
+        [disabled]="!custodyDays.includes(true)"
+      >
+        <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+        Remplir mon calendrier
+      </ion-button>
+    </div>
+  </div>
+
+</ion-content>

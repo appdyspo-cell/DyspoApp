@@ -150,6 +150,43 @@ ion-item {
   }
 }
 
+// ── Bulle de disponibilité autour de l'avatar ────────────────────────────────
+//    Un ring coloré (box-shadow double couche : gap blanc + couleur) selon le
+//    statut dyspo du jour. UNDEFINED = pas de ring.
+
+.avatar-ring-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--d-space-3);
+  border-radius: 50%;
+  background: transparent;
+  transition: box-shadow 300ms ease;
+
+  ion-thumbnail {
+    width: 46px;
+    height: 46px;
+    --border-radius: 50%;
+    margin-right: 0;   // géré par le wrapper
+    border: none;      // la bordure est sur le wrapper
+    flex-shrink: 0;
+  }
+
+  &.ring-dyspo {
+    box-shadow: 0 0 0 2px var(--ion-background-color, #fff),
+                0 0 0 4px var(--d-dyspo);
+  }
+  &.ring-kids {
+    box-shadow: 0 0 0 2px var(--ion-background-color, #fff),
+                0 0 0 4px var(--d-dyspo-kids);
+  }
+  &.ring-nodyspo {
+    box-shadow: 0 0 0 2px var(--ion-background-color, #fff),
+                0 0 0 4px var(--d-no-dyspo);
+  }
+}
+
 // Avatar dans la liste d'autocomplete
 .avatar-thumbnail {
   width: 46px;
@@ -217,6 +254,75 @@ ion-button.btn-invite {
   font-weight: 600;
   color: var(--d-brand);
   line-height: 1;
+}
+
+// ── Invitations reçues ────────────────────────────────────────────────────────
+
+// Avatar cliquable dans la liste des invitations
+.inv-avatar-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-right: var(--d-space-3);
+  border: 2px solid var(--d-surface-3);
+  cursor: pointer;
+  transition: transform var(--d-duration-fast) var(--d-ease),
+              opacity  var(--d-duration-fast) var(--d-ease);
+
+  &:active { transform: scale(0.93); opacity: 0.8; }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+}
+
+// Groupe de deux bulles Accept / Refuse
+.inv-btn-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.inv-bubble {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+
+  &:active { transform: scale(0.88); opacity: 0.85; }
+
+  ion-icon { font-size: 20px; }
+}
+
+.inv-bubble-accept {
+  background: transparent;
+  color: var(--d-dyspo-dark);
+  border: 2px solid var(--d-dyspo-dark);
+}
+
+.inv-bubble-refuse {
+  background: transparent;
+  color: var(--d-no-dyspo);
+  border: 2px solid var(--d-no-dyspo);
+}
+
+// Désactiver l'effet tap sur l'item entier (avatar et boutons gèrent les actions)
+.inv-item {
+  --background-activated: transparent;
+  --background-hover: transparent;
 }
 
 // ── FAB ────────────────────────────────────────────────────────────────────────

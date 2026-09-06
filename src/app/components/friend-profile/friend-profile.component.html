@@ -10,58 +10,116 @@
 </ion-header>
 
 <ion-content class="ion-padding">
+
+  <!-- ── En-tête : photo + nom + statut dyspo ─────────────────────── -->
   <div class="profile-header">
-    <ion-avatar class="profile-avatar">
+    <div class="avatar-wrap">
       <img
+        class="profile-avatar"
         [src]="user?.avatarPath || defaultAvatar"
         (error)="$any($event.target).src = defaultAvatar"
       />
-    </ion-avatar>
+      <div class="avatar-ring"
+        [class.ring-dyspo]="todayDyspo === UserDyspoStatus.DYSPO"
+        [class.ring-kids]="todayDyspo === UserDyspoStatus.DYSPOWITHKIDS"
+        [class.ring-nodyspo]="todayDyspo === UserDyspoStatus.NODYSPO"
+      ></div>
+    </div>
+
     <h2 class="profile-name">
       {{ user?.firstname }} {{ user?.lastname | uppercase }}
     </h2>
     <p class="profile-tagline" *ngIf="user?.tagline">{{ user?.tagline }}</p>
+
+    <ng-container *ngIf="!loadingDyspo && todayDyspo">
+      <div class="dyspo-badge"
+        [class.badge-dyspo]="todayDyspo === UserDyspoStatus.DYSPO"
+        [class.badge-kids]="todayDyspo === UserDyspoStatus.DYSPOWITHKIDS"
+        [class.badge-nodyspo]="todayDyspo === UserDyspoStatus.NODYSPO"
+      >
+        <ion-icon
+          [name]="todayDyspo === UserDyspoStatus.NODYSPO ? 'close-circle' : 'checkmark-circle'"
+        ></ion-icon>
+        <span *ngIf="todayDyspo === UserDyspoStatus.DYSPO">Dyspo aujourd'hui !</span>
+        <span *ngIf="todayDyspo === UserDyspoStatus.DYSPOWITHKIDS">Dyspo avec kid(s)</span>
+        <span *ngIf="todayDyspo === UserDyspoStatus.NODYSPO">Pas dyspo aujourd'hui</span>
+      </div>
+    </ng-container>
   </div>
 
+  <!-- ── Infos ──────────────────────────────────────────────────────── -->
   <ion-list lines="none" class="info-list">
+
     <ion-item *ngIf="user?.geo_zone">
-      <ion-icon name="location-outline" slot="start" style="color: var(--d-brand)"></ion-icon>
+      <ion-icon name="location-outline" slot="start" color="tertiary"></ion-icon>
       <ion-label>
-        <p>Zone</p>
-        <h3>{{ user?.geo_zone === 'zone_A' ? 'Zone A' : user?.geo_zone === 'zone_B' ? 'Zone B' : 'Zone C' }}</h3>
-      </ion-label>
-    </ion-item>
-
-    <ion-item *ngIf="user?.with_kids !== undefined">
-      <ion-icon name="people-outline" slot="start" style="color: var(--d-brand)"></ion-icon>
-      <ion-label>
-        <p>Enfants</p>
-        <h3>{{ user?.with_kids ? 'Avec enfants' : 'Sans enfants' }}</h3>
-      </ion-label>
-    </ion-item>
-
-    <ion-item *ngIf="user?.dyspoStatus">
-      <ion-icon name="calendar-outline" slot="start" style="color: var(--d-brand)"></ion-icon>
-      <ion-label>
-        <p>Statut dyspo</p>
+        <p>Zone scolaire</p>
         <h3>
-          <span *ngIf="user?.dyspoStatus === 'DYSPO'">🟢 Dyspo !</span>
-          <span *ngIf="user?.dyspoStatus === 'DYSPOWITHKIDS'">🔵 Dyspo avec kid(s)</span>
-          <span *ngIf="user?.dyspoStatus === 'NODYSPO'">🔴 Pas dyspo</span>
-          <span *ngIf="user?.dyspoStatus === 'UNDEFINED'">⚪ Non défini</span>
+          {{ user?.geo_zone === 'zone_A' ? 'Zone A'
+           : user?.geo_zone === 'zone_B' ? 'Zone B'
+           : 'Zone C' }}
         </h3>
       </ion-label>
     </ion-item>
-  </ion-list>
-</ion-content>
 
-<ion-footer *ngIf="!isFriend" class="ion-no-border friend-request-footer">
-  <ion-toolbar>
-    <div class="footer-inner">
+    <ion-item *ngIf="user?.with_kids !== undefined && user?.with_kids !== null">
+      <ion-icon
+        [name]="user?.with_kids ? 'happy-outline' : 'person-outline'"
+        slot="start"
+        color="tertiary"
+      ></ion-icon>
+      <ion-label>
+        <p>Enfants</p>
+        <h3>{{ user?.with_kids ? 'Avec enfant(s)' : 'Sans enfants' }}</h3>
+      </ion-label>
+    </ion-item>
+
+    <ion-item *ngIf="isFriend && commonFriendsCount > 0">
+      <ion-icon name="people-outline" slot="start" color="tertiary"></ion-icon>
+      <ion-label>
+        <p>Amis en commun</p>
+        <h3>{{ commonFriendsCount }} ami{{ commonFriendsCount > 1 ? 's' : '' }}</h3>
+      </ion-label>
+    </ion-item>
+
+  </ion-list>
+
+  <!-- ── Actions ────────────────────────────────────────────────────── -->
+  <div class="actions-block">
+
+    <!-- Invitation reçue → Accepter / Refuser -->
+    <ng-container *ngIf="isPendingInvitation">
+      <div class="inv-action-row">
+        <ion-button
+          expand="block"
+          fill="outline"
+          color="danger"
+          class="btn-decline"
+          [disabled]="declining || accepting"
+          (click)="declineInvitation()"
+        >
+          <ion-spinner *ngIf="declining" name="dots" slot="start"></ion-spinner>
+          <ion-icon *ngIf="!declining" name="close-outline" slot="start"></ion-icon>
+          Refuser
+        </ion-button>
+        <ion-button
+          expand="block"
+          class="btn-accept"
+          [disabled]="accepting || declining"
+          (click)="acceptInvitation()"
+        >
+          <ion-spinner *ngIf="accepting" name="dots" slot="start"></ion-spinner>
+          <ion-icon *ngIf="!accepting" name="checkmark-outline" slot="start"></ion-icon>
+          Accepter
+        </ion-button>
+      </div>
+    </ng-container>
+
+    <!-- Pas encore ami → bouton demande -->
+    <ng-container *ngIf="!isFriend && !isPendingInvitation">
       <ion-button
         *ngIf="!requested"
         expand="block"
-        class="dyspo-button"
         color="tertiary"
         [disabled]="sending"
         (click)="sendRequest()"
@@ -74,6 +132,22 @@
         <ion-icon name="checkmark-circle-outline"></ion-icon>
         Demande envoyée !
       </div>
-    </div>
-  </ion-toolbar>
-</ion-footer>
+    </ng-container>
+
+    <!-- Déjà ami → bouton supprimer -->
+    <ion-button
+      *ngIf="isFriend && !isPendingInvitation"
+      expand="block"
+      class="btn-remove-friend"
+      fill="outline"
+      [disabled]="removing"
+      (click)="removeFriend()"
+    >
+      <ion-spinner *ngIf="removing" name="dots" slot="start"></ion-spinner>
+      <ion-icon *ngIf="!removing" name="person-remove-outline" slot="start"></ion-icon>
+      Ne plus être ami
+    </ion-button>
+
+  </div>
+
+</ion-content>

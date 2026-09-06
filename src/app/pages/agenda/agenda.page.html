@@ -27,7 +27,10 @@
       <ion-title style="padding-left: 0">
         <div class="d-flex">
           <ion-thumbnail class="thumb-friend">
-            <ion-img src="{{agendaFriend?.userData?.avatarPath}}"></ion-img>
+            <img
+              [src]="agendaFriend?.userData?.avatarPath || 'assets/logo.svg'"
+              (error)="$any($event.target).src = 'assets/logo.svg'"
+            />
           </ion-thumbnail>
           <h1>{{agendaFriend?.userData?.firstname}}</h1>
         </div></ion-title

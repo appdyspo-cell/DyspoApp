@@ -13,6 +13,12 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/event/**",
+        "destination": "/event/index.html"
+      }
     ]
   }
 }

@@ -113,7 +113,14 @@ export class AuthService {
   }
 
   resetPw(email: string): Promise<void> {
-    return sendPasswordResetEmail(this.afAuth, email);
+    // SDK web @angular/fire avec actionCodeSettings explicites :
+    // - handleCodeInApp: false → lien standard /__/auth/action?mode=resetPassword
+    //   (évite les Firebase Dynamic Links dépréciés qui génèrent mode=action invalide)
+    // - url : continue URL affichée après reset, doit être dans les domaines autorisés Firebase
+    return sendPasswordResetEmail(this.afAuth, email, {
+      url: `https://${environment.firebaseConfig.authDomain}`,
+      handleCodeInApp: false,
+    });
   }
 
   async removeAccount() {

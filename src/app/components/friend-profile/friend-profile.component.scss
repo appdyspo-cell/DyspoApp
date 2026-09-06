@@ -1,20 +1,40 @@
+// ── En-tête ────────────────────────────────────────────────────────────────
 .profile-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24px 16px 16px;
+  padding: 24px 16px 20px;
   text-align: center;
 }
 
-.profile-avatar {
-  width: 90px;
-  height: 90px;
-  margin-bottom: 12px;
+// Avatar avec anneau coloré
+.avatar-wrap {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin-bottom: 14px;
+}
 
-  img {
-    object-fit: cover;
-    border-radius: 50%;
-  }
+.profile-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  // fine bordure neutre par défaut
+  border: 3px solid var(--ion-color-light);
+}
+
+.avatar-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 3.5px solid transparent;
+  pointer-events: none;
+
+  &.ring-dyspo    { border-color: var(--d-dyspo); }
+  &.ring-kids     { border-color: var(--d-dyspo-kids); }
+  &.ring-nodyspo  { border-color: var(--d-no-dyspo); }
 }
 
 .profile-name {
@@ -27,53 +47,115 @@
 .profile-tagline {
   font-size: 0.9rem;
   color: var(--ion-color-medium);
-  margin: 0;
+  margin: 0 0 12px;
 }
 
+// ── Badge dyspo ─────────────────────────────────────────────────────────────
+.dyspo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-top: 4px;
+  letter-spacing: 0.01em;
+
+  ion-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  &.badge-dyspo {
+    background: var(--d-dyspo);
+    color: #184d2b;
+  }
+
+  &.badge-kids {
+    background: var(--d-dyspo-kids);
+    color: #fff;
+  }
+
+  &.badge-nodyspo {
+    background: var(--d-no-dyspo);
+    color: #fff;
+  }
+}
+
+// ── Liste d'infos ───────────────────────────────────────────────────────────
 .info-list {
-  margin-top: 16px;
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: hidden;
+  background: var(--ion-item-background, var(--ion-background-color));
 
   ion-item {
     --padding-start: 16px;
     --inner-padding-end: 16px;
-    --min-height: 56px;
+    --min-height: 58px;
 
     ion-label {
       p {
-        font-size: 0.75rem;
+        font-size: 0.73rem;
         color: var(--ion-color-medium);
+        margin-bottom: 1px;
       }
       h3 {
         font-size: 0.95rem;
         font-weight: 600;
-        margin-top: 2px;
+        margin-top: 0;
       }
     }
   }
 }
 
-.friend-request-footer {
-  ion-toolbar {
-    --background: var(--d-surface-1);
-    --padding-bottom: max(12px, env(safe-area-inset-bottom));
-  }
+// ── Actions (inline, sous les infos) ────────────────────────────────────────
+.actions-block {
+  margin-top: 24px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
 
-  .footer-inner {
-    padding: 8px 16px 4px;
-  }
+// ── Boutons invitation (Accepter / Refuser) ──────────────────────────────────
+.inv-action-row {
+  display: flex;
+  gap: 12px;
 
-  .request-sent {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px;
-    font-size: 15px;
+  .btn-decline,
+  .btn-accept {
+    flex: 1;
+    --border-radius: var(--d-radius-md);
     font-weight: 700;
-    color: var(--d-brand);
-
-    ion-icon { font-size: 22px; }
+    font-size: 15px;
+    height: 48px;
+    text-transform: none;
   }
+
+  .btn-accept {
+    --background: var(--d-dyspo, var(--ion-color-success));
+    --background-activated: var(--d-dyspo);
+    --color: #184d2b;
+  }
+}
+
+.btn-remove-friend {
+  --color: var(--d-no-dyspo);
+  --border-color: var(--d-no-dyspo);
+  --border-radius: var(--d-radius-md);
+  font-weight: 700;
+  font-size: 15px;
+  height: 48px;
+  text-transform: none;
+}
+
+.request-sent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--d-brand);
+
+  ion-icon { font-size: 22px; }
 }

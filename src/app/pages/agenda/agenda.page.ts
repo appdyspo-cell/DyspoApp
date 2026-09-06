@@ -185,10 +185,12 @@ export class AgendaPage implements AfterViewInit {
           // indispensable sur iOS avec @angular/fire v20 (les callbacks s'exécutent hors zone)
           this.ngZone.run(() => {
             this.agendaEvents = friendData.agendaEvents;
+            this.buildCalendarEventDates(); // construit calendarEventDates (Set) → bulles de l'ami
             this.tagCalendarEventsDataForMonth();
             this.agendaDyspos = friendData.dyspos;
             this.tagCalendarUserDyspoData();
             this.myDysposForCommon = myData.dyspos;
+            this.cdr.detectChanges(); // force le repaint du calendrier après chargement async
           });
         } else {
           this.utils.showAlert('Ne souhaite pas partager son calendrier');
@@ -516,7 +518,7 @@ export class AgendaPage implements AfterViewInit {
     const buttons = [];
     buttons.push({
       text: 'Rendez-vous personnel',
-      // cssClass: 'dyspo-sheet-dyspo',
+      cssClass: 'dyspo-sheet-no-dyspo',
       data: {
         is_multi: false,
       },
@@ -524,14 +526,14 @@ export class AgendaPage implements AfterViewInit {
 
     buttons.push({
       text: 'Événement avec mes amis',
-      // cssClass: 'dyspo-sheet-dyspo-with-kids',
+      cssClass: 'dyspo-sheet-dyspo',
       data: {
         is_multi: true,
       },
     });
 
     const actionSheet = await this.actionSheetCtrl.create({
-      header: "Saisissez le type d'événement",
+      header: 'On fait quoi ?',
       cssClass: 'dyspo-sheet',
       buttons,
     });
@@ -717,13 +719,14 @@ export class AgendaPage implements AfterViewInit {
       day.cssClass = (day.cssClass || '').replace(/\bfilter-dimmed\b/g, '').trim();
       if (this.showCommonDatesOnly && !day.isLastMonth && !day.isNextMonth) {
         const myDyspo = this.myDysposForCommon.find((d) => isSameDay(d.time, day.time));
-        const meAvailable =
-          myDyspo?.userDyspo === UserDyspoStatus.DYSPO ||
-          myDyspo?.userDyspo === UserDyspoStatus.DYSPOWITHKIDS;
-        const friendAvailable =
-          day.userDyspo === UserDyspoStatus.DYSPO ||
-          day.userDyspo === UserDyspoStatus.DYSPOWITHKIDS;
-        if (!meAvailable || !friendAvailable) {
+        const myStatus = myDyspo?.userDyspo ?? UserDyspoStatus.UNDEFINED;
+        const friendStatus = day.userDyspo ?? UserDyspoStatus.UNDEFINED;
+        // Afficher uniquement les jours où les deux ont exactement le même statut
+        // et que ce statut est une disponibilité réelle (DYSPO ou DYSPOWITHKIDS)
+        const sameAvailableStatus =
+          myStatus === friendStatus &&
+          (myStatus === UserDyspoStatus.DYSPO || myStatus === UserDyspoStatus.DYSPOWITHKIDS);
+        if (!sameAvailableStatus) {
           day.cssClass = ((day.cssClass || '') + ' filter-dimmed').trim();
         }
       }

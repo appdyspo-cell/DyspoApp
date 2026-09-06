@@ -9,52 +9,22 @@
       <span class="notif-label">Notifications</span>
       <span class="notif-sub" *ngIf="totalNotifications === 0">Aucune notification</span>
     </div>
-    <ion-text style="padding-top: 30px">- Aujourd'hui -</ion-text>
-    <span style="font-size: 1.4em; font-weight: 600">{{todayFormatted}}</span>
-    <div
-      style="
-        margin-top: 32px;
-        margin-bottom: 20px;
-        width: 100%;
-        display: flex;
-        justify-content: center;
-      "
-    >
-      <div button id="open-status-modal" class="dyspo-btn-container">
-        <div
-          class="dyspo-button ion-activatable animate__animated animate__fadeIn"
-          *ngIf="todayDyspo?.userDyspo === dyspoStatus.DYSPO"
-        >
-          <ion-img src="/assets/newimg/home_dyspo.png"></ion-img>
-          <!-- <ion-ripple-effect></ion-ripple-effect> -->
-        </div>
-
-        <div
-          *ngIf="todayDyspo?.userDyspo === dyspoStatus.DYSPOWITHKIDS"
-          class="dyspo-button ion-activatable animate__animated animate__fadeIn"
-        >
-          <ion-img src="/assets/newimg/home_dyspo_wk.png"></ion-img>
-          <!-- <ion-ripple-effect></ion-ripple-effect> -->
-        </div>
-
-        <div
-          *ngIf="todayDyspo?.userDyspo === dyspoStatus.NODYSPO"
-          class="dyspo-button ion-activatable animate__animated animate__fadeIn"
-        >
-          <ion-img src="/assets/newimg/home_pas_dyspo.png"></ion-img>
-          <!-- <ion-ripple-effect></ion-ripple-effect> -->
-        </div>
-
-        <div
-          *ngIf="todayDyspo.userDyspo === dyspoStatus.UNDEFINED "
-          class="dyspo-button ion-activatable animate__animated animate__fadeIn"
-        >
-          <ion-img src="/assets/newimg/home_pas_dyspo.png"></ion-img>
-          <!-- <ion-ripple-effect></ion-ripple-effect> -->
-        </div>
-      </div>
+    <!-- ── Date ───────────────────────────────────────────────── -->
+    <div class="status-date-block">
+      <ion-text class="today-pre">- Aujourd'hui -</ion-text>
+      <span class="today-date">{{todayFormatted}}</span>
     </div>
 
+    <!-- ── Bulle statut (tap → modal) ─────────────────────────── -->
+    <button id="open-status-modal" class="status-bubble-block animate__animated animate__fadeIn">
+      <span class="status-tap-hint">Appuyer pour changer</span>
+      <ion-img *ngIf="todayDyspo?.userDyspo === dyspoStatus.DYSPO"        src="/assets/newimg/home_dyspo.png"></ion-img>
+      <ion-img *ngIf="todayDyspo?.userDyspo === dyspoStatus.DYSPOWITHKIDS" src="/assets/newimg/home_dyspo_wk.png"></ion-img>
+      <ion-img *ngIf="todayDyspo?.userDyspo === dyspoStatus.NODYSPO"       src="/assets/newimg/home_pas_dyspo.png"></ion-img>
+      <ion-img *ngIf="todayDyspo?.userDyspo === dyspoStatus.UNDEFINED"     src="/assets/newimg/home_pas_dyspo.png"></ion-img>
+    </button>
+
+    <!-- ── CTA ────────────────────────────────────────────────── -->
     <div class="cta-invite">
       <p class="cta-label">Planifiez votre prochain moment</p>
       <p class="cta-phrase" [class.cta-visible]="ctaVisible">{{ ctaPhrase }}</p>
@@ -187,59 +157,60 @@
     </ion-card-content>
   </div> -->
 
+  <!-- ── Modal statut centré ──────────────────────────────────── -->
   <ion-modal
     #statusmodal
     trigger="open-status-modal"
     (willDismiss)="onWillDismiss($event)"
-    [initialBreakpoint]="userSvc.userInfo?.with_kids? 0.5: 0.4"
-    [breakpoints]="userSvc.userInfo?.with_kids? [0, 0.5] : [0, 0.4]"
+    cssClass="status-center-modal"
   >
     <ng-template>
-      <ion-header>
-        <ion-toolbar>
-          <div style="text-align: center; width: 100%">
-            Changer mon statut du jour
+      <div class="status-modal-content">
+        <div class="status-modal-inner">
+
+          <div class="status-modal-header">
+            <div class="status-modal-title">Mon statut du jour</div>
+            <div class="status-modal-sub">Sélectionne ta disponibilité</div>
           </div>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content class="ion-padding ion-margin">
-        <div class="dyspo-modal-btns-container">
-          <div
-            style="display: flex; justify-content: center"
-            button
-            (click)="updateStatus(dyspoStatus.DYSPO)"
-          >
-            <ion-img
-              style="width: 50%"
-              src="/assets/newimg/home_dyspo.png"
-            ></ion-img>
-            <ion-ripple-effect></ion-ripple-effect>
+
+          <div class="status-options">
+
+            <button class="status-option status-opt-dyspo"
+                    (click)="updateStatus(dyspoStatus.DYSPO)">
+              <ion-img src="/assets/newimg/home_dyspo.png" class="sopt-img"></ion-img>
+              <div class="sopt-text">
+                <span class="sopt-label">Je suis Dyspo !</span>
+                <span class="sopt-sub">Disponible pour sortir</span>
+              </div>
+              <ion-icon name="chevron-forward-outline" class="sopt-arrow"></ion-icon>
+            </button>
+
+            <button *ngIf="userSvc.userInfo?.with_kids"
+                    class="status-option status-opt-kids"
+                    (click)="updateStatus(dyspoStatus.DYSPOWITHKIDS)">
+              <ion-img src="/assets/newimg/home_dyspo_wk.png" class="sopt-img"></ion-img>
+              <div class="sopt-text">
+                <span class="sopt-label">Dyspo avec kids</span>
+                <span class="sopt-sub">Disponible en famille</span>
+              </div>
+              <ion-icon name="chevron-forward-outline" class="sopt-arrow"></ion-icon>
+            </button>
+
+            <button class="status-option status-opt-nodyspo"
+                    (click)="updateStatus(dyspoStatus.NODYSPO)">
+              <ion-img src="/assets/newimg/home_pas_dyspo.png" class="sopt-img"></ion-img>
+              <div class="sopt-text">
+                <span class="sopt-label">Pas Dyspo</span>
+                <span class="sopt-sub">Je ne suis pas dispo</span>
+              </div>
+              <ion-icon name="chevron-forward-outline" class="sopt-arrow"></ion-icon>
+            </button>
+
           </div>
-          <div
-            *ngIf="userSvc.userInfo?.with_kids"
-            button
-            style="display: flex; justify-content: center"
-            (click)="updateStatus(dyspoStatus.DYSPOWITHKIDS)"
-          >
-            <ion-img
-              style="width: 50%"
-              src="/assets/newimg/home_dyspo_wk.png"
-            ></ion-img>
-            <!-- <ion-ripple-effect></ion-ripple-effect> -->
-          </div>
-          <div
-            button
-            style="display: flex; justify-content: center"
-            (click)="updateStatus(dyspoStatus.NODYSPO)"
-          >
-            <ion-img
-              style="width: 50%"
-              src="/assets/newimg/home_pas_dyspo.png"
-            ></ion-img>
-            <ion-ripple-effect></ion-ripple-effect>
-          </div>
+
+          <button class="status-cancel-btn" (click)="modal.dismiss()">Annuler</button>
         </div>
-      </ion-content>
+      </div>
     </ng-template>
   </ion-modal>
 </ion-content>

@@ -43,6 +43,9 @@ export class FriendsService {
 
   public friends$!: Observable<Friend[]>;
   public friendGroups$!: Observable<FriendGroup[]>;
+
+  /** Onglet à ouvrir au prochain ionViewWillEnter de FriendsPage (consommé une seule fois). */
+  pendingOpenSegment: string | null = null;
   onSnapshotFriendGroupsCancel!: import('@angular/fire/firestore').Unsubscribe;
   onSnapshotFriendsCancel!: import('@angular/fire/firestore').Unsubscribe;
 
@@ -163,6 +166,7 @@ export class FriendsService {
         snapshot.docChanges().forEach((change) => {
           if (change.type === 'modified') {
             const friendModified = change.doc.data() as Friend;
+            friendModified.friend_uid = change.doc.id; // manquait : sans ça, findIndex retourne toujours -1
 
             const foundIndex = this.friends.findIndex(
               (elt) => elt.friend_uid === friendModified.friend_uid
@@ -484,40 +488,33 @@ export class FriendsService {
       doc(this.firestore, `friends/${friend.friend_uid}/friend_list/${uid}`)
     );
 
+    // Suppression du lien ami — opération principale (critique).
     await batch.commit();
 
-    // Lire les groupes concernés avant d'écrire (getDocs hors transaction —
-    // transaction.get() n'accepte pas de Query dans le SDK modulaire)
-    const [mygroups_snapshots, hisgroups_snapshots] = await Promise.all([
-      getDocs(
+    // Nettoyage de nos propres groupes qui contenaient cet ami — secondaire.
+    // Enveloppé dans try/catch : une erreur ici (index manquant, réseau…)
+    // ne doit jamais faire échouer la suppression qui, elle, a déjà réussi.
+    try {
+      if (!friend.friend_uid) return;
+      const mygroups_snapshots = await getDocs(
         query(
           collection(this.firestore, `friend_groups/${uid}/friend_group_list`),
           where('members_uid', 'array-contains', friend.friend_uid)
         )
-      ),
-      getDocs(
-        query(
-          collection(this.firestore, `friend_groups/${friend.friend_uid}/friend_group_list`),
-          where('members_uid', 'array-contains', uid)
-        )
-      ),
-    ]);
+      );
 
-    const groupBatch = writeBatch(this.firestore);
-
-    mygroups_snapshots.forEach((snap) => {
-      const group = snap.data() as FriendGroup;
-      const updated = group.members_uid.filter((m) => m !== friend.friend_uid);
-      groupBatch.update(snap.ref, { members_uid: updated });
-    });
-
-    hisgroups_snapshots.forEach((snap) => {
-      const group = snap.data() as FriendGroup;
-      const updated = group.members_uid.filter((m) => m !== uid);
-      groupBatch.update(snap.ref, { members_uid: updated });
-    });
-
-    await groupBatch.commit();
+      if (!mygroups_snapshots.empty) {
+        const groupBatch = writeBatch(this.firestore);
+        mygroups_snapshots.forEach((snap) => {
+          const group = snap.data() as FriendGroup;
+          const updated = group.members_uid.filter((m) => m !== friend.friend_uid);
+          groupBatch.update(snap.ref, { members_uid: updated });
+        });
+        await groupBatch.commit();
+      }
+    } catch (err) {
+      console.warn('[FriendsService] nettoyage des groupes après deleteFriend échoué (non-critique) :', err);
+    }
   }
 
   async deleteFriendGroup(friendGroup: FriendGroup, listElement: any) {

@@ -55,17 +55,16 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
-
-    <uses-permission
-    android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-    android:maxSdkVersion="29"
-  />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <!-- Requis par @capacitor-community/contacts v7 même en lecture seule -->
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
 
-    <!-- Bloquer les permissions média injectées par les plugins Capacitor -->
+    <!-- Suppression de toutes les permissions médias/stockage injectées par @capacitor/camera.
+         L'app utilise le Photo Picker Android et @capacitor/filesystem + share — aucune
+         permission de stockage/média n'est nécessaire sur Android 10+. -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" tools:node="remove" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
 </manifest>

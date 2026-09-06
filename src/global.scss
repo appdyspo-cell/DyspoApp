@@ -27,11 +27,9 @@ ion-app {
   background: var(--d-surface-0);
 }
 
-// Safe area Android 15 edge-to-edge
-ion-tab-bar {
-  padding-bottom: env(safe-area-inset-bottom);
-  height: calc(56px + env(safe-area-inset-bottom));
-}
+// ── Safe area Android 15 edge-to-edge ─────────────────────────────────────────
+// Note : --ion-safe-area-* sont définis dynamiquement via env() dans variables.scss.
+// Ces règles ciblent des éléments spécifiques qui ne lisent pas ces variables Ionic.
 
 ion-content {
   --padding-bottom: env(safe-area-inset-bottom);
@@ -41,6 +39,18 @@ ion-content {
 .fixed-bottom-btn,
 ion-footer ion-toolbar {
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+// Action sheets (dyspo-sheet, participant actions, etc.)
+// Ionic utilise --ion-safe-area-bottom en interne, mais on force le groupe de boutons
+// à descendre pour couvrir les appareils Android 15 avec navbar gesture.
+.action-sheet-group:last-child {
+  padding-bottom: max(8px, env(safe-area-inset-bottom)) !important;
+}
+
+// Alertes & toasts — padding bas minimum sur Android edge-to-edge
+ion-alert .alert-wrapper {
+  margin-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 // Page background — propre, sans image de fond
@@ -542,7 +552,7 @@ ion-popover {
 .bg-nokids   { --background: var(--d-dyspo);      color: var(--d-text-primary); }
 .bg-kids     { --background: var(--d-dyspo-kids);  color: #fff; }
 .bg-nodyspo  { --background: var(--d-no-dyspo);    color: #fff; }
-.bg-free     { --background: var(--d-free);        color: #fff; }
+.bg-free     { --background: var(--d-free);        color: #3d2600; }
 
 .bg-color-nokids  { background-color: var(--d-dyspo); }
 .bg-color-kid     { background-color: var(--d-dyspo-kids); }
@@ -552,11 +562,11 @@ ion-popover {
 .color-nokids  { color: var(--d-dyspo-dark); }
 .color-kid     { color: var(--d-dyspo-kids-dark); }
 .color-nodyspo { color: var(--d-no-dyspo); }
-.color-free    { color: var(--d-free); }
+.color-free    { color: var(--text-dyspo-free); }
 
 .label-bg-kids   { background: var(--d-dyspo-kids);  color: #fff; border-radius: var(--d-radius-sm); }
 .label-bg-nokids { background: var(--d-dyspo);        color: var(--d-text-primary); border-radius: var(--d-radius-sm); }
-.label-bg-free   { background: var(--d-free);         color: #fff; border-radius: var(--d-radius-sm); }
+.label-bg-free   { background: var(--d-free);         color: #3d2600; border-radius: var(--d-radius-sm); }
 .label-bg-solo   { background: var(--d-no-dyspo);     color: #fff; border-radius: var(--d-radius-sm); }
 
 .bg-kids-secondary    { background: var(--d-dyspo-kids-light); }
@@ -696,7 +706,7 @@ button.dyspo-sheet-dyspo,
 button.dyspo-sheet-dyspo-with-kids,
 button.dyspo-sheet-no-dyspo {
   font-size: 1.1rem !important;
-  font-weight: 700 !important;
+  font-weight: 800 !important;
   background: transparent !important;
   border-radius: 0 !important;
   margin: 0 !important;
@@ -763,7 +773,24 @@ ion-modal.status-picker-modal {
   }
 }
 
-// ── 25. RTL support (conservé) ────────────────────────────────────────────────
+// ── 25. Modal statut — centré, carte arrondie ─────────────────────────────────
+
+ion-modal.status-center-modal {
+  --width: 92%;
+  --max-width: 390px;
+  --height: fit-content;
+  --border-radius: 24px;
+  --box-shadow: 0 20px 64px rgba(26, 29, 35, 0.28);
+  --backdrop-opacity: 0.48;
+  align-items: center;
+  justify-content: center;
+
+  &::part(content) {
+    animation: d-bounce-in 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+}
+
+// ── 26. RTL support (conservé) ────────────────────────────────────────────────
 
 ion-app[dir="rtl"] {
   ion-header ion-toolbar ion-title {
@@ -782,12 +809,21 @@ ion-app[dir="rtl"] {
 // ── 25. Dyspo image viewer modal ──────────────────────────────────────────────
 
 .dyspo-viewer-modal {
-  --background: #000;
-  --backdrop-opacity: 0.92;
+  --width: 94%;
+  --max-width: 420px;
+  --height: 72vw;        // carré approx. — s'adapte à la largeur du modal
+  --max-height: 70vh;
+  --border-radius: 20px;
+  --background: #111;
+  --backdrop-opacity: 0.72;
+  --box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+  align-items: center;
+  justify-content: center;
 
   &::part(content) {
-    border-radius: 0;
-    background: #000;
+    border-radius: 20px;
+    background: #111;
+    animation: d-bounce-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   }
 }
 

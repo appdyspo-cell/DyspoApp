@@ -136,7 +136,7 @@ ion-radio.radio-checked::part(mark) {
 // Status color badges (used on radio labels)
 .kids  { background-color: var(--d-dyspo-kids); color: #fff; }
 .nokids { background-color: var(--d-dyspo); color: #fff; }
-.free  { background-color: var(--d-free); color: #fff; }
+.free  { background-color: var(--d-free); color: #3d2600; }
 
 // ── Title input ───────────────────────────────────────────────────────────────
 
@@ -518,6 +518,46 @@ ion-datetime {
 
   &:hover { background: rgba(53, 134, 162, 0.08); color: var(--ion-color-tertiary-shade); }
   &:active { background: var(--d-surface-3); color: var(--ion-color-tertiary-shade); }
+}
+
+// ── Raccourcis horaires (Matinée / Journée / Soirée) ─────────────────────────
+
+.time-presets {
+  display: flex;
+  gap: var(--d-space-2);
+  padding: var(--d-space-3) var(--d-space-4) var(--d-space-3);
+  background: var(--d-surface-2);
+  border-top: 1px solid var(--d-surface-3);
+}
+
+.time-preset-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--d-space-2) var(--d-space-1);
+  background: var(--d-surface-1);
+  border: 1.5px solid var(--d-surface-3);
+  border-radius: var(--d-radius-md);
+  cursor: pointer;
+  font-family: var(--ion-font-family, inherit);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--d-text-secondary);
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.12s ease, color 0.12s ease, transform 0.1s ease;
+
+  ion-icon {
+    font-size: 18px;
+    color: var(--d-brand);
+  }
+
+  &:active {
+    transform: scale(0.94);
+    border-color: var(--d-brand);
+    color: var(--d-brand);
+  }
 }
 
 // ── Description ───────────────────────────────────────────────────────────────

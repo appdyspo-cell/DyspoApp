@@ -48,7 +48,11 @@ export class NotificationsListPage implements OnInit {
   }
 
   openFriendRequests() {
-    this.navCtrl.navigateForward('/tabs/friends', { state: { isFromNotif: true } });
+    // On pose le flag AVANT de naviguer : FriendsPage est toujours vivante dans
+    // les tabs (Ionic ne recrée pas le composant), donc ionViewWillEnter est le
+    // seul endroit fiable pour le consommer.
+    this.friendsSvc.pendingOpenSegment = 'suggestions';
+    this.navCtrl.navigateForward('/tabs/friends');
   }
 
   async openAgendaEventInfo(agendaEvent: AgendaEvent) {

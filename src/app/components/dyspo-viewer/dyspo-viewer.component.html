@@ -1,25 +1,12 @@
-<ion-content [fullscreen]="true" scrollY="false" class="viewer-content">
-  <!-- Floating controls -->
-  <div class="viewer-controls">
-    <ion-button fill="clear" class="ctrl-btn" (click)="close()">
-      <ion-icon slot="icon-only" name="close-outline"></ion-icon>
-    </ion-button>
-    <ion-button fill="clear" class="ctrl-btn" (click)="saveToGallery()">
-      <ion-icon slot="icon-only" name="download-outline"></ion-icon>
-    </ion-button>
-  </div>
+<div class="viewer-card">
 
-  <!-- Pan-zoom image -->
-  <div class="viewer-panzoom">
-    <pan-zoom
-      [keepInBounds]="panZoomKeepInBounds"
-      [scalePerZoomLevel]="panZoomScalePerZoomLevel"
-      [zoomLevels]="panZoomZoomLevels"
-      [zoomOnDoubleClick]="panZoomZoomOnDoubleClick"
-    >
-      <div class="viewer-img-wrapper">
-        <img [src]="image" class="viewer-img" />
-      </div>
-    </pan-zoom>
-  </div>
-</ion-content>
+  <!-- Croix fermeture — haut droite -->
+  <button class="viewer-close" (click)="close()">
+    <ion-icon name="close-outline"></ion-icon>
+  </button>
+
+  <!-- Image -->
+  <img [src]="image" class="viewer-img"
+       (error)="$any($event.target).style.display='none'" />
+
+</div>

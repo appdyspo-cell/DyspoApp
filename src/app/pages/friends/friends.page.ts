@@ -25,7 +25,9 @@ import {
   FriendGroup,
   FriendStatus,
   ShowHelper,
+  UserDyspoStatus,
 } from 'src/app/models/models';
+import { AgendaService } from 'src/app/services/agenda.service';
 import { FriendsService } from 'src/app/services/friends.service';
 import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
@@ -44,10 +46,14 @@ export class FriendsPage implements OnInit {
     $event.stopPropagation();
     const modal = await this.modalCtrl.create({
       component: FriendProfileComponent,
-      componentProps: { user: friend.userData },
+      componentProps: { user: friend.userData, isFriend: true },
       cssClass: 'friend-profile-modal',
     });
     await modal.present();
+    const { data } = await modal.onWillDismiss();
+    if (data === 'removed') {
+      this.utils.showToastSuccess(`${friend.userData?.firstname} retiré de vos amis`);
+    }
   }
 
   async openFriendProfile(user: AppUser) {
@@ -57,6 +63,27 @@ export class FriendsPage implements OnInit {
       cssClass: 'friend-profile-modal',
     });
     await modal.present();
+  }
+
+  /** Ouvre la fiche d'un ami qui nous a envoyé une invitation, avec Accepter / Refuser */
+  async openInvitationProfile(friend: Friend, $event: MouseEvent) {
+    $event.stopPropagation();
+    const modal = await this.modalCtrl.create({
+      component: FriendProfileComponent,
+      componentProps: {
+        user: friend.userData,
+        isFriend: false,
+        isPendingInvitation: true,
+      },
+      cssClass: 'friend-profile-modal',
+    });
+    await modal.present();
+    const { data } = await modal.onWillDismiss();
+    if (data === 'accepted') {
+      this.utils.showToastSuccess(`${friend.userData?.firstname} ajouté à vos amis !`);
+    } else if (data === 'declined') {
+      this.utils.showToast(`Invitation de ${friend.userData?.firstname} refusée`);
+    }
   }
 
   scrollToLetter(letter: string) {
@@ -97,6 +124,16 @@ export class FriendsPage implements OnInit {
   friendsSubscrition: Subscription;
   friendGroupsSubscrition: Subscription;
 
+  /** Statut dyspo d'aujourd'hui par friend_uid — alimente la bulle de l'avatar */
+  friendTodayDyspoMap = new Map<string, UserDyspoStatus>();
+  UserDyspoStatus = UserDyspoStatus;
+
+  /**
+   * Cache des bulles dyspo : évite N requêtes Firestore à chaque retour sur l'onglet.
+   * Invalidé si le jour change ou si la liste d'amis change.
+   */
+  private _dyspoCache: { date: string; key: string; map: Map<string, UserDyspoStatus> } | null = null;
+
   get filteredFriends(): Friend[] {
     if (!this.inputSearch) return this.friends;
     const query = this.inputSearch.toUpperCase();
@@ -116,7 +153,8 @@ export class FriendsPage implements OnInit {
     public animationCtrl: AnimationController,
     private navCtrl: NavController,
     private modalCtrl: ModalController,
-    private platform: Platform
+    private platform: Platform,
+    private agendaSvc: AgendaService
   ) {
     this.friends$ = this.friendService.friends$;
     this.friendGroups$ = this.friendService.friendGroups$;
@@ -151,11 +189,6 @@ export class FriendsPage implements OnInit {
         console.log('Friend Groups  ', friendGroups);
       }
     );
-    const isFromNotif =
-      this.route.getCurrentNavigation()?.extras.state?.['isFromNotif'];
-    if (isFromNotif) {
-      this.selectSegment = 'suggestions';
-    }
   }
 
   async ngOnInit() {
@@ -188,7 +221,45 @@ export class FriendsPage implements OnInit {
   }
 
   async ionViewWillEnter() {
-    this.allOtherUsers = await this.userSvc.getAllOtherUsers();
+    // Consommer le flag posé par la page Notifications avant la navigation.
+    // Le constructeur ne tourne qu'une fois (tabs), donc c'est ici qu'on agit.
+    if (this.friendService.pendingOpenSegment) {
+      this.selectSegment = this.friendService.pendingOpenSegment;
+      this.friendService.pendingOpenSegment = null;
+    }
+
+    const uids = this.friends
+      .map((f) => f.friend_uid)
+      .filter((uid): uid is string => !!uid);
+
+    // Clé de cache : jour courant + liste triée des UIDs (détecte ajout/suppression d'ami)
+    const today = new Date().toISOString().slice(0, 10);
+    const uidsKey = uids.slice().sort().join(',');
+    const cacheHit =
+      this._dyspoCache !== null &&
+      this._dyspoCache.date === today &&
+      this._dyspoCache.key === uidsKey;
+
+    // Résolution des bulles dyspo : cache ou requêtes Firestore parallèles
+    const dyspoPromise = cacheHit
+      ? Promise.resolve(this._dyspoCache!.map)
+      : uids.length > 0
+        ? this.agendaSvc.getTodayDyspos(uids)
+        : Promise.resolve(new Map<string, UserDyspoStatus>());
+
+    // getAllOtherUsers et getTodayDyspos partent EN PARALLÈLE
+    const [users, dyspoMap] = await Promise.all([
+      this.userSvc.getAllOtherUsers(),
+      dyspoPromise,
+    ]);
+
+    this.allOtherUsers = users;
+
+    if (!cacheHit) {
+      this._dyspoCache = { date: today, key: uidsKey, map: dyspoMap };
+    }
+
+    this.friendTodayDyspoMap = dyspoMap;
   }
 
   promptDeleteFriend(friend: Friend, i: number) {
@@ -313,11 +384,14 @@ export class FriendsPage implements OnInit {
 
   showAgenda(friend: AppUser, event: any) {
     event.stopPropagation();
-    //this.utils.showModalPage(AmiFicheComponent, {friendListDoc: friend, userData: friend.userData});
+    // Depuis la recherche, on reçoit un AppUser sans userData imbriqué.
+    // La page agenda lit friend.userData.* → on normalise en Friend-like si besoin.
+    const normalized = (friend as any).userData
+      ? friend
+      : { ...(friend as any), userData: friend, friend_uid: (friend as any).uid };
+
     const navigationExtras: NavigationExtras = {
-      state: {
-        friend,
-      },
+      state: { friend: normalized },
     };
 
     this.navCtrl.navigateForward('agenda/friend', navigationExtras);

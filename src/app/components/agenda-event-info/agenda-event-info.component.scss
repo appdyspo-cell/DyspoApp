@@ -1,303 +1,492 @@
+// ── Animation d'entrée ───────────────────────────────────────────────────────
 :host {
   animation: eventFicheBounce 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  display: block;
+  height: 100%;
 }
 
 @keyframes eventFicheBounce {
-  from { opacity: 0; transform: scale(0.82) translateY(24px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.bg-kids-img {
-  --background: none;
-  background-image: url("/assets/newimg/fd_ecran_event_kid.jpg");
-  background-position: center top;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-.bg-nokids-img {
-  --background: none;
-  background-image: url("/assets/newimg/fd_ecran_event_nokid.jpg");
-  background-position: center top;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-.bg-free-img {
-  --background: none;
-  background-image: url("/assets/newimg/fd_ecran_event_kidnokid.jpg");
-  background-position: center top;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-.bg-solo-img {
-  --background: none;
-  background-image: url("/assets/newimg/fd_ecran_event_solo.jpg");
-  background-position: center top;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-ion-toolbar {
-  --background: transparent;
-}
-
-.toolbar-icon-btn {
-  --padding-start: 8px;
-  --padding-end: 8px;
-  width: 44px;
-  height: 44px;
-  font-size: 26px;
-}
-
-ion-button {
-  margin-left: 0px;
-}
-
-.white-btn {
-  --color: #eee;
-}
-
-.form-btn {
-  --background: #363636;
-}
-
-.header-container {
-  margin: 0px 5px 16px 5px;
-  ion-thumbnail {
-    height: 100px;
-    width: 100px;
-    --border-radius: 50%;
-    margin-right: 10px;
-    padding: 3px;
-  }
-  .admin {
-  }
-}
-
-.body-inner {
-  //color: #eee;
-}
-
-.category_div {
-  overflow: scroll;
+// ── Wrapper flex — remplace .ev-card comme conteneur de layout ───────────────
+// Ce div porte aussi les tokens couleur via [ngClass]="evTypeClass"
+.ev-wrap {
   display: flex;
-  flex-direction: row;
-  min-height: 82px;
-  padding: 0px 8px 8px 8px;
-  .menu {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    //justify-content: center;
-    .item {
-      border-radius: 50%;
-      background: transparent !important;
-      width: max-content;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      background: var(--d-surface-2);
-      ion-label {
-        font-size: 10px;
-      }
-      ion-thumbnail {
-        border-radius: 50%;
-        padding: 2px;
-        margin: 2px;
-        height: 60px;
-        width: 60px;
-        --background: transparent;
-        //border: 2px solid rgb(255, 95, 122);
-        position: relative;
+  flex-direction: column;
+  height: 100%;
 
-        .invite-icon {
-          position: absolute;
-          bottom: -5px;
-          right: -5px;
-          color: var(--d-brand);
-          font-size: 20px;
-          background: white;
-          border-radius: 50%;
-          cursor: pointer;
-        }
-        img {
-          border-radius: 50%;
-        }
+  // ── Tokens couleur par type d'événement ──────────────────────────────
+  --ev-accent: var(--d-surface-3);
+  --ev-light:  var(--d-surface-2);
+  --ev-text:   var(--d-text-primary);
+  --ev-dark:   var(--d-text-secondary);
 
-        .thumbnail-status {
-          position: absolute;
-          top: 0px; /* Ajustez cette valeur pour positionner verticalement */
-          //right: -5px; /* Ajustez cette valeur pour positionner horizontalement */
-          font-size: 60px; /* Taille du texte du badge */
-          width: 100%;
-          height: 100%;
-
-          left: 0px;
-          text-align: center;
-          justify-content: center;
-          border-radius: 50%; /* Pour créer un badge circulaire */
-          // background-color: rgb(35, 176, 47); /* Couleur de fond du badge */
-          color: rgb(240, 240, 240); /* Couleur du texte du badge */
-          display: flex;
-          align-items: center;
-        }
-      }
-    }
+  &.ev-KIDS {
+    --ev-accent: var(--d-dyspo-kids);
+    --ev-light:  var(--d-dyspo-kids-light);
+    --ev-text:   #fff;
+    --ev-dark:   var(--d-dyspo-kids-dark);
+  }
+  &.ev-NOKIDS {
+    --ev-accent: var(--d-dyspo);
+    --ev-light:  var(--d-dyspo-light);
+    --ev-text:   #184d2b;
+    --ev-dark:   var(--d-dyspo-dark);
+  }
+  &.ev-FREE {
+    --ev-accent: var(--d-free);
+    --ev-light:  var(--d-free-light);
+    --ev-text:   #3d2600;
+    --ev-dark:   #c49a08;
+  }
+  &.ev-SOLO {
+    --ev-accent: var(--d-no-dyspo);
+    --ev-light:  var(--d-no-dyspo-light);
+    --ev-text:   #fff;
+    --ev-dark:   var(--d-no-dyspo);
   }
 }
 
-ion-row {
-  ion-col {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    .img {
-      height: 160px;
-      width: 160px;
-      border-radius: 20px;
-      background-position: center center;
-      background-repeat: no-repeat;
-      background-size: cover;
-    }
-  }
+// ── ion-content — prend tout l'espace vertical restant ───────────────────────
+.ev-content {
+  flex: 1;
+  min-height: 0; // évite le débordement flex sur iOS WebView
+  --background: var(--d-surface-1);
 }
 
-.bg-event-avatar {
-  overflow: hidden;
-  border-radius: 3px;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  // min-width: 50%;
-  // max-width: 60%;
-  // min-height: 150px;
-  width: 189px;
-  height: 140px;
-  position: relative;
-  border: 2px solid rgb(255, 255, 255);
-  transform-origin: top left;
-
-  transform: rotate(-2deg); /* Ajustez l'angle de rotation selon vos besoins */
-
-  ion-img {
-    min-width: calc(100% + 30px);
-    min-height: 100%;
-    transform-origin: top left;
-    transform: rotate(2deg); /* Ajustez l'angle de rotation selon vos besoins */
-
-    position: absolute;
-    top: -20px;
-    left: -10px;
-  }
+// ── Carte (wrapper stylistique uniquement, plus de flex) ─────────────────────
+.ev-card {
+  background: var(--d-surface-1);
 }
 
-.container {
-  perspective: 1000px; /* Crée une perspective pour l'effet de perspective */
+// ── ① Barre colorée ──────────────────────────────────────────────────────────
+.ev-stripe {
+  height: 6px;
+  background: var(--ev-accent);
 }
 
-.skewed-div {
-  width: 300px; /* Ajustez la largeur selon vos besoins */
-  height: 200px; /* Ajustez la hauteur selon vos besoins */
-  background-color: var(--d-surface-2); /* Couleur de fond pour la div inclinée */
-  transform: rotate(-10deg); /* Inclinaison de la div */
+// ── ② En-tête teinté ─────────────────────────────────────────────────────────
+.ev-header {
+  background: var(--ev-light);
+  padding: 10px 14px 16px;
+  padding-top: calc(var(--ion-safe-area-top, env(safe-area-inset-top, 0px)) + 10px);
+}
+
+.ev-topbar {
   display: flex;
-  overflow: hidden;
-  justify-content: center;
   align-items: center;
-  margin: 50px; /* Marge pour séparer la div */
+  justify-content: space-between;
+  margin-bottom: 12px;
 }
 
-.skewed-div img {
-  transform: rotate(10deg); /* Inverse l'inclinaison de la div pour l'image */
-  width: calc(120%);
-  max-height: 100%;
+.ev-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.72);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--d-text-primary);
+  backdrop-filter: blur(6px);
+  transition: background var(--d-duration-fast, 150ms) ease,
+              transform var(--d-duration-fast, 150ms) ease;
+
+  &:active { transform: scale(.92); }
+
+  ion-icon { font-size: 20px; }
 }
 
-.label-type {
-  width: fit-content;
-  border-radius: 3px;
-  padding: 3px 5px;
-  margin-top: 3px;
+// Badge type d'événement
+.ev-type-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 13px;
+  border-radius: var(--d-radius-pill);
+  background: var(--ev-accent);
+  color: var(--ev-text);
+  font-size: .72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-bottom: 12px;
 }
 
-// ── Titre + description + adresse ────────────────────────────────────────────
+// Ligne admin
+.ev-admin-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-.event-title-text {
-  display: block;
-  font-size: 1.3rem;
+.ev-admin-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 300ms ease;
+
+  img {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+  }
+
+  &.ring-dyspo   { box-shadow: 0 0 0 2.5px var(--d-surface-1), 0 0 0 5px var(--d-dyspo); }
+  &.ring-kids    { box-shadow: 0 0 0 2.5px var(--d-surface-1), 0 0 0 5px var(--d-dyspo-kids); }
+  &.ring-nodyspo { box-shadow: 0 0 0 2.5px var(--d-surface-1), 0 0 0 5px var(--d-no-dyspo); }
+}
+
+.ev-admin-text {
+  strong {
+    display: block;
+    font-size: .98rem;
+    font-weight: 800;
+    color: var(--d-text-primary);
+    line-height: 1.25;
+  }
+  span {
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--d-text-secondary);
+  }
+}
+
+// Header événement solo
+.ev-solo-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .88rem;
   font-weight: 700;
-  line-height: 1.3;
+  color: var(--d-text-secondary);
+}
+.ev-solo-icon { font-size: 18px; }
+
+// ── ③ Corps blanc ────────────────────────────────────────────────────────────
+// Pas de flex ni overflow ici — c'est ion-content qui gère le scroll
+.ev-body {
+  background: var(--d-surface-1);
+  padding: 16px 16px 8px;
 }
 
-.event-meta-row {
+// Image
+.ev-image-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+  cursor: pointer;
+}
+.ev-image {
+  width: 100%;
+  max-height: 160px;
+  object-fit: cover;
+  border-radius: var(--d-radius-md);
+}
+
+// Titre
+.ev-title {
+  font-size: 1.22rem;
+  font-weight: 900;
+  letter-spacing: -.3px;
+  color: var(--d-text-primary);
+  line-height: 1.25;
+  margin-bottom: 10px;
+}
+
+// Lignes d'info
+.ev-info-row {
   display: flex;
   align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--d-surface-2);
+}
+
+.ev-info-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--d-radius-sm);
+  background: var(--ev-light);
+  display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 6px;
-  margin-top: 8px;
-  padding: 0 16px;
-  text-align: left;
-}
-
-.event-meta-icon {
-  font-size: 16px;
   flex-shrink: 0;
-  opacity: 0.65;
-  margin-top: 2px;
+  margin-top: 1px;
+
+  ion-icon {
+    font-size: 15px;
+    color: var(--ev-dark);
+  }
 }
 
-.event-meta-text {
-  font-size: 0.92rem;
-  line-height: 1.45;
-  opacity: 0.85;
+.ev-info-content { flex: 1; min-width: 0; }
+
+.ev-info-label {
+  font-size: .67rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--d-text-tertiary);
+  margin-bottom: 2px;
+}
+
+.ev-info-value {
+  font-size: .9rem;
+  font-weight: 600;
+  color: var(--d-text-primary);
+  line-height: 1.4;
   white-space: pre-wrap;
   word-break: break-word;
+
+  &.lighter {
+    font-weight: 400;
+    color: var(--d-text-secondary);
+  }
 }
 
-ion-item:last-child {
-  --inner-border-width: 0;
+// ── Participants ──────────────────────────────────────────────────────────────
+.ev-participants-section {
+  padding: 12px 0 8px;
+  border-top: 1px solid var(--d-surface-2);
+  margin-top: 4px;
 }
 
-.event-chat-row {
+.ev-participants-label {
+  font-size: .67rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--d-text-tertiary);
+  margin-bottom: 10px;
+}
+
+.ev-participants-scroll {
   display: flex;
-  justify-content: center;
-  margin-top: 14px;
+  gap: 12px;
+  overflow-x: auto;
+  // Padding sur tous les côtés pour que les box-shadow de ring (+4px),
+  // les badges (débordent de 1-2px) et l'icône "+" (bottom/right -4px)
+  // ne soient pas coupés par le overflow-y implicite du conteneur scrollable.
+  padding: 6px 6px 14px 6px;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
 }
 
-.event-chat-btn {
-  --background: rgba(45, 45, 45, 0.82);
-  --background-activated: rgba(30, 30, 30, 0.9);
-  --background-hover: rgba(30, 30, 30, 0.9);
-  --border-width: 0;
-  --color: #fff;
-  --border-radius: var(--d-radius-pill, 999px);
+.ev-participant {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.ev-p-wrap {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.ring-dyspo   { box-shadow: 0 0 0 2px var(--d-surface-1), 0 0 0 4px var(--d-dyspo); }
+  &.ring-kids    { box-shadow: 0 0 0 2px var(--d-surface-1), 0 0 0 4px var(--d-dyspo-kids); }
+  &.ring-nodyspo { box-shadow: 0 0 0 2px var(--d-surface-1), 0 0 0 4px var(--d-no-dyspo); }
+  &.ring-undef   { box-shadow: 0 0 0 2px var(--d-surface-1), 0 0 0 4px var(--d-surface-3); }
+}
+
+.ev-p-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.ev-p-skeleton {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: block;
+}
+
+.ev-p-badge {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  border: 2px solid var(--d-surface-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+
+  ion-icon { font-size: 9px; color: #fff; }
+
+  &.ev-p-confirmed { background: #4baf69; }
+  &.ev-p-pending   { background: var(--d-text-tertiary); }
+}
+
+.ev-p-conflict {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--d-no-dyspo);
+  border: 2px solid var(--d-surface-1);
+  z-index: 2;
+}
+
+.ev-p-add {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  font-size: 18px;
+  color: var(--d-brand);
+  background: var(--d-surface-1);
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 3;
+}
+
+.ev-p-name {
+  font-size: .68rem;
+  font-weight: 700;
+  color: var(--d-text-secondary);
+  max-width: 52px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ── Bannière disponibilité ────────────────────────────────────────────────────
+.ev-avail-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--d-radius-md);
+  margin-top: 12px;
+  background: var(--d-surface-2);
+  font-size: .83rem;
   font-weight: 600;
+  color: var(--d-text-secondary);
+
+  .ev-avail-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: var(--d-brand);
+  }
+
+  .ev-avail-sub {
+    font-size: .75rem;
+    font-weight: 400;
+    color: var(--d-text-tertiary);
+    margin-top: 2px;
+  }
+}
+
+// ── ④ Footer ancré en bas (flex-shrink: 0 dans .ev-wrap) ─────────────────────
+.ev-footer {
+  flex-shrink: 0;
+  background: var(--d-surface-1);
+  padding: 12px 16px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  display: flex;
+  gap: 8px;
+  border-top: 1px solid var(--d-surface-2);
+}
+
+.ev-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 46px;
+  border-radius: var(--d-radius-md);
+  font-family: var(--ion-font-family, inherit);
+  font-size: .83rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  transition: transform 100ms ease, opacity 150ms ease;
+  white-space: nowrap;
+  padding: 0 12px;
+  letter-spacing: -.1px;
+
+  &:active { transform: scale(.95); opacity: .88; }
+
+  ion-icon { font-size: 16px; flex-shrink: 0; }
+}
+
+// Invitation
+.ev-btn-accept {
+  flex: 2;
+  background: var(--ev-accent);
+  color: var(--ev-text);
+}
+
+.ev-btn-decline {
+  flex: 1.5;
+  background: transparent;
+  border: 1.5px solid var(--d-no-dyspo);
+  color: var(--d-no-dyspo);
+}
+
+.ev-btn-maybe {
+  flex: 1.5;
+  background: transparent;
+  border: 1.5px solid var(--d-surface-3);
+  color: var(--d-text-secondary);
+}
+
+// Discussion (mon événement)
+.ev-btn-chat {
+  flex: 1;
+  background: var(--d-text-primary);
+  color: var(--d-text-inverse, #fff);
+}
+
+// Ajouter au calendrier
+.ev-btn-calendar {
+  flex: 1;
+  background: transparent;
+  border: 1.5px solid var(--d-brand);
+  color: var(--d-brand);
+}
+
+// ── Popovers (inchangés) ──────────────────────────────────────────────────────
+.popover-events-header {
+  padding: 10px 14px;
+  font-size: .88rem;
+  font-weight: 600;
+  color: var(--d-text-primary);
+  border-bottom: 1px solid var(--d-surface-2);
 }
 
 .popover-calendar-btn {
-  color: var(--ion-color-primary);
+  color: var(--d-brand);
   font-weight: 700;
-  border-top: 1px solid var(--d-surface-3);
   cursor: pointer;
 
-  &:active { opacity: 0.7; }
-}
-
-.thumbnail-badge {
-  position: absolute;
-  top: -2px; /* Ajustez cette valeur pour positionner verticalement */
-  right: -5px; /* Ajustez cette valeur pour positionner horizontalement */
-  font-size: 12px; /* Taille du texte du badge */
-  width: 9px; /* Largeur du badge */
-  height: 9px; /* Hauteur du badge */
-  border-radius: 8px; /* Pour créer un badge circulaire */
-  background: var(--text-no-dyspo); /* Couleur de fond du badge */
-  color: white; /* Couleur du texte du badge */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100000000;
+  &:active { opacity: .7; }
 }

@@ -121,13 +121,19 @@
           </ion-item-option>
         </ion-item-options>
         <ion-item lines="full" class="friend-item" button detail="false" (click)="openFriendProfile(friendListDoc.userData!)">
-          <ion-thumbnail slot="start">
-            <img
-              [defaultImage]="defaultImage"
-              [lazyLoad]="friendListDoc.userData?.avatarPath!"
-              class="crop_img fade-img"
-            />
-          </ion-thumbnail>
+          <div slot="start" class="avatar-ring-wrapper"
+            [class.ring-dyspo]="friendTodayDyspoMap.get(friendListDoc.friend_uid!) === UserDyspoStatus.DYSPO"
+            [class.ring-kids]="friendTodayDyspoMap.get(friendListDoc.friend_uid!) === UserDyspoStatus.DYSPOWITHKIDS"
+            [class.ring-nodyspo]="friendTodayDyspoMap.get(friendListDoc.friend_uid!) === UserDyspoStatus.NODYSPO"
+          >
+            <ion-thumbnail>
+              <img
+                [defaultImage]="defaultImage"
+                [lazyLoad]="friendListDoc.userData?.avatarPath!"
+                class="crop_img fade-img"
+              />
+            </ion-thumbnail>
+          </div>
           <ion-label>
             <ion-row class="ion-align-items-center">
               {{friendListDoc.userData?.firstname}}
@@ -219,26 +225,26 @@
         [id]="'slidingItemSuggested' + i"
         *ngFor="let friendSuggested of friendsSuggested; let i = index;"
       >
-        <ion-item-options>
+        <ion-item-options side="end">
           <ion-item-option
-            (click)="declineFriendInvit(friendSuggested,i)"
+            (click)="declineFriendInvit(friendSuggested, i)"
             color="danger"
           >
-            <ion-icon slot="icon-only" name="trash"></ion-icon>
+            <ion-icon slot="icon-only" name="close-outline"></ion-icon>
           </ion-item-option>
         </ion-item-options>
-        <ion-item
-          (click)="showProfile(friendSuggested, $event)"
-          lines="full"
-          class="friend-item"
-        >
-          <ion-thumbnail slot="start">
+
+        <ion-item lines="full" class="friend-item inv-item">
+
+          <!-- Avatar cliquable → fiche avec Accepter / Refuser -->
+          <div slot="start" class="inv-avatar-wrap"
+            (click)="openInvitationProfile(friendSuggested, $event)">
             <img
               [defaultImage]="defaultImage"
               [lazyLoad]="friendSuggested.userData?.avatarPath!"
               class="crop_img fade-img"
             />
-          </ion-thumbnail>
+          </div>
 
           <ion-label>
             <ion-row class="ion-align-items-center">
@@ -247,7 +253,8 @@
             <ion-row class="ion-align-items-center">
               {{friendSuggested.userData?.lastname | uppercase}}
             </ion-row>
-            <ion-row class="ion-align-items-center common-friends-row" *ngIf="friendSuggested.commonFriendsCount && friendSuggested.commonFriendsCount > 0">
+            <ion-row class="ion-align-items-center common-friends-row"
+              *ngIf="friendSuggested.commonFriendsCount && friendSuggested.commonFriendsCount > 0">
               <ion-icon name="people-outline" class="common-friends-icon"></ion-icon>
               <span class="common-friends-label">
                 {{ friendSuggested.commonFriendsCount }}
@@ -256,17 +263,18 @@
             </ion-row>
           </ion-label>
 
-          <ion-button
-            slot="end"
-            fill="clear"
-            (click)="confirmFriendInvitation(friendSuggested, i, $event)"
-          >
-            <ion-icon
-              [id]="'add'+i"
-              name="person-add"
-              slot="icon-only"
-            ></ion-icon>
-          </ion-button>
+          <!-- Boutons Accept / Refuse directement visibles -->
+          <div slot="end" class="inv-btn-group">
+            <button class="inv-bubble inv-bubble-accept"
+                    (click)="confirmFriendInvitation(friendSuggested, i, $event)">
+              <ion-icon [id]="'add'+i" name="checkmark-outline"></ion-icon>
+            </button>
+            <button class="inv-bubble inv-bubble-refuse"
+                    (click)="declineFriendInvit(friendSuggested, i)">
+              <ion-icon name="close-outline"></ion-icon>
+            </button>
+          </div>
+
         </ion-item>
       </ion-item-sliding>
     </ion-list>
