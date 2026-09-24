@@ -113,7 +113,7 @@ ion-item {
   --border-radius: 0;
   --padding-start: var(--d-space-3);
   --inner-padding-end: var(--d-space-3);
-  --inner-border-width: 1px;
+  --inner-border-width: 0 0 1px 0; // trait du bas uniquement (pas de trait vertical)
   --border-color: var(--d-surface-3);
   --min-height: 68px;
   margin-bottom: 0;

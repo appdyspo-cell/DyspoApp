@@ -3,20 +3,29 @@
 .dyspo-tab-bar {
   --background: var(--d-surface-1);
   --border: none;
-  // Hauteur dynamique : 56px d'icônes + inset navigation Android
-  height: calc(56px + env(safe-area-inset-bottom, 0px));
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  // Zone basse réservée à la barre système (home indicator iOS / navigation Android)
+  --tab-bar-inset: env(safe-area-inset-bottom, 0px);
+  // Hauteur dynamique : 50px d'icônes + inset système
+  height: calc(50px + var(--tab-bar-inset));
+  padding-bottom: var(--tab-bar-inset);
   box-shadow: 0 -1px 0 var(--d-surface-3), 0 -4px 16px rgba(26, 29, 35, 0.06);
   border-top: none;
+}
+
+// iOS : le home indicator peut chevaucher une partie de l'inset (34px) sans gêner,
+// comme les tab bars natives → on n'en garde que 20px pour une barre plus compacte.
+:host-context(.plt-ios) .dyspo-tab-bar {
+  --tab-bar-inset: max(0px, calc(env(safe-area-inset-bottom, 0px) - 14px));
 }
 
 .dyspo-tab-btn {
   --color:         var(--d-text-tertiary);
   --color-selected: var(--d-brand);
-  --padding-top: 10px;
-  --padding-bottom: 8px;
+  --padding-top: 5px;
+  --padding-bottom: 5px;
   flex-direction: column;
-  gap: 4px;
+  justify-content: center;
+  gap: 3px;
   position: relative;
 
   // Indicateur actif — ligne en haut de l'onglet
@@ -47,7 +56,7 @@
   }
 
   ion-icon {
-    font-size: 28px;
+    font-size: 26px;
     margin: 0;
     transition: transform var(--d-duration-base) var(--d-spring);
   }
@@ -57,7 +66,7 @@
   }
 
   .tab-icon-sli {
-    font-size: 28px;
+    font-size: 26px;
     line-height: 1;
     color: inherit;
     transition: transform var(--d-duration-base) var(--d-spring);

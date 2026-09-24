@@ -25,6 +25,10 @@
 	<false />
 	<key>LSRequiresIPhoneOS</key>
 	<true />
+	<key>NSCalendarsUsageDescription</key>
+	<string>Dyspo ajoute vos événements à votre calendrier lorsque vous le demandez.</string>
+	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
+	<string>Dyspo ajoute vos événements à votre calendrier lorsque vous le demandez.</string>
 	<key>NSCameraUsageDescription</key>
 	<string
     >L'application vous permet d' ajouter une photo à votre profile et ajouter des pièces jointes à vos messages dans le chat</string>

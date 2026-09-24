@@ -402,12 +402,18 @@ ion-searchbar {
 // ── Footer fixe Enregistrer ───────────────────────────────────────────────────
 
 .save-event-footer {
+  // Même espace au-dessus et en dessous du bouton. Sur iPhone, le home indicator
+  // peut chevaucher une partie de l'inset (34px) → on n'en garde que 20px.
+  --save-footer-pad: max(var(--d-space-3), calc(env(safe-area-inset-bottom, 0px) - 14px));
+
   ion-toolbar {
     --background: var(--d-surface-1);
     --padding-start: var(--d-space-4);
     --padding-end: var(--d-space-4);
-    --padding-top: var(--d-space-3);
-    --padding-bottom: calc(var(--d-space-3) + env(safe-area-inset-bottom));
+    --padding-top: var(--save-footer-pad);
+    --padding-bottom: var(--save-footer-pad);
+    // Neutralise l'inset déjà ajouté par global.scss et par Ionic (ion-footer iOS)
+    padding-bottom: 0 !important;
     box-shadow: 0 -4px 20px rgba(26, 29, 35, 0.10);
   }
 }
@@ -496,6 +502,12 @@ ion-datetime {
   --ion-color-primary: var(--d-brand-dark);
   --ion-color-primary-shade: var(--ion-color-tertiary-shade);
   --ion-color-primary-contrast: #fff;
+
+  // iOS : la grille des jours remplit la hauteur du composant (350px par défaut),
+  // ce qui serre les lignes → on agrandit pour aérer les dates.
+  &.ios {
+    min-height: 410px;
+  }
 }
 
 .time-pick-btn {

@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { ActionSheetController } from '@ionic/angular';
+import { ActionSheetController, Platform } from '@ionic/angular';
+import { Device } from '@capacitor/device';
+import { CapacitorCalendar } from '@ebarooni/capacitor-calendar';
 import { format, parseISO } from 'date-fns';
 import { AgendaEvent } from 'src/app/models/models';
 import { environment } from 'src/environments/environment';
@@ -12,7 +14,10 @@ export class CalendarService {
     ? 'https://dyspo-2bb43.web.app'
     : 'https://dyspo-test.web.app';
 
-  constructor(private actionSheetCtrl: ActionSheetController) {}
+  constructor(
+    private actionSheetCtrl: ActionSheetController,
+    private platform: Platform,
+  ) {}
 
   async promptAddToCalendar(event: AgendaEvent) {
     const sheet = await this.actionSheetCtrl.create({
@@ -27,14 +32,23 @@ export class CalendarService {
             return true;
           },
         },
-        {
-          text: 'Calendrier Apple / Outlook',
-          icon: 'calendar-outline',
-          handler: () => {
-            this.exportICS(event);
-            return true;
+        this.platform.is('ios') && this.platform.is('capacitor')
+          ? {
+            text: 'Calendrier iPhone',
+            icon: 'calendar-outline',
+            handler: () => {
+              this.addToNativeCalendar(event);
+              return true;
+            },
+          }
+          : {
+            text: 'Calendrier Apple / Outlook',
+            icon: 'calendar-outline',
+            handler: () => {
+              this.exportICS(event);
+              return true;
+            },
           },
-        },
         {
           text: 'Annuler',
           role: 'cancel',
@@ -74,6 +88,41 @@ export class CalendarService {
 
   private toGcalDate(iso: string): string {
     return format(parseISO(iso), "yyyyMMdd'T'HHmmss");
+  }
+
+  // ── Calendrier natif iOS ───────────────────────────────────────────────────
+
+  /**
+   * Ouvre la fiche « Nouvel événement » native d'iOS pré-remplie.
+   * L'utilisateur choisit le calendrier puis valide avec « Ajouter ».
+   * Sur iOS 17+ aucune permission n'est nécessaire (fiche système hors process) ;
+   * avant iOS 17, un accès au calendrier doit être demandé au préalable.
+   */
+  private async addToNativeCalendar(event: AgendaEvent) {
+    try {
+      const { osVersion } = await Device.getInfo();
+      if (parseInt(osVersion, 10) < 17) {
+        const { result } = await CapacitorCalendar.requestWriteOnlyCalendarAccess();
+        if (result !== 'granted') {
+          // Accès refusé → repli sur le fichier .ics
+          await this.exportICS(event);
+          return;
+        }
+      }
+
+      const webLink = `${this.hostingBase}/event/${event.uid}`;
+      await CapacitorCalendar.createEventWithPrompt({
+        title: event.title || 'Événement dyspo',
+        startDate: parseISO(event.startISO).getTime(),
+        endDate: parseISO(event.endISO).getTime(),
+        location: event.place_description || undefined,
+        description: [webLink, event.description].filter(Boolean).join('\n\n'),
+        url: webLink,
+      });
+    } catch (err) {
+      console.error('[CalendarService] addToNativeCalendar failed, fallback ICS', err);
+      await this.exportICS(event);
+    }
   }
 
   // ── iCal (.ics) ───────────────────────────────────────────────────────────
