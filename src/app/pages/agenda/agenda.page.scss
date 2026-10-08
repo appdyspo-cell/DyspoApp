@@ -289,3 +289,9 @@ ion-list {
 
   ion-icon { font-size: 22px; }
 }
+
+// Événements passés grisés dans la liste sous le calendrier
+ion-item.past-event {
+  opacity: 0.45;
+  filter: grayscale(1);
+}

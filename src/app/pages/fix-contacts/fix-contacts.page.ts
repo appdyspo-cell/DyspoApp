@@ -3,17 +3,13 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
-  OnInit,
+  OnDestroy,
   QueryList,
-  TemplateRef,
-  ViewChild,
   ViewChildren,
-  ViewContainerRef,
 } from '@angular/core';
 import { Contacts } from '@capacitor-community/contacts';
-import { ContactPayload } from '@capacitor-community/contacts';
 import { Share } from '@capacitor/share';
-import { IonItemGroup, Platform } from '@ionic/angular';
+import { Platform } from '@ionic/angular';
 import { AppDeviceContact } from 'src/app/models/models';
 import { FriendsService } from 'src/app/services/friends.service';
 import { LoggerService } from 'src/app/services/logger.service';
@@ -21,24 +17,35 @@ import { UserService } from 'src/app/services/user.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { environment } from 'src/environments/environment';
 
+type ContactGroup = { letter: string; contacts: AppDeviceContact[] };
+
+/**
+ * Marqueur posé pendant le chargement de la page. S'il est encore présent à
+ * l'ouverture suivante, c'est que la WebView a planté pendant le chargement
+ * (iOS la recharge alors sur la même page → boucle de plantages). On n'enchaîne
+ * pas un nouveau chargement automatique dans ce cas.
+ */
+const LOADING_MARKER_KEY = 'dyspo_contacts_page_loading';
+const LOADING_MARKER_MAX_AGE_MS = 2 * 60 * 1000;
+
 @Component({
     selector: 'app-fix-contacts',
     templateUrl: './fix-contacts.page.html',
     styleUrls: ['./fix-contacts.page.scss'],
     standalone: false
 })
-export class FixContactsPage implements OnInit, AfterViewInit {
-  @ViewChild('mainContainer', { read: ViewContainerRef })
-  container!: ViewContainerRef;
-  @ViewChild('itemGroup', { read: TemplateRef })
-  templateGroup!: TemplateRef<any>;
-  @ViewChildren(IonItemGroup, { read: ElementRef }) itemGroups!: QueryList<any>;
-  contacts: ContactPayload[] = [];
+export class FixContactsPage implements AfterViewInit, OnDestroy {
+  @ViewChildren('groupEl', { read: ElementRef }) groupEls!: QueryList<ElementRef<HTMLElement>>;
+
   appContacts: AppDeviceContact[] = [];
-  appContactsGrouped: { letter: string; contacts: AppDeviceContact[] }[] = [];
+  appContactsGrouped: ContactGroup[] = [];
+  /** Groupes réellement affichés (ajoutés progressivement pour ne pas bloquer l'UI) */
+  renderedGroups: ContactGroup[] = [];
   scroll = false;
   /** true si la permission contacts a été refusée */
   permissionDenied = false;
+  /** true si la page a planté au chargement précédent */
+  crashRecovery = false;
   colors = [
     '#a2b9bc',
     '#6b5b95',
@@ -52,6 +59,9 @@ export class FixContactsPage implements OnInit, AfterViewInit {
   inputSearch = '';
   autocompleteItems: AppDeviceContact[] = [];
 
+  private renderTimer: ReturnType<typeof setTimeout> | null = null;
+  private destroyed = false;
+
   constructor(
     private userSvc: UserService,
     private utils: UtilsService,
@@ -61,16 +71,43 @@ export class FixContactsPage implements OnInit, AfterViewInit {
     private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {}
+  ngAfterViewInit() {
+    if (this.readLoadingMarker()) {
+      this.clearLoadingMarker();
+      this.crashRecovery = true;
+      this.logger.sendError(
+        new Error('Contacts page crashed during previous load'),
+        'fixContactsCrashRecovery',
+        this.userSvc.userInfo?.uid!
+      );
+      this.cdr.detectChanges();
+      return;
+    }
+    this.loadContacts();
+  }
 
-  async ngAfterViewInit() {
-    console.log('Fix contacts');
+  ngOnDestroy() {
+    this.destroyed = true;
+    this.stopRendering();
+    this.clearLoadingMarker();
+  }
+
+  /** Bouton « Réessayer » après un plantage */
+  retryAfterCrash() {
+    this.crashRecovery = false;
+    this.cdr.detectChanges();
+    this.loadContacts();
+  }
+
+  private async loadContacts() {
+    this.setLoadingMarker();
     try {
       // ── 1. Permission contacts (mobile uniquement) ─────────────────────────
       if (this.platform.is('ios') || this.platform.is('android')) {
         const perm = await Contacts.requestPermissions();
         if (perm.contacts !== 'granted') {
           this.permissionDenied = true;
+          this.clearLoadingMarker();
           this.cdr.detectChanges();
           return;
         }
@@ -92,33 +129,31 @@ export class FixContactsPage implements OnInit, AfterViewInit {
           this.utils.hideLoader();
         }
       }
+      if (this.destroyed) return;
 
       this.appContactsGrouped = this.friendsSvc.appContactsGrouped;
       this.appContacts = this.friendsSvc.appContacts;
       console.log(`[FixContacts] ${this.appContacts.length} contact(s), ${this.appContactsGrouped.length} groupe(s)`);
 
-      // ── 3. Affichage immédiat avec les données en cache ───────────────────
+      // ── 3. Affichage progressif avec les données en cache ─────────────────
       this.cdr.detectChanges();
-      this.buildData(this.appContactsGrouped);
+      const rendering = this.renderGroups(this.appContactsGrouped);
 
-      // ── 4. Hydratation Firestore (uniquement si pas encore faite) ─────────
-      // Si is_member est déjà connu sur tous les contacts, on ne re-requête pas.
+      // ── 4. Hydratation Firestore, en parallèle de l'affichage ─────────────
+      // Les logos Dyspo apparaissent lot par lot. Si is_member est déjà connu
+      // (hydratation faite lors d'une visite précédente), on ne re-requête pas.
       const alreadyHydrated = this.appContacts.length > 0 &&
-        this.appContacts.some(c => c.is_member !== undefined);
+        this.appContacts.every(c => c.is_member !== undefined);
 
       if (!alreadyHydrated) {
         try {
-          await this.userSvc.hydrateAppContacts(this.appContacts);
+          await this.userSvc.hydrateAppContacts(this.appContacts, () => this.refreshMembers());
         } catch (hydrateErr) {
           console.error('hydrateAppContacts failed, affichage sans statut membre :', hydrateErr);
         }
       }
-
-      // Mettre à jour le flag is_my_friend dans tous les cas
-      this.appContacts.forEach((contact) => {
-        contact.is_my_friend = this.friendsSvc.isMyFriend(contact.uid!);
-      });
-      this.cdr.detectChanges();
+      await rendering;
+      this.refreshMembers();
 
     } catch (err: any) {
       console.error(err);
@@ -127,7 +162,18 @@ export class FixContactsPage implements OnInit, AfterViewInit {
         'fetchContactsData',
         this.userSvc.userInfo?.uid!
       );
+    } finally {
+      this.clearLoadingMarker();
     }
+  }
+
+  /** Met à jour le statut « déjà ami » et rafraîchit l'écran (appelé après chaque lot) */
+  private refreshMembers() {
+    if (this.destroyed) return;
+    this.appContacts.forEach((contact) => {
+      if (contact.uid) contact.is_my_friend = this.friendsSvc.isMyFriend(contact.uid);
+    });
+    this.cdr.detectChanges();
   }
 
   /** Appelé depuis le bouton "Autoriser" quand la permission est refusée */
@@ -136,8 +182,8 @@ export class FixContactsPage implements OnInit, AfterViewInit {
     const perm = await Contacts.requestPermissions();
     if (perm.contacts === 'granted') {
       this.permissionDenied = false;
-      // Vider le container avant de recharger
-      if (this.container) this.container.clear();
+      this.stopRendering();
+      this.renderedGroups = [];
       this.appContacts = [];
       this.appContactsGrouped = [];
       this.cdr.detectChanges();
@@ -145,7 +191,7 @@ export class FixContactsPage implements OnInit, AfterViewInit {
       this.appContactsGrouped = this.friendsSvc.appContactsGrouped;
       this.appContacts = this.friendsSvc.appContacts;
       this.cdr.detectChanges();
-      this.buildData(this.appContactsGrouped);
+      await this.renderGroups(this.appContactsGrouped);
     } else {
       this.utils.showToastError(
         'Autorise l\'accès aux contacts dans Paramètres → Applications → Dyspo → Autorisations'
@@ -154,17 +200,9 @@ export class FixContactsPage implements OnInit, AfterViewInit {
   }
 
   scrollToLetter(letter: string) {
-    for (let i = 0; i < this.appContactsGrouped.length; i++) {
-      const group = this.appContactsGrouped[i];
-      if (group.letter == letter) {
-        const group = this.itemGroups.filter((element, index) => index === i);
-        if (group) {
-          const el: any = group[0];
-          el.nativeElement.scrollIntoView();
-        }
-        return;
-      }
-    }
+    const index = this.renderedGroups.findIndex((group) => group.letter === letter);
+    if (index < 0) return;
+    this.groupEls.get(index)?.nativeElement.scrollIntoView();
   }
 
   letterScrollActive(active: boolean) {
@@ -181,11 +219,6 @@ export class FixContactsPage implements OnInit, AfterViewInit {
         (user) =>
           user.display!.toUpperCase().indexOf(pattern.toUpperCase()) >= 0
       );
-      // this.autocompleteItems.forEach((user) => {
-      //   user.is_my_friend = this.friendService.isMyFriend(user.uid);
-      //   console.log(user);
-      // });
-      console.log('Results ', this.autocompleteItems);
     }
   }
 
@@ -204,9 +237,6 @@ export class FixContactsPage implements OnInit, AfterViewInit {
       this.friendsSvc.inviteFromDeviceContact(contact, true);
     } else {
       this.shareApp();
-      // this.utils.showToastSuccess(
-      //   "Non membre. Inviter à installer l'application"
-      // );
     }
   }
 
@@ -218,32 +248,69 @@ export class FixContactsPage implements OnInit, AfterViewInit {
     });
   }
 
-  async buildData(groups: { letter: string; contacts: AppDeviceContact[] }[]) {
-    const ITEMS_RENDERED_AT_ONCE = 6;
+  trackByLetter(_: number, group: ContactGroup) {
+    return group.letter;
+  }
+
+  trackByContact(_: number, contact: AppDeviceContact) {
+    return contact.contactId || contact.phone_number;
+  }
+
+  /** Ajoute les groupes à l'écran par petits lots pour garder l'UI fluide */
+  private renderGroups(groups: ContactGroup[]): Promise<void> {
+    const GROUPS_PER_BATCH = 4;
     const INTERVAL_IN_MS = 40;
-    let currentIndex = 0;
-    const length = groups.length;
+    this.stopRendering();
+    this.renderedGroups = [];
 
-    const interval = setInterval(() => {
-      console.log('-------Create Next fragment . Index ' + currentIndex);
-      const nextIndex = currentIndex + ITEMS_RENDERED_AT_ONCE;
-
-      for (let n = currentIndex; n <= nextIndex; n++) {
-        if (n >= length) {
-          clearInterval(interval);
-          break;
+    return new Promise((resolve) => {
+      let index = 0;
+      const step = () => {
+        if (this.destroyed) {
+          resolve();
+          return;
         }
-        const appContactGrouped = groups[n];
-        if (appContactGrouped) {
-          console.log(appContactGrouped);
-          this.container.createEmbeddedView(this.templateGroup, {
-            $implicit: appContactGrouped,
-          });
+        this.renderedGroups = this.renderedGroups.concat(
+          groups.slice(index, index + GROUPS_PER_BATCH)
+        );
+        index += GROUPS_PER_BATCH;
+        this.cdr.detectChanges();
+        if (index < groups.length) {
+          this.renderTimer = setTimeout(step, INTERVAL_IN_MS);
+        } else {
+          this.renderTimer = null;
+          resolve();
         }
-      }
+      };
+      step();
+    });
+  }
 
-      currentIndex += ITEMS_RENDERED_AT_ONCE + 1;
-      console.log('-------Fragment created . Next Index ' + currentIndex);
-    }, INTERVAL_IN_MS);
+  private stopRendering() {
+    if (this.renderTimer) {
+      clearTimeout(this.renderTimer);
+      this.renderTimer = null;
+    }
+  }
+
+  private readLoadingMarker(): boolean {
+    try {
+      const value = Number(localStorage.getItem(LOADING_MARKER_KEY));
+      return !!value && Date.now() - value < LOADING_MARKER_MAX_AGE_MS;
+    } catch {
+      return false;
+    }
+  }
+
+  private setLoadingMarker() {
+    try {
+      localStorage.setItem(LOADING_MARKER_KEY, String(Date.now()));
+    } catch {}
+  }
+
+  private clearLoadingMarker() {
+    try {
+      localStorage.removeItem(LOADING_MARKER_KEY);
+    } catch {}
   }
 }

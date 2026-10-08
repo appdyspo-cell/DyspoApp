@@ -163,6 +163,7 @@
       <ion-item
         *ngFor="let agendaEvent of eventsForDate; let i=index "
         lines="full"
+        [class.past-event]="isPastEvent(agendaEvent)"
         (click)="openEvent(agendaEvent)"
       >
         <div

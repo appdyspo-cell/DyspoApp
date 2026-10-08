@@ -35,12 +35,23 @@
     </ion-button>
   </div>
 
+  <!-- Plantage au chargement précédent : pas de rechargement automatique -->
+  <div *ngIf="crashRecovery" class="crash-recovery">
+    <ion-icon name="alert-circle-outline"></ion-icon>
+    <ion-text>
+      Le répertoire n'a pas pu s'afficher la dernière fois.
+    </ion-text>
+    <ion-button (click)="retryAfterCrash()" expand="block">
+      Réessayer
+    </ion-button>
+  </div>
+
   <!-- Liste vide (permission accordée mais aucun contact valide) -->
   <div
     id="container-suggestions"
     class="ion-justify-content-center"
     style="display: flex; width: 100%; align-items: center; padding: 16px"
-    *ngIf="appContacts.length === 0 && !permissionDenied"
+    *ngIf="appContacts.length === 0 && !permissionDenied && !crashRecovery"
   >
     <ion-icon
       name="person-outline"
@@ -103,62 +114,50 @@
       </ion-buttons>
     </ion-item>
   </ion-list>
-  <ng-container #mainContainer> </ng-container>
+  <!-- Liste des contacts : lignes HTML simples (pas d'ion-item) pour limiter
+       la mémoire de la WebView avec de gros répertoires -->
+  <section
+    #groupEl
+    class="contact-group"
+    *ngFor="let appContactGrouped of renderedGroups; trackBy: trackByLetter"
+  >
+    <div class="contact-letter">{{ appContactGrouped.letter }}</div>
+    <div
+      class="contact-row"
+      *ngFor="let contact of appContactGrouped.contacts; let j=index; trackBy: trackByContact"
+      (click)="confirmFriendInvitation(contact)"
+    >
+      <img
+        *ngIf="contact.avatar"
+        class="contact-avatar-img"
+        [src]="contact.avatar"
+        loading="lazy"
+        alt=""
+      />
+      <div
+        *ngIf="!contact.avatar"
+        class="contact-avatar"
+        [style.background-color]="colors[j % colors.length]"
+      >
+        {{ contact.initials }}
+      </div>
+      <span class="contact-name">{{ contact.display }}</span>
+      <ion-icon
+        *ngIf="contact.is_member===true && !contact.is_my_friend"
+        class="contact-add"
+        name="add-circle-outline"
+        color="primary"
+      ></ion-icon>
+      <img
+        *ngIf="contact.is_member===true"
+        class="contact-member"
+        src="assets/logo.svg"
+        alt=""
+      />
+    </div>
+  </section>
 </ion-content>
 <app-alphabet-scroll
   (letterSelected)="scrollToLetter($event)"
   (scrollingLetter)="letterScrollActive($event)"
 ></app-alphabet-scroll>
-
-<ng-template #itemGroup let-appContactGrouped>
-  <ion-item-group>
-    <ion-item-divider sticky="true">
-      <ion-label>{{ appContactGrouped.letter }}</ion-label>
-    </ion-item-divider>
-
-    <ion-item
-      *ngFor="let contact of appContactGrouped.contacts; let j=index"
-      (click)="confirmFriendInvitation(contact)"
-    >
-      <div slot="start" class="avatar-container">
-        <ion-thumbnail class="thumb" *ngIf="contact.avatar">
-          <img src="{{contact.avatar}}" />
-        </ion-thumbnail>
-        <div
-          *ngIf="!contact.avatar"
-          [style.background-color]="colors[j % colors.length]"
-          class="avatar"
-        >
-          {{contact.initials}}
-        </div>
-      </div>
-      <div>
-        <div class="d-flex">
-          <ion-text> {{ contact.display }} </ion-text>
-          <!-- <ion-thumbnail *ngIf="contact.is_member===true">
-            <img src="assets/logo.svg" />
-          </ion-thumbnail> -->
-        </div>
-
-        <!-- <ion-note *ngIf="contact.is_my_friend"> Vous êtes ami </ion-note> -->
-      </div>
-
-      <ion-buttons slot="end" style="padding-right: 15px">
-        <ion-button
-          size="large"
-          *ngIf="contact.is_member===true && !contact.is_my_friend"
-        >
-          <ion-icon
-            name="add-circle-outline"
-            slot="icon-only"
-            color="primary"
-          ></ion-icon>
-        </ion-button>
-
-        <ion-thumbnail *ngIf="contact.is_member===true">
-          <img src="assets/logo.svg" />
-        </ion-thumbnail>
-      </ion-buttons>
-    </ion-item>
-  </ion-item-group>
-</ng-template>

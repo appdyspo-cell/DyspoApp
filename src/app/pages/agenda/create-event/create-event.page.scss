@@ -494,7 +494,9 @@ ion-searchbar {
 }
 
 ion-datetime {
-  display: block;
+  // flex (et non block) : indispensable pour que la grille des jours occupe
+  // toute la hauteur, sinon les lignes s'écrasent et la bulle déborde.
+  display: flex;
   max-width: 340px;
   margin: 0 auto;
   --background: var(--d-surface-1);
@@ -503,10 +505,10 @@ ion-datetime {
   --ion-color-primary-shade: var(--ion-color-tertiary-shade);
   --ion-color-primary-contrast: #fff;
 
-  // iOS : la grille des jours remplit la hauteur du composant (350px par défaut),
-  // ce qui serre les lignes → on agrandit pour aérer les dates.
+  // iOS : les lignes de jours se répartissent dans la hauteur du composant
+  // (350px par défaut, trop serré avec 6 semaines) → ~43px par ligne.
   &.ios {
-    min-height: 410px;
+    min-height: 360px;
   }
 }
 

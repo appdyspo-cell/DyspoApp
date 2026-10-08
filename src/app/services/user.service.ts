@@ -253,46 +253,68 @@ export class UserService {
     }
   }
 
-  async hydrateAppContacts(appContacts: AppDeviceContact[]) {
-    // BC-04: remplacement du full scan par une requête chunked sur les numéros de téléphone
-    // Prépare les numéros au format stocké en DB (préfixe '0' + 9 derniers chiffres)
-    const phoneNumbers = appContacts
+  /**
+   * Indique pour chaque contact du téléphone s'il est membre Dyspo.
+   * Requêtes par lots de 30 numéros (limite Firestore pour 'in'), plusieurs lots
+   * en parallèle. `onProgress` est appelé après chaque lot pour que l'écran
+   * affiche les logos Dyspo au fur et à mesure.
+   */
+  async hydrateAppContacts(appContacts: AppDeviceContact[], onProgress?: () => void) {
+    // Contacts regroupés par numéro au format stocké en DB ('0' + 9 derniers chiffres)
+    const contactsByPhone = new Map<string, AppDeviceContact[]>();
+    appContacts
       .filter(c => c.phone_number)
-      .map(c => '0' + c.phone_number);
+      .forEach(c => {
+        const phone = '0' + c.phone_number;
+        const list = contactsByPhone.get(phone) ?? [];
+        list.push(c);
+        contactsByPhone.set(phone, list);
+      });
 
+    const phoneNumbers = [...contactsByPhone.keys()];
     if (phoneNumbers.length === 0) {
       this.logger.logDebug('hydrateAppContacts: aucun contact à hydrater');
       return;
     }
 
-    const allUsers: AppUser[] = [];
-    const collectionUserRef = collection(this.firestore, 'users');
-
-    // Chunks de 10 (limite Firestore pour 'in')
+    const CHUNK_SIZE = 30;
+    const PARALLEL_QUERIES = 4;
     const chunks: string[][] = [];
-    for (let i = 0; i < phoneNumbers.length; i += 10) {
-      chunks.push(phoneNumbers.slice(i, i + 10));
+    for (let i = 0; i < phoneNumbers.length; i += CHUNK_SIZE) {
+      chunks.push(phoneNumbers.slice(i, i + CHUNK_SIZE));
     }
 
-    for (const chunk of chunks) {
-      const q = query(collectionUserRef, where('phoneNumber', 'in', chunk));
-      const snaps = await getDocs(q);
+    const collectionUserRef = collection(this.firestore, 'users');
+    const hydrateChunk = async (chunk: string[]) => {
+      const snaps = await getDocs(query(collectionUserRef, where('phoneNumber', 'in', chunk)));
+      const members = new Map<string, AppUser>();
       snaps.forEach((snap) => {
-        allUsers.push(snap.data() as AppUser);
+        const user = snap.data() as AppUser;
+        members.set(user.phoneNumber!, user);
       });
-    }
+      chunk.forEach((phone) => {
+        const found = members.get(phone);
+        contactsByPhone.get(phone)?.forEach((appContact) => {
+          if (found) {
+            appContact.uid = found.uid;
+            appContact.avatar = found.avatarPath;
+            appContact.is_member = true;
+          } else {
+            appContact.is_member = false;
+          }
+        });
+      });
+      onProgress?.();
+    };
 
-    appContacts.forEach((appContact) => {
-      const targetPhone = '0' + appContact.phone_number;
-      const found = allUsers.find(user => user.phoneNumber === targetPhone);
-      if (found) {
-        appContact.uid = found.uid;
-        appContact.avatar = found.avatarPath;
-        appContact.is_member = true;
-      } else {
-        appContact.is_member = false;
+    // Plusieurs lots en vol en même temps, sans tout lancer d'un coup
+    let next = 0;
+    const worker = async () => {
+      while (next < chunks.length) {
+        await hydrateChunk(chunks[next++]);
       }
-    });
+    };
+    await Promise.all(Array.from({ length: Math.min(PARALLEL_QUERIES, chunks.length) }, worker));
     this.logger.logDebug('hydrateAppContacts: hydratation OK');
   }
 

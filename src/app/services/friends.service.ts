@@ -660,8 +660,6 @@ export class FriendsService {
               }
             }
           }
-        } else {
-          console.log('Skip contact ', contact);
         }
       } catch (err: any) {
         console.error(err);

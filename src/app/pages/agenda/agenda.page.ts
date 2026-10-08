@@ -439,6 +439,11 @@ export class AgendaPage implements AfterViewInit {
     }
   }
 
+  /** Événement terminé (heure de fin dépassée) → affiché grisé dans la liste */
+  isPastEvent(agendaEvent: AgendaEvent): boolean {
+    return parseISO(agendaEvent.endISO).getTime() < Date.now();
+  }
+
   getAgendaEventsForDate(ts: number) {
     this.eventsForDate = [];
     this.eventsForDate = this.agendaEvents.filter(

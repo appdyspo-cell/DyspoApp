@@ -36,3 +36,97 @@ ion-header {
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
     rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
 }
+
+// ── Liste des contacts (HTML simple, léger en mémoire) ───────────────────────
+
+.contact-group {
+  // Le navigateur ne calcule pas le rendu des groupes hors écran
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
+
+.contact-letter {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 6px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ion-color-medium);
+  background: var(--ion-color-light);
+}
+
+.contact-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding: 5px 20px 5px 16px;
+  border-bottom: 1px solid var(--ion-color-step-150, #e4e4e4);
+  cursor: pointer;
+
+  &:active {
+    background: var(--ion-color-step-50, #f2f2f2);
+  }
+}
+
+.contact-avatar,
+.contact-avatar-img {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.contact-avatar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  font-weight: 600;
+  filter: brightness(120%);
+}
+
+.contact-avatar-img {
+  object-fit: cover;
+}
+
+.contact-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-add {
+  flex-shrink: 0;
+  font-size: 28px;
+}
+
+.contact-member {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  // Laisse la place à la barre de lettres A–Z à droite
+  margin-right: 10px;
+}
+
+.crash-recovery {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px 24px;
+  text-align: center;
+
+  ion-icon {
+    font-size: 52px;
+    color: var(--ion-color-medium);
+  }
+
+  ion-button {
+    width: 100%;
+    max-width: 280px;
+  }
+}
