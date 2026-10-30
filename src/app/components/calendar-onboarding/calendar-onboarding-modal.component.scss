@@ -148,6 +148,13 @@
   margin-bottom: 24px;
 }
 
+// Précision entre parenthèses : en minuscules, malgré le titre en majuscules
+.week-hint {
+  text-transform: none;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
 .week-label {
   font-size: 0.8rem;
   font-weight: 700;

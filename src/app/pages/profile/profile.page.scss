@@ -165,6 +165,22 @@ ion-item {
     margin-bottom: 10px;
   }
 
+  .custody-week-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--d-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+
+    // Précision entre parenthèses : en minuscules, malgré le titre en majuscules
+    .week-hint {
+      text-transform: none;
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+  }
+
   .custody-week {
     display: flex;
     justify-content: space-between;

@@ -133,7 +133,7 @@
             </ion-label>
 
             <!-- Semaine 1 -->
-            <div class="custody-week-label">Semaine 1</div>
+            <div class="custody-week-label">Semaine 1 <span class="week-hint">(semaine actuelle)</span></div>
             <div class="custody-week">
               <div
                 *ngFor="let day of weekDays; let i = index"
@@ -144,7 +144,7 @@
             </div>
 
             <!-- Semaine 2 -->
-            <div class="custody-week-label">Semaine 2</div>
+            <div class="custody-week-label">Semaine 2 <span class="week-hint">(semaine prochaine)</span></div>
             <div class="custody-week">
               <div
                 *ngFor="let day of weekDays; let i = index"

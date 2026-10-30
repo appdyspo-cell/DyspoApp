@@ -54,7 +54,7 @@
     </p>
 
     <div class="custody-section">
-      <p class="week-label">Semaine 1</p>
+      <p class="week-label">Semaine 1 <span class="week-hint">(semaine actuelle)</span></p>
       <div class="custody-week">
         <div
           *ngFor="let day of weekDays; let i = index"
@@ -64,7 +64,7 @@
         >{{ day }}</div>
       </div>
 
-      <p class="week-label" style="margin-top: 14px">Semaine 2</p>
+      <p class="week-label" style="margin-top: 14px">Semaine 2 <span class="week-hint">(semaine prochaine)</span></p>
       <div class="custody-week">
         <div
           *ngFor="let day of weekDays; let i = index"

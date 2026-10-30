@@ -127,6 +127,7 @@
         <ion-label class="custody-label">
           Jours de garde <ion-text color="medium">(sur 2 semaines)</ion-text>
         </ion-label>
+        <div class="custody-week-label">Semaine 1 <span class="week-hint">(semaine actuelle)</span></div>
         <div class="custody-week">
           <div
             *ngFor="let day of weekDays; let i = index"
@@ -135,6 +136,7 @@
             (click)="toggleCustodyDay(i)"
           >{{ day }}</div>
         </div>
+        <div class="custody-week-label">Semaine 2 <span class="week-hint">(semaine prochaine)</span></div>
         <div class="custody-week">
           <div
             *ngFor="let day of weekDays; let i = index"

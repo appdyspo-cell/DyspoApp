@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
@@ -19,28 +18,78 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.liaisongraphique.dyspo.stg</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>dyspo</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>REPLACE_WITH_GOOGLE_REVERSED_CLIENT_ID</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fbREPLACE_WITH_FACEBOOK_APP_ID</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>FacebookAppID</key>
+	<string>REPLACE_WITH_FACEBOOK_APP_ID</string>
+	<key>FacebookClientToken</key>
+	<string>REPLACE_WITH_FACEBOOK_CLIENT_TOKEN</string>
+	<key>FacebookDisplayName</key>
+	<string>Dyspo! stg</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
-	<false />
+	<false/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>fbapi</string>
+		<string>fbauth2</string>
+		<string>fb-messenger-share-api</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
-	<true />
+	<true/>
 	<key>NSCalendarsUsageDescription</key>
 	<string>Dyspo ajoute vos événements à votre calendrier lorsque vous le demandez.</string>
 	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
 	<string>Dyspo ajoute vos événements à votre calendrier lorsque vous le demandez.</string>
 	<key>NSCameraUsageDescription</key>
-	<string
-    >L'application vous permet d' ajouter une photo à votre profile et ajouter des pièces jointes à vos messages dans le chat</string>
+	<string>L'application vous permet d' ajouter une photo à votre profile et ajouter des pièces jointes à vos messages dans le chat</string>
 	<key>NSContactsUsageDescription</key>
-	<string
-    >L'accès à vos contacts permet d'inviter vos amis à utiliser l'application. Ces données ne sont pas collectées sur nos serveurs.</string>
+	<string>L'accès à vos contacts permet d'inviter vos amis à utiliser l'application. Ces données ne sont pas collectées sur nos serveurs.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string
-    >L'application souhaite accéder à votre galerie pour ajouter des pièces jointes à vos messages dans le chat</string>
+	<string>L'application souhaite accéder à votre galerie pour ajouter des pièces jointes à vos messages dans le chat</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string
-    >L'application souhaite accéder à votre galerie pour ajouter des pièces jointes à vos messages dans le chat</string>
+	<string>L'application souhaite accéder à votre galerie pour ajouter des pièces jointes à vos messages dans le chat</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneConfigurationName</key>
+					<string>Default Configuration</string>
+					<key>UISceneDelegateClassName</key>
+					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+					<key>UISceneStoryboardFile</key>
+					<string>Main</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
@@ -67,42 +116,6 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<true />
-	<!-- Connexion sociale : remplacer REPLACE_WITH_... par les vraies valeurs (voir guide de configuration) -->
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLName</key>
-			<string>com.liaisongraphique.dyspo.stg</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>dyspo</string>
-			</array>
-		</dict>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>REPLACE_WITH_GOOGLE_REVERSED_CLIENT_ID</string>
-			</array>
-		</dict>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>fbREPLACE_WITH_FACEBOOK_APP_ID</string>
-			</array>
-		</dict>
-	</array>
-	<key>FacebookAppID</key>
-	<string>REPLACE_WITH_FACEBOOK_APP_ID</string>
-	<key>FacebookClientToken</key>
-	<string>REPLACE_WITH_FACEBOOK_CLIENT_TOKEN</string>
-	<key>FacebookDisplayName</key>
-	<string>Dyspo! stg</string>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>fbapi</string>
-		<string>fbauth2</string>
-		<string>fb-messenger-share-api</string>
-	</array>
+	<true/>
 </dict>
 </plist>
