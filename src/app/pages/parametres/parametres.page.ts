@@ -153,7 +153,11 @@ export class ParametresPage implements OnInit {
       : undefined;
 
     if (this.userInfo?.custody_schedule?.length === 14) {
-      this.custodyDays = [...this.userInfo.custody_schedule];
+      // Semaine 1 affichée = semaine actuelle (le planning stocké suit le cycle d'origine)
+      this.custodyDays = this.agendaSvc.custodyPatternForCurrentWeek(
+        this.userInfo.custody_schedule,
+        this.userInfo.dyspo_ref_monday_ms
+      );
     } else {
       this.custodyDays = new Array(14).fill(false);
     }

@@ -740,6 +740,28 @@ export class AgendaService {
   }
 
   /**
+   * Returns the 14-day custody pattern re-ordered so that week 1 is the current week.
+   * The stored pattern is relative to `refMondayMs` (cycle start). After an odd number
+   * of weeks, the stored week 1 is actually next week, so the two halves are swapped.
+   * Saving this pattern with applyCustodySchedule() (which restarts the cycle this
+   * Monday) keeps the calendar unchanged.
+   */
+  custodyPatternForCurrentWeek(schedule: boolean[], refMondayMs?: number): boolean[] {
+    const pattern = [...schedule];
+    if (pattern.length !== 14 || !refMondayMs) return pattern;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const jsDay = today.getDay();
+    const thisMonday = new Date(today);
+    thisMonday.setDate(today.getDate() + (jsDay === 0 ? -6 : 1 - jsDay));
+
+    const weeks = Math.round((thisMonday.getTime() - refMondayMs) / (7 * 86400000));
+    const isOdd = ((weeks % 2) + 2) % 2 === 1;
+    return isOdd ? [...pattern.slice(7), ...pattern.slice(0, 7)] : pattern;
+  }
+
+  /**
    * Pre-fills the user's dyspo calendar for 12 months.
    *
    * options.refMondayMs  — timestamp of the original reference Monday (for renewals,

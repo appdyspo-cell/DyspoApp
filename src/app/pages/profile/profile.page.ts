@@ -99,16 +99,18 @@ export class ProfilePage implements OnInit {
       this.user = user;
       this.getAcademies();
       this.originalEmail = this.user.email;
-      if (user.custody_schedule?.length === 14) {
-        this.custodyDays = [...user.custody_schedule];
+      // Semaine 1 affichée = semaine actuelle (le planning stocké suit le cycle d'origine)
+      const currentPattern = user.custody_schedule?.length === 14
+        ? this.agendaSvc.custodyPatternForCurrentWeek(user.custody_schedule, user.dyspo_ref_monday_ms)
+        : undefined;
+      if (currentPattern) {
+        this.custodyDays = currentPattern;
       }
       // Mémoriser le planning initial une seule fois (premier chargement),
       // pour détecter si le planning change réellement lors de la sauvegarde.
       if (!this.custodySettingsLoaded) {
         this.originalWithKids = user.with_kids ?? false;
-        this.originalCustodyDays = user.custody_schedule?.length === 14
-          ? [...user.custody_schedule]
-          : new Array(14).fill(false);
+        this.originalCustodyDays = currentPattern ?? new Array(14).fill(false);
         this.custodySettingsLoaded = true;
       }
       console.log('user subscription profile page', user);
@@ -228,9 +230,8 @@ export class ProfilePage implements OnInit {
         }
       }
     } else {
-      if (this.user.with_kids) {
-        this.user.custody_schedule = [...this.custodyDays];
-      }
+      // custody_schedule n'est pas écrit ici : applyCustodySchedule() l'enregistre avec
+      // le bon point de départ du cycle, uniquement quand le planning change.
       try {
         await this.utils.showLoader();
         await this.userSvc.updateUser(Object.assign({}, this.user));
