@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 npm start                  # Dev server (ionic serve, port 8101)
 npm run build              # Production build → www/
 npm test                   # Karma/Jasmine unit tests
-npm run lint               # ESLint + Angular ESLint
+npm run lint               # ESLint + Angular ESLint — currently broken (ESLint 7 vs @angular-eslint 17 incompatibility)
 
 # Mobile builds (swaps capacitor config via configure.js, then syncs)
 npm run ios-prod           # Production → iOS
@@ -17,6 +17,9 @@ npm run android-prod       # Production → Android
 npm run android-stg        # Staging → Android
 npm run web-prod           # Production → ionic serve
 npm run web-stg            # Staging → ionic serve
+
+# Deploy debug APK directly to connected Android phone (staging)
+node scripts/deploy-phone.js   # builds android-stg, assembles debug APK, installs via adb
 
 # npm install requires --legacy-peer-deps due to @angular-eslint/schematics peer conflict
 npm install --legacy-peer-deps
@@ -39,7 +42,9 @@ Current versionCode: **62** (v1.4.0). Always check Play Console for the last use
 
 **Key split**: Firestore pour toutes les données structurées (users, events, friends, dyspos, chat messages). Les messages de chat sont stockés dans `agenda_events/{uid}/messages_list` (Firestore), pas dans Realtime Database.
 
-**Environment management**: `src/environments/environment.ts` (staging) / `environment.prod.ts` (production). `configure.js` copies environment-specific Capacitor configs from `cap-configs/{platform}/` to `capacitor.config.ts`. Never manually edit `capacitor.config.ts` — use the npm scripts.
+**Environment management**: `src/environments/environment.ts` (staging) / `environment.prod.ts` (production). Both are in `.gitignore` — never commit them. `configure.js` copies environment-specific Capacitor configs from `cap-configs/{platform}/` to `capacitor.config.ts`. Never manually edit `capacitor.config.ts` — use the npm scripts.
+
+Key fields in environment files: `firebaseConfig`, `googleMapsApiKey`, `appCheckDebugToken` (generate in Firebase Console → App Check → Debug tokens for the staging project; leave empty in prod — native builds use Play Integrity / App Attest).
 
 ## Service Layer
 
@@ -54,7 +59,7 @@ All services use `providedIn: 'root'` and are initialized after login via `initS
 | `ChatService` | Group chat, messages Firestore (`agenda_events/{uid}/messages_list`), pagination |
 | `NotificationService` | FCM, local notifications, notification routing |
 | `MediaService` | Camera/gallery, Firebase Storage uploads. `saveToGallery()` uses `Filesystem` (write to cache) + `Share` (system share sheet) — **not** `@capacitor-community/media` (removed, see constraints) |
-| `CalendarService` | Export events to Google Calendar (URL) or ICS file; includes event description, location, and `dyspo://event/<uid>` deep link |
+| `CalendarService` | Export events to Google Calendar (URL), native iOS calendar sheet (`@ebarooni/capacitor-calendar` — iOS only), or ICS file (Android/web fallback); includes event description, location, and `dyspo://event/<uid>` deep link |
 | `UtilsService` | Toast/Alert/Loading UI, Firebase error → French message mapping |
 | `LoggerService` | Debug logging, error submission to Firestore |
 
@@ -118,6 +123,8 @@ Android 15 enforces edge-to-edge display. Use `env(safe-area-inset-bottom)` at t
 - **`Contacts.requestPermissions()`** must always be wrapped in a `platform.is('ios') || platform.is('android')` check before calling — the Capacitor web implementation throws `Not implemented on web` which propagates to Angular's error handler even inside try/catch via Zone.js.
 - **iOS UIScene lifecycle is mandatory** — apps built with the iOS 27 SDK (Xcode 27+) are killed at launch on iOS 27 unless they adopt UIScene (crash in `_UIApplicationEvaluateRuntimeIssueForNoSceneLifecycleAdoption`). Capacitor 7 does not provide it, so `ios/{prod,stg}/App/App/SceneDelegate.swift` plus a `UIApplicationSceneManifest` entry in each `Info.plist` were added by hand. Incoming URLs now arrive in `SceneDelegate` and are forwarded to `ApplicationDelegateProxy` so `appUrlOpen` keeps working. Do not remove them, and re-check them after any `npx cap add ios` or Capacitor upgrade.
 - **`@angular/fire` v20 injection context warnings** — Firebase APIs (`getDoc`, `onSnapshot`, etc.) called inside Firestore snapshot callbacks run outside Angular's injection context. These appear as `console.warn` in `angular-fire.mjs`. They don't crash the app but indicate calls should be wrapped with `runInInjectionContext` or moved to service constructors. This is a known systemic issue — do not silence the warnings by patching `angular-fire.mjs`.
+- **Firebase App Check** is implemented in `app.module.ts` via `provideAppCheck()`. On native platforms, it uses `@capacitor-firebase/app-check` (Play Integrity on Android, App Attest on iOS) via `CustomProvider`. On web, it uses a debug token from `environment.appCheckDebugToken`. App Check is currently in **monitoring mode** (not enforced) — to enforce, go to Firebase Console → App Check → each app → enforce, but only after all active users have upgraded.
+- **`npm run lint` is currently broken** — ESLint 7.32 is installed but `@angular-eslint` 17.5 requires ESLint 8+. This is a pre-existing incompatibility; `npm run build` succeeds and is the reliable correctness check.
 
 ## i18n
 
