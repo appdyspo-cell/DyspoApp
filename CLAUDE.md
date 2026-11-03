@@ -34,7 +34,7 @@ The signed AAB must be generated from Android Studio (not CLI) — the keystore 
 3. Android Studio → `android/prod/` → **Build > Generate Signed Bundle** → release variant
 4. Upload `android/prod/app/release/app-release.aab` to Play Console
 
-Current versionCode: **63** (v1.4.1). Always check Play Console for the last used versionCode before bumping — Play Console rejects codes already submitted even if unpublished.
+Current versionCode: **64** (v1.4.2). Always check Play Console for the last used versionCode before bumping — Play Console rejects codes already submitted even if unpublished.
 
 ## Architecture
 

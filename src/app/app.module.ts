@@ -30,9 +30,6 @@ import { provideStorage, getStorage } from '@angular/fire/storage';
 import { Capacitor } from '@capacitor/core';
 import { getFunctions, provideFunctions } from '@angular/fire/functions';
 import { getDatabase, provideDatabase } from '@angular/fire/database';
-import { provideAppCheck } from '@angular/fire/app-check';
-import { initializeAppCheck, CustomProvider } from 'firebase/app-check';
-import { FirebaseAppCheck } from '@capacitor-firebase/app-check';
 import { CalendarModule } from './calendar';
 import { HammerModule } from '@angular/platform-browser';
 
@@ -60,35 +57,6 @@ export function createTranslateLoader(http: HttpClient) {
         AppRoutingModule], providers: [
         { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
         provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
-        provideAppCheck(() => {
-            const app = getApp();
-            if (Capacitor.isNativePlatform()) {
-                // Android: Play Integrity — iOS: App Attest (via @capacitor-firebase/app-check)
-                return initializeAppCheck(app, {
-                    provider: new CustomProvider({
-                        getToken: () =>
-                            FirebaseAppCheck.getToken().then((r: { token: string; expireTimeMillis?: number }) => ({
-                                token: r.token,
-                                expireTimeMillis: r.expireTimeMillis ?? Date.now() + 3_600_000,
-                            })),
-                    }),
-                    isTokenAutoRefreshEnabled: true,
-                });
-            }
-            // Web: token de debug (App Check en mode monitoring — non enforced)
-            if (environment.appCheckDebugToken) {
-                (window as any).FIREBASE_APPCHECK_DEBUG_TOKEN = environment.appCheckDebugToken;
-            }
-            return initializeAppCheck(app, {
-                provider: new CustomProvider({
-                    getToken: async () => ({
-                        token: environment.appCheckDebugToken || 'web-debug',
-                        expireTimeMillis: Date.now() + 3_600_000,
-                    }),
-                }),
-                isTokenAutoRefreshEnabled: false,
-            });
-        }),
         provideAuth(() => {
             if (Capacitor.isNativePlatform()) {
                 return initializeAuth(getApp(), { persistence: indexedDBLocalPersistence });
