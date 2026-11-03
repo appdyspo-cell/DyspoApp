@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Auth, User, authState, user } from '@angular/fire/auth';
-import { ModalController, NavController, Platform } from '@ionic/angular';
+import { AlertController, ModalController, NavController, Platform } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
 import { UserService } from './services/user.service';
@@ -12,11 +12,13 @@ import { NotificationService } from './services/notification.service';
 import { environment } from 'src/environments/environment';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { App } from '@capacitor/app';
+import { Browser } from '@capacitor/browser';
 import { UtilsService } from './services/utils.service';
 import { Contacts } from '@capacitor-community/contacts';
 import { AppUser } from './models/models';
 import { CustodyRenewalModalComponent, CustodyRenewalResult } from './components/custody-renewal/custody-renewal-modal.component';
 import { CalendarOnboardingModalComponent, CalendarOnboardingResult } from './components/calendar-onboarding/calendar-onboarding-modal.component';
+import { RemoteConfig, fetchAndActivate, getValue } from '@angular/fire/remote-config';
 
 @Component({
     selector: 'app-root',
@@ -37,6 +39,8 @@ export class AppComponent {
     private translate: TranslateService,
     private navController: NavController,
     private modalCtrl: ModalController,
+    private alertCtrl: AlertController,
+    private remoteConfig: RemoteConfig,
 
     private userSvc: UserService,
     private logger: LoggerService,
@@ -99,6 +103,7 @@ export class AppComponent {
               this.navController.navigateRoot('/tabs');
               setTimeout(() => {
                 this.hideStartupLoader();
+                this.checkForUpdate();
                 // Popup unique de 1ère configuration (utilisateurs existants sans calendrier)
                 // checkFirstCalendarSetup s'enchaîne avec checkCustodyRenewal si besoin.
                 this.checkFirstCalendarSetup(appUser).then(() => {
@@ -272,6 +277,68 @@ export class AppComponent {
       this.utils.hideLoader();
       this.utils.showToastError(err as string);
     }
+  }
+
+  private async checkForUpdate(): Promise<void> {
+    if (!this.platform.is('ios') && !this.platform.is('android')) return;
+
+    try {
+      this.remoteConfig.settings = {
+        minimumFetchIntervalMillis: 3600000,
+        fetchTimeoutMillis: 10000,
+      };
+      this.remoteConfig.defaultConfig = {
+        android_min_version: '0.0.0',
+        ios_min_version: '0.0.0',
+        android_store_url: 'https://play.google.com/store/apps/details?id=com.liaisongraphique.dyspo',
+        ios_store_url: 'https://apps.apple.com/app/dyspo/id6472632999',
+      };
+      await fetchAndActivate(this.remoteConfig);
+
+      const appInfo = await App.getInfo();
+      const currentVersion = appInfo.version; // e.g. "1.4.2"
+
+      const minVersionKey = this.platform.is('ios') ? 'ios_min_version' : 'android_min_version';
+      const storeUrlKey   = this.platform.is('ios') ? 'ios_store_url'   : 'android_store_url';
+
+      const minVersion = getValue(this.remoteConfig, minVersionKey).asString();
+      const storeUrl   = getValue(this.remoteConfig, storeUrlKey).asString();
+
+      if (!minVersion || !storeUrl) return;
+
+      if (this.compareVersions(currentVersion, minVersion) < 0) {
+        const alert = await this.alertCtrl.create({
+          header: 'Mise à jour disponible',
+          message: `Une nouvelle version de Dyspo est disponible. Mettez à jour l'application pour continuer à profiter de toutes les fonctionnalités.`,
+          backdropDismiss: false,
+          buttons: [
+            {
+              text: 'Plus tard',
+              role: 'cancel',
+            },
+            {
+              text: 'Mettre à jour',
+              handler: () => {
+                Browser.open({ url: storeUrl });
+              },
+            },
+          ],
+        });
+        await alert.present();
+      }
+    } catch (err) {
+      this.logger.logDebug('checkForUpdate error (ignored)', err);
+    }
+  }
+
+  private compareVersions(a: string, b: string): number {
+    const pa = a.split('.').map(Number);
+    const pb = b.split('.').map(Number);
+    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+      const diff = (pa[i] ?? 0) - (pb[i] ?? 0);
+      if (diff !== 0) return diff;
+    }
+    return 0;
   }
 
   private hideStartupLoader() {

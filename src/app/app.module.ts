@@ -30,6 +30,7 @@ import { provideStorage, getStorage } from '@angular/fire/storage';
 import { Capacitor } from '@capacitor/core';
 import { getFunctions, provideFunctions } from '@angular/fire/functions';
 import { getDatabase, provideDatabase } from '@angular/fire/database';
+import { getRemoteConfig, provideRemoteConfig } from '@angular/fire/remote-config';
 import { CalendarModule } from './calendar';
 import { HammerModule } from '@angular/platform-browser';
 
@@ -67,6 +68,7 @@ export function createTranslateLoader(http: HttpClient) {
         provideStorage(() => getStorage()),
         provideFunctions(() => getFunctions()),
         provideDatabase(() => getDatabase()),
+        provideRemoteConfig(() => getRemoteConfig()),
         provideHttpClient(withInterceptorsFromDi()),
     ] })
 export class AppModule {
