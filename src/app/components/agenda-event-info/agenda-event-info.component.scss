@@ -211,6 +211,21 @@
   gap: 10px;
   padding: 10px 0;
   border-top: 1px solid var(--d-surface-2);
+
+  &--tappable {
+    cursor: pointer;
+    align-items: center;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.12s ease;
+    &:active { opacity: 0.6; }
+  }
+}
+
+.ev-info-maps-icon {
+  font-size: 18px;
+  color: var(--ion-color-medium);
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .ev-info-icon {

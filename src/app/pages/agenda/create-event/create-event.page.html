@@ -15,6 +15,7 @@
   <div class="header-form-ct">
     <div class="profile">
       <div class="input-title">
+        <span class="required-star">*</span>
         <ion-input
           maxlength="50"
           autocapitalize="sentences"
@@ -214,6 +215,7 @@
               [endTime]="endTime"
               (friendSelected)="onFriendSelected($event)"
               (groupSelected)="onGroupSelected($event)"
+              (allInSelected)="onAllIn($event)"
             ></app-friends-selector>
           </div>
         </div>

@@ -2,7 +2,7 @@ import { Component, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { ModalController, NavController, SelectChangeEventDetail } from '@ionic/angular';
+import { AlertController, ModalController, NavController, SelectChangeEventDetail } from '@ionic/angular';
 import { IonSelectCustomEvent } from '@ionic/core';
 import { Preferences } from '@capacitor/preferences';
 import { HelperComponent } from 'src/app/components/helper/helper.component';
@@ -141,7 +141,8 @@ export class CreateEventPage implements OnInit, OnDestroy {
     private notificationsSvc: NotificationService,
     private logger: LoggerService,
     private zone: NgZone,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private alertCtrl: AlertController
   ) {
     this.uid = this.userSvc.userInfo?.uid!;
     if ((window as any).google?.maps?.places) {
@@ -475,6 +476,10 @@ export class CreateEventPage implements OnInit, OnDestroy {
           this.utils.showToastError("L'heure de fin doit être après l'heure de début");
           return;
         }
+        if (this.mode === 'new' && this.agendaEvent.members_invited_uid.length === 0) {
+          this.utils.showToastError('Invitez au moins un participant pour créer l\'événement');
+          return;
+        }
         this.agendaEvent.all_can_edit = this.allCanEdit;
         this.agendaEvent.all_can_see_title = this.allCanSeeTitle;
         //Recurrence
@@ -756,6 +761,115 @@ export class CreateEventPage implements OnInit, OnDestroy {
 
   async onGroupSelected(checkedFriends: CheckedFriends[]) {
     this.tagCheckedFriends(checkedFriends);
+  }
+
+  /** "All in" : sélectionne le groupe ET suggère les 3 meilleures dates. */
+  async onAllIn(memberUids: string[]) {
+    if (!memberUids || memberUids.length === 0) return;
+
+    this.utils.showLoader();
+    let dyspoMap: Map<string, any[]>;
+    try {
+      dyspoMap = await this.agendaSvc.getGroupDysposForPeriod(memberUids, 30);
+    } finally {
+      this.utils.hideLoader();
+    }
+
+    // ── Analyse : score chaque jour des 30 prochains ─────────────────────────
+    interface Suggestion { date: Date; available: number; total: number; label: string; }
+    const suggestions: Suggestion[] = [];
+    const today = new Date();
+
+    for (let i = 1; i <= 30; i++) {
+      const date = addDays(today, i);
+      const y = getYear(date);
+      const m = getMonth(date); // 0-indexed, same as AgendaDyspoItem
+      const d = getDate(date);
+
+      let available = 0;
+      for (const uid of memberUids) {
+        const items = dyspoMap.get(uid) || [];
+        const item = items.find(
+          (it: any) => it.year === y && it.month === m && it.day === d
+        );
+        const status = item?.userDyspo ?? UserDyspoStatus.UNDEFINED;
+        if (status === UserDyspoStatus.DYSPO || status === UserDyspoStatus.DYSPOWITHKIDS) {
+          available++;
+        }
+      }
+
+      if (available > 0) {
+        const dayName = format(date, 'eeee d MMMM', { locale: fr });
+        const emoji = available === memberUids.length ? '🟢' : available >= memberUids.length / 2 ? '🟡' : '🔴';
+        suggestions.push({
+          date,
+          available,
+          total: memberUids.length,
+          label: `${emoji} ${dayName} — ${available}/${memberUids.length} dispo`,
+        });
+      }
+    }
+
+    // Top 3 par disponibilité décroissante
+    const top3 = suggestions
+      .sort((a, b) => b.available - a.available)
+      .slice(0, 3);
+
+    if (top3.length === 0) {
+      await this.utils.showToastError('Aucune disponibilité commune trouvée sur les 30 prochains jours.');
+      return;
+    }
+
+    // ── Affichage dans un Alert ───────────────────────────────────────────────
+    const alert = await this.alertCtrl.create({
+      header: '✨ All in — Meilleures dates',
+      subHeader: `Pour ${memberUids.length} membre${memberUids.length > 1 ? 's' : ''}`,
+      cssClass: 'dyspo-alert-allin',
+      inputs: top3.map((s, idx) => ({
+        type: 'radio' as const,
+        label: s.label,
+        value: s.date,
+        checked: idx === 0,
+      })),
+      buttons: [
+        { text: 'Annuler', role: 'cancel' },
+        {
+          text: 'Choisir cette date',
+          handler: (selectedDate: Date) => {
+            if (!selectedDate || !this.agendaEvent) return;
+            // Applique la date tout en conservant l'heure existante
+            const currentStart = parseISO(this.agendaEvent.startISO);
+            const currentEnd   = parseISO(this.agendaEvent.endISO);
+            const duration = currentEnd.getTime() - currentStart.getTime();
+            const newStart = set(selectedDate, {
+              hours: getHours(currentStart),
+              minutes: getMinutes(currentStart),
+              seconds: 0,
+            });
+            const newEnd = new Date(newStart.getTime() + duration);
+            this.applyNewStartEnd(newStart, newEnd);
+          },
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  /** Met à jour les dates début/fin de l'événement et recalcule les champs formatés. */
+  private applyNewStartEnd(newStart: Date, newEnd: Date) {
+    if (!this.agendaEvent) return;
+    this.agendaEvent.startISO           = formatISO(newStart);
+    this.agendaEvent.endISO             = formatISO(newEnd);
+    this.agendaEvent.start_date_ts      = setHours(newStart, 0).getTime();
+    this.agendaEvent.end_date_ts        = setHours(newEnd, 23).getTime();
+    this.agendaEvent.start_date_formatted = format(newStart, 'eeee d MMMM yyyy', { locale: fr });
+    this.agendaEvent.end_date_formatted   = format(newEnd,   'eeee d MMMM yyyy', { locale: fr });
+    this.agendaEvent.start_time_formatted = format(newStart, 'HH:mm');
+    this.agendaEvent.end_time_formatted   = format(newEnd,   'HH:mm');
+    this.agendaEvent.ref_start_ISO        = format(newStart, 'yyyy-MM-dd');
+    this.agendaEvent.ref_end_ISO          = format(newEnd,   'yyyy-MM-dd');
+    this.agendaEvent.start_date_day_of_year = getDayOfYear(newStart);
+    this.agendaEvent.end_date_day_of_year   = getDayOfYear(newEnd);
   }
 
   async tagCheckedFriends(checkedFriends: CheckedFriends[]) {

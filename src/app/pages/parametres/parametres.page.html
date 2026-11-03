@@ -159,6 +159,24 @@
               <span class="legend-dot dot-green"></span> Sans enfants
             </div>
 
+            <!-- Sélecteur de semaine de référence -->
+            <div class="custody-ref-week">
+              <span class="custody-label">La Semaine 1 commence :</span>
+              <div class="custody-week-toggle">
+                <button
+                  class="week-toggle-btn"
+                  [class.week-toggle-btn--active]="!custodyStartIsNextWeek"
+                  (click)="custodyStartIsNextWeek = false"
+                >Cette semaine</button>
+                <button
+                  class="week-toggle-btn"
+                  [class.week-toggle-btn--active]="custodyStartIsNextWeek"
+                  (click)="custodyStartIsNextWeek = true"
+                >Sem. prochaine</button>
+              </div>
+              <span class="custody-ref-label">Semaine 1 = lun. {{ getCustodyWeekLabel() }}</span>
+            </div>
+
             <ion-button
               expand="block"
               class="dyspo-button"

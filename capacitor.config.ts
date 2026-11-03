@@ -3,36 +3,35 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.liaisongraphique.dyspo',
-  appName: 'dyspo!',
+  appId: 'com.rovincent.dyspo.staging',
+  appName: 'Dyspo! stg',
   webDir: 'www',
   server: {
     androidScheme: 'https',
   },
   plugins: {
     FirebaseMessaging: {
-      presentationOptions: ['sound'],
+      presentationOptions: ['badge', 'sound', 'alert'],
     },
 
     FirebaseAuthentication: {
       skipNativeAuth: false,
-      providers: ['google.com'],
+      providers: ['google.com', 'apple.com', 'facebook.com'],
     },
 
     SplashScreen: {
       launchShowDuration: 0,
       launchAutoHide: true,
-      androidSplashResourceName: 'splash',
     },
   },
   ios: {
-    path: 'ios/prod',
+    path: 'ios/stg',
     appendUserAgent: 'ios:application',
-    webContentsDebuggingEnabled: false,
+    webContentsDebuggingEnabled: true,
   },
   android: {
-    path: 'android/prod',
-    webContentsDebuggingEnabled: false,
+    path: 'android/stg',
+    webContentsDebuggingEnabled: true,
   },
 };
 

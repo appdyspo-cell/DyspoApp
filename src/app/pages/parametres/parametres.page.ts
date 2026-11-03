@@ -1,4 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { addDays, format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 import { Router } from '@angular/router';
 import {
@@ -40,6 +42,7 @@ export class ParametresPage implements OnInit {
 
   readonly weekDays = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
   custodyDays: boolean[] = new Array(14).fill(false);
+  custodyStartIsNextWeek = false;
   isSavingSchedule = false;
 
   presentingElement: any;
@@ -167,14 +170,37 @@ export class ParametresPage implements OnInit {
     this.custodyDays[index] = !this.custodyDays[index];
   }
 
+  private getThisMonday(): Date {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const jsDay = today.getDay();
+    const daysToMonday = jsDay === 0 ? -6 : 1 - jsDay;
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + daysToMonday);
+    return monday;
+  }
+
+  getCustodyRefMonday(): Date {
+    const base = this.getThisMonday();
+    return this.custodyStartIsNextWeek ? addDays(base, 7) : base;
+  }
+
+  getCustodyWeekLabel(): string {
+    const monday = this.getCustodyRefMonday();
+    const sunday = addDays(monday, 6);
+    return `${format(monday, 'd MMM', { locale: fr })} – ${format(sunday, 'd MMM', { locale: fr })}`;
+  }
+
   async saveCustodySchedule() {
     this.isSavingSchedule = true;
     try {
       this.userInfo.custody_schedule = [...this.custodyDays];
       await this.userSvc.updateUser(Object.assign({}, this.userInfo));
+      const refMondayMs = this.getCustodyRefMonday().getTime();
       await this.agendaSvc.applyCustodySchedule(
         this.userSvc.userInfo!.uid,
-        this.custodyDays
+        this.custodyDays,
+        { refMondayMs, startFromMs: refMondayMs }
       );
       this.utils.showToastSuccess('Planning de garde appliqué au calendrier !');
     } finally {

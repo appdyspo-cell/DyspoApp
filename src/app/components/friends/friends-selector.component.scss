@@ -136,6 +136,61 @@ ion-item:last-child {
   }
 }
 
+// ── Header groupe ────────────────────────────────────────────────────────────
+
+.group-header-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px 0;
+  gap: 8px;
+}
+
+.group-label {
+  font-size: 1rem;
+  flex: 1;
+}
+
+.group-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.group-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px 4px;
+
+  ion-button {
+    --border-color: var(--d-brand);
+    --color: var(--d-brand);
+    font-size: 0.8rem;
+    flex: 1;
+  }
+
+  .all-in-btn {
+    flex: 1;
+  }
+}
+
+.all-in-btn {
+  background: var(--d-dyspo, #4caf50);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.12s ease, transform 0.1s ease;
+  &:active { opacity: 0.75; transform: scale(0.94); }
+}
+
 // ── Bouton Inviter par SMS ────────────────────────────────────────────────────
 
 .btn-invite-sms {

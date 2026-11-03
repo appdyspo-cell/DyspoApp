@@ -185,6 +185,44 @@ ion-range {
       &.dot-green { background: var(--d-dyspo); margin-left: var(--d-space-3); }
     }
   }
+
+  .custody-ref-week {
+    margin-bottom: var(--d-space-3);
+
+    .custody-week-toggle {
+      display: flex;
+      gap: 8px;
+      margin: 6px 0 4px;
+    }
+
+    .week-toggle-btn {
+      flex: 1;
+      padding: 7px 0;
+      border-radius: 20px;
+      border: 1.5px solid var(--d-brand, #3586a2);
+      background: transparent;
+      color: var(--d-brand, #3586a2);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+      -webkit-tap-highlight-color: transparent;
+
+      &--active {
+        background: var(--d-brand, #3586a2);
+        color: #fff;
+      }
+
+      &:active { opacity: 0.75; }
+    }
+
+    .custody-ref-label {
+      display: block;
+      font-size: 11px;
+      color: var(--d-text-tertiary);
+      text-align: center;
+    }
+  }
 }
 
 // ── Misc legacy helpers ───────────────────────────────────────────────────────

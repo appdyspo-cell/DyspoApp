@@ -291,8 +291,8 @@ ion-button.btn-invite {
 }
 
 .inv-bubble {
-  width: 40px;
-  height: 40px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   border: none;
   display: flex;
@@ -300,23 +300,44 @@ ion-button.btn-invite {
   justify-content: center;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s ease, opacity 0.12s ease;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 
-  &:active { transform: scale(0.88); opacity: 0.85; }
+  &:active { transform: scale(0.88); }
 
-  ion-icon { font-size: 20px; }
+  .ghost-icon {
+    width: 28px;
+    height: 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  // Glossy shine highlight
+  &::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 12%;
+    width: 76%;
+    height: 40%;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.35);
+    pointer-events: none;
+    z-index: 2;
+  }
 }
 
 .inv-bubble-accept {
-  background: transparent;
-  color: var(--d-dyspo-dark);
-  border: 2px solid var(--d-dyspo-dark);
+  background: radial-gradient(ellipse at 50% 30%, #7de07a, #3ab038);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.85),
+              0 0 18px 5px rgba(58, 180, 56, 0.45);
 }
 
 .inv-bubble-refuse {
-  background: transparent;
-  color: var(--d-no-dyspo);
-  border: 2px solid var(--d-no-dyspo);
+  background: radial-gradient(ellipse at 50% 30%, #f07070, #d03030);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.85),
+              0 0 18px 5px rgba(208, 48, 48, 0.45);
 }
 
 // Désactiver l'effet tap sur l'item entier (avatar et boutons gèrent les actions)

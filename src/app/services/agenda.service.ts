@@ -198,6 +198,10 @@ export class AgendaService {
     this.dysposOnSpnashotCancel = onSnapshot(
       agendaDysposCollectionRef,
       (snapshot) => {
+        // Traiter tous les changements du snapshot en une passe, puis émettre une
+        // seule fois — évite d'appeler tagCalendarUserDyspoData() 365× lors d'un
+        // applyCustodySchedule (batch de 365 writes).
+        let emitAction: 'MODIFIED' | 'ADDED' | 'REMOVED' | null = null;
         snapshot.docChanges().forEach((change) => {
           const agendaDyspoFetched = change.doc.data() as AgendaDyspoItem;
           let foundItem = this.agendaDyspos.find((elt) => {
@@ -205,17 +209,11 @@ export class AgendaService {
           });
           if (change.type === 'modified' && foundItem) {
             foundItem.userDyspo = agendaDyspoFetched.userDyspo;
-            this.agendaDysposSubject.next({
-              action: 'MODIFIED',
-              items: this.agendaDyspos,
-            });
+            emitAction = 'MODIFIED';
           }
           if (change.type === 'added' && !foundItem) {
             this.agendaDyspos.push(agendaDyspoFetched);
-            this.agendaDysposSubject.next({
-              action: 'ADDED',
-              items: this.agendaDyspos,
-            });
+            emitAction = emitAction ?? 'ADDED';
           }
           if (change.type === 'removed') {
             const foundIndex = this.agendaDyspos.findIndex(
@@ -224,12 +222,15 @@ export class AgendaService {
             if (foundIndex >= 0) {
               this.agendaDyspos.splice(foundIndex, 1);
             }
-            this.agendaDysposSubject.next({
-              action: 'REMOVED',
-              items: this.agendaDyspos,
-            });
+            emitAction = emitAction ?? 'REMOVED';
           }
         });
+        if (emitAction) {
+          this.agendaDysposSubject.next({
+            action: emitAction,
+            items: this.agendaDyspos,
+          });
+        }
       }
     );
 
@@ -603,6 +604,41 @@ export class AgendaService {
   }
 
   /**
+   * Récupère les statuts Dyspo de plusieurs membres sur une période (N jours à
+   * partir d'aujourd'hui). Utilisé par le module "All in" pour suggérer les
+   * meilleures dates pour un groupe.
+   * Retourne : Map<uid, AgendaDyspoItem[]>
+   */
+  async getGroupDysposForPeriod(
+    uids: string[],
+    days: number
+  ): Promise<Map<string, AgendaDyspoItem[]>> {
+    const result = new Map<string, AgendaDyspoItem[]>();
+    if (!uids || uids.length === 0) return result;
+
+    const today = new Date();
+    const fromTs = today.getTime();
+    const toTs = add(today, { days }).getTime();
+
+    await Promise.all(
+      uids.map(async (uid) => {
+        try {
+          const q = query(
+            collection(this.firestore, `agenda_dyspos/${uid}/dyspo_list`),
+            where('time', '>=', fromTs),
+            where('time', '<=', toTs)
+          );
+          const snap = await getDocs(q);
+          result.set(uid, snap.docs.map(d => d.data() as AgendaDyspoItem));
+        } catch {
+          result.set(uid, []);
+        }
+      })
+    );
+    return result;
+  }
+
+  /**
    * Charge le statut dyspo d'aujourd'hui pour une liste d'UIDs en une seule
    * vague de requêtes parallèles. Utilisé par la page Amis pour afficher la
    * bulle colorée autour de l'avatar.
@@ -613,6 +649,34 @@ export class AgendaService {
 
     const today = new Date();
     const key = `${getYear(today)}_${getMonth(today)}_${getDate(today)}`;
+
+    await Promise.all(
+      uids.map(async (uid) => {
+        const docRef = doc(this.firestore, `agenda_dyspos/${uid}/dyspo_list`, key);
+        try {
+          const snap = await getDoc(docRef);
+          result.set(uid, snap.exists()
+            ? (snap.data() as AgendaDyspoItem).userDyspo
+            : UserDyspoStatus.UNDEFINED
+          );
+        } catch {
+          result.set(uid, UserDyspoStatus.UNDEFINED);
+        }
+      })
+    );
+
+    return result;
+  }
+
+  /**
+   * Charge le statut dyspo pour une date spécifique pour une liste d'UIDs.
+   * Utilisé par la commande vocale pour répondre à "qui est dyspo le...".
+   */
+  async getDysposForDate(uids: string[], date: Date): Promise<Map<string, UserDyspoStatus>> {
+    const result = new Map<string, UserDyspoStatus>();
+    if (!uids || uids.length === 0) return result;
+
+    const key = `${getYear(date)}_${getMonth(date)}_${getDate(date)}`;
 
     await Promise.all(
       uids.map(async (uid) => {

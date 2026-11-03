@@ -17,7 +17,8 @@
     "web-prod": "npm run build:configure prod && ionic serve -c production",
     "web-stg": "npm run build:configure stg && ionic serve -c development",
     "build:configure": "node configure.js",
-    "postinstall": "node scripts/fix-proguard.js"
+    "postinstall": "node scripts/fix-proguard.js",
+    "deploy-phone": "node scripts/deploy-phone.js"
   },
   "private": true,
   "dependencies": {
