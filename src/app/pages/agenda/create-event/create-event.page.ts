@@ -9,7 +9,6 @@ import { HelperComponent } from 'src/app/components/helper/helper.component';
 
 import {
   add,
-  addDays,
   addHours,
   addMonths,
   addWeeks,
@@ -79,7 +78,6 @@ export class CreateEventPage implements OnInit, OnDestroy {
   end_time_formatted!: string;
   min_time_ISO_start!: string;
   min_time_ISO_end!: string;
-  max_time_ISO_end!: string;
   agendaEvent: AgendaEvent | undefined;
   agendaEventType = AgendaEventType;
   pageTitle = '';
@@ -307,11 +305,7 @@ export class CreateEventPage implements OnInit, OnDestroy {
           this.min_time_ISO_end = formatISO(new Date().getTime());
 
           //}
-          this.max_time_ISO_end = formatISO(
-            addDays(new Date(parseISO(this.min_time_ISO_end)), 30)
-          );
           console.log('min time ', this.min_time_ISO_start);
-          console.log('max time ', this.max_time_ISO_end);
 
           break;
         case 'edit':
@@ -334,9 +328,6 @@ export class CreateEventPage implements OnInit, OnDestroy {
           //this.min_time_ISO_end = this.min_time_ISO_start;
 
           this.min_time_ISO_end = this.agendaEvent!.startISO;
-          this.max_time_ISO_end = formatISO(
-            addDays(new Date(parseISO(this.min_time_ISO_end)), 30)
-          );
           break;
       }
       if (this.is_multi) {
@@ -546,9 +537,6 @@ export class CreateEventPage implements OnInit, OnDestroy {
     );
     this.agendaEvent!.startISO = ev.detail.value;
     this.min_time_ISO_end = ev.detail.value;
-    this.max_time_ISO_end = formatISO(
-      addDays(new Date(parseISO(ev.detail.value)), 30)
-    );
     // this.agendaEvent!.day = getDate(parseISO(this.agendaEvent!.startISO));
     // this.agendaEvent!.month = getMonth(parseISO(this.agendaEvent!.startISO));
     // this.agendaEvent!.year = getYear(parseISO(this.agendaEvent!.startISO));

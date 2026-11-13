@@ -77,8 +77,8 @@
             presentation="date"
             locale="fr-FR"
             firstDayOfWeek="1"
-            [value]="agendaEvent?.startISO"
             [min]="min_time_ISO_start"
+            [value]="agendaEvent?.startISO"
             (ionChange)="onStartDateOnlyChanged($event)"
           ></ion-datetime>
           <button class="time-pick-btn" (click)="showStartClock = true">
@@ -117,9 +117,8 @@
             presentation="date"
             locale="fr-FR"
             firstDayOfWeek="1"
-            [value]="agendaEvent?.endISO"
             [min]="min_time_ISO_end"
-            [max]="max_time_ISO_end"
+            [value]="agendaEvent?.endISO"
             (ionChange)="onEndDateOnlyChanged($event)"
           ></ion-datetime>
           <button class="time-pick-btn" (click)="showEndClock = true">
