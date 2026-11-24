@@ -12,6 +12,8 @@ import {
   addHours,
   addMonths,
   addWeeks,
+  addYears,
+  endOfYear,
   format,
   formatISO,
   getDate,
@@ -78,6 +80,8 @@ export class CreateEventPage implements OnInit, OnDestroy {
   end_time_formatted!: string;
   min_time_ISO_start!: string;
   min_time_ISO_end!: string;
+  // Ionic : sans [max], le sélecteur mois/année ne propose que l'année du [min].
+  max_time_ISO = formatISO(endOfYear(addYears(new Date(), 5)));
   agendaEvent: AgendaEvent | undefined;
   agendaEventType = AgendaEventType;
   pageTitle = '';

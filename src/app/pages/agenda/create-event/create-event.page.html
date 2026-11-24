@@ -78,6 +78,7 @@
             locale="fr-FR"
             firstDayOfWeek="1"
             [min]="min_time_ISO_start"
+            [max]="max_time_ISO"
             [value]="agendaEvent?.startISO"
             (ionChange)="onStartDateOnlyChanged($event)"
           ></ion-datetime>
@@ -118,6 +119,7 @@
             locale="fr-FR"
             firstDayOfWeek="1"
             [min]="min_time_ISO_end"
+            [max]="max_time_ISO"
             [value]="agendaEvent?.endISO"
             (ionChange)="onEndDateOnlyChanged($event)"
           ></ion-datetime>
