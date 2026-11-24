@@ -231,7 +231,7 @@
       src="../../assets/newimg/logo_picto_cgv.png"
       class="logo"
     ></ion-img>
-    <p class="excepTextSize">Version 1.3.5</p>
+    <p class="excepTextSize" *ngIf="appVersion">Version {{ appVersion }}</p>
     <ion-button
       class="dyspo-button"
       color="tertiary"
