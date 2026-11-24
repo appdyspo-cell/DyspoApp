@@ -1,27 +1,55 @@
+// ── Conteneur principal du modal sans header ────────────────────────────────
+.modal-body {
+  position: relative;
+  padding: 20px 16px 0;
+  overflow-y: auto;
+  background: #ffffff;
+}
+
+// ── Bouton fermer discret ────────────────────────────────────────────────────
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--ion-color-light);
+  color: var(--ion-color-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  padding: 0;
+
+  ion-icon { font-size: 20px; }
+}
+
 // ── En-tête ────────────────────────────────────────────────────────────────
 .profile-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24px 16px 20px;
+  padding: 16px 16px 20px;
   text-align: center;
 }
 
 // Avatar avec anneau coloré
 .avatar-wrap {
   position: relative;
-  width: 96px;
-  height: 96px;
+  width: 130px;
+  height: 130px;
   margin-bottom: 14px;
 }
 
 .profile-avatar {
-  width: 96px;
-  height: 96px;
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
   object-fit: cover;
   display: block;
-  // fine bordure neutre par défaut
   border: 3px solid var(--ion-color-light);
 }
 

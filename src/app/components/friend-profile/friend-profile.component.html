@@ -1,15 +1,8 @@
-<ion-header>
-  <ion-toolbar mode="md">
-    <ion-buttons slot="start">
-      <ion-button (click)="close()" color="medium" fill="clear">
-        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-    <ion-title style="color: var(--d-text-secondary)">Fiche</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="modal-body">
 
-<ion-content class="ion-padding">
+  <button class="close-btn" (click)="close()">
+    <ion-icon name="close-outline"></ion-icon>
+  </button>
 
   <!-- ── En-tête : photo + nom + statut dyspo ─────────────────────── -->
   <div class="profile-header">
@@ -150,4 +143,4 @@
 
   </div>
 
-</ion-content>
+</div>

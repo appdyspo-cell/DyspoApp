@@ -11,6 +11,6 @@ function run(cmd, cwd) {
 }
 
 run('npm run android-stg');
-run('gradlew.bat assembleDebug', 'android/stg');
+run('.\\gradlew.bat assembleDebug', 'android/stg');
 run(`adb -s ${DEVICE} install -r ${APK}`);
 run(`adb -s ${DEVICE} shell monkey -p ${PKG} 1`);

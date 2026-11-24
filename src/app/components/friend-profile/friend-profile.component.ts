@@ -13,7 +13,7 @@ import { UtilsService } from 'src/app/services/utils.service';
 })
 export class FriendProfileComponent implements OnInit {
   @Input() user!: AppUser;
-  @Input() isFriend: boolean = true;
+  @Input() isFriend: boolean = false;
   /** true quand on visualise quelqu'un qui NOUS a envoyé une invitation */
   @Input() isPendingInvitation = false;
 
