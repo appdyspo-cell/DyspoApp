@@ -26,15 +26,20 @@ npm install --legacy-peer-deps
 npm uninstall <pkg> --legacy-peer-deps
 ```
 
-## Android Release Builds
+## Releases (iOS + Android together)
 
-The signed AAB must be generated from Android Studio (not CLI) — the keystore is at `D:\DYSPO\keystores\dyspo-upload-key.jks`, alias `dyspo-upload`. Workflow:
-1. Bump `versionCode` and `versionName` in `android/prod/app/build.gradle`
-2. Run `npm run android-prod` to build web assets and sync
-3. Android Studio → `android/prod/` → **Build > Generate Signed Bundle** → release variant
-4. Upload `android/prod/app/release/app-release.aab` to Play Console
+Work happens on two machines (Mac for iOS, Windows PC with the Android keystore). iOS and Android **always ship the same version number** from the same code.
 
 Current versionCode: **65** (v1.4.3). Always check Play Console for the last used versionCode before bumping — Play Console rejects codes already submitted even if unpublished.
+
+1. `git pull` — get what was pushed from the other machine. `ios-prod` / `android-prod` run `scripts/check-sync.js` first and **refuse to build** if the branch is behind `origin`, or if iOS and Android versions differ (emergency bypass: `SKIP_SYNC_CHECK=1`).
+2. `npm run bump` (or `-- minor`, `-- major`, `-- x.y.z`) — `scripts/bump-version.js` sets the same version in `android/prod/app/build.gradle` (versionName, versionCode +1), `ios/prod/App/App.xcodeproj/project.pbxproj` (MARKETING_VERSION, CURRENT_PROJECT_VERSION +1) and `package.json`. If the Play Console already used that versionCode: `npm run bump -- <same version> --android-code <last+1>`. Never edit these numbers by hand.
+3. Commit + `git push` **before** building, so the other machine has it.
+4. `npm run ios-prod` → Xcode → Product > Archive. `npm run android-prod` → Android Studio (`android/prod/`) → **Build > Generate Signed Bundle** → release; keystore `D:\DYSPO\keystores\dyspo-upload-key.jks`, alias `dyspo-upload`; upload `android/prod/app/release/app-release.aab`.
+
+The settings page shows the installed version via `App.getInfo()` — nothing to update in the code.
+
+Release scripts call `ng build` + `cap sync` directly (no global `ionic` CLI needed). iOS `pod install` needs `xcode-select -s /Applications/Xcode.app/Contents/Developer`.
 
 ## Architecture
 

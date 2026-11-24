@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { addDays, format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -28,6 +28,8 @@ import { LoggerService } from 'src/app/services/logger.service';
 import { NotificationService } from 'src/app/services/notification.service';
 import { Browser } from '@capacitor/browser';
 import { Preferences } from '@capacitor/preferences';
+import { App } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 import { ShowHelper } from 'src/app/models/models';
 import { HelperComponent } from 'src/app/components/helper/helper.component';
 
@@ -39,6 +41,8 @@ import { HelperComponent } from 'src/app/components/helper/helper.component';
 })
 export class ParametresPage implements OnInit {
   dyspoStatus = UserDyspoStatus;
+  // Version réellement installée (App Store / Play Store), vide sur le web
+  appVersion = '';
 
   readonly weekDays = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
   custodyDays: boolean[] = new Array(14).fill(false);
@@ -116,14 +120,27 @@ export class ParametresPage implements OnInit {
     private notificationsSvc: NotificationService,
     private modalCtrl: ModalController,
     private utils: UtilsService,
-    private agendaSvc: AgendaService
+    private agendaSvc: AgendaService,
+    private cdr: ChangeDetectorRef
   ) {}
+
+  private async loadAppVersion() {
+    if (!Capacitor.isNativePlatform()) return;
+    try {
+      const info = await App.getInfo();
+      this.appVersion = `${info.version} (${info.build})`;
+      this.cdr.detectChanges();
+    } catch (e) {
+      this.logger.logDebug('App.getInfo indisponible', e);
+    }
+  }
 
   async ngOnInit() {
     this.presentingElement = document.querySelector('.ion-page');
     this.logger.logDebug('ngOnInit Parametres');
 
     this.loadInfos();
+    this.loadAppVersion();
 
     if (this.userSvc.userInfo?.firstConnexion) {
       const { value } = await Preferences.get({ key: ShowHelper.SETTINGS });
