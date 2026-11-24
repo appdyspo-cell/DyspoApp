@@ -11,7 +11,6 @@ import {
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { NavigationExtras } from '@angular/router';
-import { Browser } from '@capacitor/browser';
 import {
   ActionSheetController,
   AlertController,
@@ -432,7 +431,7 @@ export class AgendaEventInfoComponent implements OnInit, OnDestroy {
   openMaps() {
     const query = encodeURIComponent(this.agendaEvent.place_description || '');
     const url = `https://www.google.com/maps/search/?api=1&query=${query}`;
-    Browser.open({ url });
+    this.utils.openUrl(url);
   }
 
   addToCalendar() {

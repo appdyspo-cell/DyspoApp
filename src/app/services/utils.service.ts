@@ -9,6 +9,8 @@ import { environment } from 'src/environments/environment';
 import { LoggerService } from './logger.service';
 import { fr } from 'date-fns/locale';
 import { format, parseISO } from 'date-fns';
+import { Browser } from '@capacitor/browser';
+import { Capacitor } from '@capacitor/core';
 
 @Injectable({
   providedIn: 'root',
@@ -22,6 +24,25 @@ export class UtilsService {
     private loadCtrl: LoadingController,
     private logger: LoggerService
   ) {}
+
+  /**
+   * Ouvre une page web dans le navigateur intégré.
+   * iOS : présentation « popover » obligatoire. En plein écran, le plugin Browser
+   * crée une UIWindow sans windowScene, qu'iOS n'affiche pas depuis l'adoption
+   * du cycle UIScene (SceneDelegate) — rien ne s'ouvrait. En popover, la page
+   * est présentée depuis la vue de l'app (plein écran sur iPhone).
+   */
+  async openUrl(url: string) {
+    try {
+      await Browser.open({
+        url,
+        presentationStyle: Capacitor.getPlatform() === 'ios' ? 'popover' : 'fullscreen',
+      });
+    } catch (e) {
+      this.logger.logDebug('Browser.open a échoué', e);
+      window.open(url, '_blank');
+    }
+  }
 
   // Wrapper of this.logger.logDebug()
   log(message?: any, ...optionalParams: any[]) {

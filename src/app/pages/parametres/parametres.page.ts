@@ -1,6 +1,4 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { addDays, format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 
 import { Router } from '@angular/router';
 import {
@@ -26,7 +24,6 @@ import { EmailComposer } from 'capacitor-email-composer';
 import { LoggerService } from 'src/app/services/logger.service';
 
 import { NotificationService } from 'src/app/services/notification.service';
-import { Browser } from '@capacitor/browser';
 import { Preferences } from '@capacitor/preferences';
 import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
@@ -46,7 +43,6 @@ export class ParametresPage implements OnInit {
 
   readonly weekDays = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
   custodyDays: boolean[] = new Array(14).fill(false);
-  custodyStartIsNextWeek = false;
   isSavingSchedule = false;
 
   presentingElement: any;
@@ -197,15 +193,9 @@ export class ParametresPage implements OnInit {
     return monday;
   }
 
+  // Semaine 1 = semaine actuelle (libellés « semaine actuelle / prochaine »)
   getCustodyRefMonday(): Date {
-    const base = this.getThisMonday();
-    return this.custodyStartIsNextWeek ? addDays(base, 7) : base;
-  }
-
-  getCustodyWeekLabel(): string {
-    const monday = this.getCustodyRefMonday();
-    const sunday = addDays(monday, 6);
-    return `${format(monday, 'd MMM', { locale: fr })} – ${format(sunday, 'd MMM', { locale: fr })}`;
+    return this.getThisMonday();
   }
 
   async saveCustodySchedule() {
@@ -297,9 +287,7 @@ export class ParametresPage implements OnInit {
   }
 
   async openTutorial() {
-    await Browser.open({
-      url: 'https://www.dyspo.app/',
-    });
+    await this.utils.openUrl('https://www.dyspo.app/');
   }
 
   openBlockedUsers() {
