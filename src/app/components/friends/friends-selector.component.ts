@@ -49,6 +49,7 @@ export class FriendsSelectorComponent implements OnInit, OnDestroy {
     checkedFriends: CheckedFriends[];
   }>();
   @Output() groupSelected = new EventEmitter<CheckedFriends[]>();
+  @Output() allInSelected = new EventEmitter<string[]>();
 
   @ViewChild('popoverConfirmInvitEvent') popoverConfirmInvitEvent: any;
 
@@ -258,6 +259,19 @@ export class FriendsSelectorComponent implements OnInit, OnDestroy {
       }
     });
     this.groupSelected.emit(this.checkedFriends);
+  }
+
+  allIn(group: FriendGroup, $event: Event) {
+    $event.stopPropagation();
+    // Sélectionne tous les membres du groupe
+    this.checkedFriends.forEach((item) => {
+      if (group.members_uid.includes(item.friend.friend_uid!)) {
+        item.isChecked = true;
+      }
+    });
+    this.groupSelected.emit(this.checkedFriends);
+    // Émet les UIDs pour la suggestion IA de dates
+    this.allInSelected.emit(group.members_uid);
   }
 
   getDelayClass(index: number): string {

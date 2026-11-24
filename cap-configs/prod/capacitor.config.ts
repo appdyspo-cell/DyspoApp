@@ -11,7 +11,7 @@ const config: CapacitorConfig = {
   },
   plugins: {
     FirebaseMessaging: {
-      presentationOptions: ['sound'],
+      presentationOptions: ['badge', 'sound', 'alert'],
     },
 
     FirebaseAuthentication: {

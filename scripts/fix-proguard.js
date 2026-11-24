@@ -15,6 +15,8 @@ const targets = [
   '@capacitor-firebase/authentication/android/build.gradle',
   '@capacitor-firebase/messaging/android/build.gradle',
   'capacitor-email-composer/android/build.gradle',
+  '@ebarooni/capacitor-calendar/android/build.gradle',
+  '@capacitor-firebase/app-check/android/build.gradle',
 ];
 
 const nodeModules = path.join(__dirname, '..', 'node_modules');

@@ -35,6 +35,7 @@ import {
 } from 'src/app/models/models';
 import { AgendaService } from 'src/app/services/agenda.service';
 import { CalendarService } from 'src/app/services/calendar.service';
+import { FriendsService } from 'src/app/services/friends.service';
 import { UtilsService } from 'src/app/services/utils.service';
 
 import { cloneDeep } from 'lodash';
@@ -104,6 +105,7 @@ export class AgendaPage implements AfterViewInit {
   myDysposForCommon: AgendaDyspoItem[] = [];
   showCommonDatesOnly = false;
 
+
   constructor(
     public agendaSvc: AgendaService,
     public navCtrl: NavController,
@@ -143,14 +145,17 @@ export class AgendaPage implements AfterViewInit {
         //this.agendaDyspos$ = this.agendaSvc.agendaDyspos$;
         this.agendaDysposSubscription = this.agendaSvc.agendaDyspos$.subscribe(
           (agendaDyspos) => {
-            console.log(agendaDyspos.action);
             if (
               agendaDyspos.action === 'ADDED' ||
               agendaDyspos.action === 'MODIFIED'
             ) {
-              this.agendaDyspos = agendaDyspos.items;
-              this.tagCalendarUserDyspoData();
-              this.cdr.detectChanges();
+              // ngZone.run() requis : les callbacks Firestore s'exécutent hors zone
+              // (angular/fire v20) — sans ça, detectChanges() ne met pas à jour la vue
+              this.ngZone.run(() => {
+                this.agendaDyspos = agendaDyspos.items;
+                this.tagCalendarUserDyspoData();
+                this.cdr.detectChanges();
+              });
             }
           }
         );
@@ -737,4 +742,5 @@ export class AgendaPage implements AfterViewInit {
       }
     });
   }
+
 }

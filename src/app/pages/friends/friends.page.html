@@ -267,11 +267,21 @@
           <div slot="end" class="inv-btn-group">
             <button class="inv-bubble inv-bubble-accept"
                     (click)="confirmFriendInvitation(friendSuggested, i, $event)">
-              <ion-icon [id]="'add'+i" name="checkmark-outline"></ion-icon>
+              <svg [id]="'add'+i" class="ghost-icon" viewBox="0 0 24 28" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2,24 L2,12 Q2,2 12,2 Q22,2 22,12 L22,24 Q19.5,20.5 17,24 Q14.5,20.5 12,24 Q9.5,20.5 7,24 Q4.5,20.5 2,24 Z" fill="white"/>
+                <circle cx="9" cy="15" r="2" fill="#2a7a28"/>
+                <circle cx="15" cy="15" r="2" fill="#2a7a28"/>
+              </svg>
             </button>
             <button class="inv-bubble inv-bubble-refuse"
                     (click)="declineFriendInvit(friendSuggested, i)">
-              <ion-icon name="close-outline"></ion-icon>
+              <svg class="ghost-icon" viewBox="0 0 24 28" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2,24 L2,12 Q2,2 12,2 Q22,2 22,12 L22,24 Q19.5,20.5 17,24 Q14.5,20.5 12,24 Q9.5,20.5 7,24 Q4.5,20.5 2,24 Z" fill="white"/>
+                <line x1="7.5" y1="13" x2="10.5" y2="16" stroke="#8a2020" stroke-width="1.8" stroke-linecap="round"/>
+                <line x1="10.5" y1="13" x2="7.5" y2="16" stroke="#8a2020" stroke-width="1.8" stroke-linecap="round"/>
+                <line x1="13.5" y1="13" x2="16.5" y2="16" stroke="#8a2020" stroke-width="1.8" stroke-linecap="round"/>
+                <line x1="16.5" y1="13" x2="13.5" y2="16" stroke="#8a2020" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
             </button>
           </div>
 

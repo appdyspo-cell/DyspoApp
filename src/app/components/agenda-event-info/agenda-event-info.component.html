@@ -80,7 +80,7 @@
         </div>
 
         <!-- Lieu -->
-        <div class="ev-info-row" *ngIf="agendaEvent.place_description">
+        <div class="ev-info-row ev-info-row--tappable" *ngIf="agendaEvent.place_description" (click)="openMaps()">
           <div class="ev-info-icon">
             <ion-icon name="location-outline"></ion-icon>
           </div>
@@ -88,6 +88,7 @@
             <div class="ev-info-label">Lieu</div>
             <div class="ev-info-value lighter">{{ agendaEvent.place_description }}</div>
           </div>
+          <ion-icon name="map-outline" class="ev-info-maps-icon"></ion-icon>
         </div>
 
         <!-- Description -->

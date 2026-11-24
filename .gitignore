@@ -74,6 +74,9 @@ service-account-prod.json
 service-account-stg.json
 firestore-backup.json
 
+# Scripts with test credentials (SENSITIVE - never commit)
+scripts/seed-test-data.js
+
 # Environment files with API keys (SENSITIVE - never commit)
 src/environments/environment.ts
 src/environments/environment.prod.ts
