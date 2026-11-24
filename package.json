@@ -1,6 +1,6 @@
 {
   "name": "dyspo",
-  "version": "1.0.1",
+  "version": "1.4.3",
   "author": "Romain VINCENT",
   "homepage": "https://ionicframework.com/",
   "scripts": {
@@ -10,13 +10,15 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
-    "ios-prod": "npm run build:configure prod && ionic cap sync ios -c production",
-    "ios-stg": "npm run build:configure stg && ionic cap sync ios -c development",
-    "android-prod": "npm run build:configure prod && ionic cap sync android -c production",
-    "android-stg": "npm run build:configure stg && ionic cap sync android -c development",
+    "ios-prod": "node scripts/check-sync.js && npm run build:configure prod && ng build --configuration production && cap sync ios",
+    "ios-stg": "npm run build:configure stg && ng build --configuration development && cap sync ios",
+    "android-prod": "node scripts/check-sync.js && npm run build:configure prod && ng build --configuration production && cap sync android",
+    "android-stg": "npm run build:configure stg && ng build --configuration development && cap sync android",
     "web-prod": "npm run build:configure prod && ionic serve -c production",
     "web-stg": "npm run build:configure stg && ionic serve -c development",
     "build:configure": "node configure.js",
+    "bump": "node scripts/bump-version.js",
+    "check-sync": "node scripts/check-sync.js",
     "postinstall": "node scripts/fix-proguard.js",
     "deploy-phone": "node scripts/deploy-phone.js"
   },
