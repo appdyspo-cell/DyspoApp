@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { NavigationExtras } from '@angular/router';
+import { Capacitor } from '@capacitor/core';
 import {
   ActionSheetController,
   AlertController,
@@ -430,8 +431,14 @@ export class AgendaEventInfoComponent implements OnInit, OnDestroy {
 
   openMaps() {
     const query = encodeURIComponent(this.agendaEvent.place_description || '');
-    const url = `https://www.google.com/maps/search/?api=1&query=${query}`;
-    this.utils.openUrl(url);
+    if (Capacitor.getPlatform() === 'ios') {
+      // Ouvre l'app Plans : un lien externe ouvert via window.open est confié
+      // par Capacitor au système (UIApplication.open), qui route maps.apple.com
+      // vers Plans.
+      window.open(`https://maps.apple.com/?q=${query}`, '_blank');
+      return;
+    }
+    this.utils.openUrl(`https://www.google.com/maps/search/?api=1&query=${query}`);
   }
 
   addToCalendar() {
